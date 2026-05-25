@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Game of Us - Prediction Mode</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#ffb3b0",
+                    "tertiary-fixed": "#ffe173",
+                    "surface-container-highest": "#ffdbd0",
+                    "on-surface-variant": "#584140",
+                    "on-primary-container": "#6d0010",
+                    "inverse-on-surface": "#ffede8",
+                    "secondary-container": "#e7ded9",
+                    "secondary-fixed-dim": "#cec5c0",
+                    "on-primary-fixed-variant": "#8c1520",
+                    "surface-variant": "#ffdbd0",
+                    "surface-dim": "#fbd1c4",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed-variant": "#4b4642",
+                    "inverse-primary": "#ffb3b0",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#ffe9e3",
+                    "surface-container-low": "#fff1ed",
+                    "on-tertiary": "#ffffff",
+                    "background": "#fff8f6",
+                    "tertiary-container": "#caa800",
+                    "surface-bright": "#fff8f6",
+                    "on-tertiary-container": "#4c3e00",
+                    "on-tertiary-fixed-variant": "#554500",
+                    "tertiary-fixed-dim": "#e8c426",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#ffe2da",
+                    "on-secondary-container": "#68615e",
+                    "outline-variant": "#e0bfbd",
+                    "surface": "#fff8f6",
+                    "tertiary": "#705d00",
+                    "on-error-container": "#93000a",
+                    "on-primary": "#ffffff",
+                    "primary": "#ae2f34",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed": "#1f1b18",
+                    "outline": "#8c706f",
+                    "inverse-surface": "#442a22",
+                    "surface-tint": "#ae2f34",
+                    "on-surface": "#2c160e",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#ff6b6b",
+                    "secondary": "#635d59",
+                    "secondary-fixed": "#eae1dc",
+                    "on-tertiary-fixed": "#221b00",
+                    "primary-fixed": "#ffdad8",
+                    "on-background": "#2c160e",
+                    "on-primary-fixed": "#410006"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "container-padding-mobile": "24px",
+                    "base": "8px",
+                    "container-padding-desktop": "48px",
+                    "section-gap": "40px"
+            },
+            "fontFamily": {
+                    "label-md": ["Quicksand"],
+                    "headline-md": ["Quicksand"],
+                    "headline-xl": ["Quicksand"],
+                    "headline-lg-mobile": ["Quicksand"],
+                    "headline-lg": ["Quicksand"],
+                    "body-lg": ["Quicksand"],
+                    "body-md": ["Quicksand"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Quicksand', sans-serif; background-color: #fff8f6; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+        
+        /* Soft Diffusion Shadows */
+        .shadow-soft { box-shadow: 0 4px 16px rgba(174, 47, 52, 0.05); }
+        .shadow-active { box-shadow: 0 8px 24px rgba(174, 47, 52, 0.1); }
+        
+        /* Custom Progress Bar Gradient */
+        .bg-progress-gradient { background: linear-gradient(to right, #ae2f34, #caa800); }
+    </style>
+</head>
+<body class="text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 flex justify-between items-center px-container-padding-desktop py-4 w-full bg-surface shadow-sm shadow-primary/5">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md font-bold text-primary">Game of Us</span>
+</div>
+<div class="flex items-center gap-4 text-primary">
+<button class="hover:bg-primary-container/10 transition-colors active:scale-95 transition-transform p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+<button class="hover:bg-primary-container/10 transition-colors active:scale-95 transition-transform p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Layout -->
+<main class="flex-1 flex max-w-[1440px] mx-auto w-full relative">
+<!-- Left Nav / Status Panel -->
+<aside class="fixed left-0 top-0 h-full w-[300px] hidden md:flex flex-col bg-surface-container-low border-r border-outline-variant/30 pt-[80px] px-6">
+<div class="mt-8 mb-12">
+<div class="inline-flex items-center gap-2 px-4 py-2 bg-tertiary-container/20 rounded-full mb-6">
+<span class="material-symbols-outlined text-tertiary text-sm">psychology</span>
+<span class="font-label-md text-label-md text-tertiary">Tahmin Modu</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Bölüm 1</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Soru 4 / 10</p>
+<!-- Relationship Progress -->
+<div class="w-full bg-surface-container-highest rounded-full h-3 overflow-hidden relative">
+<div class="bg-progress-gradient h-full rounded-full transition-all duration-500 ease-out" style="width: 40%;"></div>
+</div>
+<div class="mt-12">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-4 uppercase tracking-wider">Mevcut Skor</h3>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-primary">350</span>
+<span class="font-body-md text-body-md text-on-surface-variant">puan</span>
+</div>
+</div>
+</div>
+<div class="mt-auto pb-12">
+<button class="w-full py-4 bg-secondary-container text-primary font-label-md text-label-md rounded-full hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">arrow_back</span>
+                      Geri Dön
+                  </button>
+</div>
+</aside>
+<!-- Center Play Area -->
+<section class="flex-1 ml-0 md:ml-[300px] mr-0 md:mr-[300px] px-container-padding-desktop py-12 flex flex-col items-center justify-center min-h-[calc(100vh-80px)]">
+<div class="w-full max-w-[720px] flex flex-col gap-8">
+<!-- Question Card -->
+<div class="bg-surface-container-lowest rounded-[24px] p-8 shadow-soft text-center">
+<span class="material-symbols-outlined text-primary-fixed-dim text-4xl mb-4">forum</span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Boş bir cumartesi gününde ne yapmayı tercih edersin?</h1>
+</div>
+<!-- Options Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
+<!-- Option 1: Inactive -->
+<button class="bg-surface-container-lowest rounded-[24px] p-8 shadow-soft border-2 border-transparent hover:border-primary-fixed-dim hover:shadow-active transition-all group flex flex-col items-center justify-center text-center min-h-[160px]">
+<span class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Evde dinlenmek</span>
+</button>
+<!-- Option 2: Active / Selected -->
+<button class="bg-surface-container-lowest rounded-[24px] p-8 shadow-active border-2 border-primary relative overflow-hidden flex flex-col items-center justify-center text-center min-h-[160px] transform scale-[1.02] transition-all">
+<div class="absolute top-4 right-4 text-primary">
+<span class="material-symbols-outlined fill">check_circle</span>
+</div>
+<span class="font-headline-md text-headline-md text-primary">Dışarı çıkmak</span>
+</button>
+<!-- Option 3: Inactive -->
+<button class="bg-surface-container-lowest rounded-[24px] p-8 shadow-soft border-2 border-transparent hover:border-primary-fixed-dim hover:shadow-active transition-all group flex flex-col items-center justify-center text-center min-h-[160px]">
+<span class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Arkadaşlarla buluşmak</span>
+</button>
+<!-- Option 4: Inactive -->
+<button class="bg-surface-container-lowest rounded-[24px] p-8 shadow-soft border-2 border-transparent hover:border-primary-fixed-dim hover:shadow-active transition-all group flex flex-col items-center justify-center text-center min-h-[160px]">
+<span class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Spontane plan yapmak</span>
+</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-center mt-4">Partnerin ne seçeceğini sonra tahmin edeceksin.</p>
+<div class="mt-8 flex justify-center">
+<button class="bg-primary text-on-primary font-label-md text-label-md rounded-full px-12 py-4 min-h-[56px] text-lg hover:bg-primary/90 transition-colors shadow-soft">
+                        Devam
+                    </button>
+</div>
+</div>
+</section>
+<!-- Right Status Panel -->
+<aside class="fixed right-0 top-0 h-full w-[300px] hidden lg:flex flex-col bg-surface-container-low pt-[80px] px-6">
+<div class="mt-12 bg-surface-container-lowest rounded-[24px] p-6 shadow-soft flex flex-col items-center text-center">
+<div class="relative mb-4">
+<div class="w-20 h-20 rounded-full bg-secondary-container overflow-hidden border-4 border-surface-container-lowest shadow-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant">person</span>
+</div>
+<!-- Typing Indicator Dot -->
+<div class="absolute bottom-0 right-0 w-5 h-5 bg-tertiary rounded-full border-2 border-surface-container-lowest flex items-center justify-center animate-pulse">
+<span class="block w-2 h-2 bg-on-tertiary rounded-full"></span>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Alex</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
+                    Şu an cevaplıyor
+                    <span class="flex gap-1">
+<span class="w-1 h-1 bg-on-surface-variant rounded-full animate-bounce" style="animation-delay: 0s;"></span>
+<span class="w-1 h-1 bg-on-surface-variant rounded-full animate-bounce" style="animation-delay: 0.2s;"></span>
+<span class="w-1 h-1 bg-on-surface-variant rounded-full animate-bounce" style="animation-delay: 0.4s;"></span>
+</span>
+</p>
+</div>
+</aside>
+</main>
+</body></html>

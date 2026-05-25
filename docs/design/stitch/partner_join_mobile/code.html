@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Game of Us - Oyuna Katıl</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline": "#8c706f",
+                    "inverse-primary": "#ffb3b0",
+                    "secondary": "#635d59",
+                    "on-secondary-fixed-variant": "#4b4642",
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed-variant": "#554500",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed": "#410006",
+                    "on-tertiary-fixed": "#221b00",
+                    "secondary-fixed": "#eae1dc",
+                    "inverse-on-surface": "#ffede8",
+                    "surface-variant": "#ffdbd0",
+                    "surface-dim": "#fbd1c4",
+                    "on-background": "#2c160e",
+                    "tertiary": "#705d00",
+                    "surface-bright": "#fff8f6",
+                    "secondary-fixed-dim": "#cec5c0",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed": "#ffdad8",
+                    "on-primary": "#ffffff",
+                    "inverse-surface": "#442a22",
+                    "surface-container": "#ffe9e3",
+                    "surface-tint": "#ae2f34",
+                    "surface-container-highest": "#ffdbd0",
+                    "on-secondary-container": "#68615e",
+                    "background": "#fff8f6",
+                    "primary": "#ae2f34",
+                    "on-tertiary-container": "#4c3e00",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#ffe2da",
+                    "surface-container-low": "#fff1ed",
+                    "tertiary-container": "#caa800",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#8c1520",
+                    "tertiary-fixed": "#ffe173",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed": "#1f1b18",
+                    "error": "#ba1a1a",
+                    "primary-container": "#ff6b6b",
+                    "secondary-container": "#e7ded9",
+                    "outline-variant": "#e0bfbd",
+                    "surface": "#fff8f6",
+                    "primary-fixed-dim": "#ffb3b0",
+                    "tertiary-fixed-dim": "#e8c426",
+                    "on-surface-variant": "#584140",
+                    "on-primary-container": "#6d0010",
+                    "on-surface": "#2c160e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "container-padding-desktop": "48px",
+                    "container-padding-mobile": "24px",
+                    "section-gap": "40px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Quicksand"],
+                    "label-md": ["Quicksand"],
+                    "headline-xl": ["Quicksand"],
+                    "body-lg": ["Quicksand"],
+                    "body-md": ["Quicksand"],
+                    "headline-lg": ["Quicksand"],
+                    "headline-lg-mobile": ["Quicksand"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-surface-container-low to-surface min-h-[884px] flex flex-col items-center justify-center p-container-padding-mobile antialiased relative overflow-hidden">
+<!-- Decorative background elements -->
+<div class="absolute top-[-10%] left-[-20%] w-[60vw] h-[60vw] rounded-full bg-surface-container opacity-50 blur-3xl -z-10"></div>
+<div class="absolute bottom-[-10%] right-[-20%] w-[70vw] h-[70vw] rounded-full bg-surface-variant opacity-30 blur-3xl -z-10"></div>
+<!-- Main Card Container -->
+<main class="w-full max-w-[420px] bg-surface-container-lowest rounded-[32px] p-8 shadow-[0_16px_32px_-12px_rgba(174,47,52,0.08)] flex flex-col items-center relative z-10 border border-surface-container-lowest/50 backdrop-blur-sm">
+<!-- Illustration -->
+<div class="w-32 h-32 mb-6 rounded-full bg-surface-container flex items-center justify-center overflow-hidden border-4 border-surface-container-lowest shadow-sm">
+<img alt="Playful illustration" class="w-full h-full object-cover" data-alt="A lighthearted, warm, and playful 3D illustration of two abstract heart characters smiling and holding hands. The aesthetic is Soft-Tactile Modernism, featuring smooth, matte textures and a pastel color palette dominated by soft peach and coral tones. The background is a clean, bright, light-mode studio environment with soft, diffused lighting that creates gentle shadows, evoking a sense of warmth, safety, and friendly connection." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCu1xL9BVxTWt5ybU6_QFmbGPxVsEjXsh96jF0Y5nUv4H5xp72H8KmrpBm0OlQ-kK2aT11GtbhgZBF6EV6PatIxk9K40tpDWkRkb8uaP3VcvJgeeZnQtsdor5XI26ejVwpSx2aJ3sO9uNyzP62DSUbdg35gCn8pO1oQqsRfkSf9qz9iLrc0pXIkHXOLUozmKYz5nSR_DNasA8BytTCWaTMhJDexBFDO0E6OgXKDXELBE9owXZxJPBZltSa8T846cpjFDVV6AebZNIk"/>
+</div>
+<!-- Typography Section -->
+<div class="flex flex-col items-center w-full text-center space-y-3 mb-8">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background leading-tight">
+                Game of Us oynamaya davet edildin!
+            </h1>
+<p class="font-body-lg text-body-lg text-primary bg-primary-container/20 px-4 py-1.5 rounded-full inline-block">
+                Sefa seninle bir oyun oynamak istiyor
+            </p>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[280px]">
+                Birkaç soruya cevap ver ve birbirinizi tahmin edin
+            </p>
+</div>
+<!-- Interactive Form -->
+<form class="w-full flex flex-col gap-6" onsubmit="event.preventDefault();">
+<!-- Input Field -->
+<div class="flex flex-col gap-2 w-full">
+<label class="font-label-md text-label-md text-on-background ml-1" for="playerName">İsmin</label>
+<div class="relative group">
+<input class="w-full bg-surface-container text-on-background font-body-lg text-body-lg rounded-xl px-5 py-4 border-2 border-transparent focus:border-primary focus:bg-surface-container-lowest outline-none transition-all duration-300 placeholder:text-on-surface-variant/50" id="playerName" placeholder="Adını buraya yaz..." type="text"/>
+<!-- Subtle focus glow -->
+<div class="absolute inset-0 -z-10 rounded-xl bg-primary/0 group-focus-within:bg-primary/5 blur-md transition-all duration-300"></div>
+</div>
+</div>
+<!-- Primary CTA -->
+<button class="w-full bg-primary text-on-primary font-headline-md text-headline-md rounded-full py-4 px-6 mt-2 flex items-center justify-center gap-3 hover:bg-on-primary-fixed-variant hover:scale-[0.98] active:scale-95 transition-all duration-300 shadow-[0_8px_16px_rgba(174,47,52,0.15)] hover:shadow-[0_4px_8px_rgba(174,47,52,0.1)] group" type="submit">
+<span>Oyuna Katıl</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" style="font-variation-settings: 'wght' 600;">
+                    arrow_forward
+                </span>
+</button>
+</form>
+</main>
+<script>
+        // Simple input focus interaction enhancement
+        const input = document.getElementById('playerName');
+        input.addEventListener('focus', () => {
+            input.parentElement.classList.add('scale-[1.02]');
+        });
+        input.addEventListener('blur', () => {
+            input.parentElement.classList.remove('scale-[1.02]');
+        });
+    </script>
+</body></html>

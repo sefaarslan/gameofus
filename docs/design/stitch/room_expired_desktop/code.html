@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Oda Süresi Doldu - Game of Us</title>
+<!-- Google Fonts: Quicksand -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#635d59",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "surface": "#fff8f6",
+                        "surface-container-low": "#fff1ed",
+                        "surface-variant": "#ffdbd0",
+                        "tertiary-container": "#caa800",
+                        "on-background": "#2c160e",
+                        "background": "#fff8f6",
+                        "secondary-fixed": "#eae1dc",
+                        "surface-container-high": "#ffe2da",
+                        "surface-bright": "#fff8f6",
+                        "outline-variant": "#e0bfbd",
+                        "secondary-fixed-dim": "#cec5c0",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#ffdad8",
+                        "primary-container": "#ff6b6b",
+                        "on-primary-container": "#6d0010",
+                        "tertiary-fixed-dim": "#e8c426",
+                        "on-tertiary-fixed": "#221b00",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#68615e",
+                        "inverse-primary": "#ffb3b0",
+                        "surface-dim": "#fbd1c4",
+                        "inverse-on-surface": "#ffede8",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#705d00",
+                        "primary-fixed-dim": "#ffb3b0",
+                        "on-surface": "#2c160e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#4b4642",
+                        "on-tertiary-container": "#4c3e00",
+                        "outline": "#8c706f",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#584140",
+                        "tertiary-fixed": "#ffe173",
+                        "inverse-surface": "#442a22",
+                        "surface-container": "#ffe9e3",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#ae2f34",
+                        "on-primary-fixed-variant": "#8c1520",
+                        "primary": "#ae2f34",
+                        "surface-container-highest": "#ffdbd0",
+                        "on-secondary-fixed": "#1f1b18",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#410006",
+                        "secondary-container": "#e7ded9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "40px",
+                        "gutter": "24px",
+                        "container-padding-desktop": "48px",
+                        "container-padding-mobile": "24px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "headline-xl": ["Quicksand"],
+                        "headline-lg-mobile": ["Quicksand"],
+                        "body-md": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface min-h-screen w-full flex items-center justify-center relative overflow-hidden font-body-md text-on-surface">
+<!-- Ambient Background Gradient -->
+<div class="absolute inset-0 bg-gradient-to-br from-surface via-surface-container-low to-surface-variant opacity-80 z-0"></div>
+<!-- Soft Background Texture Image -->
+<div class="absolute inset-0 z-0 opacity-10 mix-blend-multiply bg-cover bg-center" data-alt="A macro photograph of delicate, textured watercolor paper illuminated by soft, warm morning sunlight. The surface has a subtle, organic grain that catches the light, creating gentle micro-shadows. The overall palette is a very faint, warm peach transitioning to pure white, perfectly matching the light-mode Soft-Tactile Modernism aesthetic. The mood is calm, blank, and inviting, serving as a non-distracting atmospheric backdrop." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCIzOmWqoZrUGK-n9Ov3XHIN8z_IlO1Qy3y5d-q8B1wE6hK8tT2ooahFA_8zmC-nBx46qmHfJQc_54QOzlhrVIqRS6ZxzR1UHVz4ouNMq2NduLbjIeOyQYyKvwe1vHydcIbkIMVT7-PKRwTCtbJFgHstF9IkGQ_Cqg5WYxWuQMvuZ0r_r72HSfjrB-w9l7pigHo24XtzOOAGwu9przG9a4FFoVzdF7cPMKg_-es71S7DE4lsnOkZnbMPkgjCiM_qpikwgJYMrWNX1g');">
+</div>
+<!-- Decorative Floating Orbs -->
+<div class="absolute top-[10%] left-[15%] w-64 h-64 bg-primary/5 rounded-full blur-[60px] z-0 pointer-events-none mix-blend-multiply"></div>
+<div class="absolute bottom-[10%] right-[15%] w-96 h-96 bg-tertiary-fixed-dim/10 rounded-full blur-[80px] z-0 pointer-events-none mix-blend-multiply"></div>
+<!-- Main Content Canvas -->
+<main class="relative z-10 w-full max-w-2xl px-gutter md:px-container-padding-desktop">
+<!-- Error Card -->
+<article class="bg-surface-container-lowest rounded-xl shadow-[0_24px_48px_rgba(174,47,52,0.06)] border border-outline-variant/20 p-8 md:p-16 flex flex-col items-center text-center transform transition-all duration-500 hover:shadow-[0_32px_64px_rgba(174,47,52,0.08)]">
+<!-- Illustration / Icon Area -->
+<div class="relative mb-10 w-40 h-40 flex items-center justify-center">
+<!-- Soft background glow behind icon -->
+<div class="absolute inset-0 bg-surface-container-high rounded-full opacity-60 scale-110 animate-pulse" style="animation-duration: 4s;"></div>
+<div class="absolute inset-0 bg-surface-variant rounded-full flex items-center justify-center shadow-inner">
+<span class="material-symbols-outlined text-[80px] text-primary" style="font-variation-settings: 'FILL' 1;">
+                        hourglass_bottom
+                    </span>
+</div>
+<!-- Floating decorative particles near icon -->
+<div class="absolute -top-2 -right-2 w-6 h-6 bg-tertiary-fixed-dim rounded-full shadow-sm animate-bounce" style="animation-duration: 3s;"></div>
+<div class="absolute bottom-4 -left-4 w-4 h-4 bg-primary-fixed-dim rounded-full shadow-sm animate-bounce" style="animation-duration: 2.5s; animation-delay: 0.5s;"></div>
+</div>
+<!-- Typography -->
+<h1 class="font-headline-xl text-headline-xl text-on-background mb-4">
+                Bu oyun odasının süresi doldu
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md mx-auto mb-12">
+                Güvenliğiniz ve oyun deneyiminiz için odalar belirli bir süre sonra kapanır.
+            </p>
+<!-- Actions -->
+<div class="w-full flex flex-col items-center gap-4">
+<button class="w-full max-w-xs bg-primary hover:bg-surface-tint text-on-primary font-label-md text-label-md rounded-full py-5 px-8 shadow-[0_8px_16px_rgba(174,47,52,0.2)] hover:shadow-[0_12px_24px_rgba(174,47,52,0.3)] hover:-translate-y-1 active:scale-95 transition-all duration-300 ease-out flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined text-[20px] transition-transform group-hover:rotate-180 duration-500">
+                        refresh
+                    </span>
+                    Yeni oyun başlat
+                </button>
+<button class="w-full max-w-xs bg-transparent hover:bg-surface-container text-on-surface-variant font-label-md text-label-md rounded-full py-4 px-8 active:scale-95 transition-all duration-300 ease-out mt-2">
+                    Ana Sayfaya Dön
+                </button>
+</div>
+</article>
+</main>
+<!-- Simple interaction script for card entrance -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const card = document.querySelector('article');
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body></html>

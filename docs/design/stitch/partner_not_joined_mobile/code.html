@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Game of Us - Bekleniyor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary": "#635d59",
+                      "on-tertiary-fixed-variant": "#554500",
+                      "surface": "#fff8f6",
+                      "surface-container-low": "#fff1ed",
+                      "surface-variant": "#ffdbd0",
+                      "tertiary-container": "#caa800",
+                      "on-background": "#2c160e",
+                      "background": "#fff8f6",
+                      "secondary-fixed": "#eae1dc",
+                      "surface-container-high": "#ffe2da",
+                      "surface-bright": "#fff8f6",
+                      "outline-variant": "#e0bfbd",
+                      "secondary-fixed-dim": "#cec5c0",
+                      "on-primary": "#ffffff",
+                      "primary-fixed": "#ffdad8",
+                      "primary-container": "#ff6b6b",
+                      "on-primary-container": "#6d0010",
+                      "tertiary-fixed-dim": "#e8c426",
+                      "on-tertiary-fixed": "#221b00",
+                      "on-error": "#ffffff",
+                      "on-secondary-container": "#68615e",
+                      "inverse-primary": "#ffb3b0",
+                      "surface-dim": "#fbd1c4",
+                      "inverse-on-surface": "#ffede8",
+                      "error-container": "#ffdad6",
+                      "on-error-container": "#93000a",
+                      "tertiary": "#705d00",
+                      "primary-fixed-dim": "#ffb3b0",
+                      "on-surface": "#2c160e",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-fixed-variant": "#4b4642",
+                      "on-tertiary-container": "#4c3e00",
+                      "outline": "#8c706f",
+                      "on-tertiary": "#ffffff",
+                      "on-surface-variant": "#584140",
+                      "tertiary-fixed": "#ffe173",
+                      "inverse-surface": "#442a22",
+                      "surface-container": "#ffe9e3",
+                      "error": "#ba1a1a",
+                      "surface-tint": "#ae2f34",
+                      "on-primary-fixed-variant": "#8c1520",
+                      "primary": "#ae2f34",
+                      "surface-container-highest": "#ffdbd0",
+                      "on-secondary-fixed": "#1f1b18",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed": "#410006",
+                      "secondary-container": "#e7ded9"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-gap": "40px",
+                      "gutter": "24px",
+                      "container-padding-desktop": "48px",
+                      "container-padding-mobile": "24px",
+                      "base": "8px"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Quicksand"
+                      ],
+                      "headline-lg": [
+                              "Quicksand"
+                      ],
+                      "body-lg": [
+                              "Quicksand"
+                      ],
+                      "label-md": [
+                              "Quicksand"
+                      ],
+                      "headline-xl": [
+                              "Quicksand"
+                      ],
+                      "headline-lg-mobile": [
+                              "Quicksand"
+                      ],
+                      "body-md": [
+                              "Quicksand"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-xl": [
+                              "40px",
+                              {
+                                      "lineHeight": "48px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "34px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+            },
+          }
+        }
+      </script>
+<style>
+        body {
+            background-color: theme('colors.secondary'); /* Level 1 Surface */
+            color: theme('colors.on-surface');
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .soft-shadow {
+            box-shadow: 0px 4px 16px rgba(174, 47, 52, 0.05);
+        }
+        
+        .card-shadow {
+            box-shadow: 0px 8px 24px rgba(174, 47, 52, 0.05); /* Diffused primary-tinted shadow */
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim text-primary dark:text-primary-fixed-dim docked full-width top-0 shadow-sm shadow-primary/5 dark:shadow-none flex justify-between items-center w-full px-container-mobile h-16 shrink-0 z-10 relative">
+<button aria-label="Back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-secondary-container/50 transition-colors">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+            Game of Us
+        </div>
+<div class="flex items-center gap-2">
+<button aria-label="Help" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-secondary-container/50 transition-colors text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button aria-label="Settings" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-secondary-container/50 transition-colors text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex items-center justify-center px-container-mobile py-section-gap relative">
+<!-- Subtle decorative background elements to enhance "Floating Harmony" -->
+<div class="absolute top-1/4 left-0 w-64 h-64 bg-primary-fixed opacity-30 rounded-full blur-3xl -z-10"></div>
+<div class="absolute bottom-1/4 right-0 w-80 h-80 bg-surface-variant opacity-40 rounded-full blur-3xl -z-10"></div>
+<!-- Centered Card Interaction -->
+<div class="w-full max-w-[400px] bg-white rounded-xl card-shadow flex flex-col p-8 items-center text-center relative overflow-hidden">
+<!-- Decorative Top Accent -->
+<div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary-container to-tertiary-container"></div>
+<!-- Illustration Container -->
+<div class="w-48 h-48 mb-8 relative rounded-full bg-surface-container flex items-center justify-center">
+<img alt="Illustration of an empty chair next to an occupied one" class="w-full h-full object-cover rounded-full opacity-80 mix-blend-multiply" data-alt="A soft, minimalist digital illustration in a warm light-mode aesthetic, featuring two cozy armchairs in a well-lit room. One chair is occupied by a stylized figure holding a warm cup, while the other remains empty. The palette relies on soft peach and warm coral tones, emphasizing a sense of waiting and anticipation. Gentle, diffused lighting creates a comforting and reassuring atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmxsRflkjAuUJFvi3ddE6XPifGHDeAvTlZCOHCruKouhaRe0r2R3w223m4fIzjJsVL04bhu_5sLLo55ZmjqEGYPS3JRfkj5eH8BenlOfQFVyrCTIVPxyFWdlf21JFfWcRsq2W4zEOUw_yyKpp1xynbVg69wq-g0zG9H632dTvf-RUtu2G6eyIOX8Dp2TdwOCwjKI7cHEq7YIn5iVSFGYPZoJ6IIpNI3faBIMG1KLXTYKMKRRqyv_4IHltJhbf8QIQeaJK9j5D2FHg"/>
+<!-- Overlay pulsing indicator -->
+<div class="absolute inset-0 rounded-full border-4 border-white opacity-50"></div>
+<div class="absolute -bottom-2 -right-2 bg-white rounded-full p-3 card-shadow flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[32px] animate-pulse" data-icon="hourglass_empty" data-weight="fill">hourglass_empty</span>
+</div>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-4">
+                Partnerin henüz katılmadı
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-8 px-2">
+                Oyunun başlaması için partnerinin linke tıklayıp odaya girmesi gerekiyor.
+            </p>
+<button class="w-full min-h-[56px] bg-primary text-on-primary rounded-full font-label-md text-label-md font-bold hover:bg-on-primary-fixed-variant transition-colors flex items-center justify-center gap-2 px-6">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+                Linki tekrar paylaş
+            </button>
+<button class="mt-4 w-full min-h-[56px] bg-surface-container text-primary rounded-full font-label-md text-label-md font-bold hover:bg-surface-variant transition-colors flex items-center justify-center">
+                 Beklemeye devam et
+            </button>
+</div>
+</main>
+<!-- Suppressed Bottom Navigation: Intentionally excluded because this is a transactional "waiting" state, not a top-level destination where the user should navigate away easily. -->
+</body></html>

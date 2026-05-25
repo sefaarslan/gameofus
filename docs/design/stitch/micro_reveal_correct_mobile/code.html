@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Micro-Reveal</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Quicksand -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS Setup -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#fbd1c4",
+                    "on-primary-container": "#6d0010",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#4b4642",
+                    "secondary-fixed-dim": "#cec5c0",
+                    "tertiary": "#705d00",
+                    "on-background": "#2c160e",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#eae1dc",
+                    "surface-bright": "#fff8f6",
+                    "inverse-on-surface": "#ffede8",
+                    "surface-container-highest": "#ffdbd0",
+                    "surface-container": "#ffe9e3",
+                    "on-tertiary-fixed": "#221b00",
+                    "secondary": "#635d59",
+                    "on-surface": "#2c160e",
+                    "primary-fixed": "#ffdad8",
+                    "inverse-surface": "#442a22",
+                    "tertiary-fixed-dim": "#e8c426",
+                    "outline-variant": "#e0bfbd",
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed-variant": "#554500",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-container": "#68615e",
+                    "background": "#fff8f6",
+                    "primary": "#ae2f34",
+                    "on-surface-variant": "#584140",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#ffb3b0",
+                    "on-tertiary-container": "#4c3e00",
+                    "on-secondary-fixed": "#1f1b18",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#ffe173",
+                    "surface-container-low": "#fff1ed",
+                    "surface": "#fff8f6",
+                    "on-primary-fixed-variant": "#8c1520",
+                    "on-primary-fixed": "#410006",
+                    "on-primary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#ffb3b0",
+                    "primary-container": "#ff6b6b",
+                    "surface-container-high": "#ffe2da",
+                    "tertiary-container": "#caa800",
+                    "outline": "#8c706f",
+                    "surface-tint": "#ae2f34",
+                    "surface-variant": "#ffdbd0",
+                    "secondary-container": "#e7ded9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "section-gap": "40px",
+                    "base": "8px",
+                    "container-padding-mobile": "24px",
+                    "container-padding-desktop": "48px"
+            },
+            "fontFamily": {
+                    "headline-xl": ["Quicksand"],
+                    "body-md": ["Quicksand"],
+                    "headline-md": ["Quicksand"],
+                    "headline-lg": ["Quicksand"],
+                    "headline-lg-mobile": ["Quicksand"],
+                    "label-md": ["Quicksand"],
+                    "body-lg": ["Quicksand"]
+            },
+            "fontSize": {
+                    "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Custom animations for the micro-reveal */
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            60% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes pulseSoft {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+        
+        .animate-pop-in {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .animate-float-up {
+            animation: floatUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        
+        .bg-celebration-glow {
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            background: radial-gradient(circle, rgba(255,225,115,0.4) 0%, rgba(255,218,216,0.1) 50%, rgba(255,255,255,0) 70%);
+            animation: pulseSoft 3s infinite ease-in-out;
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-dim h-[884px] flex flex-col relative overflow-hidden font-body-md text-on-background selection:bg-primary/20">
+<!-- Atmospheric Background Elements -->
+<div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+<div class="absolute -top-20 -left-20 w-[300px] h-[300px] bg-primary-fixed rounded-full mix-blend-multiply filter blur-[80px] opacity-60"></div>
+<div class="absolute bottom-20 -right-20 w-[250px] h-[250px] bg-tertiary-fixed rounded-full mix-blend-multiply filter blur-[60px] opacity-40"></div>
+</div>
+<!-- Main Content Area (Centered Canvas) -->
+<main class="flex-1 flex flex-col items-center justify-center w-full px-container-padding-mobile relative z-10 pb-[100px]">
+<!-- The Reveal Card -->
+<div class="bg-surface-container-lowest w-full max-w-[400px] rounded-xl p-8 flex flex-col items-center text-center shadow-[0_16px_40px_rgba(174,47,52,0.08)] animate-pop-in relative overflow-hidden">
+<!-- Soft Celebratory Background Glow inside card -->
+<div class="bg-celebration-glow"></div>
+<!-- Top Celebratory Icon -->
+<div class="w-24 h-24 rounded-full bg-tertiary-fixed flex items-center justify-center mb-6 shadow-sm shadow-tertiary/20 relative z-10">
+<span class="material-symbols-outlined text-[48px] text-on-tertiary-fixed" style="font-variation-settings: 'FILL' 1;">
+                    workspace_premium
+                </span>
+<!-- Sparkle decorations -->
+<span class="material-symbols-outlined absolute -top-2 -right-2 text-tertiary text-[20px] animate-pulse">colors_spark</span>
+<span class="material-symbols-outlined absolute bottom-2 -left-3 text-tertiary text-[16px] animate-pulse delay-100">star</span>
+</div>
+<!-- Title -->
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2 relative z-10 animate-float-up delay-100">
+                Doğru bildin!
+            </h1>
+<!-- Detail Line -->
+<p class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 animate-float-up delay-200">
+                Senin cevabın: <span class="font-bold text-on-surface">Evet</span> · Partnerin: <span class="font-bold text-on-surface">Evet</span>
+</p>
+<!-- Points & Bonus Container -->
+<div class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg p-6 flex flex-col items-center relative z-10 animate-float-up delay-300">
+<!-- Points -->
+<div class="flex items-baseline gap-2 mb-3">
+<span class="font-headline-xl text-headline-xl text-tertiary drop-shadow-sm">+3 puan</span>
+<span class="font-label-md text-label-md text-on-surface-variant opacity-80">(eminim)</span>
+</div>
+<!-- Bonus Chip -->
+<div class="bg-tertiary-fixed text-on-tertiary-fixed font-label-md text-label-md px-4 py-2 rounded-full inline-flex items-center gap-1.5 shadow-sm shadow-tertiary/10">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span>Emin oldun ve haklı çıktın — bonus!</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Sticky Bottom CTA -->
+<div class="fixed bottom-0 left-0 w-full px-container-padding-mobile pb-safe pt-8 pb-8 bg-gradient-to-t from-surface-dim via-surface-dim/90 to-transparent z-20 flex justify-center animate-float-up delay-300">
+<button class="w-full max-w-[400px] bg-primary text-on-primary h-[64px] rounded-full flex items-center justify-center gap-3 shadow-[0_8px_24px_rgba(174,47,52,0.25)] active:scale-95 transition-all duration-200 hover:bg-on-primary-container group">
+<span class="font-body-lg text-body-lg font-bold">Devam</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+<style>
+        /* iOS Safe Area Support */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 32px);
+        }
+    </style>
+</body></html>

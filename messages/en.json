@@ -1,0 +1,249 @@
+{
+  "nav": {
+    "howItWorks": "How It Works",
+    "modes": "Modes",
+    "premium": "Premium",
+    "start": "Start Now",
+    "menu": "Menu"
+  },
+  "landing": {
+    "hero": {
+      "title": "Get to know each other better through a game.",
+      "titlePre": "Get to",
+      "titleHighlight": "know each other better",
+      "titlePost": "through a game.",
+      "subtitle": "Game of Us offers short and fun games where two people guess each other and discover more together.",
+      "badge": "Strengthen your bond",
+      "howToPlay": "How to Play?",
+      "socialProof": "+10k couples playing"
+    },
+    "cta": {
+      "start": "Start Game"
+    },
+    "how": {
+      "title": "How it works",
+      "badge": "Simple & Fast",
+      "subtitle": "Strengthen your bond in just 3 steps",
+      "step1": "Create a room",
+      "step2": "Share the link",
+      "step3": "Reveal together",
+      "step1Desc": "Create a room and send your personal invite link to your partner.",
+      "step2Desc": "Answer the questions for yourself and predict your partner.",
+      "step3Desc": "When you're both done, reveal the results together and talk it through."
+    },
+    "modes": {
+      "title": "Game Modes",
+      "subtitle": "Different setups for different moods",
+      "explore": "Explore all",
+      "popular": "POPULAR",
+      "sc": {
+        "desc": "Make your secret choice from the options. Will your partner guess it right?",
+        "tag": "Fun & Easy"
+      },
+      "pred": {
+        "desc": "Predict in advance how your partner would react to future scenarios.",
+        "tag": "Deep Connection"
+      },
+      "order": {
+        "desc": "Rank the cards by your own priorities. Test how well your partner knows you.",
+        "tag": "Discovery"
+      }
+    },
+    "premiumSection": {
+      "badge": "Explore More",
+      "title": "Premium Package",
+      "desc": "Take your relationship to the next level. Unlimited questions, exclusive modes, and detailed insights.",
+      "feat1": "50+ Specially Crafted Questions",
+      "feat2": "Access to 3 Game Modes",
+      "feat3": "Detailed Compatibility Analysis",
+      "feat4": "Result Sharing Cards",
+      "price": "249 TL",
+      "payOnce": "One-time payment",
+      "noSub": "No monthly subscription — 3-day access.",
+      "cta": "See the Package",
+      "secure": "Secure payment · Instant access"
+    },
+    "mockup": {
+      "partnerOnline": "Alex online",
+      "questionCount": "Q 3 / 10",
+      "question": "What do you need most when you're stressed?",
+      "yourAnswer": "Your answer",
+      "partnerAnswer": "What would your partner say?",
+      "lock": "Lock guess",
+      "score": "Reading Score",
+      "greatMatch": "Great match!",
+      "correct": "Correct! 🎉",
+      "points": "+3 pts",
+      "partnerName": "Alex"
+    }
+  },
+  "create": {
+    "title": "Create a new game",
+    "subtitle": "Choose your game settings and share the link with your partner.",
+    "sideTitle": "New Game",
+    "sideSubtitle": "Start an experience.",
+    "sideStep1": "Step 1: Enter Your Info",
+    "sideStep2": "Step 2: Share the Link",
+    "sideStep3": "Step 3: Play!",
+    "name": { "label": "Your name", "placeholder": "Your name" },
+    "partner": { "label": "Partner name", "optional": "Optional", "placeholder": "Your partner's name" },
+    "mode": {
+      "label": "Game mode",
+      "options": {
+        "secret_choice": "Yes / No",
+        "prediction": "Scenario",
+        "orderline": "Ranking",
+        "mixed": "Mixed"
+      },
+      "descs": {
+        "secret_choice": "3-option classic",
+        "prediction": "Multiple choice",
+        "orderline": "Guess the order",
+        "mixed": "A bit of everything"
+      }
+    },
+    "questions": {
+      "label": "Number of questions",
+      "fast": "Quick — 5 questions",
+      "classic": "Classic — 10 questions"
+    },
+    "submit": "Create game link",
+    "creating": "Creating...",
+    "limitTitle": "Free room limit reached",
+    "limitDesc": "You can only create one room with the free plan. You can continue your existing game or upgrade to premium for more.",
+    "limitGoBack": "Back to my game",
+    "limitUpgrade": "Go Premium"
+  },
+  "share": {
+    "title": "Your invite link is ready",
+    "subtitle": "Share the link with your partner and start playing.",
+    "link": "Your invite link",
+    "copy": "Copy link",
+    "copied": "Copied!",
+    "whatsapp": "Share on WhatsApp",
+    "whatsappText": "Let's play Game of Us!",
+    "start": "Start answering",
+    "startWaiting": "Waiting for partner...",
+    "waiting": "Your partner hasn't joined yet.",
+    "joined": "Your partner joined!",
+    "info": "When your partner opens the link, you'll both answer and predict each other. Then the results will reveal together.",
+    "roomStatus": "Room Status",
+    "you": "You",
+    "inRoom": "You're in",
+    "partnerWaiting": "Waiting...",
+    "partnerJoinedStatus": "Joined!",
+    "relaxMessage": "Grab a cup of tea — your partner is on the way."
+  },
+  "join": {
+    "title": "Join the game",
+    "subtitle": "Your friend is waiting. Enter your name and start playing.",
+    "name": { "label": "Your name", "placeholder": "Your name" },
+    "submit": "Join",
+    "joining": "Joining...",
+    "roomFull": "This room already has two players.",
+    "expired": "This room has expired."
+  },
+  "game": {
+    "yourAnswer": "Your answer",
+    "yourAnswerNote": "not shown to partner",
+    "partnerGuess": "What would your partner answer?",
+    "confidence": "How sure are you?",
+    "lock": "Lock guess",
+    "locking": "Saving...",
+    "progress": "Question {current}/{total}",
+    "finish": "Finish",
+    "orderGuide": "Tap in the order you prefer",
+    "orderReset": "Reset",
+    "partnerOrderGuide": "How would your partner rank these?",
+    "modeSecret": "Secret Choice",
+    "modePrediction": "Prediction",
+    "modeOrderline": "Ranking",
+    "errorGeneric": "Something went wrong.",
+    "errorConnection": "Connection error."
+  },
+  "option": {
+    "yes": "Yes",
+    "unsure": "Not sure",
+    "no": "No"
+  },
+  "confidence": {
+    "guess": "Guess",
+    "think": "I think so",
+    "sure": "I'm sure"
+  },
+  "reveal": {
+    "correct": "You guessed right!",
+    "near": "You were close!",
+    "miss": "You missed it!",
+    "correctTitle": "You got it right!",
+    "nearTitle": "Close one!",
+    "missTitle": "Missed it",
+    "greatReading": "Great reading!",
+    "points": "+{points} pts",
+    "saved": "Your guess is saved. You'll see it together when your partner plays.",
+    "savedSubtitle": "You'll see the result together when your partner plays.",
+    "next": "Next question",
+    "finish": "See results"
+  },
+  "waiting": {
+    "title": "You're done!",
+    "partner": "Results will unlock when your partner finishes.",
+    "resend": "Send link again",
+    "or": "or",
+    "copyTitle": "Copy",
+    "waitingDots": "Waiting for partner...",
+    "whatsappText": "Let's play Game of Us!"
+  },
+  "results": {
+    "title": "Results are ready",
+    "score": "Reading Score",
+    "myScore": "Your score",
+    "details": "Question details",
+    "playAgain": "Play again",
+    "correct": "Correct",
+    "near": "Close",
+    "miss": "Miss",
+    "yourAnswer": "Your answer",
+    "partnerAnswer": "Partner's answer",
+    "yourGuess": "Your guess",
+    "partnerGuess": "Partner's guess",
+    "goHome": "Home",
+    "backHome": "Back to home",
+    "correctCount": "Correct",
+    "nearCount": "Close",
+    "compatRate": "Compatibility",
+    "matchGreat": "Great match!",
+    "matchGrowing": "Getting there!",
+    "matchDiscovering": "Still discovering",
+    "diffOpinion": "Different Views",
+    "missCountText": "{count} questions — keep discovering!",
+    "continueConvo": "Keep the conversation going",
+    "continueConvoDesc": "Talking about these results can deepen your connection.",
+    "backToSummary": "Back to Summary",
+    "seeDetails": "See Details",
+    "labelCorrect": "Spot On",
+    "labelNear": "Close Call",
+    "labelMiss": "Different View",
+    "answerOf": "answer",
+    "guessOf": "guess",
+    "guessAboutPartner": "guess about partner",
+    "partnerRealAnswer": "actual answer"
+  },
+  "error": {
+    "generic": "Something went wrong. Please try again.",
+    "invalidLink": "This link is not valid.",
+    "roomExpired": "This room has expired.",
+    "roomFull": "This room already has two players.",
+    "resultNotReady": "Results are not ready yet.",
+    "rateLimited": "Too many attempts. Please try again later.",
+    "retry": "Try again",
+    "goHome": "Back to home",
+    "connection": "Connection error."
+  },
+  "premium": {
+    "title": "Keep the game night going",
+    "subtitle": "More games and longer question sets will be available with premium soon.",
+    "price": "249 TL — 3-day access",
+    "cta": "I'm interested"
+  }
+}

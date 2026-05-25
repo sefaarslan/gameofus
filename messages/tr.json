@@ -1,0 +1,249 @@
+{
+  "nav": {
+    "howItWorks": "Nasıl Çalışır",
+    "modes": "Modlar",
+    "premium": "Premium",
+    "start": "Hemen Başla",
+    "menu": "Menü"
+  },
+  "landing": {
+    "hero": {
+      "title": "Oyun oynayarak birbirinizi daha iyi tanıyın.",
+      "titlePre": "Oyun oynayarak",
+      "titleHighlight": "birbirinizi daha iyi",
+      "titlePost": "tanıyın",
+      "subtitle": "Game of Us, iki kişinin birbirini tahmin edip daha iyi tanıması için tasarlanmış kısa ve eğlenceli oyunlar sunar.",
+      "badge": "İlişkinizi güçlendirin",
+      "howToPlay": "Nasıl Oynanır?",
+      "socialProof": "+10k çift oynuyor"
+    },
+    "cta": {
+      "start": "Oyun Başlat"
+    },
+    "how": {
+      "title": "Nasıl çalışır?",
+      "badge": "Basit & Hızlı",
+      "subtitle": "Sadece 3 adımda bağınızı güçlendirin",
+      "step1": "Oda oluştur",
+      "step2": "Linki paylaş",
+      "step3": "Cevapları birlikte aç",
+      "step1Desc": "Odanı oluştur ve özel davet linkini partnerine gönder.",
+      "step2Desc": "Soruları kendin için cevapla, partnerini tahmin et.",
+      "step3Desc": "İkiniz de bitirince sonuçları birlikte görün ve konuşun."
+    },
+    "modes": {
+      "title": "Oyun Modları",
+      "subtitle": "Farklı duygular için farklı oyun kurguları",
+      "explore": "Hepsini keşfet",
+      "popular": "POPÜLER",
+      "sc": {
+        "desc": "Seçenekler arasından gizlice seçimini yap. Bakalım partnerin doğru tahmin edebilecek mi?",
+        "tag": "Rahat & Eğlenceli"
+      },
+      "pred": {
+        "desc": "Gelecekteki senaryolar hakkında partnerinin ne tepki vereceğini önceden tahmin et.",
+        "tag": "Derin Bağlar"
+      },
+      "order": {
+        "desc": "Seçenekleri kendi önceliklerine göre sırala. Partnerinin seninkini ne kadar bildiğini test et.",
+        "tag": "Keşif"
+      }
+    },
+    "premiumSection": {
+      "badge": "Daha Fazla Keşfet",
+      "title": "Premium Paket",
+      "desc": "İlişkinizi bir sonraki seviyeye taşıyın. Sınırsız soru, özel modlar ve detaylı analizler.",
+      "feat1": "50+ Özel Hazırlanmış Soru",
+      "feat2": "3 Farklı Oyun Modu Erişimi",
+      "feat3": "Detaylı Uyumluluk Analizi",
+      "feat4": "Sonuç Paylaşım Kartları",
+      "price": "249 TL",
+      "payOnce": "Tek seferlik ödeme",
+      "noSub": "Aylık abonelik yok — 3 günlük erişim.",
+      "cta": "Paketi İncele",
+      "secure": "Güvenli ödeme · Anında erişim"
+    },
+    "mockup": {
+      "partnerOnline": "Ayşe online",
+      "questionCount": "Soru 3 / 10",
+      "question": "Stresliyken en çok neye ihtiyaç duyarsın?",
+      "yourAnswer": "Senin cevabın",
+      "partnerAnswer": "Partnerin ne cevap verir?",
+      "lock": "Tahmini kilitle",
+      "score": "Okuma Skoru",
+      "greatMatch": "Harika bir uyum!",
+      "correct": "Doğru! 🎉",
+      "points": "+3 puan",
+      "partnerName": "Ayşe"
+    }
+  },
+  "create": {
+    "title": "Yeni oyun oluştur",
+    "subtitle": "Oyun ayarlarını seç ve linki partnerinle paylaş.",
+    "sideTitle": "Yeni Oyun",
+    "sideSubtitle": "Bir deneyim başlat.",
+    "sideStep1": "Adım 1: Bilgilerini Gir",
+    "sideStep2": "Adım 2: Linki Paylaş",
+    "sideStep3": "Adım 3: Oynayın!",
+    "name": { "label": "İsmin", "placeholder": "Adın" },
+    "partner": { "label": "Partner adı", "optional": "Opsiyonel", "placeholder": "Partnerinin adı" },
+    "mode": {
+      "label": "Oyun modu",
+      "options": {
+        "secret_choice": "Evet / Hayır",
+        "prediction": "Senaryo",
+        "orderline": "Sıralama",
+        "mixed": "Karma"
+      },
+      "descs": {
+        "secret_choice": "3 şıklı klasik",
+        "prediction": "Çoktan seçmeli",
+        "orderline": "Sırayı tahmin et",
+        "mixed": "Hepsinden biraz"
+      }
+    },
+    "questions": {
+      "label": "Soru sayısı",
+      "fast": "Hızlı — 5 soru",
+      "classic": "Klasik — 10 soru"
+    },
+    "submit": "Oyun linki oluştur",
+    "creating": "Oluşturuluyor...",
+    "limitTitle": "Ücretsiz oda hakkın doldu",
+    "limitDesc": "Ücretsiz planla yalnızca bir oda oluşturabilirsin. Mevcut oyununa devam edebilir ya da daha fazlası için premium'a geçebilirsin.",
+    "limitGoBack": "Mevcut oyunuma dön",
+    "limitUpgrade": "Premium'a Geç"
+  },
+  "share": {
+    "title": "Davet linkin hazır",
+    "subtitle": "Linki partnerin ile paylaş ve oynamaya başla.",
+    "link": "Davet linkin",
+    "copy": "Linki kopyala",
+    "copied": "Kopyalandı!",
+    "whatsapp": "WhatsApp ile paylaş",
+    "whatsappText": "Game of Us oynayalım!",
+    "start": "Cevaplamaya başla",
+    "startWaiting": "Partner bekleniyor...",
+    "waiting": "Partner henüz katılmadı.",
+    "joined": "Partner katıldı!",
+    "info": "Partnerin linki açtığında ikiniz de cevap verip birbirinizi tahmin edeceksiniz. Ardından sonuçlar birlikte açılacak.",
+    "roomStatus": "Oda Durumu",
+    "you": "Sen",
+    "inRoom": "Odadasın",
+    "partnerWaiting": "Bekleniyor...",
+    "partnerJoinedStatus": "Katıldı!",
+    "relaxMessage": "Sıcak bir çay al, partnerin gelmek üzere."
+  },
+  "join": {
+    "title": "Oyuna katıl",
+    "subtitle": "Arkadaşın seni bekliyor. İsmini gir ve oynamaya başla.",
+    "name": { "label": "İsmin", "placeholder": "Adın" },
+    "submit": "Katıl",
+    "joining": "Katılıyor...",
+    "roomFull": "Bu odada iki kişi zaten var.",
+    "expired": "Bu odanın süresi dolmuş."
+  },
+  "game": {
+    "yourAnswer": "Kendi cevabın",
+    "yourAnswerNote": "partnerine gösterilmez",
+    "partnerGuess": "Partnerin ne cevap verir?",
+    "confidence": "Ne kadar eminsin?",
+    "lock": "Tahmini kilitle",
+    "locking": "Kaydediliyor...",
+    "progress": "Soru {current}/{total}",
+    "finish": "Bitir",
+    "orderGuide": "Tercih ettiğin sırayla seç",
+    "orderReset": "Sıfırla",
+    "partnerOrderGuide": "Partnerin nasıl sıralar?",
+    "modeSecret": "Gizli Seçim",
+    "modePrediction": "Tahmin",
+    "modeOrderline": "Sıralama",
+    "errorGeneric": "Bir hata oluştu.",
+    "errorConnection": "Bağlantı hatası."
+  },
+  "option": {
+    "yes": "Evet",
+    "unsure": "Kararsız",
+    "no": "Hayır"
+  },
+  "confidence": {
+    "guess": "Tahmin",
+    "think": "Sanırım",
+    "sure": "Eminim"
+  },
+  "reveal": {
+    "correct": "Doğru bildin!",
+    "near": "Yakındın!",
+    "miss": "Iskaladın!",
+    "correctTitle": "Doğru bildin!",
+    "nearTitle": "Yakın bildin!",
+    "missTitle": "Iskaladın",
+    "greatReading": "Harika bir okuma!",
+    "points": "+{points} puan",
+    "saved": "Tahminin kaydedildi. Partner oynayınca birlikte göreceksiniz.",
+    "savedSubtitle": "Partner cevapladığında sonucu birlikte göreceksiniz.",
+    "next": "Sonraki soru",
+    "finish": "Sonuçlara git"
+  },
+  "waiting": {
+    "title": "Sen tamamladın!",
+    "partner": "Partnerin oyunu tamamlayınca sonuçlar açılacak.",
+    "resend": "Linki tekrar gönder",
+    "or": "veya",
+    "copyTitle": "Kopyala",
+    "waitingDots": "Partner bekleniyor...",
+    "whatsappText": "Game of Us oynayalım!"
+  },
+  "results": {
+    "title": "Sonuçlar hazır",
+    "score": "Okuma Skoru",
+    "myScore": "Senin skorum",
+    "details": "Soru detayları",
+    "playAgain": "Tekrar oyna",
+    "correct": "Doğru",
+    "near": "Yakın",
+    "miss": "Iskala",
+    "yourAnswer": "Cevabın",
+    "partnerAnswer": "Partnerinin cevabı",
+    "yourGuess": "Tahminin",
+    "partnerGuess": "Partnerinin tahmini",
+    "goHome": "Ana Sayfa",
+    "backHome": "Ana sayfaya dön",
+    "correctCount": "Doğru Tahmin",
+    "nearCount": "Yakın Tahmin",
+    "compatRate": "Uyum Oranı",
+    "matchGreat": "Harika uyum!",
+    "matchGrowing": "Gelişiyor!",
+    "matchDiscovering": "Keşfediyorsunuz",
+    "diffOpinion": "Farklı Görüş",
+    "missCountText": "{count} soru — keşfetmeye devam!",
+    "continueConvo": "Sohbeti devam ettirin",
+    "continueConvoDesc": "Bu sonuçlar üzerine konuşmak ilişkinizi derinleştirebilir.",
+    "backToSummary": "Özete Dön",
+    "seeDetails": "Detayları Gör",
+    "labelCorrect": "Tam İsabet",
+    "labelNear": "Yakın Tahmin",
+    "labelMiss": "Farklı Görüş",
+    "answerOf": "cevabı",
+    "guessOf": "tahmini",
+    "guessAboutPartner": "partneri hakkındaki tahmini",
+    "partnerRealAnswer": "gerçek cevabı"
+  },
+  "error": {
+    "generic": "Bir şeyler ters gitti. Lütfen tekrar dene.",
+    "invalidLink": "Bu link geçerli değil.",
+    "roomExpired": "Bu odanın süresi dolmuş.",
+    "roomFull": "Bu odada iki kişi zaten var.",
+    "resultNotReady": "Sonuçlar henüz hazır değil.",
+    "rateLimited": "Kısa sürede çok fazla deneme yaptın. Biraz sonra tekrar dene.",
+    "retry": "Tekrar dene",
+    "goHome": "Ana sayfaya dön",
+    "connection": "Bağlantı hatası."
+  },
+  "premium": {
+    "title": "Oyun gecesini uzat",
+    "subtitle": "Daha fazla oyun ve daha uzun soru setleri yakında premium ile açılacak.",
+    "price": "249 TL — 3 günlük erişim",
+    "cta": "İlgileniyorum"
+  }
+}

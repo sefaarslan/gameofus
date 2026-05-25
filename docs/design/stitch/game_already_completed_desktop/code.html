@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="light" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Game of Us - Oyun Tamamlandı</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary": "#635d59",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "surface": "#fff8f6",
+                        "surface-container-low": "#fff1ed",
+                        "surface-variant": "#ffdbd0",
+                        "tertiary-container": "#caa800",
+                        "on-background": "#2c160e",
+                        "background": "#fff8f6",
+                        "secondary-fixed": "#eae1dc",
+                        "surface-container-high": "#ffe2da",
+                        "surface-bright": "#fff8f6",
+                        "outline-variant": "#e0bfbd",
+                        "secondary-fixed-dim": "#cec5c0",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#ffdad8",
+                        "primary-container": "#ff6b6b",
+                        "on-primary-container": "#6d0010",
+                        "tertiary-fixed-dim": "#e8c426",
+                        "on-tertiary-fixed": "#221b00",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#68615e",
+                        "inverse-primary": "#ffb3b0",
+                        "surface-dim": "#fbd1c4",
+                        "inverse-on-surface": "#ffede8",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#705d00",
+                        "primary-fixed-dim": "#ffb3b0",
+                        "on-surface": "#2c160e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#4b4642",
+                        "on-tertiary-container": "#4c3e00",
+                        "outline": "#8c706f",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#584140",
+                        "tertiary-fixed": "#ffe173",
+                        "inverse-surface": "#442a22",
+                        "surface-container": "#ffe9e3",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#ae2f34",
+                        "on-primary-fixed-variant": "#8c1520",
+                        "primary": "#ae2f34",
+                        "surface-container-highest": "#ffdbd0",
+                        "on-secondary-fixed": "#1f1b18",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#410006",
+                        "secondary-container": "#e7ded9"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "section-gap": "40px",
+                        "gutter": "24px",
+                        "container-padding-desktop": "48px",
+                        "container-padding-mobile": "24px",
+                        "base": "8px"
+                    },
+                    fontFamily: {
+                        "headline-md": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "headline-xl": ["Quicksand"],
+                        "headline-lg-mobile": ["Quicksand"],
+                        "body-md": ["Quicksand"]
+                    },
+                    fontSize: {
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "700" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "500" }],
+                        "label-md": ["14px", { lineHeight: "20px", fontWeight: "600" }],
+                        "headline-xl": ["40px", { lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "headline-lg-mobile": ["28px", { lineHeight: "34px", fontWeight: "700" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Quicksand', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row">
+<!-- SideNavBar (Desktop Only) -->
+<nav class="bg-surface-container-low dark:bg-on-background h-screen w-[300px] hidden md:flex flex-col fixed left-0 top-0 border-r border-outline-variant/30 z-40">
+<div class="p-container-padding-desktop flex flex-col items-center border-b border-outline-variant/30 pb-6">
+<div class="w-20 h-20 rounded-full overflow-hidden bg-surface-variant mb-4 flex items-center justify-center">
+<img alt="Partner Avatar" class="w-full h-full object-cover" data-alt="A warm, inviting portrait of two people smiling together. The image features soft, natural lighting that emphasizes a friendly, approachable mood. It aligns with the Soft-Tactile Modernism style, using soft colors and a clean aesthetic to evoke connection and trust, perfectly matching the warm peach and coral brand palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtKL01VJWPJIf1P_n2bVu0kApYuvnAsmPJLHPwrg_YP_F23TVxXayjuZR9iZVcIRRGoaYBzrzSTX7Jjc-ThoyMnSSjY4rKAYVFNZ1SmqWF7ruN1z9Afkp4i9drMAVS0UEi1BXOdJC1Jm8ioNIpaTMb_fDbsbLApmDBujST_rEoXvm9uDrd_P6zcLew1JuU9j-0H2WeMRZ4zvQC6Q6oMMXOaQBR6v_KCLbY-jmJ5jCaluvG82YVz6_3LWAFRZjeuvQrniWJJr181cc"/>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim text-center">İlişki Durumu</h2>
+<p class="font-body-md text-body-md text-on-surface-variant text-center mt-1">%75 Tamamlandı</p>
+<!-- Relationship Progress Bar -->
+<div class="w-full h-3 bg-surface-variant rounded-full mt-4 overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary-container to-tertiary-fixed-dim rounded-full" style="width: 75%;"></div>
+</div>
+<button class="mt-6 w-full py-3 px-6 bg-primary text-on-primary font-label-md text-label-md rounded-full shadow-md hover:bg-on-primary-fixed-variant transition-colors active:scale-95">
+                Yeni Oyun
+            </button>
+</div>
+<ul class="flex-col mt-4 flex-grow px-4">
+<li class="mb-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-on-surface-variant font-medium hover:bg-surface-container-high transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">steppers</span>
+<span class="font-body-lg text-body-lg">Adımlar</span>
+</a>
+</li>
+<li class="mb-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-on-surface-variant font-medium hover:bg-surface-container-high transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">leaderboard</span>
+<span class="font-body-lg text-body-lg">İlerleme</span>
+</a>
+</li>
+<li class="mb-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold border-r-4 border-primary bg-primary-container/10" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="font-body-lg text-body-lg">Geçmiş</span>
+</a>
+</li>
+<li class="mb-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-on-surface-variant font-medium hover:bg-surface-container-high transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="font-body-lg text-body-lg">Ayarlar</span>
+</a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-grow md:ml-[300px] flex flex-col min-h-screen">
+<!-- TopAppBar (Mobile & Desktop Header) -->
+<header class="bg-surface dark:bg-on-background sticky top-0 z-50 flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop py-4 w-full shadow-sm shadow-primary/5">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+                Game of Us
+            </div>
+<div class="flex gap-4">
+<button class="text-on-surface-variant font-medium hover:bg-primary-container/10 transition-colors active:scale-95 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+<button class="text-on-surface-variant font-medium hover:bg-primary-container/10 transition-colors active:scale-95 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Canvas / Focus Area -->
+<div class="flex-grow flex items-center justify-center p-gutter md:p-container-padding-desktop">
+<!-- Large Centered Card -->
+<div class="bg-surface-container-lowest max-w-[720px] w-full rounded-xl shadow-[0_16px_32px_rgba(174,47,52,0.05)] p-8 md:p-12 flex flex-col items-center text-center border border-outline-variant/20 relative overflow-hidden">
+<!-- Background decorative elements for the card -->
+<div class="absolute -top-20 -right-20 w-64 h-64 bg-surface-variant rounded-full opacity-50 blur-3xl z-0"></div>
+<div class="absolute -bottom-20 -left-20 w-64 h-64 bg-primary-fixed rounded-full opacity-30 blur-3xl z-0"></div>
+<!-- Content container -->
+<div class="z-10 flex flex-col items-center w-full">
+<!-- Enlarged Celebratory Illustration -->
+<div class="w-48 h-48 md:w-64 md:h-64 mb-8 bg-surface-container rounded-full flex items-center justify-center overflow-hidden">
+<img alt="Celebration Illustration" class="w-full h-full object-cover mix-blend-multiply opacity-90" data-alt="A stylized, cheerful illustration of colorful confetti and abstract organic shapes floating in a clean, bright space. The lighting is soft and ambient, creating a warm, playful mood. It utilizes a Soft-Tactile Modernism aesthetic with shades of warm coral, peach, and soft gold against an off-white background, embodying a sense of gentle celebration and achievement." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm7l_2bz2TZf26SLWKrutlkkCtqqk9zrWzRH5cMaNatKRnXF2UJ0-n3V_tOvBublYNhQSJ8fd4cRcLThMokmWyzUW62tboNKTqj4RyXsdLFtOdsBVkhQF1RQIa8tMj03LStbeXxxplhp6a7DlNoEiiw4ShNP0xM39A3on8bp4hxmeeQjn2s4_TcoSYNeLsYmGs4y-DkbcwAhJe9OoiVoNuExbkfHYT4uC4e9LDfdWobP0AHPH2FOtwIlyICusgq6kbfvdZvikNw38"/>
+</div>
+<!-- Heading -->
+<h1 class="font-headline-xl text-headline-lg-mobile md:text-headline-xl text-on-background mb-4">
+                        Bu oyun tamamlandı
+                    </h1>
+<!-- Short Explanation -->
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[500px] mb-10">
+                        Bu oyunu daha önce bitirmiştiniz. Sonuçlarınızı tekrar inceleyebilirsiniz.
+                    </p>
+<!-- Action Button -->
+<button class="h-14 px-8 bg-primary text-on-primary font-headline-md text-[18px] leading-[24px] rounded-full shadow-lg shadow-primary/20 hover:bg-on-primary-fixed-variant hover:shadow-xl transition-all active:scale-95 flex items-center gap-2">
+<span>Sonuçları gör</span>
+<span class="material-symbols-outlined" style="font-size: 20px;">arrow_forward</span>
+</button>
+<!-- Secondary Option -->
+<button class="mt-6 px-6 py-3 bg-transparent text-primary font-label-md text-label-md rounded-full hover:bg-surface-variant/50 transition-colors">
+                        Ana Sayfaya Dön
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="bg-surface dark:bg-on-background shadow-[0_-4px_16px_rgba(174,47,52,0.05)] docked full-width bottom-0 rounded-t-lg md:hidden fixed left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 pb-2">
+<a class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-14 active:bg-surface-variant transition-colors active:scale-90 rounded-2xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">play_circle</span>
+<span class="font-label-md text-[12px] mt-1">Oyna</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-14 active:bg-surface-variant transition-colors active:scale-90 rounded-2xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">trending_up</span>
+<span class="font-label-md text-[12px] mt-1">İlerleme</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-14 active:bg-surface-variant transition-colors active:scale-90 rounded-2xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">forum</span>
+<span class="font-label-md text-[12px] mt-1">Sohbet</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-14 active:bg-surface-variant transition-colors active:scale-90 rounded-2xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-md text-[12px] mt-1">Profil</span>
+</a>
+</nav>
+</body></html>

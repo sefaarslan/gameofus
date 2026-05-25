@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Yeni Oyun Oluştur - Game of Us</title>
+<!-- Google Fonts: Quicksand for Warm, Approachable Typography -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration (Soft-Tactile Modernism Theme) -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#fbd1c4",
+                        "secondary-fixed-dim": "#cec5c0",
+                        "on-primary-container": "#6d0010",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#4b4642",
+                        "tertiary": "#705d00",
+                        "on-background": "#2c160e",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#eae1dc",
+                        "surface-bright": "#fff8f6",
+                        "inverse-on-surface": "#ffede8",
+                        "surface-container-highest": "#ffdbd0",
+                        "surface-container": "#ffe9e3",
+                        "on-tertiary-fixed": "#221b00",
+                        "primary-fixed": "#ffdad8",
+                        "secondary": "#635d59",
+                        "on-surface": "#2c160e",
+                        "inverse-surface": "#442a22",
+                        "tertiary-fixed-dim": "#e8c426",
+                        "outline-variant": "#e0bfbd",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#68615e",
+                        "background": "#fff8f6",
+                        "primary": "#ae2f34",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#4c3e00",
+                        "on-secondary-fixed": "#1f1b18",
+                        "error": "#ba1a1a",
+                        "on-surface-variant": "#584140",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#ffb3b0",
+                        "tertiary-fixed": "#ffe173",
+                        "surface-container-low": "#fff1ed",
+                        "surface": "#fff8f6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#8c1520",
+                        "on-primary-fixed": "#410006",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#ffe2da",
+                        "tertiary-container": "#caa800",
+                        "primary-fixed-dim": "#ffb3b0",
+                        "primary-container": "#ff6b6b",
+                        "surface-tint": "#ae2f34",
+                        "surface-variant": "#ffdbd0",
+                        "secondary-container": "#e7ded9",
+                        "outline": "#8c706f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding-mobile": "24px",
+                        "container-padding-desktop": "48px",
+                        "gutter": "24px",
+                        "section-gap": "40px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "headline-lg-mobile": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "headline-xl": ["Quicksand"],
+                        "body-md": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "500" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Soft Diffusion Shadows & Custom Utilities */
+        .shadow-soft-card {
+            box-shadow: 0 16px 32px -12px rgba(174, 47, 52, 0.08);
+        }
+        .shadow-soft-active {
+            box-shadow: 0 24px 48px -12px rgba(174, 47, 52, 0.15);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<!-- 
+    TRANSACTIONAL SCREEN LOGIC: 
+    Navigation shell (TopAppBar with tabs/actions, SideNavBar, BottomNavBar) is SUPPRESSED 
+    to maintain focus on the linear "Create Game" flow. 
+-->
+<body class="bg-surface-container-low text-on-surface antialiased min-h-screen flex flex-col pb-32 selection:bg-primary-container selection:text-on-primary-container">
+<!-- Minimal Flow Header -->
+<header class="w-full px-container-padding-mobile md:px-container-padding-desktop py-6 flex items-center justify-between sticky top-0 z-40 bg-surface-container-low/90 backdrop-blur-md">
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant active:scale-95">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex items-center gap-2">
+<div class="h-2 w-12 rounded-full bg-primary"></div>
+<div class="h-2 w-12 rounded-full bg-surface-container-highest"></div>
+<div class="h-2 w-12 rounded-full bg-surface-container-highest"></div>
+</div>
+<div class="font-label-md text-label-md text-primary bg-primary-container/20 px-4 py-2 rounded-full">
+            Adım 1
+        </div>
+</header>
+<!-- Main Content Canvas (Floating Harmony Layout) -->
+<main class="w-full max-w-[720px] mx-auto px-container-padding-mobile md:px-container-padding-desktop flex flex-col gap-section-gap pt-4">
+<!-- Header Text -->
+<section class="flex flex-col gap-2">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Yeni Oyun Oluştur</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Harika bir deneyim için detayları belirleyelim.</p>
+</section>
+<!-- Player Details (Inputs) -->
+<section class="flex flex-col gap-gutter bg-surface-container-lowest p-6 md:p-8 rounded-lg shadow-soft-card border border-surface-container-highest/50">
+<div class="flex flex-col gap-2 group">
+<label class="font-label-md text-label-md text-on-surface-variant ml-2 flex items-center gap-1 transition-colors group-focus-within:text-primary" for="player-name">
+                    İsmin <span class="text-primary">*</span>
+</label>
+<input class="h-16 w-full bg-surface-container border-2 border-transparent rounded-lg px-6 font-body-lg text-body-lg text-on-surface focus:bg-surface-container-lowest focus:border-primary focus:ring-0 transition-all placeholder:text-on-surface-variant/40 outline-none" id="player-name" placeholder="Adını gir" required="" type="text"/>
+</div>
+<div class="flex flex-col gap-2 group">
+<label class="font-label-md text-label-md text-on-surface-variant ml-2 flex items-center gap-1 transition-colors group-focus-within:text-primary" for="partner-name">
+                    Partner adı (opsiyonel)
+                </label>
+<input class="h-16 w-full bg-surface-container border-2 border-transparent rounded-lg px-6 font-body-lg text-body-lg text-on-surface focus:bg-surface-container-lowest focus:border-primary focus:ring-0 transition-all placeholder:text-on-surface-variant/40 outline-none" id="partner-name" placeholder="Onun adını gir" type="text"/>
+</div>
+</section>
+<!-- Game Mode Selector -->
+<section class="flex flex-col gap-4">
+<h2 class="font-headline-md text-headline-md text-on-surface ml-2">Oyun Modu</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="mode-selector">
+<!-- Card 1: Secret Choice (Selected State) -->
+<button class="mode-card group relative flex flex-col items-start gap-4 p-6 bg-surface-container-lowest rounded-lg border-2 border-primary shadow-soft-active transition-all active:scale-[0.98] text-left overflow-hidden cursor-pointer" data-selected="true">
+<!-- Recommended Badge -->
+<div class="absolute top-0 right-0 bg-primary text-on-primary font-label-md text-[11px] px-4 py-1.5 rounded-bl-lg font-bold tracking-wider uppercase shadow-sm">
+                        Önerilen
+                    </div>
+<div class="w-14 h-14 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">visibility_off</span>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="font-headline-md text-headline-md text-on-surface">Secret Choice</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Seçenekler arasından gizlice seçimini yap.</p>
+</div>
+<!-- Selection Indicator -->
+<div class="absolute bottom-4 right-4 text-primary opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</button>
+<!-- Card 2: Prediction (Unselected State) -->
+<button class="mode-card group relative flex flex-col items-start gap-4 p-6 bg-surface-container-lowest rounded-lg border-2 border-transparent hover:border-surface-container-highest shadow-soft-card hover:shadow-soft-active transition-all active:scale-[0.98] text-left cursor-pointer" data-selected="false">
+<div class="w-14 h-14 rounded-full bg-surface-container group-hover:bg-primary-container/20 text-on-surface-variant group-hover:text-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">psychology</span>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="font-headline-md text-headline-md text-on-surface">Prediction</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Gelecekteki senaryolar hakkında partnerinin ne tepki vereceğini tahmin et.</p>
+</div>
+<!-- Selection Indicator (Hidden) -->
+<div class="absolute bottom-4 right-4 text-primary opacity-0 transition-opacity">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</button>
+<!-- Card 3: Orderline (Unselected State) -->
+<button class="mode-card group relative flex flex-col items-start gap-4 p-6 bg-surface-container-lowest rounded-lg border-2 border-transparent hover:border-surface-container-highest shadow-soft-card hover:shadow-soft-active transition-all active:scale-[0.98] text-left cursor-pointer" data-selected="false">
+<div class="w-14 h-14 rounded-full bg-surface-container group-hover:bg-primary-container/20 text-on-surface-variant group-hover:text-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">format_list_numbered</span>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="font-headline-md text-headline-md text-on-surface">Orderline</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Seçenekleri kendi önceliklerine göre sırala.</p>
+</div>
+<!-- Selection Indicator (Hidden) -->
+<div class="absolute bottom-4 right-4 text-primary opacity-0 transition-opacity">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</button>
+</div>
+</section>
+<!-- Question Count Selector (Segmented Pills) -->
+<section class="flex flex-col gap-4">
+<h2 class="font-headline-md text-headline-md text-on-surface ml-2">Soru Sayısı</h2>
+<div class="flex items-center gap-3 bg-surface-container-lowest p-2 rounded-full shadow-sm border border-surface-container-highest/30" id="count-selector">
+<button class="count-pill flex-1 h-14 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md flex items-center justify-center hover:bg-surface-container-high transition-all active:scale-95" data-selected="false">
+                    10
+                </button>
+<!-- Selected State -->
+<button class="count-pill flex-1 h-14 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center shadow-[0_8px_16px_-6px_rgba(174,47,52,0.4)] transition-all active:scale-95" data-selected="true">
+                    20
+                </button>
+<button class="count-pill flex-1 h-14 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-surface-container-high transition-all active:scale-95 relative overflow-hidden group" data-selected="false">
+<!-- Subtle premium glow on hover -->
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-tertiary-container/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    50 
+                    <span class="material-symbols-outlined text-tertiary text-[20px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Sticky CTA Bottom Area -->
+<div class="fixed bottom-0 left-0 w-full z-50 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/90 to-transparent pt-12 pb-6 px-container-padding-mobile md:px-container-padding-desktop">
+<div class="max-w-[720px] mx-auto">
+<button class="w-full h-16 bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-headline-md text-headline-md rounded-full shadow-[0_12px_24px_-8px_rgba(174,47,52,0.4)] transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                Oyun linki oluştur
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_link</span>
+</button>
+</div>
+</div>
+<!-- Lightweight Interactive Scripts -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Logic for Game Mode Selection
+            const modeCards = document.querySelectorAll('.mode-card');
+            modeCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    // Reset all
+                    modeCards.forEach(c => {
+                        c.setAttribute('data-selected', 'false');
+                        c.classList.remove('border-primary', 'shadow-soft-active');
+                        c.classList.add('border-transparent', 'shadow-soft-card');
+                        
+                        // Handle internal styles
+                        const iconContainer = c.querySelector('.w-14');
+                        iconContainer.classList.remove('bg-primary-container', 'text-on-primary-container');
+                        iconContainer.classList.add('bg-surface-container', 'text-on-surface-variant');
+                        
+                        const checkIcon = c.querySelector('.absolute.bottom-4');
+                        checkIcon.classList.remove('opacity-100');
+                        checkIcon.classList.add('opacity-0');
+                    });
+
+                    // Set active
+                    card.setAttribute('data-selected', 'true');
+                    card.classList.remove('border-transparent', 'shadow-soft-card');
+                    card.classList.add('border-primary', 'shadow-soft-active');
+                    
+                    const activeIconContainer = card.querySelector('.w-14');
+                    activeIconContainer.classList.remove('bg-surface-container', 'text-on-surface-variant');
+                    activeIconContainer.classList.add('bg-primary-container', 'text-on-primary-container');
+                    
+                    const activeCheck = card.querySelector('.absolute.bottom-4');
+                    activeCheck.classList.remove('opacity-0');
+                    activeCheck.classList.add('opacity-100');
+                });
+            });
+
+            // Logic for Question Count Selection
+            const countPills = document.querySelectorAll('.count-pill');
+            countPills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    // Reset all
+                    countPills.forEach(p => {
+                        p.setAttribute('data-selected', 'false');
+                        p.classList.remove('bg-primary', 'text-on-primary', 'shadow-[0_8px_16px_-6px_rgba(174,47,52,0.4)]');
+                        p.classList.add('bg-surface-container', 'text-on-surface-variant');
+                    });
+
+                    // Set active
+                    pill.setAttribute('data-selected', 'true');
+                    pill.classList.remove('bg-surface-container', 'text-on-surface-variant');
+                    pill.classList.add('bg-primary', 'text-on-primary', 'shadow-[0_8px_16px_-6px_rgba(174,47,52,0.4)]');
+                });
+            });
+
+        });
+    </script>
+</body></html>

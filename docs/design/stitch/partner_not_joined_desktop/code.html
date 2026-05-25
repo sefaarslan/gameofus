@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Game of Us - Partner Bekleniyor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#635d59",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "surface": "#fff8f6",
+                        "surface-container-low": "#fff1ed",
+                        "surface-variant": "#ffdbd0",
+                        "tertiary-container": "#caa800",
+                        "on-background": "#2c160e",
+                        "background": "#fff8f6",
+                        "secondary-fixed": "#eae1dc",
+                        "surface-container-high": "#ffe2da",
+                        "surface-bright": "#fff8f6",
+                        "outline-variant": "#e0bfbd",
+                        "secondary-fixed-dim": "#cec5c0",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#ffdad8",
+                        "primary-container": "#ff6b6b",
+                        "on-primary-container": "#6d0010",
+                        "tertiary-fixed-dim": "#e8c426",
+                        "on-tertiary-fixed": "#221b00",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#68615e",
+                        "inverse-primary": "#ffb3b0",
+                        "surface-dim": "#fbd1c4",
+                        "inverse-on-surface": "#ffede8",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#705d00",
+                        "primary-fixed-dim": "#ffb3b0",
+                        "on-surface": "#2c160e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#4b4642",
+                        "on-tertiary-container": "#4c3e00",
+                        "outline": "#8c706f",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#584140",
+                        "tertiary-fixed": "#ffe173",
+                        "inverse-surface": "#442a22",
+                        "surface-container": "#ffe9e3",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#ae2f34",
+                        "on-primary-fixed-variant": "#8c1520",
+                        "primary": "#ae2f34",
+                        "surface-container-highest": "#ffdbd0",
+                        "on-secondary-fixed": "#1f1b18",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#410006",
+                        "secondary-container": "#e7ded9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "40px",
+                        "gutter": "24px",
+                        "container-padding-desktop": "48px",
+                        "container-padding-mobile": "24px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "headline-xl": ["Quicksand"],
+                        "headline-lg-mobile": ["Quicksand"],
+                        "body-md": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.surface'); color: theme('colors.on-background'); font-family: 'Quicksand', sans-serif; }
+        .material-symbols-outlined { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 24px; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; }
+        .soft-shadow { box-shadow: 0 16px 32px -8px rgba(174, 47, 52, 0.05); }
+        .interactive-shadow { box-shadow: 0 24px 48px -12px rgba(174, 47, 52, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 flex justify-between items-center px-container-padding-desktop py-4 w-full bg-surface shadow-sm shadow-primary/5">
+<div class="font-headline-md text-headline-md font-bold text-primary">Game of Us</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-primary-container/10 transition-colors p-2 rounded-full active:scale-95 transition-transform flex items-center justify-center">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+<button class="text-on-surface-variant hover:bg-primary-container/10 transition-colors p-2 rounded-full active:scale-95 transition-transform flex items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1">
+<!-- SideNavBar -->
+<nav class="h-screen w-[300px] hidden md:flex flex-col bg-surface-container-low border-r border-outline-variant/30 fixed left-0 top-0 pt-[80px]">
+<div class="p-6 flex flex-col gap-2 border-b border-outline-variant/20 mb-4">
+<div class="w-16 h-16 rounded-full bg-surface-variant flex items-center justify-center mb-2 overflow-hidden">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant">person</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary">İlişki Durumu</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">%75 Tamamlandı</p>
+</div>
+<div class="flex flex-col gap-2 px-4 flex-1">
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container-high transition-all hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">steppers</span>
+<span class="font-body-md text-body-md">Adımlar</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container-high transition-all hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-body-md text-body-md">İlerleme</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container-high transition-all hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body-md text-body-md">Geçmiş</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container-high transition-all hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Ayarlar</span>
+</a>
+</div>
+<div class="p-4 mt-auto">
+<button class="w-full bg-primary text-on-primary py-3 rounded-full font-label-md text-label-md font-bold hover:bg-on-primary-fixed-variant transition-colors active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">add</span>
+                     Yeni Oyun
+                 </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-[300px] flex items-center justify-center p-container-padding-desktop min-h-[calc(100vh-80px)]">
+<div class="w-full max-w-[720px] bg-white rounded-[24px] p-10 md:p-14 flex flex-col items-center text-center soft-shadow relative overflow-hidden transition-all duration-300 hover:interactive-shadow group">
+<!-- Decorative background elements -->
+<div class="absolute top-[-50px] right-[-50px] w-40 h-40 bg-surface-container-highest rounded-full blur-3xl opacity-50 group-hover:scale-110 transition-transform duration-700"></div>
+<div class="absolute bottom-[-50px] left-[-50px] w-40 h-40 bg-primary-fixed rounded-full blur-3xl opacity-30 group-hover:scale-110 transition-transform duration-700"></div>
+<!-- Illustration / Icon -->
+<div class="w-48 h-48 md:w-64 md:h-64 mb-8 relative flex items-center justify-center">
+<div class="absolute inset-0 bg-surface-variant rounded-full opacity-50 animate-pulse"></div>
+<img alt="Waiting concept illustration" class="w-3/4 h-3/4 object-contain z-10 rounded-full border-4 border-white shadow-sm shadow-primary/10" data-alt="A soft, minimalist illustration representing waiting or anticipation in a warm, inviting style. The scene uses a delicate palette of coral, peach, and soft whites to match a Light-Mode Soft-Tactile Modernism aesthetic. A stylized hourglass or a calm character sitting peacefully with a subtle, friendly expression. Gentle, diffused lighting creates a comforting and safe atmosphere without harsh shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDufk_Nw9NQT1lWYjlDb2Nl6hq2YeR_U4wf7XWqpNlHIw-sEatm0cn0EyQr1rHvaOefXLmBqXyu333t7m7Abf9aOl658JA-HUMIqEi7pFxCxNaYS7n87jSBCXrImE0I3McVpEoNzAW0D4WnflOBxLUnBtpdPzMH1esbWLuY1nwq2SWSp6GEkIQ5ERMeV1mXaYhcrTkjYaT33xfIHrpSm0TXuGxNB2_n4dpvdCwjwrkF8E-xLc_03usy-DnbR1VsAq1yEDVuCjPkqI0"/>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 text-primary bg-white rounded-full p-3 shadow-md text-3xl z-20">schedule</span>
+</div>
+<!-- Text Content -->
+<h1 class="font-headline-xl text-headline-xl text-on-surface mb-4">Partnerin henüz katılmadı</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-md">
+                    Oyunun başlaması için partnerinin linke tıklayıp odaya girmesi gerekiyor.
+                </p>
+<!-- Action Area -->
+<div class="w-full max-w-sm flex flex-col gap-4">
+<button class="w-full min-h-[56px] bg-primary text-on-primary rounded-full font-label-md text-label-md font-bold hover:bg-on-primary-fixed-variant transition-colors active:scale-95 flex items-center justify-center gap-2 shadow-sm shadow-primary/20">
+<span class="material-symbols-outlined">share</span>
+                        Linki tekrar paylaş
+                    </button>
+<div class="flex items-center gap-4 w-full">
+<div class="h-px bg-outline-variant flex-1"></div>
+<span class="font-label-md text-label-md text-outline">veya</span>
+<div class="h-px bg-outline-variant flex-1"></div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-3 flex items-center justify-between border border-outline-variant/30">
+<span class="font-body-md text-body-md text-on-surface-variant truncate mr-2 select-all font-mono text-sm">gameofus.app/join/x7y9-z2a1</span>
+<button class="p-2 text-primary hover:bg-surface-variant rounded-lg transition-colors flex-shrink-0" title="Kopyala">
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+</button>
+</div>
+</div>
+<!-- Subtle Loading Indicator -->
+<div class="mt-12 flex items-center gap-2 text-on-surface-variant">
+<div class="flex gap-1">
+<div class="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style="animation-delay: 0ms"></div>
+<div class="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style="animation-delay: 150ms"></div>
+<div class="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style="animation-delay: 300ms"></div>
+</div>
+<span class="font-label-md text-label-md ml-2">Partner bekleniyor...</span>
+</div>
+</div>
+</main>
+</div>
+</body></html>

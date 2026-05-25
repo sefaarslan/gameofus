@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html class="light" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Game of Us - Secret Choice</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#8c706f",
+                        "surface-tint": "#ae2f34",
+                        "on-surface": "#2c160e",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#442a22",
+                        "secondary": "#635d59",
+                        "primary-container": "#ff6b6b",
+                        "secondary-fixed": "#eae1dc",
+                        "on-tertiary-fixed": "#221b00",
+                        "primary-fixed": "#ffdad8",
+                        "on-background": "#2c160e",
+                        "on-primary-fixed": "#410006",
+                        "surface-container-high": "#ffe2da",
+                        "outline-variant": "#e0bfbd",
+                        "on-secondary-container": "#68615e",
+                        "tertiary": "#705d00",
+                        "surface": "#fff8f6",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary": "#ae2f34",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1f1b18",
+                        "surface-container-low": "#fff1ed",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fff8f6",
+                        "surface-container": "#ffe9e3",
+                        "surface-bright": "#fff8f6",
+                        "on-tertiary-container": "#4c3e00",
+                        "tertiary-container": "#caa800",
+                        "tertiary-fixed-dim": "#e8c426",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffe173",
+                        "primary-fixed-dim": "#ffb3b0",
+                        "surface-container-highest": "#ffdbd0",
+                        "on-primary-container": "#6d0010",
+                        "inverse-on-surface": "#ffede8",
+                        "on-surface-variant": "#584140",
+                        "secondary-container": "#e7ded9",
+                        "surface-variant": "#ffdbd0",
+                        "surface-dim": "#fbd1c4",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#cec5c0",
+                        "on-primary-fixed-variant": "#8c1520",
+                        "on-secondary-fixed-variant": "#4b4642",
+                        "inverse-primary": "#ffb3b0",
+                        "surface-container-lowest": "#ffffff",
+                        "accent-gold": "#caa800"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "container-padding-mobile": "24px",
+                        "base": "8px",
+                        "section-gap": "40px",
+                        "container-padding-desktop": "48px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "headline-md": ["Quicksand"],
+                        "body-md": ["Quicksand"],
+                        "headline-lg-mobile": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "body-lg": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Quicksand', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(174, 47, 52, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop py-4 w-full bg-surface dark:bg-on-background shadow-sm shadow-primary/5">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+            Game of Us
+        </div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:bg-primary-container/10 transition-colors p-2 rounded-full cursor-pointer active:scale-95 transition-transform" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:bg-primary-container/10 transition-colors p-2 rounded-full cursor-pointer active:scale-95 transition-transform" style="font-variation-settings: 'FILL' 0;">settings</span>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 px-container-padding-mobile md:px-container-padding-desktop py-section-gap flex justify-center">
+<!-- Desktop 3-column layout -->
+<div class="w-full max-w-[1440px] grid grid-cols-1 md:grid-cols-[300px_minmax(0,720px)_300px] gap-gutter items-start">
+<!-- Left Column: Game Info -->
+<aside class="hidden md:flex flex-col gap-base sticky top-[100px]">
+<div class="glass-card rounded-[24px] p-6 flex flex-col gap-4">
+<div class="inline-flex items-center gap-2 bg-accent-gold/20 text-tertiary-container px-3 py-1 rounded-full w-max font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm">visibility_off</span>
+                        Secret Choice
+                    </div>
+<div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-1">Soru</p>
+<p class="font-headline-lg text-headline-lg text-primary">3 <span class="text-on-surface-variant font-headline-md text-headline-md">/ 10</span></p>
+</div>
+<div class="h-px bg-outline-variant/30 w-full my-2"></div>
+<div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-1">Puan</p>
+<p class="font-headline-md text-headline-md text-tertiary-container flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">stars</span>
+                            12
+                        </p>
+</div>
+</div>
+</aside>
+<!-- Center Column: Play Area -->
+<section class="flex flex-col gap-gutter w-full max-w-[720px] mx-auto">
+<div class="glass-card rounded-[24px] p-8 md:p-10 flex flex-col gap-8 relative overflow-hidden">
+<!-- Ambient decorative blur -->
+<div class="absolute -top-20 -right-20 w-64 h-64 bg-primary-container/20 rounded-full blur-[60px] pointer-events-none"></div>
+<h1 class="font-headline-xl text-headline-xl text-center text-on-surface relative z-10">
+                        Her gün mesajlaşmak senin için önemli mi?
+                    </h1>
+<div class="flex flex-col gap-section-gap relative z-10">
+<!-- Section 1: Self -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+                                    Senin cevabın
+                                </h2>
+<span class="text-on-surface-variant flex items-center gap-1 font-body-md text-body-md opacity-70">
+<span class="material-symbols-outlined text-sm">lock</span>
+                                    partnerine gösterilmez
+                                </span>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full text-left px-6 py-4 rounded-full border-2 border-primary-container bg-primary-container/10 font-body-lg text-body-lg font-bold text-primary transition-all active:scale-[0.98] flex justify-between items-center group relative overflow-hidden">
+<div class="absolute inset-0 bg-primary-container opacity-100 transition-opacity"></div>
+<span class="relative z-10 text-on-primary">Evet</span>
+<span class="material-symbols-outlined relative z-10 text-on-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+<button class="w-full text-left px-6 py-4 rounded-full border border-outline-variant bg-surface-container-lowest font-body-lg text-body-lg text-on-surface transition-all hover:bg-surface-container-low active:scale-[0.98]">
+                                    Kararsız
+                                </button>
+<button class="w-full text-left px-6 py-4 rounded-full border border-outline-variant bg-surface-container-lowest font-body-lg text-body-lg text-on-surface transition-all hover:bg-surface-container-low active:scale-[0.98]">
+                                    Hayır
+                                </button>
+</div>
+</div>
+<!-- Separator -->
+<div class="flex items-center justify-center gap-4 w-full">
+<div class="h-px bg-outline-variant/30 flex-1"></div>
+<span class="material-symbols-outlined text-outline-variant">favorite</span>
+<div class="h-px bg-outline-variant/30 flex-1"></div>
+</div>
+<!-- Section 2: Partner Guess -->
+<div class="flex flex-col gap-4">
+<h2 class="font-headline-md text-headline-md text-on-surface">
+                                Partnerin ne cevap verdi sence?
+                            </h2>
+<div class="flex flex-col gap-3">
+<button class="w-full text-left px-6 py-4 rounded-full border border-outline-variant bg-surface-container-lowest font-body-lg text-body-lg text-on-surface transition-all hover:bg-surface-container-low active:scale-[0.98]">
+                                    Evet
+                                </button>
+<button class="w-full text-left px-6 py-4 rounded-full border border-outline-variant bg-surface-container-lowest font-body-lg text-body-lg text-on-surface transition-all hover:bg-surface-container-low active:scale-[0.98]">
+                                    Kararsız
+                                </button>
+<button class="w-full text-left px-6 py-4 rounded-full border-2 border-tertiary-container bg-tertiary-container/10 font-body-lg text-body-lg font-bold text-tertiary transition-all active:scale-[0.98] flex justify-between items-center group relative overflow-hidden">
+<div class="absolute inset-0 bg-tertiary-container opacity-100 transition-opacity"></div>
+<span class="relative z-10 text-on-tertiary">Hayır</span>
+<span class="material-symbols-outlined relative z-10 text-on-tertiary" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</button>
+</div>
+<!-- Confidence Selector -->
+<div class="mt-4 bg-surface-container-low rounded-2xl p-4 border border-outline-variant/20 flex flex-col items-center gap-3">
+<p class="font-body-md text-body-md text-on-surface-variant text-center">
+                                    Ne kadar eminsin? <span class="text-tertiary-container font-semibold">Emin olup tutturmak daha çok puan.</span>
+</p>
+<div class="flex gap-2 w-full justify-center">
+<button class="px-4 py-2 rounded-full font-label-md text-label-md border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-variant transition-colors flex-1 max-w-[120px]">
+                                        Tahmin
+                                    </button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-variant transition-colors flex-1 max-w-[120px]">
+                                        Sanırım
+                                    </button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md border-2 border-tertiary-container bg-tertiary-container text-on-tertiary shadow-sm shadow-tertiary-container/30 flex-1 max-w-[120px]">
+                                        Eminim
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Primary CTA -->
+<button class="w-full min-h-[64px] rounded-full bg-primary text-on-primary font-headline-md text-headline-md font-bold shadow-[0_8px_24px_rgba(174,47,52,0.3)] hover:shadow-[0_12px_32px_rgba(174,47,52,0.4)] hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    Tahmini kilitle
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">vpn_key</span>
+</button>
+</section>
+<!-- Right Column: Partner Status -->
+<aside class="hidden md:flex flex-col gap-base sticky top-[100px]">
+<div class="glass-card rounded-[24px] p-6 flex flex-col items-center gap-4 text-center">
+<div class="w-20 h-20 rounded-full bg-surface-variant flex items-center justify-center border-4 border-surface shadow-sm overflow-hidden relative">
+<!-- Placeholder avatar -->
+<div class="w-full h-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-on-secondary-container opacity-50">face</span>
+</div>
+<!-- Typing indicator dots -->
+<div class="absolute bottom-1 right-1 bg-surface rounded-full p-1 shadow-sm flex gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style="animation-delay: 0ms"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style="animation-delay: 150ms"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style="animation-delay: 300ms"></div>
+</div>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold">Alex</h3>
+<p class="font-body-md text-body-md text-on-surface-variant italic mt-1">Şu an cevaplıyor...</p>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 bg-surface dark:bg-on-background shadow-[0_-4px_16px_rgba(174,47,52,0.05)] shadow-lg docked full-width bottom-0 rounded-t-lg md:hidden">
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-2xl px-4 py-1 active:bg-surface-variant transition-colors active:scale-90 transition-transform">
+<span class="material-symbols-outlined font-label-md text-label-md">play_circle</span>
+<span class="font-label-md text-label-md mt-1">Oyna</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant transition-colors active:scale-90 transition-transform">
+<span class="material-symbols-outlined font-label-md text-label-md">trending_up</span>
+<span class="font-label-md text-label-md mt-1">İlerleme</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant transition-colors active:scale-90 transition-transform">
+<span class="material-symbols-outlined font-label-md text-label-md">forum</span>
+<span class="font-label-md text-label-md mt-1">Sohbet</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant transition-colors active:scale-90 transition-transform">
+<span class="material-symbols-outlined font-label-md text-label-md">person</span>
+<span class="font-label-md text-label-md mt-1">Profil</span>
+</button>
+</nav>
+</body></html>

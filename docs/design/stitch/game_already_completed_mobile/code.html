@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Oyun Tamamlandı - Game of Us</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config from Guidelines -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#635d59",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "surface": "#fff8f6",
+                        "surface-container-low": "#fff1ed",
+                        "surface-variant": "#ffdbd0",
+                        "tertiary-container": "#caa800",
+                        "on-background": "#2c160e",
+                        "background": "#fff8f6",
+                        "secondary-fixed": "#eae1dc",
+                        "surface-container-high": "#ffe2da",
+                        "surface-bright": "#fff8f6",
+                        "outline-variant": "#e0bfbd",
+                        "secondary-fixed-dim": "#cec5c0",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#ffdad8",
+                        "primary-container": "#ff6b6b",
+                        "on-primary-container": "#6d0010",
+                        "tertiary-fixed-dim": "#e8c426",
+                        "on-tertiary-fixed": "#221b00",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#68615e",
+                        "inverse-primary": "#ffb3b0",
+                        "surface-dim": "#fbd1c4",
+                        "inverse-on-surface": "#ffede8",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#705d00",
+                        "primary-fixed-dim": "#ffb3b0",
+                        "on-surface": "#2c160e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#4b4642",
+                        "on-tertiary-container": "#4c3e00",
+                        "outline": "#8c706f",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#584140",
+                        "tertiary-fixed": "#ffe173",
+                        "inverse-surface": "#442a22",
+                        "surface-container": "#ffe9e3",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#ae2f34",
+                        "on-primary-fixed-variant": "#8c1520",
+                        "primary": "#ae2f34",
+                        "surface-container-highest": "#ffdbd0",
+                        "on-secondary-fixed": "#1f1b18",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#410006",
+                        "secondary-container": "#e7ded9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "40px",
+                        "gutter": "24px",
+                        "container-padding-desktop": "48px",
+                        "container-padding-mobile": "24px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "headline-xl": ["Quicksand"],
+                        "headline-lg-mobile": ["Quicksand"],
+                        "body-md": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Ensures material icons render correctly with weight */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar (Shared Component Translated) -->
+<header class="bg-surface docked full-width top-0 shadow-sm shadow-primary/5 flex justify-between items-center w-full px-container-padding-mobile h-16 shrink-0 z-10 sticky">
+<!-- Leading Action -->
+<button class="text-primary hover:bg-secondary-container/50 transition-colors rounded-full p-2 -ml-2 flex items-center justify-center active:scale-95">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<!-- Brand Logo -->
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">Game of Us</h1>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-1 -mr-2">
+<button class="text-primary hover:bg-secondary-container/50 transition-colors rounded-full p-2 flex items-center justify-center active:scale-95">
+<span class="material-symbols-outlined text-[24px]">help</span>
+</button>
+<button class="text-primary hover:bg-secondary-container/50 transition-colors rounded-full p-2 flex items-center justify-center active:scale-95">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<!-- Suppressed BottomNavBar as this is a transactional end-state -->
+<main class="flex-1 flex flex-col items-center justify-center p-container-padding-mobile w-full max-w-[480px] mx-auto">
+<!-- Glassmorphism/Soft-Tactile Card -->
+<div class="bg-surface-container-lowest w-full rounded-lg shadow-[0_16px_32px_-12px_rgba(174,47,52,0.1)] border border-primary/5 p-[32px] flex flex-col items-center text-center transform transition-all duration-500 opacity-0 translate-y-4" id="completion-card">
+<!-- Illustration Area -->
+<div class="w-48 h-48 mb-8 relative rounded-full bg-surface-container-low flex items-center justify-center shadow-inner">
+<!-- Image placeholder with detailed prompt -->
+<img alt="Trophy Illustration" class="w-full h-full object-cover rounded-full mix-blend-multiply opacity-90 p-4" data-alt="A meticulously crafted, soft-tactile 3D illustration of a golden trophy alongside a sealed romantic letter, resting gracefully on a pastel peach pedestal. The composition is bathed in warm, high-key, diffused lighting that evokes a gentle, comforting emotional response. The aesthetic aligns perfectly with a clean, modern lifestyle app, utilizing generous white space, subtle organic shapes, and soft primary coral tinted ambient shadows against a pristine white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzAsbFD3w8467UMznUovoDTDrB_uHWEazgSU5CGCS9CieKbN2pzF88TRtjts3FigHIXIIThUUKIbxhaMm6XNX4lScPZwbs-XjvqmhyXsYcOwIe8fJJAjtQ4rcNHg3ieEnG44qRyeInwYBrOJKxQmfhqTC1wUELQpdakpjgHIKYZ6uYVoKG66sDEkgSI6O93_bPXjJgJfTPFU9ngDU-ezkyWyVObLAcY11EVVqRbBmOJkBikF7Mzo-3_E6sgFjDEijg4M4gmFC7G8Y"/>
+<!-- Decorative sparkling elements -->
+<div class="absolute -top-2 -right-2 text-tertiary animate-pulse">
+<span class="material-symbols-outlined icon-fill text-[32px]">temp_preferences_custom</span>
+</div>
+<div class="absolute bottom-4 -left-4 text-primary-fixed-dim animate-bounce" style="animation-delay: 0.5s;">
+<span class="material-symbols-outlined icon-fill text-[24px]">favorite</span>
+</div>
+</div>
+<!-- Typography -->
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background mb-4">Bu oyun tamamlandı</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-[280px]">
+                Bu oyunu daha önce bitirmiştiniz. Sonuçlarınızı tekrar inceleyebilirsiniz.
+            </p>
+<!-- Primary Action Button -->
+<button class="w-full min-h-[56px] bg-primary text-on-primary rounded-full font-label-md text-label-md flex justify-center items-center gap-2 hover:bg-surface-tint hover:shadow-lg hover:shadow-primary/20 active:scale-95 transition-all duration-200">
+<span>Sonuçları gör</span>
+<span class="material-symbols-outlined text-[20px]">trending_flat</span>
+</button>
+<!-- Secondary Alternative Action (Optional but good for UX) -->
+<button class="mt-4 w-full min-h-[56px] bg-secondary-fixed text-on-secondary-fixed-variant rounded-full font-label-md text-label-md flex justify-center items-center hover:bg-secondary-container transition-all duration-200">
+                Ana Sayfaya Dön
+            </button>
+</div>
+</main>
+<!-- Lightweight JS for entrance animation -->
+<script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const card = document.getElementById('completion-card');
+            // Slight delay for smooth visual entry
+            setTimeout(() => {
+                card.classList.remove('opacity-0', 'translate-y-4');
+            }, 100);
+        });
+    </script>
+</body></html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html class="light" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Game of Us - Prediction Mode</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-fixed-dim": "#ffb3b0",
+                        "tertiary-fixed": "#ffe173",
+                        "surface-container-highest": "#ffdbd0",
+                        "on-surface-variant": "#584140",
+                        "on-primary-container": "#6d0010",
+                        "inverse-on-surface": "#ffede8",
+                        "secondary-container": "#e7ded9",
+                        "secondary-fixed-dim": "#cec5c0",
+                        "on-primary-fixed-variant": "#8c1520",
+                        "surface-variant": "#ffdbd0",
+                        "surface-dim": "#fbd1c4",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#4b4642",
+                        "inverse-primary": "#ffb3b0",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#ffe9e3",
+                        "surface-container-low": "#fff1ed",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fff8f6",
+                        "tertiary-container": "#caa800",
+                        "surface-bright": "#fff8f6",
+                        "on-tertiary-container": "#4c3e00",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "tertiary-fixed-dim": "#e8c426",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#ffe2da",
+                        "on-secondary-container": "#68615e",
+                        "outline-variant": "#e0bfbd",
+                        "surface": "#fff8f6",
+                        "tertiary": "#705d00",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "primary": "#ae2f34",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1f1b18",
+                        "outline": "#8c706f",
+                        "inverse-surface": "#442a22",
+                        "surface-tint": "#ae2f34",
+                        "on-surface": "#2c160e",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#ff6b6b",
+                        "secondary": "#635d59",
+                        "secondary-fixed": "#eae1dc",
+                        "on-tertiary-fixed": "#221b00",
+                        "primary-fixed": "#ffdad8",
+                        "on-background": "#2c160e",
+                        "on-primary-fixed": "#410006"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "gutter": "24px",
+                        "container-padding-mobile": "24px",
+                        "base": "8px",
+                        "container-padding-desktop": "48px",
+                        "section-gap": "40px"
+                    },
+                    fontFamily: {
+                        "label-md": ["Quicksand"],
+                        "headline-md": ["Quicksand"],
+                        "headline-xl": ["Quicksand"],
+                        "headline-lg-mobile": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "body-md": ["Quicksand"]
+                    },
+                    fontSize: {
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                },
+            }
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        .soft-shadow {
+            box-shadow: 0 8px 24px rgba(174, 47, 52, 0.05);
+        }
+        .active-shadow {
+            box-shadow: 0 12px 32px rgba(174, 47, 52, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop py-4 w-full bg-surface shadow-sm shadow-primary/5 transition-all">
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-primary-container/10 transition-colors text-primary active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+</div>
+<div class="font-headline-md text-headline-md font-bold text-primary text-center flex-1">
+            Soru 4 / 10
+        </div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-primary-container/10 transition-colors text-primary active:scale-95" data-icon="close">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">close</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col px-container-padding-mobile py-6 gap-section-gap max-w-[720px] mx-auto w-full relative z-10">
+<!-- Progress Bar -->
+<div class="w-full h-2 bg-secondary-fixed rounded-full overflow-hidden mb-2">
+<div class="h-full bg-gradient-to-r from-primary to-tertiary-fixed rounded-full transition-all duration-500 ease-out w-[40%]"></div>
+</div>
+<!-- Question Card -->
+<div class="bg-surface-container-lowest rounded-xl p-8 soft-shadow flex flex-col items-center justify-center min-h-[160px] text-center transform transition-transform hover:scale-[1.01]">
+<span class="inline-block px-4 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-md text-label-md mb-4 shadow-sm">Kişisel</span>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Boş bir cumartesi gününde ne yapmayı tercih edersin?</h2>
+</div>
+<!-- Options Stack -->
+<div class="flex flex-col gap-4 w-full pb-[100px]" id="options-container">
+<!-- Option 1 -->
+<button class="option-btn w-full bg-surface-container-lowest border-2 border-transparent rounded-[24px] p-6 text-left transition-all duration-200 soft-shadow hover:bg-surface-container-low focus:outline-none" data-value="1">
+<span class="font-body-lg text-body-lg text-on-surface block">Evde dinlenmek</span>
+</button>
+<!-- Option 2 -->
+<button class="option-btn w-full bg-surface-container-lowest border-2 border-transparent rounded-[24px] p-6 text-left transition-all duration-200 soft-shadow hover:bg-surface-container-low focus:outline-none" data-value="2">
+<span class="font-body-lg text-body-lg text-on-surface block">Dışarı çıkmak</span>
+</button>
+<!-- Option 3 -->
+<button class="option-btn w-full bg-surface-container-lowest border-2 border-transparent rounded-[24px] p-6 text-left transition-all duration-200 soft-shadow hover:bg-surface-container-low focus:outline-none" data-value="3">
+<span class="font-body-lg text-body-lg text-on-surface block">Arkadaşlarla buluşmak</span>
+</button>
+<!-- Option 4 -->
+<button class="option-btn w-full bg-surface-container-lowest border-2 border-transparent rounded-[24px] p-6 text-left transition-all duration-200 soft-shadow hover:bg-surface-container-low focus:outline-none" data-value="4">
+<span class="font-body-lg text-body-lg text-on-surface block">Spontane plan yapmak</span>
+</button>
+</div>
+</main>
+<!-- Bottom Sticky Action -->
+<div class="fixed bottom-0 left-0 w-full bg-gradient-to-t from-background via-background/95 to-transparent pt-12 pb-6 px-container-padding-mobile z-40 transform translate-y-0 transition-transform duration-300" id="bottom-action">
+<div class="max-w-[720px] mx-auto w-full flex flex-col items-center gap-3">
+<p class="font-label-md text-label-md text-outline text-center opacity-80">
+                Partnerin ne seçeceğini sonra tahmin edeceksin
+            </p>
+<button class="w-full h-[56px] rounded-full bg-secondary-fixed text-on-surface-variant font-headline-md text-headline-md flex items-center justify-center transition-all duration-300 pointer-events-none opacity-50" id="continue-btn">
+                Devam
+            </button>
+</div>
+</div>
+<!-- Background Ambient Decoration -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<div class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-primary-fixed-dim/20 blur-[100px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-tertiary-fixed/10 blur-[120px]"></div>
+</div>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const options = document.querySelectorAll('.option-btn');
+            const continueBtn = document.getElementById('continue-btn');
+            let selectedValue = null;
+
+            options.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Reset all
+                    options.forEach(opt => {
+                        opt.classList.remove('border-primary', 'bg-surface-container', 'active-shadow', 'scale-[1.02]');
+                        opt.classList.add('border-transparent', 'bg-surface-container-lowest', 'soft-shadow');
+                        const text = opt.querySelector('span');
+                        text.classList.remove('font-bold', 'text-primary');
+                        text.classList.add('font-medium', 'text-on-surface');
+                    });
+
+                    // Set active
+                    this.classList.remove('border-transparent', 'bg-surface-container-lowest', 'soft-shadow');
+                    this.classList.add('border-primary', 'bg-surface-container', 'active-shadow', 'scale-[1.02]');
+                    const activeText = this.querySelector('span');
+                    activeText.classList.remove('font-medium', 'text-on-surface');
+                    activeText.classList.add('font-bold', 'text-primary');
+
+                    selectedValue = this.getAttribute('data-value');
+
+                    // Enable Continue Button
+                    if (selectedValue) {
+                        continueBtn.classList.remove('bg-secondary-fixed', 'text-on-surface-variant', 'pointer-events-none', 'opacity-50');
+                        continueBtn.classList.add('bg-primary', 'text-on-primary', 'shadow-lg', 'active:scale-95');
+                    }
+                });
+            });
+
+            // Add simple touch feedback for mobile
+            const interactiveElements = document.querySelectorAll('button');
+            interactiveElements.forEach(el => {
+                el.addEventListener('touchstart', () => el.style.opacity = '0.7', {passive: true});
+                el.addEventListener('touchend', () => el.style.opacity = '1', {passive: true});
+            });
+        });
+    </script>
+</body></html>

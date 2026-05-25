@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Game of Us - Results Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#e0bfbd",
+                        "on-secondary-container": "#68615e",
+                        "on-tertiary-fixed": "#221b00",
+                        "primary-fixed-dim": "#ffb3b0",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#caa800",
+                        "surface-variant": "#ffdbd0",
+                        "surface-dim": "#fbd1c4",
+                        "secondary-container": "#e7ded9",
+                        "on-surface-variant": "#584140",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#ffb3b0",
+                        "secondary-fixed": "#eae1dc",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "primary": "#ae2f34",
+                        "inverse-on-surface": "#ffede8",
+                        "outline": "#8c706f",
+                        "tertiary": "#705d00",
+                        "surface-bright": "#fff8f6",
+                        "primary-container": "#ff6b6b",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#8c1520",
+                        "on-primary-container": "#6d0010",
+                        "secondary": "#635d59",
+                        "on-secondary-fixed-variant": "#4b4642",
+                        "tertiary-fixed-dim": "#e8c426",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#fff8f6",
+                        "surface-container-high": "#ffe2da",
+                        "inverse-surface": "#442a22",
+                        "tertiary-fixed": "#ffe173",
+                        "on-secondary-fixed": "#1f1b18",
+                        "surface-container-highest": "#ffdbd0",
+                        "on-background": "#2c160e",
+                        "surface-tint": "#ae2f34",
+                        "on-tertiary-container": "#4c3e00",
+                        "surface-container": "#ffe9e3",
+                        "secondary-fixed-dim": "#cec5c0",
+                        "primary-fixed": "#ffdad8",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#410006",
+                        "background": "#fff8f6",
+                        "surface-container-low": "#fff1ed",
+                        "on-surface": "#2c160e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "gutter": "24px",
+                        "container-padding-desktop": "48px",
+                        "section-gap": "40px",
+                        "container-padding-mobile": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Quicksand"],
+                        "headline-xl": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "headline-lg-mobile": ["Quicksand"],
+                        "body-md": ["Quicksand"],
+                        "body-lg": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full bg-surface dark:bg-surface flex justify-between items-center px-container-padding-desktop h-16 z-50 transition-all duration-300">
+<div class="flex items-center gap-4">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Game of Us</h1>
+</div>
+<div class="hidden md:flex gap-8">
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:opacity-80 transition-opacity font-label-md text-label-md flex flex-col items-center" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">videogame_asset</span>
+                Play
+            </a>
+<a class="text-primary dark:text-primary-fixed-dim font-bold hover:opacity-80 transition-opacity font-label-md text-label-md flex flex-col items-center" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history</span>
+                History
+            </a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:opacity-80 transition-opacity font-label-md text-label-md flex flex-col items-center" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>
+                Partners
+            </a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:opacity-80 transition-opacity font-label-md text-label-md flex flex-col items-center" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+                Profile
+            </a>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:opacity-80 active:scale-95 transition-transform"><span class="material-symbols-outlined">share</span></button>
+<button class="text-on-surface-variant hover:opacity-80 active:scale-95 transition-transform"><span class="material-symbols-outlined">settings</span></button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[104px] pb-section-gap px-container-padding-desktop max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Hero Column -->
+<section class="lg:col-span-5 flex flex-col justify-center items-center lg:items-start text-center lg:text-left space-y-8 p-8 rounded-xl bg-gradient-to-br from-surface-container-low to-surface-container relative overflow-hidden shadow-[0_16px_40px_rgba(174,47,52,0.05)]">
+<div class="absolute -top-24 -left-24 w-64 h-64 bg-tertiary-container/20 rounded-full blur-3xl"></div>
+<div class="relative z-10 space-y-4">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Oyun Bitti!</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Birbirinizi oldukça iyi okudunuz!</p>
+</div>
+<div class="relative z-10 w-48 h-48 md:w-64 md:h-64 rounded-full bg-surface shadow-[0_24px_48px_rgba(202,168,0,0.15)] flex flex-col items-center justify-center border-4 border-tertiary-fixed-dim">
+<span class="font-headline-xl text-headline-xl text-tertiary">82%</span>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mt-2">Okuma Skoru</span>
+</div>
+<div class="z-10 w-full pt-4">
+<div class="flex justify-between font-label-md text-label-md text-on-surface-variant mb-2">
+<span>Başlangıç</span>
+<span>Hedef</span>
+</div>
+<div class="h-4 bg-secondary-container rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary-container to-tertiary-fixed-dim rounded-full w-[82%]"></div>
+</div>
+</div>
+</section>
+<!-- Right Insights Column -->
+<section class="lg:col-span-7 flex flex-col gap-gutter">
+<!-- Bento Grid Insights -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Insight Card 1 -->
+<div class="bg-surface rounded-xl p-8 shadow-[0_16px_32px_rgba(174,47,52,0.05)] flex flex-col hover:-translate-y-1 transition-transform duration-300">
+<div class="w-12 h-12 bg-primary-container/20 rounded-full flex items-center justify-center mb-4 text-primary">
+<span class="material-symbols-outlined">my_location</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">En Yakın Tahmin</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Çocukluk anılarında verdiğiniz cevaplar neredeyse aynıydı.</p>
+</div>
+<!-- Insight Card 2 -->
+<div class="bg-surface rounded-xl p-8 shadow-[0_16px_32px_rgba(174,47,52,0.05)] flex flex-col hover:-translate-y-1 transition-transform duration-300">
+<div class="w-12 h-12 bg-tertiary-container/20 rounded-full flex items-center justify-center mb-4 text-tertiary">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">En Büyük Sürpriz</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Gelecek planlarında birbirinizi şaşırttınız.</p>
+</div>
+<!-- Insight Card 3 -->
+<div class="bg-surface rounded-xl p-8 shadow-[0_16px_32px_rgba(174,47,52,0.05)] flex flex-col hover:-translate-y-1 transition-transform duration-300">
+<div class="w-12 h-12 bg-secondary-container rounded-full flex items-center justify-center mb-4 text-on-secondary-container">
+<span class="material-symbols-outlined">handshake</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">En Benzer Alan</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Değerler ve inançlar konusunda çok uyumlusunuz.</p>
+</div>
+<!-- Insight Card 4 -->
+<div class="bg-surface rounded-xl p-8 shadow-[0_16px_32px_rgba(174,47,52,0.05)] flex flex-col hover:-translate-y-1 transition-transform duration-300">
+<div class="w-12 h-12 bg-error-container/50 rounded-full flex items-center justify-center mb-4 text-error">
+<span class="material-symbols-outlined">shuffle</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">En Farklı Alan</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Boş zaman aktivitelerinde farklı yönlere çekiliyorsunuz.</p>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="flex flex-col sm:flex-row gap-4 mt-4">
+<button class="flex-1 bg-primary text-on-primary font-label-md text-label-md h-14 rounded-full flex items-center justify-center gap-2 hover:bg-on-primary-fixed-variant transition-colors active:scale-95 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">visibility</span>
+                    Detayları Gör
+                </button>
+<button class="flex-1 bg-secondary-container text-primary font-label-md text-label-md h-14 rounded-full flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors active:scale-95">
+<span class="material-symbols-outlined">replay</span>
+                    Tekrar Oyna
+                </button>
+</div>
+<!-- Premium Teaser -->
+<div class="mt-8 bg-surface-container-high rounded-xl p-6 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-surface rounded-full flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined">chat_bubble</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface text-lg">Sohbeti devam ettirin</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Bu sonuçlar üzerine konuşmak bağınızı güçlendirebilir.</p>
+</div>
+</div>
+<button class="text-primary hover:bg-surface p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface-container dark:bg-surface-container-high rounded-t-lg shadow-[0_-4px_16px_rgba(174,47,52,0.05)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant dark:hover:bg-surface-variant rounded-full px-4 py-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">videogame_asset</span>
+<span class="font-label-md text-[10px]">Play</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="font-label-md text-[10px]">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant dark:hover:bg-surface-variant rounded-full px-4 py-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md text-[10px]">Partners</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant dark:hover:bg-surface-variant rounded-full px-4 py-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-[10px]">Profile</span>
+</a>
+</nav>
+</body></html>

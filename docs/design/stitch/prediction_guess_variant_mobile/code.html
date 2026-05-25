@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Game of Us - Tahmin Modu</title>
+<!-- Google Fonts: Quicksand -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#ffb3b0",
+                    "tertiary-fixed": "#ffe173",
+                    "surface-container-highest": "#ffdbd0",
+                    "on-surface-variant": "#584140",
+                    "on-primary-container": "#6d0010",
+                    "inverse-on-surface": "#ffede8",
+                    "secondary-container": "#e7ded9",
+                    "secondary-fixed-dim": "#cec5c0",
+                    "on-primary-fixed-variant": "#8c1520",
+                    "surface-variant": "#ffdbd0",
+                    "surface-dim": "#fbd1c4",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed-variant": "#4b4642",
+                    "inverse-primary": "#ffb3b0",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#ffe9e3",
+                    "surface-container-low": "#fff1ed",
+                    "on-tertiary": "#ffffff",
+                    "background": "#fff8f6",
+                    "tertiary-container": "#caa800",
+                    "surface-bright": "#fff8f6",
+                    "on-tertiary-container": "#4c3e00",
+                    "on-tertiary-fixed-variant": "#554500",
+                    "tertiary-fixed-dim": "#e8c426",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#ffe2da",
+                    "on-secondary-container": "#68615e",
+                    "outline-variant": "#e0bfbd",
+                    "surface": "#fff8f6",
+                    "tertiary": "#705d00",
+                    "on-error-container": "#93000a",
+                    "on-primary": "#ffffff",
+                    "primary": "#ae2f34",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed": "#1f1b18",
+                    "outline": "#8c706f",
+                    "inverse-surface": "#442a22",
+                    "surface-tint": "#ae2f34",
+                    "on-surface": "#2c160e",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#ff6b6b",
+                    "secondary": "#635d59",
+                    "secondary-fixed": "#eae1dc",
+                    "on-tertiary-fixed": "#221b00",
+                    "primary-fixed": "#ffdad8",
+                    "on-background": "#2c160e",
+                    "on-primary-fixed": "#410006"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "container-padding-mobile": "24px",
+                    "base": "8px",
+                    "container-padding-desktop": "48px",
+                    "section-gap": "40px"
+            },
+            "fontFamily": {
+                    "label-md": [
+                            "Quicksand"
+                    ],
+                    "headline-md": [
+                            "Quicksand"
+                    ],
+                    "headline-xl": [
+                            "Quicksand"
+                    ],
+                    "headline-lg-mobile": [
+                            "Quicksand"
+                    ],
+                    "headline-lg": [
+                            "Quicksand"
+                    ],
+                    "body-lg": [
+                            "Quicksand"
+                    ],
+                    "body-md": [
+                            "Quicksand"
+                    ]
+            },
+            "fontSize": {
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-xl": [
+                            "40px",
+                            {
+                                    "lineHeight": "48px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "34px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Ensuring Material Symbols render correctly */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Hide scrollbar for clean app feel */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        * {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:hidden overflow-x-hidden relative">
+<!-- Gameplay Task Header (Suppresses Global Nav due to focused intent) -->
+<header class="flex items-center justify-between px-container-padding-mobile py-6 sticky top-0 z-40 bg-background/80 backdrop-blur-md">
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-lowest shadow-[0_4px_12px_rgba(174,47,52,0.05)] text-on-surface hover:scale-95 transition-transform active:bg-surface-variant">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+<!-- Mode Indicator (Amber/Gold for Guess Mode) -->
+<div class="px-4 py-2 bg-tertiary-container/10 rounded-full border border-tertiary-container/30 flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary fill" data-icon="psychology_alt" style="font-size: 18px;">psychology_alt</span>
+<span class="font-label-md text-label-md text-tertiary uppercase tracking-wider">Tahmin Et</span>
+</div>
+<!-- Placeholder to balance flex-between -->
+<div class="w-12 h-12 flex items-center justify-center">
+<span class="font-label-md text-label-md text-on-surface-variant">3/10</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-container-padding-mobile pb-[120px] flex flex-col gap-8 animate-fade-in">
+<!-- Screen Title -->
+<div class="pt-2 text-center">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">
+                Partnerin ne seçer sence?
+            </h1>
+</div>
+<!-- Question Card (Core Interaction Element) -->
+<div class="bg-surface-container-lowest rounded-lg p-8 shadow-[0_16px_32px_rgba(174,47,52,0.04)] relative z-10 flex flex-col items-center justify-center min-h-[160px] border border-outline-variant/10">
+<!-- Decorative icon to anchor the question -->
+<div class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center mb-4 text-primary">
+<span class="material-symbols-outlined fill" data-icon="weekend">weekend</span>
+</div>
+<p class="font-headline-md text-headline-md text-center text-on-surface leading-snug">
+                "Boş bir cumartesi gününde ne yapmayı tercih edersin?"
+            </p>
+</div>
+<!-- Options Stack -->
+<div class="flex flex-col gap-4" id="options-container">
+<!-- Option 1 (Pre-selected to demonstrate Amber/Gold state) -->
+<button class="guess-option w-full bg-tertiary-fixed text-on-tertiary-fixed-variant border-2 border-tertiary rounded-lg p-5 flex items-center justify-between shadow-[0_8px_16px_rgba(202,168,0,0.15)] transition-all active:scale-[0.98] transform" data-selected="true">
+<span class="font-body-lg text-body-lg text-left pr-4 font-semibold">
+                    Evde dinlenmek
+                </span>
+<div class="w-6 h-6 rounded-full border-2 border-tertiary flex items-center justify-center bg-tertiary text-on-tertiary relative flex-shrink-0">
+<span class="material-symbols-outlined text-[16px] font-bold icon-check absolute" data-icon="check">check</span>
+<span class="w-full h-full rounded-full bg-transparent icon-circle absolute opacity-0"></span>
+</div>
+</button>
+<!-- Option 2 -->
+<button class="guess-option w-full bg-surface-container-lowest text-on-surface border-2 border-transparent rounded-lg p-5 flex items-center justify-between shadow-[0_8px_16px_rgba(174,47,52,0.04)] hover:border-outline-variant/30 transition-all active:scale-[0.98] transform" data-selected="false">
+<span class="font-body-lg text-body-lg text-left pr-4">
+                    Dışarı çıkmak
+                </span>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center relative flex-shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[16px] font-bold icon-check absolute opacity-0" data-icon="check">check</span>
+<span class="w-full h-full rounded-full bg-transparent icon-circle absolute"></span>
+</div>
+</button>
+<!-- Option 3 -->
+<button class="guess-option w-full bg-surface-container-lowest text-on-surface border-2 border-transparent rounded-lg p-5 flex items-center justify-between shadow-[0_8px_16px_rgba(174,47,52,0.04)] hover:border-outline-variant/30 transition-all active:scale-[0.98] transform" data-selected="false">
+<span class="font-body-lg text-body-lg text-left pr-4">
+                    Arkadaşlarla buluşmak
+                </span>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center relative flex-shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[16px] font-bold icon-check absolute opacity-0" data-icon="check">check</span>
+<span class="w-full h-full rounded-full bg-transparent icon-circle absolute"></span>
+</div>
+</button>
+<!-- Option 4 -->
+<button class="guess-option w-full bg-surface-container-lowest text-on-surface border-2 border-transparent rounded-lg p-5 flex items-center justify-between shadow-[0_8px_16px_rgba(174,47,52,0.04)] hover:border-outline-variant/30 transition-all active:scale-[0.98] transform" data-selected="false">
+<span class="font-body-lg text-body-lg text-left pr-4">
+                    Spontane plan yapmak
+                </span>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center relative flex-shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[16px] font-bold icon-check absolute opacity-0" data-icon="check">check</span>
+<span class="w-full h-full rounded-full bg-transparent icon-circle absolute"></span>
+</div>
+</button>
+</div>
+</main>
+<!-- Sticky Bottom Action Area -->
+<div class="fixed bottom-0 left-0 w-full p-container-padding-mobile pb-safe bg-gradient-to-t from-background via-background/95 to-transparent z-50 flex flex-col justify-end">
+<button class="w-full min-h-[64px] bg-primary text-on-primary rounded-full flex items-center justify-center gap-2 shadow-[0_12px_24px_rgba(174,47,52,0.25)] hover:bg-on-primary-fixed active:scale-95 transition-all" id="continue-btn">
+<span class="font-headline-md text-headline-md">Devam</span>
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Micro-interaction Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const options = document.querySelectorAll('.guess-option');
+            
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Reset all options to unselected state
+                    options.forEach(opt => {
+                        // Remove Gold/Amber Selected styles
+                        opt.classList.remove('bg-tertiary-fixed', 'text-on-tertiary-fixed-variant', 'border-tertiary', 'shadow-[0_8px_16px_rgba(202,168,0,0.15)]');
+                        // Add base unselected styles
+                        opt.classList.add('bg-surface-container-lowest', 'text-on-surface', 'border-transparent', 'shadow-[0_8px_16px_rgba(174,47,52,0.04)]');
+                        opt.querySelector('span.font-body-lg').classList.remove('font-semibold');
+                        
+                        // Reset Checkbox circle
+                        const circleContainer = opt.querySelector('div.rounded-full');
+                        circleContainer.classList.remove('border-tertiary', 'bg-tertiary', 'text-on-tertiary');
+                        circleContainer.classList.add('border-outline-variant');
+                        
+                        opt.querySelector('.icon-check').classList.add('opacity-0');
+                        opt.querySelector('.icon-circle').classList.remove('opacity-0');
+                    });
+                    
+                    // Apply Gold/Amber Selected styles to clicked option
+                    this.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'border-transparent', 'shadow-[0_8px_16px_rgba(174,47,52,0.04)]');
+                    this.classList.add('bg-tertiary-fixed', 'text-on-tertiary-fixed-variant', 'border-tertiary', 'shadow-[0_8px_16px_rgba(202,168,0,0.15)]');
+                    this.querySelector('span.font-body-lg').classList.add('font-semibold');
+                    
+                    // Set Checkbox circle to active
+                    const activeCircleContainer = this.querySelector('div.rounded-full');
+                    activeCircleContainer.classList.remove('border-outline-variant');
+                    activeCircleContainer.classList.add('border-tertiary', 'bg-tertiary', 'text-on-tertiary');
+                    
+                    this.querySelector('.icon-check').classList.remove('opacity-0');
+                    this.querySelector('.icon-circle').classList.add('opacity-0');
+                    
+                    // Add subtle pop animation
+                    this.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+        });
+    </script>
+</body></html>

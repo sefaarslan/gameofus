@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="light" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Soru Tahmini - Game of Us</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#ffede8",
+                        "inverse-surface": "#442a22",
+                        "tertiary-fixed": "#ffe173",
+                        "primary-fixed-dim": "#ffb3b0",
+                        "tertiary-fixed-dim": "#e8c426",
+                        "surface-container-high": "#ffe2da",
+                        "primary-fixed": "#ffdad8",
+                        "outline": "#8c706f",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#eae1dc",
+                        "on-error": "#ffffff",
+                        "surface": "#fff8f6",
+                        "inverse-primary": "#ffb3b0",
+                        "secondary-fixed-dim": "#cec5c0",
+                        "surface-tint": "#ae2f34",
+                        "on-secondary-fixed-variant": "#4b4642",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#ae2f34",
+                        "on-secondary-fixed": "#1f1b18",
+                        "tertiary-container": "#caa800",
+                        "surface-bright": "#fff8f6",
+                        "on-primary": "#ffffff",
+                        "background": "#fff8f6",
+                        "on-surface": "#2c160e",
+                        "on-secondary-container": "#68615e",
+                        "on-primary-fixed": "#410006",
+                        "primary-container": "#ff6b6b",
+                        "on-primary-fixed-variant": "#8c1520",
+                        "secondary-container": "#e7ded9",
+                        "surface-variant": "#ffdbd0",
+                        "tertiary": "#705d00",
+                        "surface-dim": "#fbd1c4",
+                        "on-surface-variant": "#584140",
+                        "surface-container-highest": "#ffdbd0",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#635d59",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#ffe9e3",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#e0bfbd",
+                        "on-tertiary-fixed": "#221b00",
+                        "surface-container-low": "#fff1ed",
+                        "on-background": "#2c160e",
+                        "on-primary-container": "#6d0010",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "on-tertiary-container": "#4c3e00",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "40px",
+                        "container-padding-desktop": "48px",
+                        "base": "8px",
+                        "container-padding-mobile": "24px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Quicksand"],
+                        "headline-lg-mobile": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "headline-md": ["Quicksand"],
+                        "body-md": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "headline-lg": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: theme('colors.surface');
+            color: theme('colors.on-surface');
+            /* Soft gradient background to add depth and warmth */
+            background-image: radial-gradient(circle at top right, theme('colors.surface-container-high') 0%, transparent 50%),
+                              radial-gradient(circle at bottom left, theme('colors.surface-container') 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+        
+        .option-button.selected {
+            background-color: theme('colors.tertiary-container');
+            color: theme('colors.on-tertiary-container');
+            border-color: theme('colors.tertiary');
+            box-shadow: 0 8px 24px rgba(202, 168, 0, 0.15); /* Tertiary shadow */
+            transform: scale(1.02);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Smooth transitions for interactive elements */
+        .interactive {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Progress bar animation */
+        .progress-fill {
+            transition: width 0.8s ease-in-out;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+<!-- TopAppBar (Transactional - Hidden Nav, but keep structural header if needed. Here we use a clean task header) -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-container-padding-mobile py-4 bg-transparent">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface hover:bg-surface-variant transition-colors interactive">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<!-- Progress Indicator (Specific to this screen) -->
+<div class="flex-1 mx-4">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-md text-label-md text-on-surface-variant">Soru 3 / 10</span>
+<span class="font-label-md text-label-md text-tertiary font-bold">%30</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<!-- Warm gradient progress -->
+<div class="h-full bg-gradient-to-r from-primary to-tertiary rounded-full progress-fill" style="width: 30%;"></div>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-transparent text-on-surface-variant hover:text-primary transition-colors interactive">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help_outline</span>
+</button>
+</header>
+<!-- Main Content Canvas (Single Column Mobile Layout) -->
+<main class="w-full max-w-md px-container-padding-mobile flex flex-col justify-center items-center mt-20 mb-24 z-10 flex-grow">
+<!-- Context / Main Heading -->
+<div class="text-center mb-section-gap w-full">
+<div class="inline-flex items-center justify-center bg-tertiary-container/20 text-tertiary px-4 py-1.5 rounded-full mb-4">
+<span class="material-symbols-outlined text-[18px] mr-2" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<span class="font-label-md text-label-md">Tahmin Zamanı</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Partnerin ne cevap verdi sence?</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">O'nun yerine düşün, ne seçerdi?</p>
+</div>
+<!-- Question Card -->
+<div class="glass-card w-full rounded-[24px] p-8 mb-8 shadow-[0_16px_32px_-12px_rgba(174,47,52,0.08)] flex flex-col items-center text-center relative overflow-hidden">
+<!-- Decorative accent behind text -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-container rounded-full blur-[40px] opacity-30 -z-10 translate-x-1/2 -translate-y-1/2"></div>
+<div class="absolute bottom-0 left-0 w-32 h-32 bg-tertiary-container rounded-full blur-[40px] opacity-20 -z-10 -translate-x-1/2 translate-y-1/2"></div>
+<span class="material-symbols-outlined text-tertiary text-4xl mb-4" style="font-variation-settings: 'FILL' 0;">forum</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Her gün mesajlaşmak senin için önemli mi?</h2>
+</div>
+<!-- Options Stack -->
+<div class="w-full space-y-4" id="options-container">
+<!-- Option 1 -->
+<button class="option-button interactive w-full p-4 rounded-xl border-2 border-transparent bg-white shadow-sm flex items-center justify-between group hover:bg-surface-container-lowest" onclick="selectOption(this)">
+<span class="font-body-lg text-body-lg text-on-surface group-hover:text-tertiary transition-colors">Evet</span>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center group-hover:border-tertiary transition-colors indicator">
+<span class="material-symbols-outlined text-[16px] text-tertiary opacity-0 scale-50 transition-all checkmark" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</button>
+<!-- Option 2 -->
+<button class="option-button interactive w-full p-4 rounded-xl border-2 border-transparent bg-white shadow-sm flex items-center justify-between group hover:bg-surface-container-lowest" onclick="selectOption(this)">
+<span class="font-body-lg text-body-lg text-on-surface group-hover:text-tertiary transition-colors">Kararsız</span>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center group-hover:border-tertiary transition-colors indicator">
+<span class="material-symbols-outlined text-[16px] text-tertiary opacity-0 scale-50 transition-all checkmark" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</button>
+<!-- Option 3 -->
+<button class="option-button interactive w-full p-4 rounded-xl border-2 border-transparent bg-white shadow-sm flex items-center justify-between group hover:bg-surface-container-lowest" onclick="selectOption(this)">
+<span class="font-body-lg text-body-lg text-on-surface group-hover:text-tertiary transition-colors">Hayır</span>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center group-hover:border-tertiary transition-colors indicator">
+<span class="material-symbols-outlined text-[16px] text-tertiary opacity-0 scale-50 transition-all checkmark" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</button>
+</div>
+</main>
+<!-- Bottom Action Area (Floating) -->
+<div class="fixed bottom-0 left-0 w-full p-container-padding-mobile pb-safe bg-gradient-to-t from-surface via-surface to-transparent z-40">
+<button class="w-full bg-surface-variant text-on-surface-variant font-label-md text-label-md h-[56px] rounded-full flex items-center justify-center interactive shadow-sm opacity-50 cursor-not-allowed" disabled="" id="continue-btn">
+            Devam
+        </button>
+</div>
+<!-- Decorative ambient shapes for background depth -->
+<div class="fixed top-1/4 -left-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-20 pointer-events-none"></div>
+<div class="fixed bottom-1/4 -right-20 w-80 h-80 bg-tertiary/5 rounded-full blur-3xl -z-20 pointer-events-none"></div>
+<script>
+        function selectOption(selectedButton) {
+            // Get all buttons
+            const buttons = document.querySelectorAll('.option-button');
+            
+            // Reset all buttons
+            buttons.forEach(btn => {
+                btn.classList.remove('selected', 'bg-tertiary-container', 'border-tertiary');
+                btn.classList.add('bg-white', 'border-transparent');
+                
+                // Reset text color
+                const text = btn.querySelector('span:first-child');
+                text.classList.remove('text-on-tertiary-container');
+                text.classList.add('text-on-surface');
+                
+                // Reset indicator
+                const indicator = btn.querySelector('.indicator');
+                indicator.classList.remove('border-tertiary', 'bg-tertiary');
+                indicator.classList.add('border-outline-variant', 'bg-transparent');
+                
+                // Hide checkmark
+                const checkmark = btn.querySelector('.checkmark');
+                checkmark.classList.remove('opacity-100', 'scale-100', 'text-white');
+                checkmark.classList.add('opacity-0', 'scale-50', 'text-tertiary');
+            });
+
+            // Apply selected state to clicked button
+            selectedButton.classList.remove('bg-white', 'border-transparent');
+            selectedButton.classList.add('selected');
+            
+            // Update text color
+            const text = selectedButton.querySelector('span:first-child');
+            text.classList.remove('text-on-surface');
+            text.classList.add('text-on-tertiary-container', 'font-bold');
+            
+            // Update indicator
+            const indicator = selectedButton.querySelector('.indicator');
+            indicator.classList.remove('border-outline-variant', 'bg-transparent');
+            indicator.classList.add('border-tertiary', 'bg-tertiary');
+            
+            // Show checkmark
+            const checkmark = selectedButton.querySelector('.checkmark');
+            checkmark.classList.remove('opacity-0', 'scale-50', 'text-tertiary');
+            checkmark.classList.add('opacity-100', 'scale-100', 'text-white');
+
+            // Enable Continue Button
+            const continueBtn = document.getElementById('continue-btn');
+            continueBtn.disabled = false;
+            continueBtn.classList.remove('bg-surface-variant', 'text-on-surface-variant', 'opacity-50', 'cursor-not-allowed');
+            continueBtn.classList.add('bg-primary', 'text-white', 'shadow-md', 'hover:scale-[1.02]', 'active:scale-95');
+        }
+    </script>
+</body></html>

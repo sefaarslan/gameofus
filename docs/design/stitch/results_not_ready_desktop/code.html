@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html class="light" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Game of Us - Sonuçlar Bekleniyor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#635d59",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "surface": "#fff8f6",
+                        "surface-container-low": "#fff1ed",
+                        "surface-variant": "#ffdbd0",
+                        "tertiary-container": "#caa800",
+                        "on-background": "#2c160e",
+                        "background": "#fff8f6",
+                        "secondary-fixed": "#eae1dc",
+                        "surface-container-high": "#ffe2da",
+                        "surface-bright": "#fff8f6",
+                        "outline-variant": "#e0bfbd",
+                        "secondary-fixed-dim": "#cec5c0",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#ffdad8",
+                        "primary-container": "#ff6b6b",
+                        "on-primary-container": "#6d0010",
+                        "tertiary-fixed-dim": "#e8c426",
+                        "on-tertiary-fixed": "#221b00",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#68615e",
+                        "inverse-primary": "#ffb3b0",
+                        "surface-dim": "#fbd1c4",
+                        "inverse-on-surface": "#ffede8",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#705d00",
+                        "primary-fixed-dim": "#ffb3b0",
+                        "on-surface": "#2c160e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#4b4642",
+                        "on-tertiary-container": "#4c3e00",
+                        "outline": "#8c706f",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#584140",
+                        "tertiary-fixed": "#ffe173",
+                        "inverse-surface": "#442a22",
+                        "surface-container": "#ffe9e3",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#ae2f34",
+                        "on-primary-fixed-variant": "#8c1520",
+                        "primary": "#ae2f34",
+                        "surface-container-highest": "#ffdbd0",
+                        "on-secondary-fixed": "#1f1b18",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#410006",
+                        "secondary-container": "#e7ded9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "40px",
+                        "gutter": "24px",
+                        "container-padding-desktop": "48px",
+                        "container-padding-mobile": "24px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "headline-xl": ["Quicksand"],
+                        "headline-lg-mobile": ["Quicksand"],
+                        "body-md": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .shadow-soft {
+            box-shadow: 0 16px 32px -4px rgba(174, 47, 52, 0.05);
+        }
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col items-center justify-center p-container-padding-mobile md:p-container-padding-desktop">
+<!-- Top Navigation (Suppressed for this specific task-focused/waiting state per guidelines, keeping focus on the canvas) -->
+<main class="w-full max-w-[720px] flex flex-col items-center justify-center">
+<!-- Floating Card Container -->
+<div class="bg-surface-container-lowest rounded-xl shadow-soft p-8 md:p-12 w-full flex flex-col items-center text-center relative overflow-hidden">
+<!-- Decorative background blur elements -->
+<div class="absolute -top-20 -right-20 w-64 h-64 bg-primary-fixed opacity-50 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-20 -left-20 w-64 h-64 bg-surface-variant opacity-50 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Illustration -->
+<div class="w-48 h-48 md:w-64 md:h-64 mb-section-gap relative z-10">
+<img alt="Waiting illustration" class="w-full h-full object-cover rounded-full animate-pulse-slow shadow-sm shadow-primary/10" data-alt="A warm, inviting conceptual illustration representing waiting and anticipation. The scene features a stylized, minimalist hourglass or clock intertwined with soft, organic plant elements, rendered in a comforting palette of peachy corals, warm whites, and subtle gold accents. The lighting is soft and diffused, creating a serene, stress-free atmosphere that aligns with a playful, nurturing relationship app aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC176AOgmGLazj_5ajt2bxTn6psMge0XhQOEfFbLQIr57vE8LeXYjK-D8TKxS_UJ9RYh82Fg6qRiW7mbWtgPZr6ICkAbHfhfMXGiWdMlNlT8yt49UsKoFHkF7ccrmkHr_NXnDttjSxMy8yWOxERl23nNm4e8fauX5TtIJhqBVjEgU7WqTDE3Lk7Hl-aHb2choI_RtfjTFgjp3Raexe0jY4mYR4caQIhV3tXmwPmwIXpEiP8PMDmXusPhH8kHrf9BBzxtueynOxKFSY"/>
+</div>
+<!-- Content -->
+<div class="relative z-10 max-w-md mx-auto space-y-gutter">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">
+                    Sonuçlar henüz hazır değil
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+                    Partnerin hala cevaplarını veriyor. Biraz sabır, harika şeyler yolda!
+                </p>
+<!-- Status Indicator (Progress simulation) -->
+<div class="flex items-center justify-center space-x-3 py-4">
+<div class="w-3 h-3 rounded-full bg-primary animate-bounce" style="animation-delay: 0ms;"></div>
+<div class="w-3 h-3 rounded-full bg-primary/60 animate-bounce" style="animation-delay: 150ms;"></div>
+<div class="w-3 h-3 rounded-full bg-primary/30 animate-bounce" style="animation-delay: 300ms;"></div>
+</div>
+<!-- Actions -->
+<div class="pt-base">
+<button class="bg-primary text-on-primary font-label-md text-label-md h-[56px] px-8 rounded-full hover:bg-on-primary-fixed-variant transition-colors w-full md:w-auto flex items-center justify-center gap-2 shadow-sm shadow-primary/20">
+<span class="material-symbols-outlined" data-icon="arrow_back" data-weight="regular">arrow_back</span>
+                        Bekleme ekranına dön
+                    </button>
+</div>
+</div>
+</div>
+</main>
+</body></html>
