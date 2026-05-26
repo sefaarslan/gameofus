@@ -236,6 +236,7 @@
     "roomFull": "Bu odada iki kişi zaten var.",
     "resultNotReady": "Sonuçlar henüz hazır değil.",
     "rateLimited": "Kısa sürede çok fazla deneme yaptın. Biraz sonra tekrar dene.",
+    "wrongDevice": "Sonuçları görmek için oyunu oynadığın cihazı kullan.",
     "retry": "Tekrar dene",
     "goHome": "Ana sayfaya dön",
     "connection": "Bağlantı hatası."

@@ -46,14 +46,16 @@ type Screen = "loading" | "error" | "join" | "share" | "game" | "waiting" | "res
 function pickScreen(data: RoomStateData, token: string | null): Screen {
   if (data.room.status === "expired") return "error";
 
+  // Oyun bittiyse token olmasa da sonuçlara yönlendir
+  if (data.room.status === "result_ready" || data.room.status === "completed") return "results";
+
   if (!token || !data.participant) {
     if (data.participants.length >= 2) return "error";
     return "join";
   }
 
-  const { participant, room, progress, participants } = data;
+  const { participant, progress, participants } = data;
 
-  if (room.status === "result_ready" || room.status === "completed") return "results";
   if (participant.status === "completed") return "waiting";
 
   // Owner with no partner and no progress → share screen first

@@ -236,6 +236,7 @@
     "roomFull": "This room already has two players.",
     "resultNotReady": "Results are not ready yet.",
     "rateLimited": "Too many attempts. Please try again later.",
+    "wrongDevice": "To view results, open this on the device you played on.",
     "retry": "Try again",
     "goHome": "Back to home",
     "connection": "Connection error."

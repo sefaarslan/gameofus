@@ -91,7 +91,7 @@ export default function ResultsPage() {
   useEffect(() => {
     const token = localStorage.getItem(`gou_token_${roomCode}`);
     if (!token) {
-      setErrorMsg(tErr("generic"));
+      setErrorMsg(tErr("wrongDevice"));
       return;
     }
 
