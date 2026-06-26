@@ -124,7 +124,7 @@ export default function CreatePage() {
       localStorage.setItem(`gou_token_${roomCode}`, participant.token);
       // Store the created room to enforce the free tier limit
       localStorage.setItem("gou_my_room", roomCode);
-      router.push(`/${locale}/game/room/${roomCode}`);
+      router.push(`/game/room/${roomCode}`);
     } catch {
       setError(tErr("generic"));
     } finally {
@@ -157,7 +157,7 @@ export default function CreatePage() {
 
             <div className="flex flex-col gap-3 w-full">
               <button
-                onClick={() => router.push(`/${locale}/game/room/${existingRoom}`)}
+                onClick={() => router.push(`/game/room/${existingRoom}`)}
                 className="w-full flex items-center justify-center gap-2 bg-surface-container text-on-surface text-body-md font-semibold py-4 rounded-full hover:bg-surface-container-high active:scale-95 transition-all"
               >
                 <span className="material-symbols-outlined text-xl">arrow_back</span>
@@ -165,7 +165,7 @@ export default function CreatePage() {
               </button>
 
               <button
-                onClick={() => router.push(`/${locale}#premium`)}
+                onClick={() => router.push(`/#premium`)}
                 className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary text-body-md font-semibold py-4 rounded-full hover:bg-surface-tint active:scale-95 transition-all shadow-primary-glow"
               >
                 <span className="material-symbols-outlined icon-fill text-xl">smartphone</span>
