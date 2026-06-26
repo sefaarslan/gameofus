@@ -5,16 +5,75 @@ import { Link as LocaleLink } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { usePathname } from "@/i18n/navigation";
 import { GameOfUsLogo } from "./GameOfUsLogo";
+import { useState, useRef, useEffect } from "react";
 
 interface AppHeaderProps {
   locale: string;
 }
 
 const LOCALES = [
-  { code: "tr", label: "TR" },
-  { code: "en", label: "EN" },
-  { code: "es", label: "ES" },
+  { code: "tr", label: "Türkçe", short: "TR" },
+  { code: "en", label: "English", short: "EN" },
+  { code: "es", label: "Español", short: "ES" },
 ] as const;
+
+function LocaleDropdown({ locale, pathname }: { locale: string; pathname: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const current = LOCALES.find((l) => l.code === locale) ?? LOCALES[0];
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-outline-variant/30 text-label-sm text-on-surface-variant hover:bg-surface-container transition-colors"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className="material-symbols-outlined text-sm leading-none">language</span>
+        <span className="font-medium">{current.short}</span>
+        <span className={`material-symbols-outlined text-sm leading-none transition-transform ${open ? "rotate-180" : ""}`}>
+          expand_more
+        </span>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-1.5 w-36 bg-surface-container-lowest rounded-xl border border-outline-variant/20 shadow-soft-active overflow-hidden z-50">
+          {LOCALES.map(({ code, label, short }) => (
+            <LocaleLink
+              key={code}
+              href={pathname}
+              locale={code}
+              onClick={() => setOpen(false)}
+              className={[
+                "flex items-center gap-2.5 px-3 py-2 text-label-sm transition-colors",
+                code === locale
+                  ? "bg-primary/10 text-primary font-semibold"
+                  : "text-on-surface-variant hover:bg-surface-container",
+              ].join(" ")}
+            >
+              <span className="text-xs font-bold w-5">{short}</span>
+              <span>{label}</span>
+              {code === locale && (
+                <span className="material-symbols-outlined text-xs ml-auto">check</span>
+              )}
+            </LocaleLink>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function AppHeader({ locale }: AppHeaderProps) {
   const tNav = useTranslations("nav");
@@ -60,23 +119,7 @@ export function AppHeader({ locale }: AppHeaderProps) {
         <div className="flex items-center gap-3">
           {/* Locale switcher — hidden on game pages */}
           {!isGamePage && (
-            <div className="flex items-center rounded-full border border-outline-variant/30 overflow-hidden">
-              {LOCALES.map(({ code, label }) => (
-                <LocaleLink
-                  key={code}
-                  href={pathname}
-                  locale={code}
-                  className={[
-                    "px-2.5 py-1 text-label-sm transition-colors",
-                    code === locale
-                      ? "bg-primary text-on-primary font-semibold"
-                      : "text-on-surface-variant hover:bg-surface-container",
-                  ].join(" ")}
-                >
-                  {label}
-                </LocaleLink>
-              ))}
-            </div>
+            <LocaleDropdown locale={locale} pathname={pathname} />
           )}
 
           {/* Desktop CTA — hidden on game pages */}
