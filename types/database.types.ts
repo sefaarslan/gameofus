@@ -39,6 +39,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          is_premium: boolean
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_premium?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_premium?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       answers: {
         Row: {
           answer_value: Json
@@ -285,7 +312,7 @@ export type Database = {
       }
       questions: {
         Row: {
-          category: string | null
+          category_id: string | null
           created_at: string
           id: string
           is_active: boolean
@@ -294,7 +321,7 @@ export type Database = {
           question_text: string
         }
         Insert: {
-          category?: string | null
+          category_id?: string | null
           created_at?: string
           id?: string
           is_active?: boolean
@@ -303,7 +330,7 @@ export type Database = {
           question_text: string
         }
         Update: {
-          category?: string | null
+          category_id?: string | null
           created_at?: string
           id?: string
           is_active?: boolean
@@ -311,7 +338,15 @@ export type Database = {
           mode?: Database["public"]["Enums"]["game_mode"]
           question_text?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "questions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rate_limits: {
         Row: {

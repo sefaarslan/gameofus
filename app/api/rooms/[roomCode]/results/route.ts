@@ -1,8 +1,13 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { verifyToken } from "@/lib/token";
+import { verifyToken, extractToken } from "@/lib/token";
 import { isRoomExpired } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
+import { corsOptions } from "@/lib/cors";
+
+export function OPTIONS() {
+  return corsOptions();
+}
 
 const SCORE_LABELS = [
   { min: 90, label: "Sizi okumak kitap gibi!" },
@@ -21,7 +26,7 @@ export async function GET(
   { params }: { params: Promise<{ roomCode: string }> },
 ) {
   const { roomCode } = await params;
-  const token = req.nextUrl.searchParams.get("participantToken");
+  const token = extractToken(req, req.nextUrl.searchParams.get("participantToken"));
 
   if (!token) return apiError("INVALID_TOKEN", "Token gereklidir.", 403);
 

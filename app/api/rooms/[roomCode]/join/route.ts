@@ -1,8 +1,13 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { generateToken, hashToken, verifyToken } from "@/lib/token";
+import { generateToken, hashToken, verifyToken, extractToken } from "@/lib/token";
 import { isRoomExpired } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
+import { corsOptions } from "@/lib/cors";
+
+export function OPTIONS() {
+  return corsOptions();
+}
 
 export async function POST(
   req: NextRequest,
@@ -17,7 +22,9 @@ export async function POST(
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { displayName, participantToken } = body as Record<string, unknown>;
+  const { displayName } = body as Record<string, unknown>;
+  const rawBodyToken = (body as Record<string, unknown>).participantToken;
+  const participantToken = extractToken(req, typeof rawBodyToken === "string" ? rawBodyToken : null);
 
   if (!displayName || typeof displayName !== "string" || displayName.trim().length === 0) {
     return apiError("INVALID_PAYLOAD", "İsim zorunludur.");

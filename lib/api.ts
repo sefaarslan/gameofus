@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { CORS_HEADERS } from "./cors";
 
 export type ApiErrorCode =
   | "ROOM_NOT_FOUND"
@@ -13,9 +14,9 @@ export type ApiErrorCode =
   | "INTERNAL_ERROR";
 
 export function apiError(code: ApiErrorCode, message: string, status = 400) {
-  return NextResponse.json({ error: { code, message } }, { status });
+  return NextResponse.json({ error: { code, message } }, { status, headers: CORS_HEADERS });
 }
 
 export function apiOk<T>(data: T, status = 200) {
-  return NextResponse.json(data, { status });
+  return NextResponse.json(data, { status, headers: CORS_HEADERS });
 }

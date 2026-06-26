@@ -1,7 +1,12 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { verifyToken } from "@/lib/token";
+import { verifyToken, extractToken } from "@/lib/token";
 import { isRoomExpired } from "@/lib/expire";
+import { corsOptions } from "@/lib/cors";
+
+export function OPTIONS() {
+  return corsOptions();
+}
 import { compareAnswers, calculateReadingScore } from "@/lib/scoring";
 import { apiError, apiOk } from "@/lib/api";
 import type { Json } from "@/types/database.types";
@@ -21,8 +26,9 @@ export async function POST(
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { participantToken } = body as Record<string, unknown>;
-  if (!participantToken || typeof participantToken !== "string") {
+  const rawBodyToken = (body as Record<string, unknown>).participantToken;
+  const participantToken = extractToken(req, typeof rawBodyToken === "string" ? rawBodyToken : null);
+  if (!participantToken) {
     return apiError("INVALID_TOKEN", "Token gereklidir.");
   }
 

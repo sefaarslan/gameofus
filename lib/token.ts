@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { NextRequest } from "next/server";
 
 /** 64-char hex token üretir (256-bit entropi). Client'ta saklanır, DB'ye yazılmaz. */
 export function generateToken(): string {
@@ -8,6 +9,19 @@ export function generateToken(): string {
 /** Token'ın SHA-256 hash'ini döner. DB'ye yalnızca bu değer yazılır. */
 export function hashToken(raw: string): string {
   return crypto.createHash("sha256").update(raw).digest("hex");
+}
+
+/**
+ * Authorization: Bearer <token> header → fallback sıralamasıyla token çıkarır.
+ * Web (query param / body) ve mobile (Bearer header) akışlarını tek noktada birleştirir.
+ */
+export function extractToken(req: NextRequest, fallback?: string | null): string | null {
+  const authHeader = req.headers.get("authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7).trim();
+    if (token) return token;
+  }
+  return fallback ?? null;
 }
 
 /**

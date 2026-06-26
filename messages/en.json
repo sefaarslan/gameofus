@@ -107,6 +107,15 @@
       "fast": "Quick — 5 questions",
       "classic": "Classic — 10 questions"
     },
+    "category": {
+      "label": "Category",
+      "all": "All"
+    },
+    "premiumModal": {
+      "title": "This category is only available in the mobile app",
+      "desc": "Download Game of Us app to access this content.",
+      "close": "Got it"
+    },
     "submit": "Create game link",
     "creating": "Creating...",
     "limitTitle": "Free room limit reached",

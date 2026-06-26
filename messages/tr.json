@@ -107,6 +107,15 @@
       "fast": "Hızlı — 5 soru",
       "classic": "Klasik — 10 soru"
     },
+    "category": {
+      "label": "Kategori",
+      "all": "Tümü"
+    },
+    "premiumModal": {
+      "title": "Bu kategori sadece mobile app'te açılır",
+      "desc": "Game of Us uygulamasını indirip bu içeriğe erişebilirsin.",
+      "close": "Anladım"
+    },
     "submit": "Oyun linki oluştur",
     "creating": "Oluşturuluyor...",
     "limitTitle": "Ücretsiz oda hakkın doldu",

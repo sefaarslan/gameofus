@@ -2,6 +2,11 @@ import crypto from "crypto";
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { generateToken, hashToken } from "@/lib/token";
+import { corsOptions } from "@/lib/cors";
+
+export function OPTIONS() {
+  return corsOptions();
+}
 import { generateUniqueRoomCode } from "@/lib/room-code";
 import { getRoomExpiry } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
@@ -68,8 +73,12 @@ export async function POST(req: NextRequest) {
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { displayName, partnerName, gameMode, questionCount, locale } =
+  const { displayName, partnerName, gameMode, questionCount, locale, categoryId } =
     body as Record<string, unknown>;
+
+  const selectedCategoryId = typeof categoryId === "string" && categoryId.length > 0
+    ? categoryId
+    : null;
 
   if (!displayName || typeof displayName !== "string" || displayName.trim().length === 0) {
     return apiError("INVALID_PAYLOAD", "İsim zorunludur.");
@@ -112,16 +121,35 @@ export async function POST(req: NextRequest) {
   const selectedQuestions: Array<{ id: string; mode: string }> = [];
 
   for (const { mode: qMode, count: qCount } of questionGroups) {
-    const { data: qs, error } = await supabase
-      .from("questions")
-      .select("id, mode")
-      .eq("mode", qMode as "secret_choice" | "prediction" | "orderline" | "mixed")
-      .eq("locale", roomLocale)
-      .eq("is_active", true)
-      .limit(qCount * 3); // fazladan çek, shuffle için
+    let qs: Array<{ id: string; mode: string }> | null = null;
 
-    if (error || !qs || qs.length < qCount) {
-      return apiError("INTERNAL_ERROR", "Yeterli soru bulunamadı.", 500);
+    // Kategori seçildiyse önce filtreli dene, yetersizse tüm kategorilere düş
+    if (selectedCategoryId) {
+      const result = await supabase
+        .from("questions")
+        .select("id, mode")
+        .eq("mode", qMode as "secret_choice" | "prediction" | "orderline" | "mixed")
+        .eq("locale", roomLocale)
+        .eq("is_active", true)
+        .eq("category_id", selectedCategoryId)
+        .limit(qCount * 3);
+      if (!result.error && result.data && result.data.length >= qCount) {
+        qs = result.data;
+      }
+    }
+
+    if (!qs) {
+      const result = await supabase
+        .from("questions")
+        .select("id, mode")
+        .eq("mode", qMode as "secret_choice" | "prediction" | "orderline" | "mixed")
+        .eq("locale", roomLocale)
+        .eq("is_active", true)
+        .limit(qCount * 3);
+      if (result.error || !result.data || result.data.length < qCount) {
+        return apiError("INTERNAL_ERROR", "Yeterli soru bulunamadı.", 500);
+      }
+      qs = result.data;
     }
 
     // Fisher-Yates shuffle, ilk qCount'u al
