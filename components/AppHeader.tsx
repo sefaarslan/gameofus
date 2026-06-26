@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Link as LocaleLink } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { usePathname } from "@/i18n/navigation";
 import { GameOfUsLogo } from "./GameOfUsLogo";
@@ -8,6 +9,12 @@ import { GameOfUsLogo } from "./GameOfUsLogo";
 interface AppHeaderProps {
   locale: string;
 }
+
+const LOCALES = [
+  { code: "tr", label: "TR" },
+  { code: "en", label: "EN" },
+  { code: "es", label: "ES" },
+] as const;
 
 export function AppHeader({ locale }: AppHeaderProps) {
   const tNav = useTranslations("nav");
@@ -53,12 +60,23 @@ export function AppHeader({ locale }: AppHeaderProps) {
         <div className="flex items-center gap-3">
           {/* Locale switcher — hidden on game pages */}
           {!isGamePage && (
-            <Link
-              href={`/${locale === "tr" ? "en" : "tr"}`}
-              className="px-3 py-1.5 rounded-full text-label-md text-on-surface-variant hover:bg-surface-container transition-colors"
-            >
-              {locale === "tr" ? "EN" : "TR"}
-            </Link>
+            <div className="flex items-center rounded-full border border-outline-variant/30 overflow-hidden">
+              {LOCALES.map(({ code, label }) => (
+                <LocaleLink
+                  key={code}
+                  href={pathname}
+                  locale={code}
+                  className={[
+                    "px-2.5 py-1 text-label-sm transition-colors",
+                    code === locale
+                      ? "bg-primary text-on-primary font-semibold"
+                      : "text-on-surface-variant hover:bg-surface-container",
+                  ].join(" ")}
+                >
+                  {label}
+                </LocaleLink>
+              ))}
+            </div>
           )}
 
           {/* Desktop CTA — hidden on game pages */}

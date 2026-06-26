@@ -1,0 +1,259 @@
+{
+  "nav": {
+    "howItWorks": "Cómo Funciona",
+    "modes": "Modos",
+    "premium": "Premium",
+    "start": "Empezar",
+    "menu": "Menú"
+  },
+  "landing": {
+    "hero": {
+      "title": "Conócense mejor jugando.",
+      "titlePre": "Conócense",
+      "titleHighlight": "mejor",
+      "titlePost": "jugando.",
+      "subtitle": "Game of Us ofrece juegos cortos y divertidos donde dos personas se adivinan y se descubren juntas.",
+      "badge": "Fortalece tu vínculo",
+      "howToPlay": "¿Cómo se juega?",
+      "socialProof": "+10k parejas jugando"
+    },
+    "cta": {
+      "start": "Iniciar juego"
+    },
+    "how": {
+      "title": "Cómo funciona",
+      "badge": "Simple y rápido",
+      "subtitle": "Fortalece tu vínculo en solo 3 pasos",
+      "step1": "Crea una sala",
+      "step2": "Comparte el link",
+      "step3": "Descúbranse juntos",
+      "step1Desc": "Crea una sala y envía tu link de invitación a tu pareja.",
+      "step2Desc": "Responde las preguntas y adivina a tu pareja.",
+      "step3Desc": "Cuando ambos terminen, vean los resultados juntos y conversen."
+    },
+    "modes": {
+      "title": "Modos de juego",
+      "subtitle": "Distintas experiencias para distintos momentos",
+      "explore": "Ver todos",
+      "popular": "POPULAR",
+      "sc": {
+        "desc": "Elige en secreto entre las opciones. ¿Tu pareja lo adivinará?",
+        "tag": "Fácil y divertido"
+      },
+      "pred": {
+        "desc": "Adivina cómo reaccionaría tu pareja ante distintas situaciones.",
+        "tag": "Conexión profunda"
+      },
+      "order": {
+        "desc": "Ordena las tarjetas según tus prioridades. Pon a prueba cuánto te conoce tu pareja.",
+        "tag": "Descubrimiento"
+      }
+    },
+    "premiumSection": {
+      "badge": "Descubre más",
+      "title": "Paquete Premium",
+      "desc": "Lleva tu relación al siguiente nivel. Preguntas ilimitadas, modos exclusivos y análisis detallados.",
+      "feat1": "50+ Preguntas especialmente diseñadas",
+      "feat2": "Acceso a 3 modos de juego",
+      "feat3": "Análisis detallado de compatibilidad",
+      "feat4": "Tarjetas para compartir resultados",
+      "price": "2,99 USD",
+      "payOnce": "Pago único",
+      "noSub": "Sin suscripción mensual.",
+      "cta": "Ver el paquete",
+      "secure": "Pago seguro · Acceso inmediato"
+    },
+    "mockup": {
+      "partnerOnline": "Alex en línea",
+      "questionCount": "Preg. 3 / 10",
+      "question": "¿Qué necesitas más cuando estás estresado/a?",
+      "yourAnswer": "Tu respuesta",
+      "partnerAnswer": "¿Qué respondería tu pareja?",
+      "lock": "Confirmar predicción",
+      "score": "Puntuación de lectura",
+      "greatMatch": "¡Gran sintonía!",
+      "correct": "¡Correcto! 🎉",
+      "points": "+3 pts",
+      "partnerName": "Alex"
+    }
+  },
+  "create": {
+    "title": "Crear nuevo juego",
+    "subtitle": "Elige la configuración y comparte el link con tu pareja.",
+    "sideTitle": "Nuevo juego",
+    "sideSubtitle": "Comienza una experiencia.",
+    "sideStep1": "Paso 1: Ingresa tu info",
+    "sideStep2": "Paso 2: Comparte el link",
+    "sideStep3": "Paso 3: ¡A jugar!",
+    "name": { "label": "Tu nombre", "placeholder": "Tu nombre" },
+    "partner": { "label": "Nombre de tu pareja", "optional": "Opcional", "placeholder": "Nombre de tu pareja" },
+    "mode": {
+      "label": "Modo de juego",
+      "options": {
+        "secret_choice": "Sí / No",
+        "prediction": "Escenario",
+        "orderline": "Ranking",
+        "mixed": "Mixto"
+      },
+      "descs": {
+        "secret_choice": "Clásico de 3 opciones",
+        "prediction": "Opción múltiple",
+        "orderline": "Adivina el orden",
+        "mixed": "Un poco de todo"
+      }
+    },
+    "questions": {
+      "label": "Número de preguntas",
+      "fast": "Rápido — 5 preguntas",
+      "classic": "Clásico — 10 preguntas"
+    },
+    "category": {
+      "label": "Categoría",
+      "all": "Todas"
+    },
+    "premiumModal": {
+      "title": "Esta categoría solo está disponible en la app móvil",
+      "desc": "Descarga Game of Us para acceder a este contenido.",
+      "close": "Entendido"
+    },
+    "submit": "Crear link del juego",
+    "creating": "Creando...",
+    "limitTitle": "Límite de sala gratuita alcanzado",
+    "limitDesc": "Solo puedes crear una sala con el plan gratuito. Puedes continuar tu juego actual o pasarte al premium.",
+    "limitGoBack": "Volver a mi juego",
+    "limitUpgrade": "Ir a Premium"
+  },
+  "share": {
+    "title": "Tu link de invitación está listo",
+    "subtitle": "Comparte el link con tu pareja y empieza a jugar.",
+    "link": "Tu link de invitación",
+    "copy": "Copiar link",
+    "copied": "¡Copiado!",
+    "whatsapp": "Compartir por WhatsApp",
+    "whatsappText": "¡Juguemos Game of Us!",
+    "start": "Empezar a responder",
+    "startWaiting": "Esperando a tu pareja...",
+    "waiting": "Tu pareja aún no se ha unido.",
+    "joined": "¡Tu pareja se unió!",
+    "info": "Cuando tu pareja abra el link, ambos responderán y se adivinarán mutuamente. Luego los resultados se revelarán juntos.",
+    "roomStatus": "Estado de la sala",
+    "you": "Tú",
+    "inRoom": "Estás dentro",
+    "partnerWaiting": "Esperando...",
+    "partnerJoinedStatus": "¡Se unió!",
+    "relaxMessage": "Tómate un té — tu pareja está en camino."
+  },
+  "join": {
+    "title": "Unirse al juego",
+    "subtitle": "Tu amigo/a te espera. Ingresa tu nombre y empieza a jugar.",
+    "name": { "label": "Tu nombre", "placeholder": "Tu nombre" },
+    "submit": "Unirme",
+    "joining": "Uniéndome...",
+    "roomFull": "Esta sala ya tiene dos jugadores.",
+    "expired": "Esta sala ha expirado."
+  },
+  "game": {
+    "yourAnswer": "Tu respuesta",
+    "yourAnswerNote": "no se muestra a tu pareja",
+    "partnerGuess": "¿Qué respondería tu pareja?",
+    "confidence": "¿Qué tan seguro/a estás?",
+    "lock": "Confirmar predicción",
+    "locking": "Guardando...",
+    "progress": "Pregunta {current}/{total}",
+    "finish": "Terminar",
+    "orderGuide": "Toca en el orden que prefieras",
+    "orderReset": "Reiniciar",
+    "partnerOrderGuide": "¿Cómo lo ordenaría tu pareja?",
+    "modeSecret": "Elección Secreta",
+    "modePrediction": "Predicción",
+    "modeOrderline": "Ranking",
+    "errorGeneric": "Algo salió mal.",
+    "errorConnection": "Error de conexión."
+  },
+  "option": {
+    "yes": "Sí",
+    "unsure": "No sé",
+    "no": "No"
+  },
+  "confidence": {
+    "guess": "Adivino",
+    "think": "Creo que sí",
+    "sure": "Estoy seguro/a"
+  },
+  "reveal": {
+    "correct": "¡Adivinaste!",
+    "near": "¡Casi lo tienes!",
+    "miss": "¡Fallaste!",
+    "correctTitle": "¡Correcto!",
+    "nearTitle": "¡Cerca!",
+    "missTitle": "Fallaste",
+    "greatReading": "¡Excelente lectura!",
+    "points": "+{points} pts",
+    "saved": "Tu predicción fue guardada. Lo verán juntos cuando tu pareja juegue.",
+    "savedSubtitle": "Verán el resultado juntos cuando tu pareja juegue.",
+    "next": "Siguiente pregunta",
+    "finish": "Ver resultados"
+  },
+  "waiting": {
+    "title": "¡Terminaste!",
+    "partner": "Los resultados se revelarán cuando tu pareja termine.",
+    "resend": "Enviar link otra vez",
+    "or": "o",
+    "copyTitle": "Copiar",
+    "waitingDots": "Esperando a tu pareja...",
+    "whatsappText": "¡Juguemos Game of Us!"
+  },
+  "results": {
+    "title": "Los resultados están listos",
+    "score": "Puntuación de lectura",
+    "myScore": "Tu puntuación",
+    "details": "Detalles de preguntas",
+    "playAgain": "Jugar de nuevo",
+    "correct": "Correcto",
+    "near": "Cerca",
+    "miss": "Fallaste",
+    "yourAnswer": "Tu respuesta",
+    "partnerAnswer": "Respuesta de tu pareja",
+    "yourGuess": "Tu predicción",
+    "partnerGuess": "Predicción de tu pareja",
+    "goHome": "Inicio",
+    "backHome": "Volver al inicio",
+    "correctCount": "Correcto",
+    "nearCount": "Cerca",
+    "compatRate": "Compatibilidad",
+    "matchGreat": "¡Gran sintonía!",
+    "matchGrowing": "¡Vamos bien!",
+    "matchDiscovering": "Aún descubriéndose",
+    "diffOpinion": "Opiniones distintas",
+    "missCountText": "{count} preguntas — ¡sigan descubriendo!",
+    "continueConvo": "Sigan la conversación",
+    "continueConvoDesc": "Hablar sobre estos resultados puede profundizar su vínculo.",
+    "backToSummary": "Volver al resumen",
+    "seeDetails": "Ver detalles",
+    "labelCorrect": "Exacto",
+    "labelNear": "Cerca",
+    "labelMiss": "Opinión distinta",
+    "answerOf": "respuesta",
+    "guessOf": "predicción",
+    "guessAboutPartner": "predicción sobre tu pareja",
+    "partnerRealAnswer": "respuesta real"
+  },
+  "error": {
+    "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
+    "invalidLink": "Este link no es válido.",
+    "roomExpired": "Esta sala ha expirado.",
+    "roomFull": "Esta sala ya tiene dos jugadores.",
+    "resultNotReady": "Los resultados aún no están listos.",
+    "rateLimited": "Demasiados intentos. Por favor, inténtalo más tarde.",
+    "wrongDevice": "Para ver los resultados, ábrelos en el dispositivo donde jugaste.",
+    "retry": "Intentar de nuevo",
+    "goHome": "Volver al inicio",
+    "connection": "Error de conexión."
+  },
+  "premium": {
+    "title": "Continúa la noche de juegos",
+    "subtitle": "Más juegos y sets de preguntas más largos estarán disponibles con premium pronto.",
+    "price": "2,99 USD — acceso único",
+    "cta": "Me interesa"
+  }
+}

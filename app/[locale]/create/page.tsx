@@ -67,13 +67,13 @@ export default function CreatePage() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/categories")
+    fetch(`/api/categories?locale=${locale}`)
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data)) setCategories(data);
       })
       .catch(() => {});
-  }, []);
+  }, [locale]);
 
   function handleCategoryClick(cat: Category) {
     if (cat.is_premium) {

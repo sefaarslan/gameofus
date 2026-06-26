@@ -44,6 +44,7 @@ export type Database = {
           created_at: string
           id: string
           is_premium: boolean
+          locale: string
           name: string
           slug: string
           sort_order: number
@@ -52,6 +53,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_premium?: boolean
+          locale?: string
           name: string
           slug: string
           sort_order?: number
@@ -60,6 +62,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_premium?: boolean
+          locale?: string
           name?: string
           slug?: string
           sort_order?: number
@@ -319,6 +322,7 @@ export type Database = {
           locale: string
           mode: Database["public"]["Enums"]["game_mode"]
           question_text: string
+          translation_group_id: string | null
         }
         Insert: {
           category_id?: string | null
@@ -328,6 +332,7 @@ export type Database = {
           locale?: string
           mode?: Database["public"]["Enums"]["game_mode"]
           question_text: string
+          translation_group_id?: string | null
         }
         Update: {
           category_id?: string | null
@@ -337,6 +342,7 @@ export type Database = {
           locale?: string
           mode?: Database["public"]["Enums"]["game_mode"]
           question_text?: string
+          translation_group_id?: string | null
         }
         Relationships: [
           {
@@ -445,11 +451,11 @@ export type Database = {
       }
       rooms: {
         Row: {
+          category_id: string | null
           created_at: string
           expires_at: string
           game_mode: Database["public"]["Enums"]["game_mode"]
           id: string
-          is_premium_room: boolean
           join_locked: boolean
           locale: string
           max_participants: number
@@ -460,11 +466,11 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          category_id?: string | null
           created_at?: string
           expires_at: string
           game_mode?: Database["public"]["Enums"]["game_mode"]
           id?: string
-          is_premium_room?: boolean
           join_locked?: boolean
           locale?: string
           max_participants?: number
@@ -475,11 +481,11 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          category_id?: string | null
           created_at?: string
           expires_at?: string
           game_mode?: Database["public"]["Enums"]["game_mode"]
           id?: string
-          is_premium_room?: boolean
           join_locked?: boolean
           locale?: string
           max_participants?: number
@@ -511,21 +517,68 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
-          premium_until: string | null
+          is_premium: boolean
+          room_credits: number
         }
         Insert: {
           created_at?: string
           email?: string | null
           id: string
-          premium_until?: string | null
+          is_premium?: boolean
+          room_credits?: number
         }
         Update: {
           created_at?: string
           email?: string | null
           id?: string
-          premium_until?: string | null
+          is_premium?: boolean
+          room_credits?: number
         }
         Relationships: []
+      }
+      purchases: {
+        Row: {
+          amount: number | null
+          created_at: string
+          currency: string
+          id: string
+          product_type: string
+          provider: string
+          provider_transaction_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          currency?: string
+          id?: string
+          product_type: string
+          provider: string
+          provider_transaction_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          currency?: string
+          id?: string
+          product_type?: string
+          provider?: string
+          provider_transaction_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

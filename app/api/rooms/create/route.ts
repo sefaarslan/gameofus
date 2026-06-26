@@ -187,6 +187,7 @@ export async function POST(req: NextRequest) {
       question_count: count,
       locale: roomLocale,
       expires_at: expiresAt.toISOString(),
+      ...(selectedCategoryId ? { category_id: selectedCategoryId } : {}),
     })
     .select("id")
     .single();
