@@ -49,19 +49,15 @@
         "tag": "Keşif"
       }
     },
-    "premiumSection": {
-      "badge": "Daha Fazla Keşfet",
-      "title": "Premium Paket",
-      "desc": "İlişkinizi bir sonraki seviyeye taşıyın. Sınırsız soru, özel modlar ve detaylı analizler.",
-      "feat1": "50+ Özel Hazırlanmış Soru",
-      "feat2": "3 Farklı Oyun Modu Erişimi",
-      "feat3": "Detaylı Uyumluluk Analizi",
-      "feat4": "Sonuç Paylaşım Kartları",
-      "price": "249 TL",
-      "payOnce": "Tek seferlik ödeme",
-      "noSub": "Aylık abonelik yok — 3 günlük erişim.",
-      "cta": "Paketi İncele",
-      "secure": "Güvenli ödeme · Anında erişim"
+    "mobileTeaser": {
+      "badge": "Mobil Uygulama",
+      "title": "Daha derin bir deneyim için",
+      "desc": "Premium kategoriler ve geçmiş oyunlar yakında Game of Us mobil uygulamasında seni bekliyor.",
+      "feat1": "Premium kategorilere kalıcı erişim",
+      "feat2": "Geçmiş oyunlarını istediğin zaman incele",
+      "feat3": "Partner oynadığında anında bildirim al",
+      "comingSoon": "Yakında geliyor",
+      "storeNote": "App Store ve Google Play'de yayınlanacak."
     },
     "mockup": {
       "partnerOnline": "Ayşe online",

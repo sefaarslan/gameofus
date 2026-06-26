@@ -363,49 +363,68 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Premium Teaser ─────────────────────────────────────────── */}
+      {/* ── Mobile App Teaser ─────────────────────────────────────── */}
       <section className="py-12 pb-28" id="premium">
         <div className="bg-gradient-to-br from-surface to-surface-container-high rounded-[2rem] p-8 md:p-14 shadow-soft-active border border-outline-variant/20 flex flex-col md:flex-row items-center justify-center gap-10 md:gap-14 relative overflow-hidden">
-          {/* Blobs */}
+          {/* Ambient blobs */}
           <div className="absolute -right-24 -top-24 w-72 h-72 bg-tertiary-container/15 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -left-24 -bottom-24 w-72 h-72 bg-primary-container/15 rounded-full blur-3xl pointer-events-none" />
 
           {/* Left: text */}
           <div className="flex-1 max-w-lg relative z-10 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-tertiary-container text-on-tertiary-container rounded-full text-label-md text-xs mb-5">
-              <span className="material-symbols-outlined text-sm icon-fill">star</span>
-              <span>{t("premiumSection.badge")}</span>
+              <span className="material-symbols-outlined text-sm icon-fill">smartphone</span>
+              <span>{t("mobileTeaser.badge")}</span>
             </div>
-            <h2 className="text-headline-md md:text-[2rem] text-on-background mb-4 font-bold">{t("premiumSection.title")}</h2>
+            <h2 className="text-headline-md md:text-[2rem] text-on-background mb-4 font-bold">
+              {t("mobileTeaser.title")}
+            </h2>
             <p className="text-body-lg text-on-surface-variant mb-7 max-w-md">
-              {t("premiumSection.desc")}
+              {t("mobileTeaser.desc")}
             </p>
             <ul className="flex flex-col gap-3.5 text-left">
-              {(["feat1", "feat2", "feat3", "feat4"] as const).map((key, i) => (
+              {(["feat1", "feat2", "feat3"] as const).map((key, i) => (
                 <li key={i} className="flex items-center gap-3 text-on-background text-body-md">
                   <span className="material-symbols-outlined text-primary text-base bg-primary-container/25 p-1.5 rounded-full icon-fill">
-                    {["quiz", "gamepad", "bar_chart", "share"][i]}
+                    {["lock_open", "history", "notifications"][i]}
                   </span>
-                  {t(`premiumSection.${key}`)}
+                  {t(`mobileTeaser.${key}`)}
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Right: pricing card */}
-          <div className="w-full md:w-[340px] shrink-0 bg-surface-container-lowest rounded-2xl p-10 shadow-soft-active border border-outline-variant/10 flex flex-col items-center text-center relative z-10">
-            <div className="w-16 h-16 rounded-2xl bg-tertiary-container flex items-center justify-center mb-6">
-              <span className="material-symbols-outlined text-on-tertiary-container icon-fill text-3xl">workspace_premium</span>
+          {/* Right: store badges */}
+          <div className="w-full md:w-[300px] shrink-0 relative z-10">
+            <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/10 shadow-soft-active flex flex-col items-center text-center gap-6">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary icon-fill text-3xl">smartphone</span>
+              </div>
+
+              <div>
+                <p className="text-label-lg font-bold text-on-background mb-1">{t("mobileTeaser.comingSoon")}</p>
+                <p className="text-xs text-on-surface-variant">{t("mobileTeaser.storeNote")}</p>
+              </div>
+
+              <div className="flex flex-col gap-3 w-full">
+                {/* App Store badge */}
+                <div className="flex items-center gap-3 bg-on-surface/5 rounded-xl px-4 py-3 select-none opacity-50">
+                  <span className="material-symbols-outlined text-on-surface-variant text-2xl">apple</span>
+                  <div className="text-left">
+                    <p className="text-[10px] text-on-surface-variant leading-tight">Download on the</p>
+                    <p className="text-sm font-semibold text-on-background leading-tight">App Store</p>
+                  </div>
+                </div>
+                {/* Google Play badge */}
+                <div className="flex items-center gap-3 bg-on-surface/5 rounded-xl px-4 py-3 select-none opacity-50">
+                  <span className="material-symbols-outlined text-on-surface-variant text-2xl">play_circle</span>
+                  <div className="text-left">
+                    <p className="text-[10px] text-on-surface-variant leading-tight">Get it on</p>
+                    <p className="text-sm font-semibold text-on-background leading-tight">Google Play</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="text-label-md text-on-surface-variant mb-2">{t("premiumSection.payOnce")}</p>
-            <p className="text-[3rem] font-bold text-primary leading-none mb-2">
-              {t("premiumSection.price")}
-            </p>
-            <p className="text-sm text-on-surface-variant mb-8">{t("premiumSection.noSub")}</p>
-            <button className="w-full bg-primary text-on-primary text-body-md font-semibold px-6 py-4 rounded-xl hover:bg-surface-tint active:scale-95 transition-all shadow-primary-glow">
-              {t("premiumSection.cta")}
-            </button>
-            <p className="text-xs text-on-surface-variant mt-4 opacity-60">{t("premiumSection.secure")}</p>
           </div>
         </div>
       </section>

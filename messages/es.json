@@ -49,19 +49,15 @@
         "tag": "Descubrimiento"
       }
     },
-    "premiumSection": {
-      "badge": "Descubre más",
-      "title": "Paquete Premium",
-      "desc": "Lleva tu relación al siguiente nivel. Preguntas ilimitadas, modos exclusivos y análisis detallados.",
-      "feat1": "50+ Preguntas especialmente diseñadas",
-      "feat2": "Acceso a 3 modos de juego",
-      "feat3": "Análisis detallado de compatibilidad",
-      "feat4": "Tarjetas para compartir resultados",
-      "price": "2,99 USD",
-      "payOnce": "Pago único",
-      "noSub": "Sin suscripción mensual.",
-      "cta": "Ver el paquete",
-      "secure": "Pago seguro · Acceso inmediato"
+    "mobileTeaser": {
+      "badge": "App Móvil",
+      "title": "Para una experiencia más profunda",
+      "desc": "Las categorías premium y el historial de juegos estarán próximamente en la app móvil de Game of Us.",
+      "feat1": "Acceso permanente a categorías premium",
+      "feat2": "Revisa tus juegos anteriores cuando quieras",
+      "feat3": "Recibe notificaciones cuando tu pareja juegue",
+      "comingSoon": "Próximamente",
+      "storeNote": "Disponible en App Store y Google Play."
     },
     "mockup": {
       "partnerOnline": "Alex en línea",

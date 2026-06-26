@@ -49,19 +49,15 @@
         "tag": "Discovery"
       }
     },
-    "premiumSection": {
-      "badge": "Explore More",
-      "title": "Premium Package",
-      "desc": "Take your relationship to the next level. Unlimited questions, exclusive modes, and detailed insights.",
-      "feat1": "50+ Specially Crafted Questions",
-      "feat2": "Access to 3 Game Modes",
-      "feat3": "Detailed Compatibility Analysis",
-      "feat4": "Result Sharing Cards",
-      "price": "249 TL",
-      "payOnce": "One-time payment",
-      "noSub": "No monthly subscription — 3-day access.",
-      "cta": "See the Package",
-      "secure": "Secure payment · Instant access"
+    "mobileTeaser": {
+      "badge": "Mobile App",
+      "title": "For a deeper experience",
+      "desc": "Premium categories and game history are coming soon to the Game of Us mobile app.",
+      "feat1": "Permanent access to premium categories",
+      "feat2": "Review your past games anytime",
+      "feat3": "Get notified instantly when your partner plays",
+      "comingSoon": "Coming soon",
+      "storeNote": "Launching on App Store and Google Play."
     },
     "mockup": {
       "partnerOnline": "Alex online",
