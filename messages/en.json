@@ -114,10 +114,10 @@
     },
     "submit": "Create game link",
     "creating": "Creating...",
-    "limitTitle": "Free room limit reached",
-    "limitDesc": "You can only create one room with the free plan. You can continue your existing game or upgrade to premium for more.",
+    "limitTitle": "You already have a game in progress",
+    "limitDesc": "With the free version you can run one game at a time. Download the Game of Us mobile app to play more.",
     "limitGoBack": "Back to my game",
-    "limitUpgrade": "Go Premium"
+    "limitUpgrade": "Download the App"
   },
   "share": {
     "title": "Your invite link is ready",

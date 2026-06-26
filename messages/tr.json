@@ -114,10 +114,10 @@
     },
     "submit": "Oyun linki oluştur",
     "creating": "Oluşturuluyor...",
-    "limitTitle": "Ücretsiz oda hakkın doldu",
-    "limitDesc": "Ücretsiz planla yalnızca bir oda oluşturabilirsin. Mevcut oyununa devam edebilir ya da daha fazlası için premium'a geçebilirsin.",
+    "limitTitle": "Zaten devam eden bir oyunun var",
+    "limitDesc": "Ücretsiz sürümle aynı anda bir oyun yürütebilirsin. Daha fazla oyun için Game of Us mobil uygulamasını indir.",
     "limitGoBack": "Mevcut oyunuma dön",
-    "limitUpgrade": "Premium'a Geç"
+    "limitUpgrade": "Mobil Uygulamayı İndir"
   },
   "share": {
     "title": "Davet linkin hazır",

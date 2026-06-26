@@ -147,8 +147,8 @@ export default function CreatePage() {
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-primary-container/15 rounded-full blur-3xl -z-10 pointer-events-none" />
 
         <div className="w-full max-w-sm flex flex-col items-center text-center gap-6">
-          <div className="w-20 h-20 rounded-full bg-tertiary-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-on-tertiary-container icon-fill" style={{ fontSize: "40px" }}>workspace_premium</span>
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+            <span className="material-symbols-outlined text-primary icon-fill" style={{ fontSize: "40px" }}>smartphone</span>
           </div>
 
           <div className="bg-surface-container-lowest rounded-[28px] p-8 shadow-soft-active border border-outline-variant/20 flex flex-col items-center gap-5">
@@ -157,7 +157,7 @@ export default function CreatePage() {
 
             <div className="flex flex-col gap-3 w-full">
               <button
-                onClick={() => router.push(`/game/room/${existingRoom}`)}
+                onClick={() => router.push(`/${locale}/game/room/${existingRoom}`)}
                 className="w-full flex items-center justify-center gap-2 bg-surface-container text-on-surface text-body-md font-semibold py-4 rounded-full hover:bg-surface-container-high active:scale-95 transition-all"
               >
                 <span className="material-symbols-outlined text-xl">arrow_back</span>
@@ -165,10 +165,10 @@ export default function CreatePage() {
               </button>
 
               <button
-                onClick={() => router.push(`/#premium`)}
+                onClick={() => router.push(`/${locale}#premium`)}
                 className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary text-body-md font-semibold py-4 rounded-full hover:bg-surface-tint active:scale-95 transition-all shadow-primary-glow"
               >
-                <span className="material-symbols-outlined icon-fill text-xl">star</span>
+                <span className="material-symbols-outlined icon-fill text-xl">smartphone</span>
                 {t("limitUpgrade")}
               </button>
             </div>

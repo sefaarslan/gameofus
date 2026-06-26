@@ -114,10 +114,10 @@
     },
     "submit": "Crear link del juego",
     "creating": "Creando...",
-    "limitTitle": "Límite de sala gratuita alcanzado",
-    "limitDesc": "Solo puedes crear una sala con el plan gratuito. Puedes continuar tu juego actual o pasarte al premium.",
+    "limitTitle": "Ya tienes un juego en curso",
+    "limitDesc": "Con la versión gratuita puedes tener un juego a la vez. Descarga la app móvil de Game of Us para jugar más.",
     "limitGoBack": "Volver a mi juego",
-    "limitUpgrade": "Ir a Premium"
+    "limitUpgrade": "Descargar la App"
   },
   "share": {
     "title": "Tu link de invitación está listo",
