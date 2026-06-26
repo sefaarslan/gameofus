@@ -124,7 +124,7 @@ export default function CreatePage() {
       localStorage.setItem(`gou_token_${roomCode}`, participant.token);
       // Store the created room to enforce the free tier limit
       localStorage.setItem("gou_my_room", roomCode);
-      router.push(`/game/room/${roomCode}`);
+      router.push(`/${locale}/game/room/${roomCode}`);
     } catch {
       setError(tErr("generic"));
     } finally {
