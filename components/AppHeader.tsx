@@ -78,16 +78,21 @@ function LocaleDropdown({ locale, pathname }: { locale: string; pathname: string
 export function AppHeader({ locale }: AppHeaderProps) {
   const tNav = useTranslations("nav");
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Hide locale switcher on game pages — locale is locked to the room's language
   const isGamePage = pathname.includes("/game/");
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-surface/90 backdrop-blur-md border-b border-outline-variant/20 shadow-soft-sm transition-all duration-300">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 h-16 flex items-center justify-between gap-6">
 
         {/* Logo */}
-        <Link href={`/${locale}`} className="flex-shrink-0">
+        <Link href={`/${locale}`} className="flex-shrink-0" onClick={() => setMobileOpen(false)}>
           <GameOfUsLogo size="md" />
         </Link>
 
@@ -133,17 +138,58 @@ export function AppHeader({ locale }: AppHeaderProps) {
             </Link>
           )}
 
-          {/* Mobile menu icon — hidden on game pages */}
+          {/* Mobile menu toggle — hidden on game pages */}
           {!isGamePage && (
             <button
               className="md:hidden p-2 rounded-full hover:bg-surface-container transition-colors text-on-surface-variant"
               aria-label={tNav("menu")}
+              aria-expanded={mobileOpen}
+              onClick={() => setMobileOpen((v) => !v)}
             >
-              <span className="material-symbols-outlined text-xl">menu</span>
+              <span className="material-symbols-outlined text-xl">
+                {mobileOpen ? "close" : "menu"}
+              </span>
             </button>
           )}
         </div>
       </div>
+
+      {/* Mobile menu panel */}
+      {!isGamePage && mobileOpen && (
+        <div className="md:hidden border-t border-outline-variant/20 bg-surface/95 backdrop-blur-md">
+          <nav className="flex flex-col px-6 py-4 gap-1">
+            <Link
+              href={`/${locale}#nasil-calisir`}
+              className="text-body-md text-on-surface-variant hover:text-primary py-3 border-b border-outline-variant/10 transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              {tNav("howItWorks")}
+            </Link>
+            <Link
+              href={`/${locale}#oyun-modlari`}
+              className="text-body-md text-on-surface-variant hover:text-primary py-3 border-b border-outline-variant/10 transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              {tNav("modes")}
+            </Link>
+            <Link
+              href={`/${locale}#premium`}
+              className="text-body-md text-on-surface-variant hover:text-primary py-3 border-b border-outline-variant/10 transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              {tNav("premium")}
+            </Link>
+            <Link
+              href={`/${locale}/create`}
+              className="mt-3 flex items-center justify-center gap-2 bg-primary text-on-primary text-label-md font-semibold px-5 py-3 rounded-full hover:bg-surface-tint active:scale-95 transition-all shadow-primary-glow"
+              onClick={() => setMobileOpen(false)}
+            >
+              {tNav("start")}
+              <span className="material-symbols-outlined text-base">arrow_forward</span>
+            </Link>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
