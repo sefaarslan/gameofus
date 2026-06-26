@@ -338,16 +338,18 @@ export default function CreatePage() {
                       key={count}
                       type="button"
                       onClick={() => setQuestionCount(count)}
-                      className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 text-label-md transition-all ${
+                      className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3.5 px-2 rounded-xl border-2 text-center transition-all ${
                         questionCount === count
                           ? "border-primary bg-primary-container/10 text-primary"
                           : "border-outline-variant/30 bg-surface-container-lowest text-on-surface-variant hover:border-outline"
                       }`}
                     >
-                      <span className="material-symbols-outlined text-lg">
+                      <span className="material-symbols-outlined text-xl flex-shrink-0">
                         {count === 5 ? "bolt" : "format_list_bulleted"}
                       </span>
-                      {count === 5 ? t("questions.fast") : t("questions.classic")}
+                      <span className="text-xs sm:text-label-md leading-tight">
+                        {count === 5 ? t("questions.fast") : t("questions.classic")}
+                      </span>
                     </button>
                   ))}
                 </div>

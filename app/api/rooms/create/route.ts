@@ -139,17 +139,24 @@ export async function POST(req: NextRequest) {
     }
 
     if (!qs) {
-      const result = await supabase
-        .from("questions")
-        .select("id, mode")
-        .eq("mode", qMode as "secret_choice" | "prediction" | "orderline" | "mixed")
-        .eq("locale", roomLocale)
-        .eq("is_active", true)
-        .limit(qCount * 3);
-      if (result.error || !result.data || result.data.length < qCount) {
+      // Önce istenen locale ile dene, yetersizse 'tr'ye düş
+      const locales = roomLocale === "tr" ? ["tr"] : [roomLocale, "tr"];
+      for (const loc of locales) {
+        const result = await supabase
+          .from("questions")
+          .select("id, mode")
+          .eq("mode", qMode as "secret_choice" | "prediction" | "orderline" | "mixed")
+          .eq("locale", loc)
+          .eq("is_active", true)
+          .limit(qCount * 3);
+        if (!result.error && result.data && result.data.length >= qCount) {
+          qs = result.data;
+          break;
+        }
+      }
+      if (!qs) {
         return apiError("INTERNAL_ERROR", "Yeterli soru bulunamadı.", 500);
       }
-      qs = result.data;
     }
 
     // Fisher-Yates shuffle, ilk qCount'u al
