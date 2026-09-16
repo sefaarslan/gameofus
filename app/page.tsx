@@ -5,7 +5,7 @@ const SUPPORTED_LOCALES = ["tr", "en", "es"] as const;
 type Locale = (typeof SUPPORTED_LOCALES)[number];
 
 function detectLocale(acceptLanguage: string | null): Locale {
-  if (!acceptLanguage) return "tr";
+  if (!acceptLanguage) return "en";
   const langs = acceptLanguage
     .split(",")
     .map((l) => l.split(";")[0].trim().toLowerCase());
@@ -14,7 +14,7 @@ function detectLocale(acceptLanguage: string | null): Locale {
     if (lang.startsWith("en")) return "en";
     if (lang.startsWith("es")) return "es";
   }
-  return "tr";
+  return "en";
 }
 
 export default async function RootPage() {

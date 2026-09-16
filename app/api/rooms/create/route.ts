@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
     ? questionCount
     : 5;
 
-  const roomLocale = typeof locale === "string" ? locale : "tr";
+  const roomLocale = typeof locale === "string" ? locale : "en";
 
   // Rate limiting
   const forwarded = req.headers.get("x-forwarded-for")?.split(",")[0];

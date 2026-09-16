@@ -8,9 +8,9 @@ export function OPTIONS() {
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const locale = searchParams.get("locale") ?? "tr";
+  const locale = searchParams.get("locale") ?? "en";
   const validLocales = ["tr", "en", "es"];
-  const safeLocale = validLocales.includes(locale) ? locale : "tr";
+  const safeLocale = validLocales.includes(locale) ? locale : "en";
 
   const supabase = createAdminClient();
 
