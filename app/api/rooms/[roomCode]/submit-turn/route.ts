@@ -70,11 +70,19 @@ export async function POST(
   if (!room) return apiError("ROOM_NOT_FOUND", "Oda bulunamadı.", 404);
   if (isRoomExpired(room.expires_at)) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
 
-  // Token doğrulama
-  const { data: allParticipants } = await supabase
-    .from("participants")
-    .select("id, role, status, token_hash")
-    .eq("room_id", room.id);
+  // Token doğrulama + soru kontrolü — ikisi de yalnızca room.id'ye bağlı, paralel çalışır
+  const [{ data: allParticipants }, { data: rq }] = await Promise.all([
+    supabase
+      .from("participants")
+      .select("id, role, status, token_hash")
+      .eq("room_id", room.id),
+    supabase
+      .from("room_questions")
+      .select("question_id, questions(mode)")
+      .eq("room_id", room.id)
+      .eq("question_id", questionId)
+      .maybeSingle(),
+  ]);
 
   const participants = allParticipants ?? [];
   const me = participants.find((p) => verifyToken(participantToken, p.token_hash));
@@ -82,14 +90,6 @@ export async function POST(
 
   const partner = participants.find((p) => p.id !== me.id);
   if (!partner) return apiError("ROOM_NOT_FOUND", "Partner henüz katılmadı.", 404);
-
-  // Question bu odaya ait mi + mode al
-  const { data: rq } = await supabase
-    .from("room_questions")
-    .select("question_id, questions(mode)")
-    .eq("room_id", room.id)
-    .eq("question_id", questionId)
-    .maybeSingle();
 
   if (!rq) return apiError("QUESTION_NOT_FOUND", "Bu soru bu odaya ait değil.", 404);
 
@@ -110,8 +110,16 @@ export async function POST(
 
   const now = new Date().toISOString();
 
-  // Cevap + tahmin aynı anda yaz
-  const [{ error: answerErr }, { error: predErr }] = await Promise.all([
+  // Cevap + tahmin yazma, katılımcı/oda durum güncellemesi ve partner cevabı okuma —
+  // hiçbiri birbirine bağlı değil, hepsi paralel çalışır (sıralı 5-6 round-trip yerine 1)
+  const newRoomStatus = me.role === "owner" ? "owner_playing" : "guest_playing";
+  const [
+    { error: answerErr },
+    { error: predErr },
+    ,
+    ,
+    { data: partnerAnswer },
+  ] = await Promise.all([
     supabase.from("answers").insert({
       room_id: room.id,
       question_id: questionId,
@@ -129,28 +137,24 @@ export async function POST(
       confidence_multiplier: CONFIDENCE_MULTIPLIERS[confidence],
       locked_at: now,
     }),
+    me.status === "joined"
+      ? supabase.from("participants").update({ status: "playing" }).eq("id", me.id)
+      : Promise.resolve(null),
+    me.status === "joined"
+      ? supabase.from("rooms").update({ status: newRoomStatus }).eq("id", room.id)
+      : Promise.resolve(null),
+    supabase
+      .from("answers")
+      .select("answer_value")
+      .eq("room_id", room.id)
+      .eq("question_id", questionId)
+      .eq("participant_id", partner.id)
+      .maybeSingle(),
   ]);
 
   if (answerErr || predErr) {
     return apiError("INTERNAL_ERROR", "Cevap kaydedilemedi.", 500);
   }
-
-  // Participant status → playing
-  if (me.status === "joined") {
-    await supabase.from("participants").update({ status: "playing" }).eq("id", me.id);
-    // Room status güncelle
-    const newRoomStatus = me.role === "owner" ? "owner_playing" : "guest_playing";
-    await supabase.from("rooms").update({ status: newRoomStatus }).eq("id", room.id);
-  }
-
-  // Mikro-reveal: partner bu soruya cevap verdiyse karşılaştır
-  const { data: partnerAnswer } = await supabase
-    .from("answers")
-    .select("answer_value")
-    .eq("room_id", room.id)
-    .eq("question_id", questionId)
-    .eq("participant_id", partner.id)
-    .maybeSingle();
 
   if (!partnerAnswer) {
     return apiOk({
