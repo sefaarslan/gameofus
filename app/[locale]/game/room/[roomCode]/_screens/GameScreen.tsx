@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
 
 type QuestionMode = "secret_choice" | "prediction" | "orderline";
@@ -396,6 +396,11 @@ export function GameScreen({
     }
   }, [canSubmit, question, roomCode, participantToken, myAnswer, myPrediction, confidence]);
 
+  // Soru/reveal değişince sayfa en üstten başlasın (mobilde önceki kaydırma konumu kalıp soruyu kesiyordu)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [currentIndex, reveal]);
+
   async function handleNext() {
     if (isLast) {
       try {
@@ -431,7 +436,7 @@ export function GameScreen({
   return (
     <div className="min-h-[calc(100vh-73px)] bg-background flex flex-col">
       {/* Progress bar */}
-      <div className="sticky top-[73px] z-30 bg-surface/90 backdrop-blur-sm px-6 py-3 border-b border-outline-variant/20">
+      <div className="sticky top-0 md:top-[73px] z-30 bg-surface/90 backdrop-blur-sm px-6 py-3 border-b border-outline-variant/20">
         <div className="max-w-[720px] mx-auto">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -544,13 +549,13 @@ export function GameScreen({
             {/* Confidence pills */}
             <div className="mt-6 space-y-3">
               <p className="text-label-md text-on-surface-variant text-center">{t("confidence")}</p>
-              <div className="flex justify-center gap-2">
+              <div className="grid grid-cols-3 gap-2 sm:flex sm:justify-center">
                 {confidenceLevels.map(({ level, icon }) => (
                   <button
                     key={level}
                     type="button"
                     onClick={() => setConfidence(level)}
-                    className={`flex items-center gap-1.5 px-5 py-2 rounded-full text-label-md transition-all ${
+                    className={`flex items-center justify-center gap-1.5 min-w-0 px-2 sm:px-5 py-2 rounded-full text-label-md whitespace-nowrap transition-all ${
                       confidence === level
                         ? "border border-transparent bg-tertiary-container text-on-tertiary shadow-md"
                         : "border border-outline-variant bg-surface text-on-surface-variant hover:bg-surface-container"

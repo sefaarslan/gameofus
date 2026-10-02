@@ -88,7 +88,8 @@ export function AppHeader({ locale }: AppHeaderProps) {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-surface/90 backdrop-blur-md border-b border-outline-variant/20 shadow-soft-sm transition-all duration-300">
+    // Oyun sayfalarında mobilde header sabit kalmaz (ekran alanı soruya kalsın); masaüstünde sabit
+    <header className={`${isGamePage ? "relative md:sticky" : "sticky"} top-0 z-50 w-full bg-surface/90 backdrop-blur-md border-b border-outline-variant/20 shadow-soft-sm transition-all duration-300`}>
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 h-16 flex items-center justify-between gap-6">
 
         {/* Logo */}
