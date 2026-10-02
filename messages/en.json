@@ -1,4 +1,5 @@
 {
+  "meta": { "description": "How well do you really know each other?" },
   "nav": {
     "howItWorks": "How It Works",
     "modes": "Modes",
@@ -12,10 +13,9 @@
       "titlePre": "Get to",
       "titleHighlight": "know each other better",
       "titlePost": "through a game.",
-      "subtitle": "Game of Us offers short and fun games where two people guess each other and discover more together.",
+      "subtitle": "Game of Us offers short and fun games where two people guess each other and discover more together. Soon in the mobile app, AI will read your answers and write a take made just for the two of you.",
       "badge": "Strengthen your bond",
-      "howToPlay": "How to Play?",
-      "socialProof": "+10k couples playing"
+      "howToPlay": "How to Play?"
     },
     "cta": {
       "start": "Start Game"
@@ -23,13 +23,16 @@
     "how": {
       "title": "How it works",
       "badge": "Simple & Fast",
-      "subtitle": "Strengthen your bond in just 3 steps",
+      "subtitle": "Strengthen your bond in a few steps",
       "step1": "Create a room",
       "step2": "Share the link",
       "step3": "Reveal together",
       "step1Desc": "Create a room and send your personal invite link to your partner.",
       "step2Desc": "Answer the questions for yourself and predict your partner.",
-      "step3Desc": "When you're both done, reveal the results together and talk it through."
+      "step3Desc": "When you're both done, reveal the results together and talk it through.",
+      "step4": "Let AI read your match",
+      "step4Desc": "AI looks at your answers and writes a take made just for the two of you.",
+      "step4Badge": "In the app"
     },
     "modes": {
       "title": "Game Modes",
@@ -52,7 +55,8 @@
     "mobileTeaser": {
       "badge": "Mobile App",
       "title": "For a deeper experience",
-      "desc": "Premium categories and game history are coming soon to the Game of Us mobile app.",
+      "desc": "AI insights, premium categories and game history are coming soon to the Game of Us mobile app.",
+      "featAi": "AI insights made just for the two of you",
       "feat1": "Permanent access to premium categories",
       "feat2": "Review your past games anytime",
       "feat3": "Get notified instantly when your partner plays",

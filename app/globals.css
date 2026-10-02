@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  /* Dekoratif blur daireler sağa taşıyordu; clip scroll container oluşturmaz, sticky bozulmaz.
+     html'e de verilmeli: yalnızca body'de masaüstünde kaydırma sürüyordu. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
   body {
     @apply antialiased;
   }
@@ -17,11 +24,11 @@
     letter-spacing: normal;
     text-transform: none;
     display: inline-block;
-    /* Glif 1em kare: font gelmeden de yer ayrılır, ligature metni taşmaz */
+    /* Glif 1em genişlik: font gelmeden de yer ayrılır, ligature metni taşmaz.
+       height verilmez — text-* sınıflarının line-height'ı ile çakışıp glifi aşağı kaydırıp kırpıyordu. */
     box-sizing: content-box;
     flex-shrink: 0;
     width: 1em;
-    height: 1em;
     overflow: hidden;
     white-space: nowrap;
     word-wrap: normal;

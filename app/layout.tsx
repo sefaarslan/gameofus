@@ -3,14 +3,14 @@ import { Quicksand } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+// Paylaşım önizlemeleri (WhatsApp vb.) mutlak URL ister. VERCEL_URL her deployment'a özel
+// *.vercel.app adresidir; kalıcı alan adımızı kullanıyoruz.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gameofus.app";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(defaultUrl),
+  metadataBase: new URL(siteUrl),
   title: "Game of Us",
-  description: "Partnerinizi ne kadar iyi tanıyorsunuz?",
+  description: "How well do you really know each other?",
 };
 
 const quicksand = Quicksand({

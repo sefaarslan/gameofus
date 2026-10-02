@@ -1,4 +1,5 @@
 {
+  "meta": { "description": "¿Cuánto os conocéis realmente?" },
   "nav": {
     "howItWorks": "Cómo Funciona",
     "modes": "Modos",
@@ -12,10 +13,9 @@
       "titlePre": "Conócense",
       "titleHighlight": "mejor",
       "titlePost": "jugando.",
-      "subtitle": "Game of Us ofrece juegos cortos y divertidos donde dos personas se adivinan y se descubren juntas.",
+      "subtitle": "Game of Us ofrece juegos cortos y divertidos donde dos personas se adivinan y se descubren juntas. Próximamente en la app móvil, la IA analizará vuestras respuestas y escribirá un comentario solo para vosotros.",
       "badge": "Fortalece tu vínculo",
-      "howToPlay": "¿Cómo se juega?",
-      "socialProof": "+10k parejas jugando"
+      "howToPlay": "¿Cómo se juega?"
     },
     "cta": {
       "start": "Iniciar juego"
@@ -23,13 +23,16 @@
     "how": {
       "title": "Cómo funciona",
       "badge": "Simple y rápido",
-      "subtitle": "Fortalece tu vínculo en solo 3 pasos",
+      "subtitle": "Fortalece tu vínculo en pocos pasos",
       "step1": "Crea una sala",
       "step2": "Comparte el link",
       "step3": "Descúbranse juntos",
       "step1Desc": "Crea una sala y envía tu link de invitación a tu pareja.",
       "step2Desc": "Responde las preguntas y adivina a tu pareja.",
-      "step3Desc": "Cuando ambos terminen, vean los resultados juntos y conversen."
+      "step3Desc": "Cuando ambos terminen, vean los resultados juntos y conversen.",
+      "step4": "Que la IA os analice",
+      "step4Desc": "La IA revisa vuestras respuestas y escribe un comentario solo para vosotros.",
+      "step4Badge": "En la app"
     },
     "modes": {
       "title": "Modos de juego",
@@ -52,7 +55,8 @@
     "mobileTeaser": {
       "badge": "App Móvil",
       "title": "Para una experiencia más profunda",
-      "desc": "Las categorías premium y el historial de juegos estarán próximamente en la app móvil de Game of Us.",
+      "desc": "Los comentarios con IA, las categorías premium y el historial de juegos estarán próximamente en la app móvil de Game of Us.",
+      "featAi": "Comentarios con IA hechos para vosotros",
       "feat1": "Acceso permanente a categorías premium",
       "feat2": "Revisa tus juegos anteriores cuando quieras",
       "feat3": "Recibe notificaciones cuando tu pareja juegue",

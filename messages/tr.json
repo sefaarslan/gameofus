@@ -1,4 +1,5 @@
 {
+  "meta": { "description": "Birbirinizi ne kadar iyi tanıyorsunuz?" },
   "nav": {
     "howItWorks": "Nasıl Çalışır",
     "modes": "Modlar",
@@ -12,10 +13,9 @@
       "titlePre": "Oyun oynayarak",
       "titleHighlight": "birbirinizi daha iyi",
       "titlePost": "tanıyın",
-      "subtitle": "Game of Us, iki kişinin birbirini tahmin edip daha iyi tanıması için tasarlanmış kısa ve eğlenceli oyunlar sunar.",
+      "subtitle": "Game of Us, iki kişinin birbirini tahmin edip daha iyi tanıması için tasarlanmış kısa ve eğlenceli oyunlar sunar. Yakında mobil uygulamada yapay zekâ, cevaplarınızı ikinize özel yorumlayacak.",
       "badge": "İlişkinizi güçlendirin",
-      "howToPlay": "Nasıl Oynanır?",
-      "socialProof": "+10k çift oynuyor"
+      "howToPlay": "Nasıl Oynanır?"
     },
     "cta": {
       "start": "Oyun Başlat"
@@ -23,13 +23,16 @@
     "how": {
       "title": "Nasıl çalışır?",
       "badge": "Basit & Hızlı",
-      "subtitle": "Sadece 3 adımda bağınızı güçlendirin",
+      "subtitle": "Birkaç adımda bağınızı güçlendirin",
       "step1": "Oda oluştur",
       "step2": "Linki paylaş",
       "step3": "Cevapları birlikte aç",
       "step1Desc": "Odanı oluştur ve özel davet linkini partnerine gönder.",
       "step2Desc": "Soruları kendin için cevapla, partnerini tahmin et.",
-      "step3Desc": "İkiniz de bitirince sonuçları birlikte görün ve konuşun."
+      "step3Desc": "İkiniz de bitirince sonuçları birlikte görün ve konuşun.",
+      "step4": "AI sizi yorumlasın",
+      "step4Desc": "Yapay zekâ, cevaplarınıza bakıp ikinize özel bir yorum yazar.",
+      "step4Badge": "Mobil uygulamada"
     },
     "modes": {
       "title": "Oyun Modları",
@@ -52,7 +55,8 @@
     "mobileTeaser": {
       "badge": "Mobil Uygulama",
       "title": "Daha derin bir deneyim için",
-      "desc": "Premium kategoriler ve geçmiş oyunlar yakında Game of Us mobil uygulamasında seni bekliyor.",
+      "desc": "AI yorumları, premium kategoriler ve geçmiş oyunlar yakında Game of Us mobil uygulamasında seni bekliyor.",
+      "featAi": "AI ile ikinize özel yorum",
       "feat1": "Premium kategorilere kalıcı erişim",
       "feat2": "Geçmiş oyunlarını istediğin zaman incele",
       "feat3": "Partner oynadığında anında bildirim al",

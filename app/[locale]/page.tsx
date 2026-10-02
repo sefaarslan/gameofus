@@ -169,7 +169,7 @@ export default function HomePage() {
         <div className="flex-1 flex flex-col gap-6 items-center md:items-start text-center md:text-left z-10 max-w-xl">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary-container text-on-secondary-container rounded-full text-label-md">
-            <span className="material-symbols-outlined text-base icon-fill">favorite</span>
+            <span className="material-symbols-outlined text-base icon-fill">diversity_3</span>
             <span>{t("hero.badge")}</span>
           </div>
 
@@ -210,15 +210,6 @@ export default function HomePage() {
             </a>
           </div>
 
-          {/* Social proof */}
-          <div className="flex items-center gap-3 mt-1 opacity-70">
-            <div className="flex -space-x-2">
-              {["bg-primary-container", "bg-tertiary-container", "bg-secondary-container"].map((c, i) => (
-                <div key={i} className={`w-8 h-8 rounded-full ${c} border-2 border-surface`} />
-              ))}
-            </div>
-            <span className="text-label-md text-on-surface-variant">{t("hero.socialProof")}</span>
-          </div>
         </div>
 
         {/* ── Visual column ────────────────────────────────────────── */}
@@ -237,9 +228,9 @@ export default function HomePage() {
           <p className="text-body-lg text-on-surface-variant mt-2">{t("how.subtitle")}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-y-12 lg:gap-6 relative">
           {/* Connector line on desktop */}
-          <div className="hidden md:block absolute top-[52px] left-[calc(16.67%+48px)] right-[calc(16.67%+48px)] h-px bg-gradient-to-r from-outline-variant/20 via-outline-variant/60 to-outline-variant/20 z-0" />
+          <div className="hidden lg:block absolute top-[52px] left-[calc(12.5%+48px)] right-[calc(12.5%+48px)] h-px bg-gradient-to-r from-outline-variant/20 via-outline-variant/60 to-outline-variant/20 z-0" />
 
           {[
             {
@@ -266,7 +257,16 @@ export default function HomePage() {
               iconColor: "text-on-secondary-container",
               num: "03",
             },
-          ].map(({ icon, label, desc, color, iconColor, num }, i) => (
+            {
+              icon: "auto_awesome",
+              label: t("how.step4"),
+              desc: t("how.step4Desc"),
+              color: "bg-tertiary-container",
+              iconColor: "text-on-tertiary-container",
+              num: "04",
+              badge: t("how.step4Badge"),
+            },
+          ].map(({ icon, label, desc, color, iconColor, num, badge }, i) => (
             <div key={i} className="flex flex-col items-center text-center gap-4 relative z-10">
               {/* Icon circle with step number badge */}
               <div className="relative">
@@ -280,6 +280,12 @@ export default function HomePage() {
               <div>
                 <h3 className="text-headline-md text-on-background mb-2">{label}</h3>
                 <p className="text-body-md text-on-surface-variant px-2 max-w-[220px] mx-auto">{desc}</p>
+                {badge && (
+                  <span className="inline-flex items-center gap-1 mt-3 px-3 py-1 bg-tertiary-container/40 text-on-tertiary-container rounded-full text-xs font-semibold">
+                    <span className="material-symbols-outlined text-sm">smartphone</span>
+                    {badge}
+                  </span>
+                )}
               </div>
             </div>
           ))}
@@ -383,10 +389,10 @@ export default function HomePage() {
               {t("mobileTeaser.desc")}
             </p>
             <ul className="flex flex-col gap-3.5 text-left">
-              {(["feat1", "feat2", "feat3"] as const).map((key, i) => (
+              {(["featAi", "feat1", "feat2", "feat3"] as const).map((key, i) => (
                 <li key={i} className="flex items-center gap-3 text-on-background text-body-md">
                   <span className="material-symbols-outlined text-primary text-base bg-primary-container/25 p-1.5 rounded-full icon-fill">
-                    {["lock_open", "history", "notifications"][i]}
+                    {["auto_awesome", "lock_open", "history", "notifications"][i]}
                   </span>
                   {t(`mobileTeaser.${key}`)}
                 </li>
