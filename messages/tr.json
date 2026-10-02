@@ -1,4 +1,20 @@
 {
+  "feedback": {
+    "exitTitle": "Çıkmadan önce bir saniye?",
+    "notNow": "Şimdi değil",
+    "title": "Oyunu nasıl buldun?",
+    "subtitle": "İsteğe bağlı, birkaç saniye sürer. Cevapların gizli kalır.",
+    "ratings": { "1": "Hiç beğenmedim", "2": "Pek beğenmedim", "3": "Fena değil", "4": "Beğendim", "5": "Çok beğendim" },
+    "aiQuestion": "Mobil uygulamada AI yorumunu kullanır mıydın?",
+    "ai": { "yes": "Evet", "maybe": "Belki", "no": "Hayır" },
+    "commentLabel": "Neyi değiştirirdin? (isteğe bağlı)",
+    "commentPlaceholder": "Aklındakini yaz…",
+    "send": "Gönder",
+    "sending": "Gönderiliyor…",
+    "error": "Gönderilemedi, tekrar dener misin?",
+    "thanks": "Teşekkürler, çok işimize yarıyor 💛"
+  },
+  "footer": { "follow": "Bizi Instagram'da takip et" },
   "meta": { "description": "Birbirinizi ne kadar iyi tanıyorsunuz?" },
   "nav": {
     "howItWorks": "Nasıl Çalışır",
@@ -61,7 +77,8 @@
       "feat2": "Geçmiş oyunlarını istediğin zaman incele",
       "feat3": "Partner oynadığında anında bildirim al",
       "comingSoon": "Yakında geliyor",
-      "storeNote": "App Store ve Google Play'de yayınlanacak."
+      "storeNote": "App Store ve Google Play'de yayınlanacak.",
+      "followNote": "Çıkış haberleri için"
     },
     "mockup": {
       "partnerOnline": "Ayşe online",

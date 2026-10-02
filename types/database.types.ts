@@ -124,6 +124,66 @@ export type Database = {
           },
         ]
       }
+      feedback: {
+        Row: {
+          comment: string | null
+          created_at: string
+          game_mode: string | null
+          id: string
+          locale: string | null
+          participant_id: string
+          platform: string
+          rating: number
+          relationship_type: string | null
+          room_id: string
+          updated_at: string
+          wants_ai: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          game_mode?: string | null
+          id?: string
+          locale?: string | null
+          participant_id: string
+          platform?: string
+          rating: number
+          relationship_type?: string | null
+          room_id: string
+          updated_at?: string
+          wants_ai?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          game_mode?: string | null
+          id?: string
+          locale?: string | null
+          participant_id?: string
+          platform?: string
+          rating?: number
+          relationship_type?: string | null
+          room_id?: string
+          updated_at?: string
+          wants_ai?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participants: {
         Row: {
           completed_at: string | null

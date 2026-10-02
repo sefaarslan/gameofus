@@ -1,4 +1,20 @@
 {
+  "feedback": {
+    "exitTitle": "¿Antes de irte?",
+    "notNow": "Ahora no",
+    "title": "¿Qué tal el juego?",
+    "subtitle": "Opcional, solo unos segundos. Tus respuestas siguen siendo privadas.",
+    "ratings": { "1": "No me gustó", "2": "No mucho", "3": "Estuvo bien", "4": "Me gustó", "5": "Me encantó" },
+    "aiQuestion": "¿Usarías los comentarios con IA en la app móvil?",
+    "ai": { "yes": "Sí", "maybe": "Quizás", "no": "No" },
+    "commentLabel": "¿Qué cambiarías? (opcional)",
+    "commentPlaceholder": "Cuéntanos lo que piensas…",
+    "send": "Enviar",
+    "sending": "Enviando…",
+    "error": "No se pudo enviar, ¿lo intentas de nuevo?",
+    "thanks": "Gracias, nos ayuda mucho 💛"
+  },
+  "footer": { "follow": "Síguenos en Instagram" },
   "meta": { "description": "¿Cuánto os conocéis realmente?" },
   "nav": {
     "howItWorks": "Cómo Funciona",
@@ -61,7 +77,8 @@
       "feat2": "Revisa tus juegos anteriores cuando quieras",
       "feat3": "Recibe notificaciones cuando tu pareja juegue",
       "comingSoon": "Próximamente",
-      "storeNote": "Disponible en App Store y Google Play."
+      "storeNote": "Disponible en App Store y Google Play.",
+      "followNote": "Novedades del lanzamiento en"
     },
     "mockup": {
       "partnerOnline": "Alex en línea",

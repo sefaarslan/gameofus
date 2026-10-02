@@ -1,5 +1,8 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { SiteFooter } from "@/components/SiteFooter";
+import { InstagramIcon } from "@/components/InstagramIcon";
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/social";
 
 // ── Hero Game Card Mockup ─────────────────────────────────────────
 function GameCardMockup() {
@@ -157,6 +160,7 @@ export default function HomePage() {
   const t = useTranslations("landing");
 
   return (
+    <>
     <main className="max-w-[1400px] mx-auto px-6 md:px-12 flex flex-col">
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
@@ -432,10 +436,25 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+
+              <div className="flex flex-col items-center gap-1.5">
+                <span className="text-xs text-on-surface-variant">{t("mobileTeaser.followNote")}</span>
+                <a
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-label-md font-semibold text-primary hover:underline"
+                >
+                  <InstagramIcon className="w-4 h-4" />
+                  @{INSTAGRAM_HANDLE}
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </section>
     </main>
+    <SiteFooter />
+    </>
   );
 }

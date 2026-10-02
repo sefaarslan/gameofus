@@ -1,4 +1,20 @@
 {
+  "feedback": {
+    "exitTitle": "Before you go?",
+    "notNow": "Not now",
+    "title": "How was the game?",
+    "subtitle": "Optional, takes a few seconds. Your answers stay private.",
+    "ratings": { "1": "Didn't like it", "2": "Not great", "3": "It was okay", "4": "Liked it", "5": "Loved it" },
+    "aiQuestion": "Would you use AI insights in the mobile app?",
+    "ai": { "yes": "Yes", "maybe": "Maybe", "no": "No" },
+    "commentLabel": "What would you change? (optional)",
+    "commentPlaceholder": "Tell us what's on your mind…",
+    "send": "Send",
+    "sending": "Sending…",
+    "error": "Couldn't send it, want to try again?",
+    "thanks": "Thank you, this really helps us 💛"
+  },
+  "footer": { "follow": "Follow us on Instagram" },
   "meta": { "description": "How well do you really know each other?" },
   "nav": {
     "howItWorks": "How It Works",
@@ -61,7 +77,8 @@
       "feat2": "Review your past games anytime",
       "feat3": "Get notified instantly when your partner plays",
       "comingSoon": "Coming soon",
-      "storeNote": "Launching on App Store and Google Play."
+      "storeNote": "Launching on App Store and Google Play.",
+      "followNote": "Launch news on"
     },
     "mockup": {
       "partnerOnline": "Alex online",

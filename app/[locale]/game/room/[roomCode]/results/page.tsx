@@ -4,6 +4,11 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { InstagramIcon } from "@/components/InstagramIcon";
+import { FeedbackCard } from "@/components/FeedbackCard";
+import { FeedbackExitSheet } from "@/components/FeedbackExitSheet";
+import { feedbackKeys, readFlag, writeFlag } from "@/lib/feedback-client";
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/social";
 
 type RevealResult = "correct" | "near" | "miss";
 
@@ -76,11 +81,26 @@ export default function ResultsPage() {
   const t = useTranslations("results");
   const tOpt = useTranslations("option");
   const tErr = useTranslations("error");
+  const tFooter = useTranslations("footer");
   const router = useRouter();
 
   const [data, setData] = useState<ResultsData | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [participantToken, setParticipantToken] = useState<string | null>(null);
+  const [hasRated, setHasRated] = useState(false);
+  const [exitTarget, setExitTarget] = useState<string | null>(null);
+
+  // Puan vermeden çıkan kullanıcıya oda başına yalnızca bir kez nazik bir istem göster
+  function leaveTo(target: string) {
+    const keys = feedbackKeys(roomCode);
+    if (!participantToken || hasRated || readFlag(keys.prompted)) {
+      router.push(target);
+      return;
+    }
+    writeFlag(keys.prompted);
+    setExitTarget(target);
+  }
 
   const resultLabels: Record<RevealResult, string> = {
     correct: t("labelCorrect"),
@@ -94,6 +114,8 @@ export default function ResultsPage() {
       setErrorMsg(tErr("wrongDevice"));
       return;
     }
+
+    setParticipantToken(token);
 
     fetch(`/api/rooms/${roomCode}/results?participantToken=${encodeURIComponent(token)}`)
       .then((r) => r.json())
@@ -257,6 +279,11 @@ export default function ResultsPage() {
           </button>
         </section>
 
+        {/* ── Geri bildirim mini anketi ────────────────────────── */}
+        {participantToken && (
+          <FeedbackCard roomCode={roomCode} participantToken={participantToken} onRated={() => setHasRated(true)} />
+        )}
+
         {/* ── Question details ─────────────────────────────────── */}
         {showDetails && (
           <section className="flex flex-col gap-6">
@@ -372,21 +399,47 @@ export default function ResultsPage() {
         {/* ── Action buttons ───────────────────────────────────── */}
         <section className="flex flex-col gap-4">
           <button
-            onClick={() => router.push("/create")}
+            onClick={() => leaveTo("/create")}
             className="w-full h-14 bg-primary text-on-primary rounded-full text-label-md font-bold shadow-primary-glow hover:bg-surface-tint active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-xl">refresh</span>
             {t("playAgain")}
           </button>
           <button
-            onClick={() => router.push("/")}
+            onClick={() => leaveTo("/")}
             className="w-full h-14 bg-secondary-container text-primary rounded-full text-label-md font-bold hover:bg-secondary-container/80 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-xl">home</span>
             {t("goHome")}
           </button>
+
+          {/* Sade takip bağlantısı — birincil aksiyonlarla yarışmasın diye buton değil metin linki */}
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center justify-center gap-2 text-label-md text-on-surface-variant hover:text-primary transition-colors"
+          >
+            <InstagramIcon className="w-4 h-4" />
+            <span>{tFooter("follow")}</span>
+            <span className="font-semibold text-on-surface">@{INSTAGRAM_HANDLE}</span>
+          </a>
         </section>
       </main>
+
+      {participantToken && (
+        <FeedbackExitSheet
+          open={exitTarget !== null}
+          roomCode={roomCode}
+          participantToken={participantToken}
+          onRated={() => setHasRated(true)}
+          onFinish={() => {
+            const target = exitTarget;
+            setExitTarget(null);
+            if (target) router.push(target);
+          }}
+        />
+      )}
     </div>
   );
 }
