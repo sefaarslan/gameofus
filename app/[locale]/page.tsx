@@ -33,7 +33,7 @@ function GameCardMockup() {
         {/* Mode badge + Question */}
         <div className="mb-5">
           <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary bg-primary-container/25 px-2.5 py-1 rounded-full mb-3">
-            <span className="text-[14px]" style={{ fontFamily: "Material Symbols Outlined", fontVariationSettings: "'FILL' 0" }}>visibility_off</span>
+            <span className="material-symbols-outlined text-[14px]">visibility_off</span>
             Secret Choice
           </span>
           <p className="text-base font-semibold text-on-background leading-snug">
@@ -44,7 +44,7 @@ function GameCardMockup() {
         {/* My answer section */}
         <div className="mb-4">
           <p className="text-[11px] text-on-surface-variant mb-2 flex items-center gap-1 uppercase tracking-wide font-semibold">
-            <span style={{ fontFamily: "Material Symbols Outlined", fontSize: "12px" }}>lock</span>
+            <span className="material-symbols-outlined" style={{ fontSize: "12px" }}>lock</span>
             {tM("yourAnswer")}
           </p>
           <div className="flex gap-2">
@@ -76,7 +76,7 @@ function GameCardMockup() {
         {/* Partner prediction section */}
         <div>
           <p className="text-[11px] text-on-surface-variant mb-2 flex items-center gap-1 uppercase tracking-wide font-semibold">
-            <span style={{ fontFamily: "Material Symbols Outlined", fontSize: "12px" }}>psychology</span>
+            <span className="material-symbols-outlined" style={{ fontSize: "12px" }}>psychology</span>
             {tM("partnerAnswer")}
           </p>
           <div className="flex gap-2">
@@ -102,7 +102,7 @@ function GameCardMockup() {
 
         {/* Lock button */}
         <div className="mt-5 bg-primary text-on-primary rounded-full py-3 flex items-center justify-center gap-2 text-sm font-semibold shadow-primary-glow">
-          <span style={{ fontFamily: "Material Symbols Outlined", fontSize: "16px" }}>lock_clock</span>
+          <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>lock_clock</span>
           {tM("lock")}
         </div>
       </div>
@@ -409,7 +409,9 @@ export default function HomePage() {
               <div className="flex flex-col gap-3 w-full">
                 {/* App Store badge */}
                 <div className="flex items-center gap-3 bg-on-surface/5 rounded-xl px-4 py-3 select-none opacity-50">
-                  <span className="material-symbols-outlined text-on-surface-variant text-2xl">apple</span>
+                  <svg viewBox="0 0 24 24" className="w-6 h-6 fill-on-surface-variant" aria-hidden="true">
+                    <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
+                  </svg>
                   <div className="text-left">
                     <p className="text-[10px] text-on-surface-variant leading-tight">Download on the</p>
                     <p className="text-sm font-semibold text-on-background leading-tight">App Store</p>

@@ -281,7 +281,7 @@ function MicroRevealCard({
         <span className={`material-symbols-outlined icon-fill ${cfg.iconColor}`} style={{ fontSize: "48px" }}>{cfg.icon}</span>
         {reveal.result === "correct" && (
           <>
-            <span className="material-symbols-outlined absolute -top-2 -right-2 text-tertiary text-xl animate-pulse">colors_spark</span>
+            <span className="material-symbols-outlined absolute -top-2 -right-2 text-tertiary text-xl animate-pulse">auto_awesome</span>
             <span className="material-symbols-outlined absolute bottom-2 -left-3 text-tertiary text-base animate-pulse">star</span>
           </>
         )}

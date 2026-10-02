@@ -4,7 +4,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "icons": "node scripts/build-icon-font.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "latest",

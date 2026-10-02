@@ -24,11 +24,6 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      {/* Material Symbols font */}
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-      />
       <div className="min-h-screen flex flex-col bg-background">
         <AppHeader locale={locale} />
 
