@@ -7,7 +7,7 @@ export function SiteFooter() {
   const t = useTranslations("footer");
 
   return (
-    <footer className="mt-8 border-t border-outline-variant/30">
+    <footer className="border-t border-outline-variant/30">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-8 md:py-6 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-5 text-center">
         <GameOfUsLogo size="sm" />
 

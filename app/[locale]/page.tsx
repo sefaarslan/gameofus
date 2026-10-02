@@ -374,7 +374,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Mobile App Teaser ─────────────────────────────────────── */}
-      <section className="py-12 pb-28" id="premium">
+      <section className="py-12 pb-16" id="premium">
         <div className="bg-gradient-to-br from-surface to-surface-container-high rounded-[2rem] p-8 md:p-14 shadow-soft-active border border-outline-variant/20 flex flex-col md:flex-row items-center justify-center gap-10 md:gap-14 relative overflow-hidden">
           {/* Ambient blobs */}
           <div className="absolute -right-24 -top-24 w-72 h-72 bg-tertiary-container/15 rounded-full blur-3xl pointer-events-none" />
