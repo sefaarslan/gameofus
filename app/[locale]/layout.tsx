@@ -9,6 +9,10 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// Statik dosya: [locale] içindeki dosya-tabanlı metadata görsel rotası Vercel build'inde hata veriyordu
+// ("failed to find source route /[locale]/opengraph-image.png"). Mutlak URL metadataBase'ten (gameofus.app) gelir.
+const OG_IMAGE = { url: "/og-image.png", width: 1200, height: 630, alt: "Game of Us" };
+
 const OG_LOCALES: Record<string, string> = { tr: "tr_TR", en: "en_US", es: "es_ES" };
 
 export async function generateMetadata({
@@ -29,8 +33,9 @@ export async function generateMetadata({
       type: "website",
       url: `/${locale}`,
       locale: OG_LOCALES[locale],
+      images: [OG_IMAGE],
     },
-    twitter: { card: "summary_large_image", title: "Game of Us", description },
+    twitter: { card: "summary_large_image", title: "Game of Us", description, images: [OG_IMAGE.url] },
   };
 }
 
