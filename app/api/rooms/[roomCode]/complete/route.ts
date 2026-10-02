@@ -57,22 +57,26 @@ export async function POST(
   }
 
   const now = new Date().toISOString();
-  await supabase
+  // Lazy builder: henüz çalışmaz, await/Promise.all içinde tetiklenir
+  const markCompleted = supabase
     .from("participants")
     .update({ status: "completed", completed_at: now })
     .eq("id", me.id);
 
   const partner = participants.find((p) => p.id !== me.id);
 
-  // Partner henüz tamamlamadıysa — room status güncelle ve bekle
+  // Partner henüz tamamlamadıysa — room status güncelle ve bekle (iki yazma paralel)
   if (!partner || partner.status !== "completed") {
     const newRoomStatus = me.role === "owner" ? "owner_completed" : "guest_completed";
-    await supabase.from("rooms").update({ status: newRoomStatus }).eq("id", room.id);
+    await Promise.all([
+      markCompleted,
+      supabase.from("rooms").update({ status: newRoomStatus }).eq("id", room.id),
+    ]);
     return apiOk({ completed: true, resultReady: false });
   }
 
   // Her iki oyuncu da tamamladı — sonuç hesapla
-  const result = await calculateResults(room.id, participants.map((p) => p.id), supabase);
+  const result = await calculateResults(room.id, participants.map((p) => p.id), supabase, markCompleted);
   if (!result) {
     return apiError("INTERNAL_ERROR", "Sonuç hesaplanamadı.", 500);
   }
@@ -86,21 +90,16 @@ async function calculateResults(
   roomId: string,
   participantIds: string[],
   supabase: SupabaseClient,
+  markCompleted: PromiseLike<unknown>,
 ) {
-  // Duplicate result kontrolü
-  const { data: existingResult } = await supabase
-    .from("results")
-    .select("id")
-    .eq("room_id", roomId)
-    .maybeSingle();
-
-  if (existingResult) {
-    await supabase.from("rooms").update({ status: "result_ready" }).eq("id", roomId);
-    return existingResult;
-  }
-
-  // Tüm cevap ve tahminleri çek
-  const [{ data: answers }, { data: predictions }, { data: roomQuestions }] = await Promise.all([
+  // Participant güncellemesi, duplicate result kontrolü ve veri okuma birbirinden bağımsız — hepsi paralel
+  const [, { data: existingResult }, { data: answers }, { data: predictions }, { data: roomQuestions }] = await Promise.all([
+    markCompleted,
+    supabase
+      .from("results")
+      .select("id")
+      .eq("room_id", roomId)
+      .maybeSingle(),
     supabase
       .from("answers")
       .select("participant_id, question_id, answer_value")
@@ -115,6 +114,12 @@ async function calculateResults(
       .eq("room_id", roomId)
       .order("round_order"),
   ]);
+
+  // Duplicate result oluşturma (unique(room_id))
+  if (existingResult) {
+    await supabase.from("rooms").update({ status: "result_ready" }).eq("id", roomId);
+    return existingResult;
+  }
 
   if (!answers || !predictions || !roomQuestions) return null;
 

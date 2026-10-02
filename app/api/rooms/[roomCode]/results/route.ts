@@ -44,10 +44,23 @@ export async function GET(
     return apiError("RESULT_NOT_READY", "Sonuçlar henüz hazır değil.");
   }
 
-  const { data: allParticipants } = await supabase
-    .from("participants")
-    .select("id, role, display_name, token_hash")
-    .eq("room_id", room.id);
+  // Üçü de yalnızca room.id'ye bağlı — paralel okunur (sıralı 3 round-trip yerine 1)
+  const [{ data: allParticipants }, { data: result }, { data: roomQuestions }] = await Promise.all([
+    supabase
+      .from("participants")
+      .select("id, role, display_name, token_hash")
+      .eq("room_id", room.id),
+    supabase
+      .from("results")
+      .select("reading_score, details_json")
+      .eq("room_id", room.id)
+      .maybeSingle(),
+    supabase
+      .from("room_questions")
+      .select("question_id, round_order, questions(id, mode, question_text, question_options(id, option_text, sort_order))")
+      .eq("room_id", room.id)
+      .order("round_order"),
+  ]);
 
   const participants = allParticipants ?? [];
   const me = participants.find((p) => verifyToken(token, p.token_hash));
@@ -55,19 +68,7 @@ export async function GET(
 
   const partner = participants.find((p) => p.id !== me.id);
 
-  const { data: result } = await supabase
-    .from("results")
-    .select("reading_score, details_json")
-    .eq("room_id", room.id)
-    .maybeSingle();
-
   if (!result) return apiError("RESULT_NOT_READY", "Sonuçlar henüz hazır değil.");
-
-  const { data: roomQuestions } = await supabase
-    .from("room_questions")
-    .select("question_id, round_order, questions(id, mode, question_text, question_options(id, option_text, sort_order))")
-    .eq("room_id", room.id)
-    .order("round_order");
 
   type QuestionRow = {
     id: string;
