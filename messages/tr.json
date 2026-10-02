@@ -103,9 +103,17 @@
       "fast": "Hızlı — 5 soru",
       "classic": "Klasik — 10 soru"
     },
+    "relationship": {
+      "label": "Aranızdaki bağ ne?",
+      "hint": "Soruları buna göre seçelim.",
+      "friend": { "name": "Kanka", "desc": "Bir ömürlük dost" },
+      "dating": { "name": "Sevgili", "desc": "Kalpler çarpıyor" },
+      "partner": { "name": "Hayat Arkadaşı", "desc": "Birlikte yoldayız" }
+    },
     "category": {
       "label": "Kategori",
-      "all": "Tümü"
+      "pickRelationshipFirst": "Önce aranızdaki bağı seç",
+      "all": "Karışık Sürpriz"
     },
     "premiumModal": {
       "title": "Bu kategori sadece mobile app'te açılır",

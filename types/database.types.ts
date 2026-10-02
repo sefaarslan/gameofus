@@ -46,6 +46,7 @@ export type Database = {
           is_premium: boolean
           locale: string
           name: string
+          relationship_types: string[]
           slug: string
           sort_order: number
         }
@@ -55,6 +56,7 @@ export type Database = {
           is_premium?: boolean
           locale?: string
           name: string
+          relationship_types?: string[]
           slug: string
           sort_order?: number
         }
@@ -64,6 +66,7 @@ export type Database = {
           is_premium?: boolean
           locale?: string
           name?: string
+          relationship_types?: string[]
           slug?: string
           sort_order?: number
         }
@@ -461,6 +464,7 @@ export type Database = {
           max_participants: number
           owner_id: string | null
           question_count: number
+          relationship_type: string | null
           room_code: string
           status: Database["public"]["Enums"]["room_status"]
           user_id: string | null
@@ -476,6 +480,7 @@ export type Database = {
           max_participants?: number
           owner_id?: string | null
           question_count: number
+          relationship_type?: string | null
           room_code: string
           status?: Database["public"]["Enums"]["room_status"]
           user_id?: string | null
@@ -491,6 +496,7 @@ export type Database = {
           max_participants?: number
           owner_id?: string | null
           question_count?: number
+          relationship_type?: string | null
           room_code?: string
           status?: Database["public"]["Enums"]["room_status"]
           user_id?: string | null

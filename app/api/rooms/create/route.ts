@@ -10,6 +10,7 @@ export function OPTIONS() {
 import { generateUniqueRoomCode } from "@/lib/room-code";
 import { getRoomExpiry } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
+import { isRelationshipType } from "@/lib/relationship";
 
 const RATE_LIMIT_HOUR = 10;
 const RATE_LIMIT_DAY = 50;
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { displayName, partnerName, gameMode, questionCount, locale, categoryId } =
+  const { displayName, partnerName, gameMode, questionCount, locale, categoryId, relationshipType } =
     body as Record<string, unknown>;
 
   const selectedCategoryId = typeof categoryId === "string" && categoryId.length > 0
@@ -83,6 +84,12 @@ export async function POST(req: NextRequest) {
   if (!displayName || typeof displayName !== "string" || displayName.trim().length === 0) {
     return apiError("INVALID_PAYLOAD", "İsim zorunludur.");
   }
+  // relationshipType opsiyonel (alanı henüz göndermeyen eski mobil build'ler için), ama gönderildiyse geçerli olmalı
+  if (relationshipType != null && !isRelationshipType(relationshipType)) {
+    return apiError("INVALID_PAYLOAD", "Geçersiz ilişki türü.");
+  }
+  const selectedRelationship = isRelationshipType(relationshipType) ? relationshipType : null;
+
   const validModes = ["secret_choice", "prediction", "orderline", "mixed"];
   const mode = typeof gameMode === "string" && validModes.includes(gameMode)
     ? gameMode
@@ -105,6 +112,18 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = createAdminClient();
+
+  // Seçilen kategori bu ilişki türüne uygun mu (sunucu tarafı doğrulama)
+  if (selectedCategoryId && selectedRelationship) {
+    const { data: cat } = await supabase
+      .from("categories")
+      .select("relationship_types")
+      .eq("id", selectedCategoryId)
+      .maybeSingle();
+    if (!cat || !cat.relationship_types.includes(selectedRelationship)) {
+      return apiError("INVALID_PAYLOAD", "Bu kategori seçilen ilişki türüne uygun değil.");
+    }
+  }
 
   // Room code
   const roomCode = await generateUniqueRoomCode(async (code) => {
@@ -188,6 +207,7 @@ export async function POST(req: NextRequest) {
       locale: roomLocale,
       expires_at: expiresAt.toISOString(),
       ...(selectedCategoryId ? { category_id: selectedCategoryId } : {}),
+      ...(selectedRelationship ? { relationship_type: selectedRelationship } : {}),
     })
     .select("id")
     .single();

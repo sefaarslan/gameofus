@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import { useParams } from "next/navigation";
+import { RELATIONSHIP_TYPES, type RelationshipType } from "@/lib/relationship";
 
 type GameMode = "secret_choice" | "prediction" | "orderline" | "mixed";
 
@@ -14,6 +15,7 @@ interface Category {
   slug: string;
   is_premium: boolean;
   sort_order: number;
+  relationship_types: RelationshipType[];
 }
 
 const MODE_ICONS: Record<GameMode, string> = {
@@ -21,6 +23,12 @@ const MODE_ICONS: Record<GameMode, string> = {
   prediction: "timeline",
   orderline: "format_list_numbered",
   mixed: "shuffle",
+};
+
+const RELATIONSHIP_ICONS: Record<RelationshipType, string> = {
+  friend: "diversity_3",
+  dating: "favorite",
+  partner: "all_inclusive",
 };
 
 const CATEGORY_ICONS: Record<string, string> = {
@@ -45,12 +53,16 @@ export default function CreatePage() {
 
   const [displayName, setDisplayName] = useState("");
   const [partnerName, setPartnerName] = useState("");
+  const [relationshipType, setRelationshipType] = useState<RelationshipType | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>("secret_choice");
   const [questionCount, setQuestionCount] = useState<5 | 10>(5);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const categoryRef = useRef<HTMLDivElement>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [premiumCategory, setPremiumCategory] = useState<Category | null>(null);
 
@@ -66,26 +78,67 @@ export default function CreatePage() {
     }
   }, []);
 
+  // Kategoriler sayfa açılırken bir kez çekilir; ilişki türüne göre filtreleme tarayıcıda anında yapılır
+  // (sunucu yine de oda oluştururken uyumluluğu doğrular)
   useEffect(() => {
+    let cancelled = false;
     fetch(`/api/categories?locale=${locale}`)
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data)) setCategories(data);
+        if (!cancelled && Array.isArray(data)) setAllCategories(data);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setCategoriesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [locale]);
 
+  // Dropdown: dışarı tıklayınca veya Escape ile kapanır
+  useEffect(() => {
+    if (!categoryOpen) return;
+    function onPointerDown(e: PointerEvent) {
+      if (!categoryRef.current?.contains(e.target as Node)) setCategoryOpen(false);
+    }
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setCategoryOpen(false);
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [categoryOpen]);
+
+  const categories = relationshipType
+    ? allCategories.filter((c) => c.relationship_types.includes(relationshipType))
+    : allCategories;
+
+  function handleRelationshipChange(value: RelationshipType) {
+    setRelationshipType(value);
+    setSelectedCategoryId((prev) => {
+      const cat = allCategories.find((c) => c.id === prev);
+      return cat && cat.relationship_types.includes(value) ? prev : null;
+    });
+  }
+
   function handleCategoryClick(cat: Category) {
+    setCategoryOpen(false);
     if (cat.is_premium) {
       setPremiumCategory(cat);
       return;
     }
-    setSelectedCategoryId((prev) => (prev === cat.id ? null : cat.id));
+    setSelectedCategoryId(cat.id);
   }
+
+  const selectedCategory = allCategories.find((c) => c.id === selectedCategoryId) ?? null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!displayName.trim()) return;
+    if (!displayName.trim() || !relationshipType) return;
 
     // Double-check limit before submitting
     const stored = localStorage.getItem("gou_my_room");
@@ -105,6 +158,7 @@ export default function CreatePage() {
         body: JSON.stringify({
           displayName: displayName.trim(),
           partnerName: partnerName.trim() || null,
+          relationshipType,
           gameMode,
           questionCount,
           locale,
@@ -254,45 +308,121 @@ export default function CreatePage() {
                 </div>
               </div>
 
-              {/* Category selector */}
-              {categories.length > 0 && (
-                <div className="flex flex-col gap-3">
-                  <label className="text-label-md text-on-surface-variant">{t("category.label")}</label>
-                  <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-                    {/* All categories */}
+              {/* Relationship type */}
+              <div className="flex flex-col gap-3">
+                <div>
+                  <label className="text-label-md text-on-surface-variant">{t("relationship.label")}</label>
+                  <p className="text-xs text-on-surface-variant/70 mt-0.5">{t("relationship.hint")}</p>
+                </div>
+                <div className="grid grid-cols-3 gap-3" role="radiogroup" aria-label={t("relationship.label")}>
+                  {RELATIONSHIP_TYPES.map((value) => (
                     <button
+                      key={value}
                       type="button"
-                      onClick={() => setSelectedCategoryId(null)}
-                      className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full border-2 text-label-md transition-all ${
-                        selectedCategoryId === null
-                          ? "border-primary bg-primary-container/10 text-primary"
-                          : "border-outline-variant/30 bg-surface-container-lowest text-on-surface-variant hover:border-outline"
+                      role="radio"
+                      aria-checked={relationshipType === value}
+                      onClick={() => handleRelationshipChange(value)}
+                      className={`relative flex flex-col items-center gap-2 px-2 py-4 rounded-[20px] border-2 text-center transition-all ${
+                        relationshipType === value
+                          ? "border-primary bg-primary-container/10 shadow-soft-card"
+                          : "border-outline-variant/30 bg-surface-container-lowest hover:border-outline"
                       }`}
                     >
-                      <span className="material-symbols-outlined text-base">apps</span>
-                      {t("category.all")}
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+                        relationshipType === value ? "bg-primary text-on-primary" : "bg-surface-container text-on-surface-variant"
+                      }`}>
+                        <span className="material-symbols-outlined text-lg">{RELATIONSHIP_ICONS[value]}</span>
+                      </div>
+                      <span className="block text-label-md text-on-surface leading-tight">{t(`relationship.${value}.name`)}</span>
+                      <span className="block text-xs text-on-surface-variant leading-tight">{t(`relationship.${value}.desc`)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Category selector (dropdown) */}
+              {(categoriesLoading || allCategories.length > 0) && (
+                <div className="flex flex-col gap-2" ref={categoryRef}>
+                  <div>
+                    <label id="category-label" className="text-label-md text-on-surface-variant">{t("category.label")}</label>
+                    {!relationshipType && (
+                      <p className="text-xs text-on-surface-variant/70 mt-0.5">{t("category.pickRelationshipFirst")}</p>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      disabled={!relationshipType || categoriesLoading}
+                      onClick={() => setCategoryOpen((o) => !o)}
+                      aria-haspopup="listbox"
+                      aria-expanded={categoryOpen}
+                      aria-labelledby="category-label"
+                      className={`w-full flex items-center gap-3 px-4 py-3.5 bg-surface-container-lowest border-2 rounded-xl text-body-md text-left transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+                        categoryOpen ? "border-primary" : "border-outline-variant/40"
+                      } ${categoriesLoading ? "animate-pulse" : ""}`}
+                    >
+                      <span className="material-symbols-outlined text-xl text-outline">
+                        {selectedCategory ? getCategoryIcon(selectedCategory.slug) : "auto_awesome"}
+                      </span>
+                      <span className="flex-1 text-on-surface">
+                        {selectedCategory ? selectedCategory.name : t("category.all")}
+                      </span>
+                      <span className={`material-symbols-outlined text-xl text-outline transition-transform ${categoryOpen ? "rotate-180" : ""}`}>
+                        expand_more
+                      </span>
                     </button>
 
-                    {categories.map((cat) => (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => handleCategoryClick(cat)}
-                        className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full border-2 text-label-md transition-all ${
-                          cat.is_premium
-                            ? "border-outline-variant/20 bg-surface-container-lowest text-on-surface-variant/50"
-                            : selectedCategoryId === cat.id
-                            ? "border-primary bg-primary-container/10 text-primary"
-                            : "border-outline-variant/30 bg-surface-container-lowest text-on-surface-variant hover:border-outline"
-                        }`}
+                    {categoryOpen && (
+                      <ul
+                        role="listbox"
+                        aria-labelledby="category-label"
+                        className="absolute z-20 left-0 right-0 mt-2 max-h-72 overflow-y-auto bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-soft-active py-1"
                       >
-                        <span className="material-symbols-outlined text-base">{getCategoryIcon(cat.slug)}</span>
-                        {cat.name}
-                        {cat.is_premium && (
-                          <span className="material-symbols-outlined text-sm text-tertiary icon-fill">lock</span>
-                        )}
-                      </button>
-                    ))}
+                        <li role="option" aria-selected={selectedCategoryId === null}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedCategoryId(null);
+                              setCategoryOpen(false);
+                            }}
+                            className={`w-full flex items-center gap-3 px-4 py-3 text-left text-body-md hover:bg-surface-container transition-colors ${
+                              selectedCategoryId === null ? "text-primary font-semibold" : "text-on-surface"
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-xl">auto_awesome</span>
+                            <span className="flex-1">{t("category.all")}</span>
+                            {selectedCategoryId === null && (
+                              <span className="material-symbols-outlined text-base icon-fill">check</span>
+                            )}
+                          </button>
+                        </li>
+                        {categories.map((cat) => (
+                          <li key={cat.id} role="option" aria-selected={selectedCategoryId === cat.id}>
+                            <button
+                              type="button"
+                              onClick={() => handleCategoryClick(cat)}
+                              className={`w-full flex items-center gap-3 px-4 py-3 text-left text-body-md hover:bg-surface-container transition-colors ${
+                                cat.is_premium
+                                  ? "text-on-surface-variant/60"
+                                  : selectedCategoryId === cat.id
+                                  ? "text-primary font-semibold"
+                                  : "text-on-surface"
+                              }`}
+                            >
+                              <span className="material-symbols-outlined text-xl">{getCategoryIcon(cat.slug)}</span>
+                              <span className="flex-1">{cat.name}</span>
+                              {cat.is_premium ? (
+                                <span className="material-symbols-outlined text-sm text-tertiary icon-fill">lock</span>
+                              ) : (
+                                selectedCategoryId === cat.id && (
+                                  <span className="material-symbols-outlined text-base icon-fill">check</span>
+                                )
+                              )}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
               )}
@@ -366,7 +496,7 @@ export default function CreatePage() {
               {/* Submit */}
               <button
                 type="submit"
-                disabled={loading || !displayName.trim()}
+                disabled={loading || !displayName.trim() || !relationshipType}
                 className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary text-body-lg font-semibold py-4 rounded-full hover:bg-surface-tint disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-primary-glow mt-2"
               >
                 {loading ? (

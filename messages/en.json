@@ -103,9 +103,17 @@
       "fast": "Quick — 5 questions",
       "classic": "Classic — 10 questions"
     },
+    "relationship": {
+      "label": "What's your bond?",
+      "hint": "We'll pick questions that fit you two.",
+      "friend": { "name": "Bestie", "desc": "Friends for life" },
+      "dating": { "name": "Sweetheart", "desc": "Hearts racing" },
+      "partner": { "name": "Partner for Life", "desc": "On the road together" }
+    },
     "category": {
       "label": "Category",
-      "all": "All"
+      "pickRelationshipFirst": "Pick your bond first",
+      "all": "Surprise Me"
     },
     "premiumModal": {
       "title": "This category is only available in the mobile app",

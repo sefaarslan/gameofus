@@ -103,9 +103,17 @@
       "fast": "Rápido — 5 preguntas",
       "classic": "Clásico — 10 preguntas"
     },
+    "relationship": {
+      "label": "¿Qué vínculo os une?",
+      "hint": "Elegiremos preguntas que os encajen.",
+      "friend": { "name": "Colega", "desc": "Amistad de toda la vida" },
+      "dating": { "name": "Pareja", "desc": "Corazones a mil" },
+      "partner": { "name": "Media naranja", "desc": "Juntos en el camino" }
+    },
     "category": {
       "label": "Categoría",
-      "all": "Todas"
+      "pickRelationshipFirst": "Primero elige vuestro vínculo",
+      "all": "Sorpréndeme"
     },
     "premiumModal": {
       "title": "Esta categoría solo está disponible en la app móvil",
