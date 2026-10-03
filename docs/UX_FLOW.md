@@ -1,5 +1,9 @@
 # UX_FLOW.md — Game of Us
 
+> ⚠️ **Güncel değil (tarihsel).** Akış artık ilişki türü seçimi, kategori dropdown'ı, geri bildirim kartı/çıkış istemi ve tür duyarlı metinleri içerir. Bu dosya MVP v1 döneminden kalmıştır ve bazı bölümleri
+> artık geçerli değildir. **Güncel kaynaklar:** `CLAUDE.md`, `docs/PRD.md`, `docs/API_SPEC.md`,
+> `docs/DATABASE_SCHEMA.md`, `docs/SEED_QUESTIONS.md` ve kodun kendisi. Çelişkide bunlar geçerlidir.
+
 Bu doküman MVP ekran akışlarını ve kullanıcı deneyimi kurallarını tanımlar.
 
 ---

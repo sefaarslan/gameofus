@@ -1,5 +1,9 @@
 # MVP_SCOPE.md — Game of Us
 
+> ⚠️ **Güncel değil (tarihsel).** Kapsam bugün çok daha geniştir (dört mod, üç dil, ilişki türleri, mobil uygulama, coin+tier planı). Bu dosya MVP v1 döneminden kalmıştır ve bazı bölümleri
+> artık geçerli değildir. **Güncel kaynaklar:** `CLAUDE.md`, `docs/PRD.md`, `docs/API_SPEC.md`,
+> `docs/DATABASE_SCHEMA.md`, `docs/SEED_QUESTIONS.md` ve kodun kendisi. Çelişkide bunlar geçerlidir.
+
 Bu doküman MVP kapsamını net tutmak için hazırlanmıştır. Amaç, Claude Code'un gereksiz özellik eklemesini engellemektir.
 
 ---

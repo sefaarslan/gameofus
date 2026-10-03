@@ -1,21 +1,21 @@
-# Game of Us — Docs Pack
+# Game of Us — Docs
 
-Bu paket CLAUDE.md kurallarına göre oluşturulmuş yardımcı dokümanları içerir.
+## Güncel kaynaklar (bunlara güven)
 
-## Dosyalar
+| Dosya | Ne için |
+|---|---|
+| `../CLAUDE.md` | Çalışma kuralları, mimari kararlar, konvansiyonlar (AI ajanları için ilk okunacak dosya) |
+| `PRD.md` | Ürün gereksinimleri, akışlar, monetizasyon (coin + tier), fazlar, açık kararlar |
+| `API_SPEC.md` | Gerçek API sözleşmeleri (`app/api/**`) |
+| `DATABASE_SCHEMA.md` | Gerçek şema özeti (kaynak: `supabase/migrations/*.sql`) |
+| `SEED_QUESTIONS.md` | Soru bankası v2: yapı, kurallar, iş akışı |
+| `questions-v2-{tr,en,es}.md` | Tüm soruların okunabilir dökümü (`scripts/export-questions-md.mjs` ile üretilir) |
 
-- ARCHITECTURE.md
-- DATABASE_SCHEMA.md
-- API_SPEC.md
-- SECURITY_AND_RLS.md
-- UX_FLOW.md
-- GAME_LOGIC.md
-- TASK_BREAKDOWN.md
-- MVP_SCOPE.md
-- I18N_COPY.md
-- SEED_QUESTIONS.md
+Çelişkide sıra: **PRD → CLAUDE.md → bu klasördeki diğer güncel dosyalar → kod.**
 
-## Kullanım Önerisi
+## Tarihsel (MVP v1; güncel değil — başında uyarı notu var)
 
-Claude Code'a önce `CLAUDE.md`, ardından bu dosyaları `/docs` klasörü altında verin.
-Geliştirmeye `TASK_BREAKDOWN.md` sırasıyla başlayın.
+`ARCHITECTURE.md`, `GAME_LOGIC.md`, `UX_FLOW.md`, `I18N_COPY.md`, `SECURITY_AND_RLS.md`, `MVP_SCOPE.md`,
+`TASK_LIST.md`, `PRD-Ek-Mobile-Premium.md` (premium bölümü coin + tier ile değişti), `design/`.
+
+Bunlar yeniden yazılana ya da kaldırılana kadar yalnızca bağlam için okunmalıdır.

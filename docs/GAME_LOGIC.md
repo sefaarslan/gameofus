@@ -1,5 +1,9 @@
 # GAME_LOGIC.md — Game of Us
 
+> ⚠️ **Güncel değil (tarihsel).** Oyun artık dört moddur (Secret Choice, Prediction, Orderline, Karma) ve skor/yakınlık kuralları CLAUDE.md Bölüm 6 içindedir. Bu dosya MVP v1 döneminden kalmıştır ve bazı bölümleri
+> artık geçerli değildir. **Güncel kaynaklar:** `CLAUDE.md`, `docs/PRD.md`, `docs/API_SPEC.md`,
+> `docs/DATABASE_SCHEMA.md`, `docs/SEED_QUESTIONS.md` ve kodun kendisi. Çelişkide bunlar geçerlidir.
+
 Bu doküman oyun kurallarını, skor hesaplamasını ve mikro-reveal mantığını tanımlar.
 
 ---

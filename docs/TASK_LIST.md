@@ -1,5 +1,9 @@
 # TASK_LIST.md — Game of Us MVP
 
+> ⚠️ **Güncel değil (tarihsel).** Bu liste MVP v1 içindir; güncel iş listeleri docs/PRD.md Bölüm 21 ve gameofus-mobile/tasklist.md içindedir. Bu dosya MVP v1 döneminden kalmıştır ve bazı bölümleri
+> artık geçerli değildir. **Güncel kaynaklar:** `CLAUDE.md`, `docs/PRD.md`, `docs/API_SPEC.md`,
+> `docs/DATABASE_SCHEMA.md`, `docs/SEED_QUESTIONS.md` ve kodun kendisi. Çelişkide bunlar geçerlidir.
+
 Bu dosya Claude Code ile adım adım ilerlemek için hazırlanmış iş listesi formatıdır.  
 Her task tamamlandıkça checkbox işaretlenmelidir. Büyük özellikler tek seferde değil, küçük ve test edilebilir parçalara bölünerek geliştirilmelidir.
 

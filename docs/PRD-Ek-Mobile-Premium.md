@@ -1,5 +1,9 @@
 # PRD Eki — Mobile Genişleme & Premium Model Güncellemesi
 
+> ⚠️ **Güncel değil (tarihsel).** Premium modeli (tek seferlik paket + oda kredisi) coin + tier modeliyle değiştirilmiştir; mobilde giriş artık tüm oyun için zorunludur (anonim oyun yalnızca web'de). Güncel monetizasyon için PRD Bölüm 12. Bu dosya MVP v1 döneminden kalmıştır ve bazı bölümleri
+> artık geçerli değildir. **Güncel kaynaklar:** `CLAUDE.md`, `docs/PRD.md`, `docs/API_SPEC.md`,
+> `docs/DATABASE_SCHEMA.md`, `docs/SEED_QUESTIONS.md` ve kodun kendisi. Çelişkide bunlar geçerlidir.
+
 > **Bu belge nedir:** Ana PRD'nin (`PRD - Game of Us`) yerini almaz, üzerine eklenir. Ana PRD'deki oyun mekaniği, veri modeli, güvenlik kuralları ve token mimarisi **hâlâ geçerlidir** ve referans kaynaktır. Bu ek, sadece mobile genişleme kararıyla birlikte değişen veya yeni eklenen kısımları tanımlar.
 >
 > **Claude Code'a nasıl verilir:** Web üzerinde çalışırken hem ana PRD'yi hem bu eki ver. Mobile proje üzerinde çalışırken de ikisini birlikte ver — mobile, ana PRD'deki oyun akışını (Secret Choice, birleştirilmiş tur, güven seviyesi, soft realtime vb.) birebir referans alır, sadece bu ekte tanımlanan native-özel katmanları üstüne ekler.

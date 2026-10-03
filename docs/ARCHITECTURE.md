@@ -1,5 +1,9 @@
 # ARCHITECTURE.md — Game of Us
 
+> ⚠️ **Güncel değil (tarihsel).** Mimari bugün üç dil, ilişki türü, mobil istemci, Vercel fra1 + Supabase eşlemesi ve paralel API sorgularını içerir. Bu dosya MVP v1 döneminden kalmıştır ve bazı bölümleri
+> artık geçerli değildir. **Güncel kaynaklar:** `CLAUDE.md`, `docs/PRD.md`, `docs/API_SPEC.md`,
+> `docs/DATABASE_SCHEMA.md`, `docs/SEED_QUESTIONS.md` ve kodun kendisi. Çelişkide bunlar geçerlidir.
+
 Bu doküman Game of Us MVP mimarisini tanımlar. Amaç, Claude Code ve diğer AI ajanlarının gereksiz karmaşıklık eklemeden, güvenli ve hızlı bir MVP geliştirmesidir.
 
 ---

@@ -1,5 +1,9 @@
 # I18N_COPY.md — Game of Us
 
+> ⚠️ **Güncel değil (tarihsel).** Arayüz üç dillidir (TR/EN/ES) ve metinler messages/*.json dosyalarındadır; karşı oyuncuya atıf içeren metinler ICU select kullanır. Bu dosya MVP v1 döneminden kalmıştır ve bazı bölümleri
+> artık geçerli değildir. **Güncel kaynaklar:** `CLAUDE.md`, `docs/PRD.md`, `docs/API_SPEC.md`,
+> `docs/DATABASE_SCHEMA.md`, `docs/SEED_QUESTIONS.md` ve kodun kendisi. Çelişkide bunlar geçerlidir.
+
 Bu doküman TR/EN arayüz metinlerinin temel taslağını verir. next-intl message dosyalarına dönüştürülebilir.
 
 ---
