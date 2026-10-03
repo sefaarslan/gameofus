@@ -381,6 +381,7 @@ export type Database = {
           category_id: string | null
           created_at: string
           id: string
+          insight_tag: string | null
           is_active: boolean
           locale: string
           mode: Database["public"]["Enums"]["game_mode"]
@@ -391,6 +392,7 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           id?: string
+          insight_tag?: string | null
           is_active?: boolean
           locale?: string
           mode?: Database["public"]["Enums"]["game_mode"]
@@ -401,6 +403,7 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           id?: string
+          insight_tag?: string | null
           is_active?: boolean
           locale?: string
           mode?: Database["public"]["Enums"]["game_mode"]

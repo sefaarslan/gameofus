@@ -34,7 +34,7 @@ export async function GET(
 
   const { data: room } = await supabase
     .from("rooms")
-    .select("id, status, game_mode, question_count, expires_at")
+    .select("id, status, game_mode, question_count, expires_at, relationship_type")
     .eq("room_code", roomCode)
     .maybeSingle();
 
@@ -162,6 +162,7 @@ export async function GET(
       roomCode,
       gameMode: room.game_mode,
       questionCount: room.question_count,
+      relationshipType: room.relationship_type ?? null,
     },
     me: { id: me.id, role: me.role, displayName: me.display_name },
     partner: partner ? { role: partner.role, displayName: partner.display_name } : null,

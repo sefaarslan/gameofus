@@ -34,6 +34,7 @@ interface RoomStateData {
     questionCount: number;
     expiresAt: string;
     locale: string;
+    relationshipType?: string | null;
   };
   participant: ParticipantInfo | null;
   participants: Array<{ role: string; displayName: string; status: string }>;
@@ -233,6 +234,7 @@ export default function RoomPage() {
         partnerJoined={partnerJoined}
         myName={myName}
         partnerName={partner?.displayName}
+        relationshipType={stateData?.room.relationshipType}
         onStartPlaying={handleStartPlaying}
       />
     );
@@ -245,13 +247,14 @@ export default function RoomPage() {
         participantToken={token}
         questions={stateData.questions}
         initialIndex={stateData.progress.answeredCount}
+        relationshipType={stateData.room.relationshipType}
         onComplete={handleGameComplete}
       />
     );
   }
 
   if (screen === "waiting") {
-    return <WaitingScreen roomCode={roomCode} roomLocale={roomLocale} />;
+    return <WaitingScreen roomCode={roomCode} roomLocale={roomLocale} relationshipType={stateData?.room.relationshipType} />;
   }
 
   // results: handled by useEffect redirect

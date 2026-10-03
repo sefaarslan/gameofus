@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { relKey } from "@/lib/relationship";
 import { InstagramIcon } from "@/components/InstagramIcon";
 import { FeedbackCard } from "@/components/FeedbackCard";
 import { FeedbackExitSheet } from "@/components/FeedbackExitSheet";
@@ -36,7 +37,7 @@ interface ResultsData {
   readingScore: number;
   scoreLabel: string;
   myScore: number;
-  room: { roomCode: string; gameMode: string; questionCount: number };
+  room: { roomCode: string; gameMode: string; questionCount: number; relationshipType?: string | null };
   me: { id: string; role: string; displayName: string };
   partner: { role: string; displayName: string } | null;
   questions: QuestionResult[];
@@ -85,6 +86,7 @@ export default function ResultsPage() {
   const router = useRouter();
 
   const [data, setData] = useState<ResultsData | null>(null);
+  const rel = relKey(data?.room.relationshipType);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [participantToken, setParticipantToken] = useState<string | null>(null);
@@ -341,7 +343,7 @@ export default function ResultsPage() {
                             {partnerInitial}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-label-md text-on-surface-variant mb-1">{data.partner?.displayName ?? "Partner"} — {t("guessOf")}</p>
+                            <p className="text-label-md text-on-surface-variant mb-1">{data.partner?.displayName ?? t("partnerFallback", { rel })} — {t("guessOf")}</p>
                             <p className="text-body-md text-on-background bg-surface p-3 rounded-lg rounded-tl-none border border-surface-container">
                               {formatAnswer(q.mode, q.partnerPredictionOfMe.predictedValue, q.options, tOpt)}
                             </p>
@@ -361,7 +363,7 @@ export default function ResultsPage() {
                             {myInitial}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-label-md text-on-surface-variant mb-1">{data.me.displayName} — {t("guessAboutPartner")}</p>
+                            <p className="text-label-md text-on-surface-variant mb-1">{data.me.displayName} — {t("guessAboutPartner", { rel })}</p>
                             <p className="text-body-md text-on-background bg-surface-container-low p-3 rounded-lg rounded-tl-none">
                               {formatAnswer(q.mode, q.myPrediction.predictedValue, q.options, tOpt)}
                             </p>
@@ -381,7 +383,7 @@ export default function ResultsPage() {
                             {partnerInitial}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-label-md text-on-surface-variant mb-1">{data.partner?.displayName ?? "Partner"} — {t("partnerRealAnswer")}</p>
+                            <p className="text-label-md text-on-surface-variant mb-1">{data.partner?.displayName ?? t("partnerFallback", { rel })} — {t("partnerRealAnswer")}</p>
                             <p className="text-body-md text-on-background bg-surface p-3 rounded-lg rounded-tl-none border border-surface-container">
                               {formatAnswer(q.mode, q.partnerAnswer, q.options, tOpt)}
                             </p>

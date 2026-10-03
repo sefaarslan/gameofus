@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { relKey } from "@/lib/relationship";
 
 interface WaitingScreenProps {
   roomCode: string;
   roomLocale: string;
+  relationshipType?: string | null;
 }
 
 const WhatsAppIcon = () => (
@@ -14,8 +16,9 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
-export function WaitingScreen({ roomCode, roomLocale }: WaitingScreenProps) {
+export function WaitingScreen({ roomCode, roomLocale, relationshipType }: WaitingScreenProps) {
   const t = useTranslations("waiting");
+  const rel = relKey(relationshipType);
   const tShare = useTranslations("share");
   const [copied, setCopied] = useState(false);
 
@@ -68,7 +71,7 @@ export function WaitingScreen({ roomCode, roomLocale }: WaitingScreenProps) {
         {/* Text */}
         <h1 className="text-headline-lg-mobile md:text-headline-xl text-on-background mb-4">{t("title")}</h1>
         <p className="text-body-md md:text-body-lg text-on-surface-variant mb-8 max-w-md">
-          {t("partner")}
+          {t("partner", { rel })}
         </p>
 
         {/* Actions */}
@@ -109,7 +112,7 @@ export function WaitingScreen({ roomCode, roomLocale }: WaitingScreenProps) {
             <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "150ms" }} />
             <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "300ms" }} />
           </div>
-          <span className="text-label-md ml-2">{t("waitingDots")}</span>
+          <span className="text-label-md ml-2">{t("waitingDots", { rel })}</span>
         </div>
       </div>
     </div>

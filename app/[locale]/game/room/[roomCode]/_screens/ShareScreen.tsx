@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { relKey } from "@/lib/relationship";
 
 interface ShareScreenProps {
   roomCode: string;
   roomLocale: string;
   partnerJoined: boolean;
   partnerName?: string;
+  relationshipType?: string | null;
   myName?: string;
   onStartPlaying: () => void;
 }
@@ -18,8 +20,9 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
-export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, myName, onStartPlaying }: ShareScreenProps) {
+export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, relationshipType, myName, onStartPlaying }: ShareScreenProps) {
   const t = useTranslations("share");
+  const rel = relKey(relationshipType);
   const [copied, setCopied] = useState(false);
 
   const shareUrl =
@@ -63,7 +66,7 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
             <span className="absolute -bottom-1 -left-2.5 w-2 h-2 rounded-full bg-[#34D399] animate-float-up" style={{ animationDelay: "1.2s" }} />
           </div>
           <h1 className="text-headline-lg-mobile text-on-background mb-2">{t("title")}</h1>
-          <p className="text-body-md text-on-surface-variant max-w-[280px]">{t("subtitle")}</p>
+          <p className="text-body-md text-on-surface-variant max-w-[280px]">{t("subtitle", { rel })}</p>
         </div>
 
         {/* Card */}
@@ -73,7 +76,7 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-surface-container rounded-full">
               <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${partnerJoined ? "bg-[#34D399]" : "bg-primary-container animate-soft-pulse"}`} />
               <span className="text-label-md text-on-surface-variant">
-                {partnerJoined ? t("joined") : t("waiting")}
+                {partnerJoined ? t("joined", { rel }) : t("waiting", { rel })}
               </span>
             </div>
           </div>
@@ -111,7 +114,7 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
         <div className="w-full bg-surface-container-low rounded-[16px] p-5 border border-outline-variant/10 text-center flex flex-col items-center gap-2">
           <span className="material-symbols-outlined text-primary text-2xl">info</span>
           <p className="text-body-md text-on-surface-variant leading-relaxed">
-            {t("info")}
+            {t("info", { rel })}
           </p>
         </div>
       </div>
@@ -132,7 +135,7 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
             ) : (
               <>
                 <span className="material-symbols-outlined text-xl animate-spin">progress_activity</span>
-                {t("startWaiting")}
+                {t("startWaiting", { rel })}
               </>
             )}
           </button>
@@ -153,7 +156,7 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
           <div className="text-center mb-8 relative z-10">
             <span className="material-symbols-outlined text-primary icon-fill mb-4" style={{ fontSize: "64px" }}>celebration</span>
             <h1 className="text-headline-xl text-on-background mb-2">{t("title")}</h1>
-            <p className="text-body-lg text-on-surface-variant">{t("subtitle")}</p>
+            <p className="text-body-lg text-on-surface-variant">{t("subtitle", { rel })}</p>
           </div>
 
           <div className="flex flex-col gap-6">
@@ -200,13 +203,13 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
               ) : (
                 <>
                   <span className="material-symbols-outlined text-xl animate-spin">progress_activity</span>
-                  {t("startWaiting")}
+                  {t("startWaiting", { rel })}
                 </>
               )}
             </button>
 
             <p className="text-body-md text-on-surface-variant text-center">
-              {t("info")}
+              {t("info", { rel })}
             </p>
           </div>
         </div>
@@ -240,7 +243,7 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
             </div>
             <div className="flex-1">
               <div className={`text-label-md ${partnerJoined ? "text-on-background" : "text-on-surface-variant"}`}>
-                {partnerName ?? "Partner"}
+                {partnerName ?? t("partnerFallback", { rel })}
               </div>
               <div className={`text-sm flex items-center gap-1 ${partnerJoined ? "text-[#34D399]" : "text-on-surface-variant"}`}>
                 <span className={`w-2 h-2 rounded-full inline-block ${partnerJoined ? "bg-[#34D399]" : "bg-tertiary-fixed animate-soft-pulse"}`} />
@@ -251,7 +254,7 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
 
           <div className="mt-auto pt-6 border-t border-outline-variant/30 text-center">
             <span className="material-symbols-outlined text-outline opacity-50" style={{ fontSize: "48px" }}>chair</span>
-            <p className="text-body-md text-on-surface-variant mt-2">{t("relaxMessage")}</p>
+            <p className="text-body-md text-on-surface-variant mt-2">{t("relaxMessage", { rel })}</p>
           </div>
         </div>
       </div>

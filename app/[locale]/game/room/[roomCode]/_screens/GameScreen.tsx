@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { relKey, type RelKey } from "@/lib/relationship";
 
 type QuestionMode = "secret_choice" | "prediction" | "orderline";
 type ConfidenceLevel = "guess" | "think" | "sure";
@@ -29,6 +30,7 @@ interface GameScreenProps {
   participantToken: string;
   questions: Question[];
   initialIndex: number;
+  relationshipType?: string | null;
   onComplete: () => void;
 }
 
@@ -218,10 +220,12 @@ function OrderlineRanker({
 function MicroRevealCard({
   reveal,
   isLast,
+  rel,
   onNext,
 }: {
   reveal: MicroReveal;
   isLast: boolean;
+  rel: RelKey;
   onNext: () => void;
 }) {
   const tReveal = useTranslations("reveal");
@@ -232,8 +236,8 @@ function MicroRevealCard({
         <div className="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center mb-6">
           <span className="material-symbols-outlined text-primary icon-fill" style={{ fontSize: "40px" }}>bookmark_added</span>
         </div>
-        <h2 className="text-headline-lg-mobile text-on-background mb-2">{tReveal("saved")}</h2>
-        <p className="text-body-md text-on-surface-variant mb-8">{tReveal("savedSubtitle")}</p>
+        <h2 className="text-headline-lg-mobile text-on-background mb-2">{tReveal("saved", { rel })}</h2>
+        <p className="text-body-md text-on-surface-variant mb-8">{tReveal("savedSubtitle", { rel })}</p>
         <button
           onClick={onNext}
           className="w-full bg-primary text-on-primary h-16 rounded-full flex items-center justify-center gap-3 shadow-primary-glow hover:bg-surface-tint transition-all active:scale-95 group text-body-lg font-semibold"
@@ -324,9 +328,11 @@ export function GameScreen({
   participantToken,
   questions,
   initialIndex,
+  relationshipType,
   onComplete,
 }: GameScreenProps) {
   const t = useTranslations("game");
+  const rel = relKey(relationshipType);
   const tConf = useTranslations("confidence");
   const modeLabels = useModeLabels();
 
@@ -463,7 +469,7 @@ export function GameScreen({
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
           <div className="absolute -top-20 -left-20 w-[300px] h-[300px] bg-primary-container/30 rounded-full blur-[80px] opacity-60 pointer-events-none" />
           <div className="absolute bottom-20 -right-20 w-[250px] h-[250px] bg-tertiary-fixed/40 rounded-full blur-[60px] opacity-40 pointer-events-none" />
-          <MicroRevealCard reveal={reveal} isLast={isLast} onNext={handleNext} />
+          <MicroRevealCard reveal={reveal} isLast={isLast} rel={rel} onNext={handleNext} />
         </div>
       )}
 
@@ -480,7 +486,7 @@ export function GameScreen({
           <div className="glass-card rounded-[2rem] p-6 shadow-soft-card relative mb-0">
             <div className="flex items-center gap-2 mb-5 text-primary">
               <span className="material-symbols-outlined text-xl icon-fill">lock</span>
-              <h2 className="text-label-md uppercase tracking-wide">{t("yourAnswer")} — {t("yourAnswerNote")}</h2>
+              <h2 className="text-label-md uppercase tracking-wide">{t("yourAnswer")} — {t("yourAnswerNote", { rel })}</h2>
             </div>
 
             {question.mode === "secret_choice" && (
@@ -518,7 +524,7 @@ export function GameScreen({
           <div className="glass-card rounded-[2rem] p-6 shadow-soft-card">
             <div className="flex items-center gap-2 mb-5 text-tertiary-container">
               <span className="material-symbols-outlined text-xl icon-fill">psychology</span>
-              <h2 className="text-label-md uppercase tracking-wide">{t("partnerGuess")}</h2>
+              <h2 className="text-label-md uppercase tracking-wide">{t("partnerGuess", { rel })}</h2>
             </div>
 
             {question.mode === "secret_choice" && (
@@ -541,7 +547,7 @@ export function GameScreen({
                 options={sortedOptions}
                 order={myPredictionOrder}
                 onChange={(o) => setMyPrediction(o)}
-                guide={t("partnerOrderGuide")}
+                guide={t("partnerOrderGuide", { rel })}
                 variant="prediction"
               />
             )}

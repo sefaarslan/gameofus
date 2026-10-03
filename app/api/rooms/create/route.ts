@@ -49,6 +49,15 @@ async function checkRateLimit(ipHash: string) {
   return true;
 }
 
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 function selectQuestionCounts(
   gameMode: string,
   questionCount: number,
@@ -135,55 +144,71 @@ export async function POST(req: NextRequest) {
     return !!data;
   });
 
-  // Sorular — her mod için ayrı random seçim
+  // Sorular — her mod için ayrı random seçim.
+  // Havuz: oda diline ait, aktif, ücretsiz ve ilişki türüne uygun kategoriler. Seçilen kategori önceliklidir;
+  // yetmezse yalnızca aynı güvenli havuzdan tamamlanır (başka ilişki türünün sorusu asla gelmez).
   const questionGroups = selectQuestionCounts(mode, count);
   const selectedQuestions: Array<{ id: string; mode: string }> = [];
 
+  const safePoolFor = async (loc: string): Promise<string[]> => {
+    const { data } = await supabase
+      .from("categories")
+      .select("id, relationship_types, is_premium")
+      .eq("locale", loc);
+    return (data ?? [])
+      .filter((c) => !c.is_premium && (!selectedRelationship || c.relationship_types.includes(selectedRelationship)))
+      .map((c) => c.id);
+  };
+
+  const fetchIds = async (
+    loc: string,
+    qMode: string,
+    categoryIds: string[],
+    exclude: Set<string>,
+  ): Promise<string[]> => {
+    if (categoryIds.length === 0) return [];
+    // Tüm havuz çekilir: sıralamasız limit(kısa) hep aynı ilk satırları döndürürdü
+    const { data } = await supabase
+      .from("questions")
+      .select("id")
+      .eq("mode", qMode as "secret_choice" | "prediction" | "orderline" | "mixed")
+      .eq("locale", loc)
+      .eq("is_active", true)
+      .in("category_id", categoryIds)
+      .limit(1000);
+    return shuffle((data ?? []).map((r) => r.id).filter((id) => !exclude.has(id)));
+  };
+
+  const safePools = new Map<string, string[]>();
+  const getSafePool = async (loc: string) => {
+    if (!safePools.has(loc)) safePools.set(loc, await safePoolFor(loc));
+    return safePools.get(loc)!;
+  };
+
   for (const { mode: qMode, count: qCount } of questionGroups) {
-    let qs: Array<{ id: string; mode: string }> | null = null;
+    const chosen: string[] = [];
+    const taken = new Set<string>(selectedQuestions.map((q) => q.id));
 
-    // Kategori seçildiyse önce filtreli dene, yetersizse tüm kategorilere düş
+    // 1) Seçilen kategori
     if (selectedCategoryId) {
-      const result = await supabase
-        .from("questions")
-        .select("id, mode")
-        .eq("mode", qMode as "secret_choice" | "prediction" | "orderline" | "mixed")
-        .eq("locale", roomLocale)
-        .eq("is_active", true)
-        .eq("category_id", selectedCategoryId)
-        .limit(qCount * 3);
-      if (!result.error && result.data && result.data.length >= qCount) {
-        qs = result.data;
-      }
+      const ids = await fetchIds(roomLocale, qMode, [selectedCategoryId], taken);
+      chosen.push(...ids.slice(0, qCount));
     }
 
-    if (!qs) {
-      // Önce istenen locale ile dene, yetersizse 'tr'ye düş
-      const locales = roomLocale === "tr" ? ["tr"] : [roomLocale, "tr"];
-      for (const loc of locales) {
-        const result = await supabase
-          .from("questions")
-          .select("id, mode")
-          .eq("mode", qMode as "secret_choice" | "prediction" | "orderline" | "mixed")
-          .eq("locale", loc)
-          .eq("is_active", true)
-          .limit(qCount * 3);
-        if (!result.error && result.data && result.data.length >= qCount) {
-          qs = result.data;
-          break;
-        }
-      }
-      if (!qs) {
-        return apiError("INTERNAL_ERROR", "Yeterli soru bulunamadı.", 500);
-      }
+    // 2) Yetmezse güvenli havuzdan tamamla; 3) hâlâ yetmezse 'tr' güvenli havuzu
+    const locales = roomLocale === "tr" ? ["tr"] : [roomLocale, "tr"];
+    for (const loc of locales) {
+      if (chosen.length >= qCount) break;
+      const exclude = new Set<string>([...taken, ...chosen]);
+      const pool = await getSafePool(loc);
+      const ids = await fetchIds(loc, qMode, pool, exclude);
+      chosen.push(...ids.slice(0, qCount - chosen.length));
     }
 
-    // Fisher-Yates shuffle, ilk qCount'u al
-    for (let i = qs.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [qs[i], qs[j]] = [qs[j], qs[i]];
+    if (chosen.length < qCount) {
+      return apiError("INTERNAL_ERROR", "Yeterli soru bulunamadı.", 500);
     }
-    selectedQuestions.push(...qs.slice(0, qCount));
+    selectedQuestions.push(...chosen.map((id) => ({ id, mode: qMode })));
   }
 
   // Shuffle final question list

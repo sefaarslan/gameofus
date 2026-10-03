@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import { useParams } from "next/navigation";
-import { RELATIONSHIP_TYPES, type RelationshipType } from "@/lib/relationship";
+import { RELATIONSHIP_TYPES, relKey, type RelationshipType } from "@/lib/relationship";
 
 type GameMode = "secret_choice" | "prediction" | "orderline" | "mixed";
 
@@ -38,6 +38,11 @@ const CATEGORY_ICONS: Record<string, string> = {
   lifestyle: "spa",
   values: "psychology",
   bold: "local_fire_department",
+  friend_test: "mood",
+  wild_scenarios: "rocket_launch",
+  romance: "volunteer_activism",
+  future: "route",
+  home_money: "home",
 };
 
 function getCategoryIcon(slug: string): string {
@@ -54,6 +59,7 @@ export default function CreatePage() {
   const [displayName, setDisplayName] = useState("");
   const [partnerName, setPartnerName] = useState("");
   const [relationshipType, setRelationshipType] = useState<RelationshipType | null>(null);
+  const rel = relKey(relationshipType);
   const [gameMode, setGameMode] = useState<GameMode>("secret_choice");
   const [questionCount, setQuestionCount] = useState<5 | 10>(5);
   const [loading, setLoading] = useState(false);
@@ -268,7 +274,7 @@ export default function CreatePage() {
         <main className="flex-1 flex flex-col items-center justify-start px-6 md:px-16 py-10 overflow-y-auto">
           <div className="w-full max-w-lg">
             <h1 className="text-headline-lg-mobile md:text-headline-lg text-on-background mb-2">{t("title")}</h1>
-            <p className="text-body-md text-on-surface-variant mb-8">{t("subtitle")}</p>
+            <p className="text-body-md text-on-surface-variant mb-8">{t("subtitle", { rel })}</p>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               {/* Name fields */}
@@ -291,7 +297,7 @@ export default function CreatePage() {
 
                 <div className="flex flex-col gap-2">
                   <label className="text-label-md text-on-surface-variant">
-                    {t("partner.label")}
+                    {t("partner.label", { rel })}
                     <span className="text-on-surface-variant/50 font-normal ml-1">({t("partner.optional")})</span>
                   </label>
                   <div className="relative">
@@ -300,7 +306,7 @@ export default function CreatePage() {
                       type="text"
                       value={partnerName}
                       onChange={(e) => setPartnerName(e.target.value)}
-                      placeholder={t("partner.placeholder")}
+                      placeholder={t("partner.placeholder", { rel })}
                       maxLength={30}
                       className="w-full pl-11 pr-4 py-3.5 bg-surface-container-lowest border-2 border-outline-variant/40 rounded-xl text-body-md text-on-surface placeholder-on-surface-variant/50 focus:outline-none focus:border-primary transition-colors"
                     />
