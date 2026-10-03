@@ -166,7 +166,7 @@ export default function HomePage() {
     <main className="max-w-[1400px] mx-auto px-6 md:px-12 flex flex-col">
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
-      <section className="min-h-[88vh] flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16 py-16 md:py-24 relative" id="hero">
+      <section className="md:min-h-[72vh] flex flex-col md:flex-row items-center justify-center gap-10 md:gap-16 py-10 md:py-14 relative" id="hero">
         {/* Ambient blobs */}
         <div className="absolute top-1/4 -left-[8%] w-72 h-72 bg-primary-container/15 rounded-full blur-3xl -z-10 pointer-events-none" />
         <div className="absolute bottom-1/4 -right-[8%] w-96 h-96 bg-tertiary-container/10 rounded-full blur-3xl -z-10 pointer-events-none" />
@@ -229,8 +229,8 @@ export default function HomePage() {
       </section>
 
       {/* ── Nasıl Çalışır ──────────────────────────────────────────── */}
-      <section className="py-20" id="nasil-calisir">
-        <div className="text-center mb-16">
+      <section className="py-10 md:py-14" id="nasil-calisir">
+        <div className="text-center mb-10 md:mb-12">
           <span className="inline-block px-4 py-1.5 bg-primary-container/20 text-primary rounded-full text-label-md mb-4">
             {t("how.badge")}
           </span>
@@ -303,8 +303,8 @@ export default function HomePage() {
       </section>
 
       {/* ── Oyun Modları ───────────────────────────────────────────── */}
-      <section className="py-16" id="oyun-modlari">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+      <section className="py-10 md:py-12" id="oyun-modlari">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
           <div>
             <h2 className="text-headline-lg-mobile md:text-headline-lg text-on-background">{t("modes.title")}</h2>
             <p className="text-body-lg text-on-surface-variant mt-1">{t("modes.subtitle")}</p>
@@ -380,7 +380,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Tek kişilik oyun: Red Flag Mayın Tarlası ───────────────── */}
-      <section className="py-14" id="tek-basina">
+      <section className="py-6 md:py-8" id="tek-basina">
         <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[2rem] shadow-soft-card p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 md:gap-14 relative overflow-hidden">
           <div className="absolute -right-16 -top-16 w-64 h-64 bg-tertiary-container/20 rounded-full blur-3xl pointer-events-none" />
           <div className="grid grid-cols-3 gap-2.5 w-44 md:w-52 shrink-0 relative" aria-hidden="true">
@@ -412,7 +412,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Mobile App Teaser ─────────────────────────────────────── */}
-      <section className="py-12 pb-16" id="premium">
+      <section className="py-6 md:py-8 pb-12 md:pb-16" id="premium">
         <div className="bg-gradient-to-br from-surface to-surface-container-high rounded-[2rem] p-8 md:p-14 shadow-soft-active border border-outline-variant/20 flex flex-col md:flex-row items-center justify-center gap-10 md:gap-14 relative overflow-hidden">
           {/* Ambient blobs */}
           <div className="absolute -right-24 -top-24 w-72 h-72 bg-tertiary-container/15 rounded-full blur-3xl pointer-events-none" />

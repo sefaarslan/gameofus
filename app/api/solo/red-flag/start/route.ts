@@ -24,6 +24,25 @@ function shuffle<T>(arr: T[]): T[] {
 
 type Scenario = { id: string; scenario_text: string; insight_tag: string };
 
+// Senaryo havuzu nadiren değişir: sunucu örneği başına 10 dk bellekte tutulur (her oyun başlangıcında bir DB turu azalır).
+const POOL_TTL_MS = 10 * 60 * 1000;
+const poolCache = new Map<string, { at: number; rows: Scenario[] }>();
+
+async function loadPool(locale: string): Promise<Scenario[] | null> {
+  const hit = poolCache.get(locale);
+  if (hit && Date.now() - hit.at < POOL_TTL_MS) return hit.rows;
+  const { data } = await createAdminClient()
+    .from("solo_scenarios")
+    .select("id, scenario_text, insight_tag")
+    .eq("game", RED_FLAG_GAME)
+    .eq("locale", locale)
+    .eq("is_active", true)
+    .limit(1000);
+  if (!data || data.length < RED_FLAG_CARD_COUNT) return null;
+  poolCache.set(locale, { at: Date.now(), rows: data });
+  return data;
+}
+
 /** Her temadan en az bir senaryo (kapsayıcı profil), kalan kartlar kalan havuzdan rastgele. */
 function pickNine(pool: Scenario[]): Scenario[] {
   const byTag = new Map<string, Scenario[]>();
@@ -52,23 +71,15 @@ export async function POST(req: NextRequest) {
   const locale = typeof body.locale === "string" && LOCALES.includes(body.locale) ? body.locale : "en";
   const platform = body.platform === "mobile" ? "mobile" : "web";
 
-  const allowed = await checkRateLimit(ipHashFor(req), "solo_start", RATE_LIMIT);
+  // Sınır kontrolü ve senaryo havuzu birbirinden bağımsız: paralel (havuz ayrıca bellekte önbelleğe alınır)
+  const [allowed, pool] = await Promise.all([checkRateLimit(ipHashFor(req), "solo_start", RATE_LIMIT), loadPool(locale)]);
   if (!allowed) return apiError("RATE_LIMITED", "Kısa sürede çok fazla oyun başlattınız.", 429);
-
-  const supabase = createAdminClient();
-
-  const { data: pool } = await supabase
-    .from("solo_scenarios")
-    .select("id, scenario_text, insight_tag")
-    .eq("game", RED_FLAG_GAME)
-    .eq("locale", locale)
-    .eq("is_active", true)
-    .limit(1000);
 
   if (!pool || pool.length < RED_FLAG_CARD_COUNT) {
     return apiError("INTERNAL_ERROR", "Yeterli senaryo bulunamadı.", 500);
   }
 
+  const supabase = createAdminClient();
   const scenarios = pickNine(pool);
   const token = generateToken();
 

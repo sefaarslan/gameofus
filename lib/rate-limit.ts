@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import type { NextRequest } from "next/server";
+import { after, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 
 /** İstek IP'sinin kısaltılmış SHA-256 özeti (ham IP saklanmaz). */
@@ -20,27 +20,30 @@ export async function checkRateLimit(
 ): Promise<boolean> {
   const supabase = createAdminClient();
   const now = new Date();
-  const hourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+  const hourAgo = now.getTime() - 60 * 60 * 1000;
   const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-  const count = async (since: Date) =>
-    (
-      await supabase
-        .from("rate_limits")
-        .select("*", { count: "exact", head: true })
-        .eq("key", ipHash)
-        .eq("action", action)
-        .gte("created_at", since.toISOString())
-    ).count ?? 0;
+  // Tek sorgu: son 24 saatin kayıtları; saatlik sayı bellekte türetilir (en fazla `perDay` satır okunur)
+  const { data } = await supabase
+    .from("rate_limits")
+    .select("created_at")
+    .eq("key", ipHash)
+    .eq("action", action)
+    .gte("created_at", dayAgo.toISOString())
+    .limit(limits.perDay);
 
-  const [hourCount, dayCount] = await Promise.all([count(hourAgo), count(dayAgo)]);
-  if (hourCount >= limits.perHour || dayCount >= limits.perDay) return false;
+  const rows = data ?? [];
+  const hourCount = rows.filter((r) => new Date(r.created_at as string).getTime() >= hourAgo).length;
+  if (hourCount >= limits.perHour || rows.length >= limits.perDay) return false;
 
-  await supabase.from("rate_limits").insert({
-    key: ipHash,
-    action,
-    count: 1,
-    window_start: now.toISOString(),
-  });
+  const record = async () => {
+    await supabase.from("rate_limits").insert({ key: ipHash, action, count: 1, window_start: now.toISOString() });
+  };
+  // Kayıt yanıtı geciktirmesin: yanıttan sonra yazılır (`after` kullanılamıyorsa beklenir)
+  try {
+    after(record);
+  } catch {
+    await record();
+  }
   return true;
 }

@@ -10,6 +10,7 @@ import {
   computeProfile,
   decodeGrid,
   gridToEmojiText,
+  isFlag,
   type Flag,
 } from "@/lib/solo";
 import { FlagGlyph } from "./FlagGlyph";
@@ -18,6 +19,8 @@ import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { SoloLogo } from "./SoloLogo";
 
 const STORAGE_KEY = "gou_solo_redflag";
+/** Yarım kalan oyun: sayfa yenilense/kapansa da aynı oturum devam eder (yeniden çekilip "zar atılamaz") */
+const PENDING_KEY = "gou_solo_redflag_pending";
 
 interface Scenario {
   id: string;
@@ -40,7 +43,7 @@ interface SavedGame {
   sessionId?: string;
   token?: string;
 }
-type Phase = "intro" | "loading" | "playing" | "submitting" | "result" | "startError" | "submitError";
+type Phase = "checking" | "intro" | "loading" | "playing" | "submitting" | "result" | "startError" | "submitError";
 
 function readSaved(): SavedGame | null {
   try {
@@ -53,11 +56,47 @@ function readSaved(): SavedGame | null {
   }
 }
 
+interface PendingGame {
+  sessionId: string;
+  token: string;
+  scenarios: Scenario[];
+  answers: (Flag | null)[];
+}
+
+function readPending(): PendingGame | null {
+  try {
+    const raw = localStorage.getItem(PENDING_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as PendingGame;
+    const ok =
+      typeof p.sessionId === "string" &&
+      typeof p.token === "string" &&
+      Array.isArray(p.scenarios) &&
+      p.scenarios.length === RED_FLAG_CARD_COUNT &&
+      p.scenarios.every((sc) => typeof sc.id === "string" && typeof sc.text === "string") &&
+      Array.isArray(p.answers) &&
+      p.answers.length === RED_FLAG_CARD_COUNT &&
+      p.answers.every((a) => a === null || isFlag(a));
+    return ok ? p : null;
+  } catch {
+    return null;
+  }
+}
+
+function writePending(p: PendingGame | null) {
+  try {
+    if (p) localStorage.setItem(PENDING_KEY, JSON.stringify(p));
+    else localStorage.removeItem(PENDING_KEY);
+  } catch {
+    /* localStorage kapalı olabilir */
+  }
+}
+
 export function RedFlagGame() {
   const t = useTranslations("solo");
   const locale = useLocale();
 
-  const [phase, setPhase] = useState<Phase>("intro");
+  const [phase, setPhase] = useState<Phase>("checking");
   const [session, setSession] = useState<Session | null>(null);
   const [answers, setAnswers] = useState<(Flag | null)[]>(Array(RED_FLAG_CARD_COUNT).fill(null));
   const [openCard, setOpenCard] = useState<number | null>(null);
@@ -70,7 +109,7 @@ export function RedFlagGame() {
   const firstFlagBtn = useRef<HTMLButtonElement>(null);
   const choiceLocked = useRef(false);
 
-  // Web: yalnızca 1 oyun. Daha önce oynandıysa doğrudan kayıtlı karneyi göster.
+  // Web: yalnızca 1 oyun. Daha önce oynandıysa doğrudan kayıtlı karneyi, yarım kaldıysa aynı oyunu göster.
   useEffect(() => {
     const savedGame = readSaved();
     if (savedGame) {
@@ -78,7 +117,17 @@ export function RedFlagGame() {
       setResult(savedGame.result);
       setAlreadyPlayed(true);
       setPhase("result");
+      return;
     }
+    const pending = readPending();
+    if (pending) {
+      setSession({ id: pending.sessionId, token: pending.token, scenarios: pending.scenarios });
+      setAnswers(pending.answers);
+      // Tüm kartlar cevaplanmış ama gönderim yarım kalmışsa yeniden gönderme ekranı
+      setPhase(pending.answers.every(Boolean) ? "submitError" : "playing");
+      return;
+    }
+    setPhase("intro");
   }, []);
 
   const answeredCount = answers.filter(Boolean).length;
@@ -94,7 +143,9 @@ export function RedFlagGame() {
       if (!res.ok) throw new Error("start failed");
       const data = await res.json();
       setSession({ id: data.sessionId, token: data.token, scenarios: data.scenarios });
-      setAnswers(Array(RED_FLAG_CARD_COUNT).fill(null));
+      const empty = Array(RED_FLAG_CARD_COUNT).fill(null);
+      setAnswers(empty);
+      writePending({ sessionId: data.sessionId, token: data.token, scenarios: data.scenarios, answers: empty });
       setPhase("playing");
     } catch {
       setPhase("startError");
@@ -126,6 +177,7 @@ export function RedFlagGame() {
         } catch {
           /* localStorage kapalı olabilir */
         }
+        writePending(null);
         setPhase("result");
         window.scrollTo({ top: 0 });
       } catch {
@@ -142,6 +194,7 @@ export function RedFlagGame() {
     const i = openCard;
     const next = answers.map((a, idx) => (idx === i ? flag : a));
     setAnswers(next);
+    writePending({ sessionId: session.id, token: session.token, scenarios: session.scenarios, answers: next });
     setJustAnswered(i);
     if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(12);
     window.setTimeout(() => {
@@ -166,6 +219,9 @@ export function RedFlagGame() {
       document.removeEventListener("keydown", onKey);
     };
   }, [openCard]);
+
+  // localStorage okunana kadar boş ekran: kayıtlı oyun varsa giriş ekranı bir an görünüp kaybolmasın
+  if (phase === "checking") return <div className="min-h-[calc(100vh-73px)] bg-background" aria-busy="true" />;
 
   // ── Giriş ───────────────────────────────────────────────────────────────
   if (phase === "intro" || phase === "loading" || phase === "startError") {

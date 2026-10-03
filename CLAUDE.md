@@ -399,7 +399,8 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   (her temadan ≥1), cevaplar kart geçişlerinde sunucuya gitmez, tek `complete` isteğiyle gelir.
   API: `POST /api/solo/red-flag/start`, `POST /api/solo/[sessionId]/complete`.
 - **Web:** anonim (token), yalnızca **1 oyun** (`localStorage` `gou_solo_redflag`); ikinci ziyarette kayıtlı karne +
-  mobil CTA; AI düğmesi pasif ("Mobil uygulamada"). Coin yoktur.
+  mobil CTA. Yarım kalan oyun `gou_solo_redflag_pending` ile saklanır (sayfa yenilenince aynı oturum/cevaplar devam eder,
+  bitince silinir); bu istemci tarafı bir UX katmanıdır, çerez/depolama temizlenirse yeniden oynanabilir; AI düğmesi pasif ("Mobil uygulamada"). Coin yoktur.
 - **Mobil (planlı):** oturum başına **bir kez** +20 coin, **günde 3 ödüllü oyun** sınırı, sunucuda doğrulanır
   (istemci "bitirdim" diyemez); AI analizi 100 coin (önce düş, LLM hatasında iade, oturum başına cache).
   AI'a yalnızca ilk isim (opsiyonel), 9 senaryo metni + bayrak + `insight_tag` ve dil gider; cinsiyet/e-posta
