@@ -1,6 +1,6 @@
 # Red Flag Mayın Tarlası — Senaryolar (EN)
 
-60 senaryo. Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır.
+59 aktif senaryo. Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır.
 
 ## Sınırlar  `boundaries`
 
@@ -56,7 +56,6 @@
 
 ## Para & Yaşam Tarzı  `money_lifestyle`
 
-1. Your partner suggests saving monthly for a shared goal and sets aside their own share in advance.
 2. At every meal, your friend leaves you the bill, saying “We'll even it out later.”
 3. When you ask what they do with their salary, your partner shuts it down with “That's my business.”
 4. On your birthday, your partner buys an expensive gift that stretches your budget, saying “You deserve it.”

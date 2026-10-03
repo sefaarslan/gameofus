@@ -1,6 +1,6 @@
 # Red Flag Mayın Tarlası — Senaryolar (TR)
 
-60 senaryo. Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır.
+59 aktif senaryo. Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır.
 
 ## Sınırlar  `boundaries`
 
@@ -56,7 +56,6 @@
 
 ## Para & Yaşam Tarzı  `money_lifestyle`
 
-1. Partnerin, ortak bir hedef için aylık birikim yapmayı öneriyor ve kendi payını önceden ayırıyor.
 2. Arkadaşın, her yemekte hesabı “Sonra denkleştiririz” diyerek sana bırakıyor.
 3. Maaşını ne yaptığını sorduğunda sevgilin “Bu benim işim” diyerek konuyu kapatıyor.
 4. Doğum gününde partnerin bütçenizi aşan pahalı bir hediye alıp “Hak ettin” diyor.

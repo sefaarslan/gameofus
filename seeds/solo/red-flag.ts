@@ -178,10 +178,11 @@ export const redFlagScenarios: RedFlagScenario[] = [
     "Tu pareja te compara con otras personas diciendo «otras personas son mucho más atentas»."),
 
   // ── money_lifestyle ─────────────────────────────────────────────────
-  s("money_lifestyle", 1,
+  // Pasif (migration 20260607000000_solo_deactivate_money_1.sql): yeni oyunlarda çıkmaz
+  { ...s("money_lifestyle", 1,
     "Partnerin, ortak bir hedef için aylık birikim yapmayı öneriyor ve kendi payını önceden ayırıyor.",
     "Your partner suggests saving monthly for a shared goal and sets aside their own share in advance.",
-    "Tu pareja propone ahorrar cada mes para una meta común y aparta su parte por adelantado."),
+    "Tu pareja propone ahorrar cada mes para una meta común y aparta su parte por adelantado."), inactive: true },
   s("money_lifestyle", 2,
     "Arkadaşın, her yemekte hesabı “Sonra denkleştiririz” diyerek sana bırakıyor.",
     "At every meal, your friend leaves you the bill, saying “We'll even it out later.”",

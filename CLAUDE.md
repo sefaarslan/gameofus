@@ -391,7 +391,7 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   `(green×2 + yellow) / 18`). **Arketip yoktur**; karnedeki başlık + tek cümlelik yorum yalnızca **Red sayısına (0-9)**
   göre sabittir (`solo.verdicts.<red>` → `title` + `line`, TR/EN/ES). Merak uyandırıcı ve hafif mizahi, kullanıcıyı
   yargılamaz/teşhis koymaz. Share kartı, link önizlemesi ve WhatsApp metni de aynı başlığı kullanır.
-- İçerik: `seeds/solo/red-flag.ts` — 60 senaryo (6 tema × 10: `boundaries`, `trust`, `communication`, `jealousy`,
+- İçerik: `seeds/solo/red-flag.ts` — 59 aktif senaryo (6 tema; `money_lifestyle:1` pasif, silinmez: `boundaries`, `trust`, `communication`, `jealousy`,
   `money_lifestyle`, `respect`), TR/EN/ES, **ikinci tekil kişi** ("Sevgilin…", "your partner…", "tu pareja…") ile
   cinsiyetsiz yazılır; tek genel havuz (ilişki türüne bağlı değil). Denetim: `node scripts/check-solo.mjs`.
   Migration: `node scripts/build-solo-migration.mjs` → `supabase/migrations/20260605000000_solo_red_flag.sql`.

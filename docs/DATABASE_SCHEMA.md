@@ -195,7 +195,7 @@ Ayrı model; `questions` ile karıştırılmaz. RLS açık, policy yok (erişim 
 
 `solo_scenarios`: `id`, `game` (default `red_flag`), `scenario_key` (`tema:sıra`), `translation_group_id`, `locale`,
 `scenario_text`, `insight_tag` (`boundaries | trust | communication | jealousy | money_lifestyle | respect`),
-`is_active`, `created_at`. `unique(game, scenario_key, locale)`. Aktif set: 60 senaryo × 3 dil = 180 satır
+`is_active`, `created_at`. `unique(game, scenario_key, locale)`. Aktif set: 59 senaryo × 3 dil = 177 aktif satır (60 senaryodan `money_lifestyle:1` pasif, migration `20260607000000`)
 (belirlenimci UUID v5; migration `20260605000000_solo_red_flag.sql`, `scripts/build-solo-migration.mjs` üretir).
 
 `solo_sessions`: `id`, `game`, `locale`, `platform` (`web | mobile`), `user_id` (web'de null), `token_hash`,

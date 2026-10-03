@@ -16,4 +16,6 @@ export interface RedFlagScenario {
   tr: string;
   en: string;
   es: string;
+  /** Pasife alınmış (silinmez; DB'de `is_active=false`). Yeni oyunlarda seçilmez. */
+  inactive?: boolean;
 }

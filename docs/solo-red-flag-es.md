@@ -1,6 +1,6 @@
 # Red Flag Mayın Tarlası — Senaryolar (ES)
 
-60 senaryo. Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır.
+59 aktif senaryo. Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır.
 
 ## Sınırlar  `boundaries`
 
@@ -56,7 +56,6 @@
 
 ## Para & Yaşam Tarzı  `money_lifestyle`
 
-1. Tu pareja propone ahorrar cada mes para una meta común y aparta su parte por adelantado.
 2. En cada comida, tu amigo te deja la cuenta diciendo «ya lo igualamos luego».
 3. Cuando le preguntas qué hace con su sueldo, tu pareja cierra el tema con «eso es asunto mío».
 4. En tu cumpleaños, tu pareja compra un regalo caro que se pasa de vuestro presupuesto diciendo «te lo mereces».

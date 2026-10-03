@@ -244,7 +244,7 @@ Secret Choice, Prediction ve Orderline modlarının dengeli karışımıdır. MV
 
 İki kişilik oyun partner gerektirdiği için ilk denemede sürtünme yüksektir. Tek kişilik, ~2 dakikalık, paylaşılabilir bu oyun soğuk başlangıcı kırar ve kullanıcıyı mobil uygulamaya taşır.
 
-- **Mekanik:** 3×3 kapalı kart; kartı açınca kurgusal bir durum görünür (ikinci tekil kişiyle: "Sevgilin…", "Arkadaşın…"); kullanıcı **Green / Yellow / Red Flag** seçer, kart kilitlenir; 9/9'da oyun biter. Havuz 60 senaryo (6 tema × 10, 3 dilde), her oyunda 9'u sunucuda seçilir (her temadan ≥1).
+- **Mekanik:** 3×3 kapalı kart; kartı açınca kurgusal bir durum görünür (ikinci tekil kişiyle: "Sevgilin…", "Arkadaşın…"); kullanıcı **Green / Yellow / Red Flag** seçer, kart kilitlenir; 9/9'da oyun biter. Havuz 59 aktif senaryo (6 tema, 3 dilde; biri pasife alındı), her oyunda 9'u sunucuda seçilir (her temadan ≥1).
 - **Doğru cevap yoktur:** sonuç yalnızca **tolerans profili**dir: Green/Yellow/Red sayıları, tolerans eşiği `(green×2 + yellow)/18`, ve **Red sayısına (0-9) göre sabit bir başlık + tek cümlelik yorum** (merak uyandırıcı, hafif mizahi; ör. 0 → "Kırmızı bayrak mı? Hiç görmedim.", 5 → "Yarı yarıya şüpheci.", 9 → "Komple mayın arama ekibi."). Arketip sistemi kaldırılmıştır; yargı/teşhis dili yoktur.
 - **Karne (ücretsiz):** sabit başlık + cümle, mini 3×3 ızgara + sayılar + tolerans çubuğu; **Story görseli** (1080×1920), **WhatsApp'ta paylaş** ve link önizlemesinde gönderenin karnesini gösteren paylaşım linki; **"Cevaplarına göz at"** kartı (9 kartın senaryosu ve seçilen bayrak, iki kişilik sonuçtaki "Detayları gör" gibi); geri bildirim kartı; sayfa sonunda "Ana sayfaya dön".
 - **Web:** anonim, **1 oyun** (tekrar için mobil uygulamaya yönlendirme), coin yok; "AI ile derinlemesine analiz" butonu **pasif** ("Mobil uygulamada").
@@ -1382,7 +1382,7 @@ Her ilişki türü 6 kategori görür (Sevgili ve Hayat Arkadaşı'nda biri prem
 | **AI yorum** | **Mobil, coin ile (−100), `insight_tag` + yapılandırılmış cevaplardan; yayın öncesi rıza/gizlilik netleştirilir; web'de yalnızca "yakında" olarak anlatılır** |
 | **Yaş doğrulama** | **Yalnızca mobilde (Cesur Sorular için, Sevgili/Hayat Arkadaşı + her iki oyuncu 18+); web'de Cesur Sorular kilitli olduğu için doğum tarihi toplanmaz** |
 | **Domain** | **`gameofus.app` (satın alındı, canlı); Instagram `@gameofus.app`** |
-| **Solo oyun (Red Flag Mayın Tarlası)** | **Doğru cevap yok, yalnızca tolerans profili + Red sayısına göre sabit başlık/cümle (arketip yok); tek genel havuz (60 senaryo × 3 dil); ayrı model (`solo_*`); önce web (anonim, 1 oyun), sonra mobil (+20 coin, günde 3 ödüllü oyun, AI −100 coin); oyun girişinde kişisel veri sorulmaz** |
+| **Solo oyun (Red Flag Mayın Tarlası)** | **Doğru cevap yok, yalnızca tolerans profili + Red sayısına göre sabit başlık/cümle (arketip yok); tek genel havuz (59 aktif senaryo × 3 dil); ayrı model (`solo_*`); önce web (anonim, 1 oyun), sonra mobil (+20 coin, günde 3 ödüllü oyun, AI −100 coin); oyun girişinde kişisel veri sorulmaz** |
 | **Altyapı** | **Vercel fonksiyonları Supabase ile aynı bölgede (Frankfurt); Next.js sürümü sabit; fontlar/ikonlar self-host** |
 | Sonuç hesaplama | Server-side endpoint üzerinden yapılır |
 | Realtime kapsamı | Sadece oda/participant status güncellemeleri; answers/predictions realtime'a açılmaz |
