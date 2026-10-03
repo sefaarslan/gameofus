@@ -8,6 +8,7 @@ import { relKey } from "@/lib/relationship";
 import { InstagramIcon } from "@/components/InstagramIcon";
 import { FeedbackCard } from "@/components/FeedbackCard";
 import { FeedbackExitSheet } from "@/components/FeedbackExitSheet";
+import { SoloPromoCard } from "@/components/solo/SoloPromoCard";
 import { feedbackKeys, readFlag, writeFlag } from "@/lib/feedback-client";
 import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/social";
 
@@ -397,6 +398,8 @@ export default function ResultsPage() {
             })}
           </section>
         )}
+
+        <div className="flex justify-center"><SoloPromoCard variant="results" /></div>
 
         {/* ── Action buttons ───────────────────────────────────── */}
         <section className="flex flex-col gap-4">

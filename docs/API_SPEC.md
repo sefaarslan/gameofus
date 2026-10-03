@@ -38,6 +38,9 @@ POST /api/rooms/[roomCode]/submit-turn
 POST /api/rooms/[roomCode]/complete
 GET  /api/rooms/[roomCode]/results
 POST /api/feedback
+POST /api/solo/red-flag/start
+POST /api/solo/[sessionId]/complete
+GET  /api/solo/red-flag/card?g=&l=&fmt=
 ```
 
 Ayrı bir `calculate-results` endpoint'i **yoktur**: sonuç, ikinci oyuncu `complete` çağırdığında aynı
@@ -227,6 +230,54 @@ Token zorunlu. Oda `result_ready`/`completed` değilse `RESULT_NOT_READY`.
 
 Okuma skoru = (doğru + yakın) / toplam tahmin × 100; güven çarpanı skora yansımaz. `scoreLabel` skora göre
 5 kademeli sıcak bir metindir (≥90, ≥70, ≥50, ≥30, <30).
+
+---
+
+## 10b. Solo oyun: Red Flag Mayın Tarlası
+
+Doğru cevap yoktur; sonuç yalnızca Green/Yellow/Red dağılımından türeyen tolerans profilidir. Web'de anonim (token),
+mobilde aynı endpoint'ler `platform: "mobile"` ile kullanılır (coin/AI ileride eklenecektir).
+
+### `POST /api/solo/red-flag/start`
+
+```json
+{ "locale": "tr", "platform": "web" }
+```
+
+- IP hash'e göre saatte 30 / günde 100 başlatma sınırı (`RATE_LIMITED`). `locale` geçersizse `en`.
+- Sunucu 9 senaryoyu seçer (her temadan en az biri), oturumu ve anonim token'ı oluşturur. Kart geçişleri istemcide
+  yapılır; cevaplar bu endpoint'e değil `complete`'e gider.
+
+```json
+{ "sessionId": "uuid", "token": "raw-token", "locale": "tr",
+  "scenarios": [ { "id": "uuid", "text": "Sevgilin, eski sevgilisinin hediyesini hâlâ rafta saklıyor." } ] }
+```
+
+Yanıt `201`. `scenarios` kart sırasıdır.
+
+### `POST /api/solo/[sessionId]/complete`
+
+`Authorization: Bearer <token>` (veya gövdede `participantToken`).
+
+```json
+{ "answers": { "<scenarioId>": "green", "<scenarioId>": "red" } }
+```
+
+- `answers` tam olarak oturumun 9 senaryosunu içermeli, değerler `green|yellow|red`; aksi halde `INVALID_PAYLOAD`.
+  Bilinmeyen oturum `SESSION_NOT_FOUND` (404), yanlış token `INVALID_TOKEN` (403). **İdempotent:** tamamlanmış oturum
+  aynı sonucu döndürür.
+
+```json
+{ "counts": { "green": 2, "yellow": 2, "red": 5 }, "tolerance": 33, "archetype": "boundary_guard", "grid": "RRYRGRRYG" }
+```
+
+`tolerance = round((green×2 + yellow)/18 × 100)`. `archetype`: `boundary_guard` (Red ≥5), `silver_lining` (Green ≥5),
+`talk_first` (Yellow ≥5), aksi `balanced`. `grid`: kart sırasıyla 9 harf (G/Y/R).
+
+### `GET /api/solo/red-flag/card`
+
+Paylaşım görseli (PNG, `next/og`): `g` (9 harf `[GYR]`, aksi 400), `l` (`tr|en|es`), `fmt=og` ile yatay 1200×630
+link önizlemesi (varsayılan 1080×1920 story). Uzun süreli cache; kişisel veri içermez.
 
 ---
 

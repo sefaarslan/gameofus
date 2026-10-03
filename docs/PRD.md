@@ -124,7 +124,8 @@ Kullanıcıya verilen temel değerler:
 14. Sonuç hesaplama ve sonuç ekranı
 15. **Geri bildirim:** sonuç ekranında isteğe bağlı mini anket + puansız çıkışta bir kez yumuşak istem (bkz. Bölüm 13.6, 19)
 16. Üç dil (TR / EN / ES) — arayüz ve soru içeriği
-17. Temel hata ve boş durum ekranları
+17. **Solo oyun: Red Flag Mayın Tarlası** (bkz. Bölüm 8.5)
+18. Temel hata ve boş durum ekranları
 
 ### Mobile MVP'sinde olan özellikler (yeni)
 
@@ -238,6 +239,18 @@ Kartlar:
 ### 8.4 Karma Oyun
 
 Secret Choice, Prediction ve Orderline modlarının dengeli karışımıdır. MVP'de öncelik Secret Choice modunda olacaktır. Karma Oyun daha sonra aktif edilebilir.
+
+### 8.5 Solo Oyun — Red Flag Mayın Tarlası (web canlı, mobil planlı)
+
+İki kişilik oyun partner gerektirdiği için ilk denemede sürtünme yüksektir. Tek kişilik, ~2 dakikalık, paylaşılabilir bu oyun soğuk başlangıcı kırar ve kullanıcıyı mobil uygulamaya taşır.
+
+- **Mekanik:** 3×3 kapalı kart; kartı açınca kurgusal bir durum görünür (ikinci tekil kişiyle: "Sevgilin…", "Arkadaşın…"); kullanıcı **Green / Yellow / Red Flag** seçer, kart kilitlenir; 9/9'da oyun biter. Havuz 60 senaryo (6 tema × 10, 3 dilde), her oyunda 9'u sunucuda seçilir (her temadan ≥1).
+- **Doğru cevap yoktur:** sonuç yalnızca **tolerans profili**dir: Green/Yellow/Red sayıları, tolerans eşiği `(green×2 + yellow)/18`, ve 4 nazik arketip başlığı (Red ≥5 Sınır Bekçisi, Green ≥5 İyiyi Gören, Yellow ≥5 Önce Konuşalım Diyen, aksi Dengeli Radar). Yargı/teşhis dili yoktur.
+- **Karne (ücretsiz):** mini 3×3 ızgara + sayılar + tolerans çubuğu; **Story görseli** (1080×1920), "Sonucumu kopyala" (emoji ızgara metni) ve link önizlemesinde gönderenin karnesini gösteren paylaşım linki.
+- **Web:** anonim, **1 oyun** (tekrar için mobil uygulamaya yönlendirme), coin yok; "AI ile derinlemesine analiz" butonu **pasif** ("Mobil uygulamada").
+- **Mobil (planlı):** oyun başına **+20 coin** (oturum başına bir kez, sunucuda doğrulanır; günde en çok 3 ödüllü oyun), AI analizi **−100 coin** (Bölüm 12.3; 2 paragraf, mizahi/samimi, sınır ve tolerans eşiği odaklı, teşhis/"ayrıl-kal" tavsiyesi yok). Oyun girişinde isim/cinsiyet sorulmaz; AI için yalnızca (opsiyonel) ilk isim, senaryolar + bayraklar + tema etiketleri gider.
+- **Konumlandırma:** oda oluşturma akışında bir mod **değildir** (link/partner/oda yok). Girişler: landing hero bağlantısı ve bölümü, footer, iki kişilik bekleme ve sonuç ekranlarında kapatılabilir kart; mobilde ana sayfa kartı (+20 coin rozeti, "bugün x/3").
+- **Sonraki sürümler:** kalabalık yüzdeleri, "arkadaşına gönder, aynı 9 kartı o da oynasın ve karşılaştırın" köprüsü (solo → iki kişilik ana döngü), yeni solo oyunlar (`solo_*` tabloları `game` alanıyla genişlemeye hazır).
 
 ---
 
@@ -989,6 +1002,14 @@ Sonuç ekranı mini anketi. Yazma yalnızca token doğrulayan `POST /api/feedbac
 
 **Metrik görünümleri** (`security_invoker`, `anon/authenticated` erişimi kapalı; `TEST-%` katılımcılı odalar hariç): `metrics_daily_funnel` (oda açılan → partner katılan → sonucu hazır olan + oranlar; mod/tür/dile göre), `metrics_participant_status`, `metrics_feedback_summary` (günlük ortalama puan, beğenen/beğenmeyen, AI ilgisi dağılımı).
 
+### `solo_scenarios` ve `solo_sessions` (solo oyunlar)
+
+Red Flag Mayın Tarlası için ayrı model (bkz. Bölüm 8.5; `questions` ile karıştırılmaz).
+
+- `solo_scenarios`: `game` (`red_flag`), `scenario_key` (`tema:sıra`), `translation_group_id`, `locale`, `scenario_text`, `insight_tag` (`boundaries | trust | communication | jealousy | money_lifestyle | respect`), `is_active`. `unique(game, scenario_key, locale)`. Senaryolar silinmez, pasife alınır.
+- `solo_sessions`: `game`, `locale`, `platform` (`web | mobile`), `user_id` (web'de null), `token_hash`, `scenario_ids uuid[]` (kart sırası), `answers jsonb` (`{scenarioId: green|yellow|red}`), `status` (`started | completed`), `coins_awarded` (mobil; oturum başına bir kez), `ai_analysis` (planlı), `created_at`, `completed_at`.
+- RLS açık, policy yok; tüm erişim token doğrulayan sunucu endpoint'leri üzerinden.
+
 ### `room_questions`
 
 Oda tek bir dile sabit olduğu için (bkz. Bölüm 16, `rooms.locale`), bir odadaki soru sırası doğrudan `questions.id`'ye (o dildeki satıra) referans verir. Çift-locale çözümlemeye gerek yoktur.
@@ -1361,6 +1382,7 @@ Her ilişki türü 6 kategori görür (Sevgili ve Hayat Arkadaşı'nda biri prem
 | **AI yorum** | **Mobil, coin ile (−100), `insight_tag` + yapılandırılmış cevaplardan; yayın öncesi rıza/gizlilik netleştirilir; web'de yalnızca "yakında" olarak anlatılır** |
 | **Yaş doğrulama** | **Yalnızca mobilde (Cesur Sorular için, Sevgili/Hayat Arkadaşı + her iki oyuncu 18+); web'de Cesur Sorular kilitli olduğu için doğum tarihi toplanmaz** |
 | **Domain** | **`gameofus.app` (satın alındı, canlı); Instagram `@gameofus.app`** |
+| **Solo oyun (Red Flag Mayın Tarlası)** | **Doğru cevap yok, yalnızca tolerans profili + 4 arketip başlığı; tek genel havuz (60 senaryo × 3 dil); ayrı model (`solo_*`); önce web (anonim, 1 oyun), sonra mobil (+20 coin, günde 3 ödüllü oyun, AI −100 coin); oyun girişinde kişisel veri sorulmaz** |
 | **Altyapı** | **Vercel fonksiyonları Supabase ile aynı bölgede (Frankfurt); Next.js sürümü sabit; fontlar/ikonlar self-host** |
 | Sonuç hesaplama | Server-side endpoint üzerinden yapılır |
 | Realtime kapsamı | Sadece oda/participant status güncellemeleri; answers/predictions realtime'a açılmaz |

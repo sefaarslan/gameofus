@@ -1,4 +1,98 @@
 {
+  "solo": {
+    "gameName": "Red Flag Mayın Tarlası",
+    "tagline": "9 kart, 9 durum. Hangisi mayın?",
+    "badge": "Tek kişilik",
+    "intro": "Her kartta bir durum var. Karar senin: Green, Yellow ya da Red Flag?",
+    "duration": "~2 dk",
+    "start": "Başla",
+    "starting": "Kartlar karıştırılıyor…",
+    "private": "Cevapların kimseyle paylaşılmaz.",
+    "progress": "{done} / {total} kart",
+    "progressLabel": "{total} kartın {done} tanesi cevaplandı",
+    "cardClosed": "{n}. kart, kapalı",
+    "cardDone": "{n}. kart, {flag} seçildi",
+    "cardTitle": "{n}. kart",
+    "close": "Kapat",
+    "pickPrompt": "Bu durum sence…",
+    "flags": {
+      "green": {
+        "label": "Green Flag",
+        "hint": "Sağlıklı"
+      },
+      "yellow": {
+        "label": "Yellow Flag",
+        "hint": "Şüpheli"
+      },
+      "red": {
+        "label": "Red Flag",
+        "hint": "Kabul edilemez"
+      }
+    },
+    "result": {
+      "title": "Karnen",
+      "tolerance": "Tolerans eşiği",
+      "toleranceNote": "Bu bir test değil, eğlenceli bir bakış. Doğru ya da yanlış cevap yok.",
+      "gridLabel": "Seçimlerin"
+    },
+    "archetypes": {
+      "boundary_guard": {
+        "name": "Sınır Bekçisi",
+        "desc": "Çizgilerini net çiziyorsun. Radarın hassas: tuhaf bir şey sezdiğinde hemen bayrak kaldırıyorsun."
+      },
+      "silver_lining": {
+        "name": "İyiyi Gören",
+        "desc": "İnsanlarda önce iyiyi görüyorsun. Anlayışlısın; arada “Bu gerçekten normal mi?” diye sormak da fena olmaz."
+      },
+      "talk_first": {
+        "name": "Önce Konuşalım Diyen",
+        "desc": "Hemen hüküm vermiyor, önce konuşmak istiyorsun. Gri alanlarda sabır senin süper gücün."
+      },
+      "balanced": {
+        "name": "Dengeli Radar",
+        "desc": "Radarın duruma göre ayarlanıyor: bazen esnek, bazen net. Dengeli bir tolerans profilin var."
+      }
+    },
+    "share": {
+      "story": "Story görseli",
+      "storyBusy": "Hazırlanıyor…",
+      "copy": "Sonucumu kopyala",
+      "copied": "Kopyalandı!",
+      "text": "Red Flag Mayın Tarlası’nda “{archetype}” çıktım! Sen de dene:"
+    },
+    "ai": {
+      "button": "AI ile derinlemesine analizini al",
+      "locked": "Mobil uygulamada"
+    },
+    "mobile": {
+      "title": "Mobilde tekrar oyna",
+      "desc": "Her oyunda coin kazan, AI analizini aç ve yeni kartlarla devam et.",
+      "soon": "Yakında geliyor"
+    },
+    "played": "Bu oyunu zaten oynadın. Tekrar oynamak için mobil uygulamaya gel.",
+    "error": {
+      "start": "Oyun başlatılamadı. Tekrar dener misin?",
+      "complete": "Sonuç kaydedilemedi.",
+      "retry": "Tekrar dene"
+    },
+    "backHome": "Ana sayfa",
+    "landing": {
+      "badge": "Tek kişilik oyun",
+      "title": "Partnerin yok mu? Tek başına dene",
+      "desc": "Red Flag Mayın Tarlası: 9 kapalı kart, 9 durum. Her birine bir bayrak koy, tolerans profilini gör ve story’de paylaş.",
+      "cta": "Mayın Tarlası’nı dene",
+      "heroLink": "Partnerin yok mu? Tek başına dene →"
+    },
+    "promo": {
+      "waitingTitle": "Beklerken Mayın Tarlası?",
+      "waitingDesc": "Partnerin gelene kadar 2 dakikalık tek kişilik oyunu dene.",
+      "resultsTitle": "Şimdi tek başına dene",
+      "resultsDesc": "Red Flag Mayın Tarlası: 9 kart, tolerans profilin.",
+      "cta": "Oyna",
+      "dismiss": "Kapat"
+    },
+    "footerLink": "Red Flag Mayın Tarlası"
+  },
   "feedback": {
     "exitTitle": "Çıkmadan önce bir saniye?",
     "notNow": "Şimdi değil",

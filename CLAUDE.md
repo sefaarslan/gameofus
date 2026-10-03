@@ -385,6 +385,33 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
 
 ---
 
+### Solo oyun: Red Flag Mayın Tarlası (web canlı; mobil planlı)
+- Tek kişilik, 3×3 kapalı kart; her kartta bir durum ve **Green / Yellow / Red Flag** seçimi. **Doğru cevap yoktur**:
+  sonuç yalnızca dağılımdan türeyen **tolerans profili**dir (`lib/solo.ts`: `computeProfile`; tolerans =
+  `(green×2 + yellow) / 18`; arketip: Red ≥5 → Sınır Bekçisi, Green ≥5 → İyiyi Gören, Yellow ≥5 → Önce Konuşalım
+  Diyen, aksi → Dengeli Radar). Başlıklar durumu/eğilimi anlatır, kullanıcıyı yargılamaz.
+- İçerik: `seeds/solo/red-flag.ts` — 60 senaryo (6 tema × 10: `boundaries`, `trust`, `communication`, `jealousy`,
+  `money_lifestyle`, `respect`), TR/EN/ES, **ikinci tekil kişi** ("Sevgilin…", "your partner…", "tu pareja…") ile
+  cinsiyetsiz yazılır; tek genel havuz (ilişki türüne bağlı değil). Denetim: `node scripts/check-solo.mjs`.
+  Migration: `node scripts/build-solo-migration.mjs` → `supabase/migrations/20260605000000_solo_red_flag.sql`.
+- Veri: `solo_scenarios` ve `solo_sessions` (ayrı model; `questions`'a **karıştırma**). Sunucu 9 senaryoyu seçer
+  (her temadan ≥1), cevaplar kart geçişlerinde sunucuya gitmez, tek `complete` isteğiyle gelir.
+  API: `POST /api/solo/red-flag/start`, `POST /api/solo/[sessionId]/complete`.
+- **Web:** anonim (token), yalnızca **1 oyun** (`localStorage` `gou_solo_redflag`); ikinci ziyarette kayıtlı karne +
+  mobil CTA; AI düğmesi pasif ("Mobil uygulamada"). Coin yoktur.
+- **Mobil (planlı):** oturum başına **bir kez** +20 coin, **günde 3 ödüllü oyun** sınırı, sunucuda doğrulanır
+  (istemci "bitirdim" diyemez); AI analizi 100 coin (önce düş, LLM hatasında iade, oturum başına cache).
+  AI'a yalnızca ilk isim (opsiyonel), 9 senaryo metni + bayrak + `insight_tag` ve dil gider; cinsiyet/e-posta
+  gitmez ve oyun girişinde **hiçbir şey sorulmaz**.
+- Paylaşım: `GET /api/solo/red-flag/card?g=<9 harf G/Y/R>&l=<dil>[&fmt=og]` (`next/og`, 1080×1920; `fmt=og` yatay
+  1200×630 link önizlemesi). Paylaşım linki `…/solo/red-flag?s=<kod>` — önizleme gönderenin karnesini gösterir (kişisel
+  veri yok). Satori `React.Fragment` desteklemez (görselde `<g>`/`<div>` kullan); fontlar `public/fonts/*.woff`.
+- Giriş noktaları: landing hero bağlantısı + bölüm (`#tek-basina`), footer, iki kişilik **bekleme** ve **sonuç**
+  ekranlarında kapatılabilir `SoloPromoCard`. Oda oluşturma akışına **eklenmez** (oda modu değildir).
+- Erişilebilirlik: bayraklar renk + ikon + etiket; açık kart `dialog` (Escape, odak); `prefers-reduced-motion` saygı.
+
+---
+
 ## 11. Geliştirme Fazları
 
 Ayrıntılı durum için `docs/PRD.md` Bölüm 21 esas alınır. Özet:
@@ -414,6 +441,7 @@ Ayrıntılı durum için `docs/PRD.md` Bölüm 21 esas alınır. Özet:
 | `scripts/build-questions-migration.mjs` | Seed → `supabase/migrations/*_questions_v2_*.sql` (belirlenimci UUID v5 kimlikler) |
 | `scripts/export-questions-md.mjs` | İnceleme belgeleri: `docs/questions-v2-{tr,en,es}.md` |
 | `scripts/build-icon-font.mjs` (`npm run icons`) | Kullanılan ikonlardan font alt kümesi |
+| `seeds/solo/`, `scripts/check-solo.mjs`, `scripts/build-solo-migration.mjs`, `scripts/export-solo-md.mjs` | Solo oyun senaryoları, denetimi, migration üretimi, `docs/solo-red-flag-{tr,en,es}.md` dökümü |
 
 İş akışı: seed'i düzenle → `node scripts/check-questions.mjs` → `node scripts/build-questions-migration.mjs`
 → migration'ları sırayla çalıştır. Üretilen migration dosyalarını **elle düzenleme**.

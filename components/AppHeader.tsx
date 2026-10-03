@@ -80,7 +80,8 @@ export function AppHeader({ locale }: AppHeaderProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const isGamePage = pathname.includes("/game/");
+  // Oyun akışlarında (oda ve solo) dil değiştirici/nav gizlenir; mobilde header sabit kalmaz
+  const isGamePage = pathname.includes("/game/") || pathname.includes("/solo/");
 
   // Close mobile menu on route change
   useEffect(() => {

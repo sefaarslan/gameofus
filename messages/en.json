@@ -1,4 +1,98 @@
 {
+  "solo": {
+    "gameName": "Red Flag Minefield",
+    "tagline": "9 cards, 9 situations. Which one's a mine?",
+    "badge": "Solo game",
+    "intro": "Every card holds a situation. Your call: Green, Yellow or Red Flag?",
+    "duration": "~2 min",
+    "start": "Start",
+    "starting": "Shuffling the cards…",
+    "private": "Your answers stay private.",
+    "progress": "{done} / {total} cards",
+    "progressLabel": "{done} of {total} cards answered",
+    "cardClosed": "Card {n}, closed",
+    "cardDone": "Card {n}, {flag} chosen",
+    "cardTitle": "Card {n}",
+    "close": "Close",
+    "pickPrompt": "To you, this is a…",
+    "flags": {
+      "green": {
+        "label": "Green Flag",
+        "hint": "Healthy"
+      },
+      "yellow": {
+        "label": "Yellow Flag",
+        "hint": "Questionable"
+      },
+      "red": {
+        "label": "Red Flag",
+        "hint": "Not okay"
+      }
+    },
+    "result": {
+      "title": "Your scorecard",
+      "tolerance": "Tolerance level",
+      "toleranceNote": "This isn't a test, just a fun look. There are no right or wrong answers.",
+      "gridLabel": "Your picks"
+    },
+    "archetypes": {
+      "boundary_guard": {
+        "name": "The Boundary Guard",
+        "desc": "You draw clear lines. Your radar is sharp: the moment something feels off, the flag goes up."
+      },
+      "silver_lining": {
+        "name": "The Silver-Lining Seeker",
+        "desc": "You see the good in people first. You're understanding, though asking “is this actually normal?” now and then never hurts."
+      },
+      "talk_first": {
+        "name": "The Talk-It-Out Type",
+        "desc": "You don't rush to judge, you'd rather talk first. In gray areas, patience is your superpower."
+      },
+      "balanced": {
+        "name": "The Balanced Radar",
+        "desc": "Your radar adjusts to the situation: flexible at times, firm at others. A nicely balanced tolerance profile."
+      }
+    },
+    "share": {
+      "story": "Story image",
+      "storyBusy": "Preparing…",
+      "copy": "Copy my result",
+      "copied": "Copied!",
+      "text": "I got “{archetype}” in Red Flag Minefield! Try it:"
+    },
+    "ai": {
+      "button": "Get your in-depth AI analysis",
+      "locked": "In the mobile app"
+    },
+    "mobile": {
+      "title": "Play again on mobile",
+      "desc": "Earn coins every game, unlock AI analysis and keep going with new cards.",
+      "soon": "Coming soon"
+    },
+    "played": "You've already played this game. Open the mobile app to play again.",
+    "error": {
+      "start": "Couldn't start the game. Want to try again?",
+      "complete": "Couldn't save your result.",
+      "retry": "Try again"
+    },
+    "backHome": "Home",
+    "landing": {
+      "badge": "Solo game",
+      "title": "No partner? Try it solo",
+      "desc": "Red Flag Minefield: 9 face-down cards, 9 situations. Flag each one, see your tolerance profile and share it on your story.",
+      "cta": "Try the Minefield",
+      "heroLink": "No partner? Try it solo →"
+    },
+    "promo": {
+      "waitingTitle": "Minefield while you wait?",
+      "waitingDesc": "Try the 2-minute solo game until your partner arrives.",
+      "resultsTitle": "Now try it solo",
+      "resultsDesc": "Red Flag Minefield: 9 cards, your tolerance profile.",
+      "cta": "Play",
+      "dismiss": "Dismiss"
+    },
+    "footerLink": "Red Flag Minefield"
+  },
   "feedback": {
     "exitTitle": "Before you go?",
     "notNow": "Not now",

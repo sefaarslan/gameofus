@@ -1,4 +1,98 @@
 {
+  "solo": {
+    "gameName": "Campo Minado de Red Flags",
+    "tagline": "9 cartas, 9 situaciones. ¿Cuál es una mina?",
+    "badge": "Juego en solitario",
+    "intro": "Cada carta esconde una situación. Tú decides: ¿Green, Yellow o Red Flag?",
+    "duration": "~2 min",
+    "start": "Empezar",
+    "starting": "Barajando las cartas…",
+    "private": "Tus respuestas no se comparten con nadie.",
+    "progress": "{done} / {total} cartas",
+    "progressLabel": "{done} de {total} cartas respondidas",
+    "cardClosed": "Carta {n}, cerrada",
+    "cardDone": "Carta {n}, elegiste {flag}",
+    "cardTitle": "Carta {n}",
+    "close": "Cerrar",
+    "pickPrompt": "Para ti, esto es…",
+    "flags": {
+      "green": {
+        "label": "Green Flag",
+        "hint": "Sano"
+      },
+      "yellow": {
+        "label": "Yellow Flag",
+        "hint": "Dudoso"
+      },
+      "red": {
+        "label": "Red Flag",
+        "hint": "Inaceptable"
+      }
+    },
+    "result": {
+      "title": "Tu resultado",
+      "tolerance": "Nivel de tolerancia",
+      "toleranceNote": "No es un examen, solo una mirada divertida. No hay respuestas correctas ni incorrectas.",
+      "gridLabel": "Tus elecciones"
+    },
+    "archetypes": {
+      "boundary_guard": {
+        "name": "El Guardián de los Límites",
+        "desc": "Trazas líneas claras. Tu radar es fino: en cuanto algo no cuadra, levantas la bandera."
+      },
+      "silver_lining": {
+        "name": "Quien Ve Lo Bueno",
+        "desc": "Primero ves lo bueno de la gente. Eres comprensivo, aunque preguntarte de vez en cuando «¿esto es normal?» no viene mal."
+      },
+      "talk_first": {
+        "name": "Primero Hablemos",
+        "desc": "No juzgas con prisa, prefieres hablar primero. En las zonas grises, la paciencia es tu superpoder."
+      },
+      "balanced": {
+        "name": "El Radar Equilibrado",
+        "desc": "Tu radar se ajusta a cada situación: flexible unas veces, firme otras. Un perfil de tolerancia muy equilibrado."
+      }
+    },
+    "share": {
+      "story": "Imagen para stories",
+      "storyBusy": "Preparando…",
+      "copy": "Copiar mi resultado",
+      "copied": "¡Copiado!",
+      "text": "¡Me salió «{archetype}» en el Campo Minado de Red Flags! Pruébalo:"
+    },
+    "ai": {
+      "button": "Obtén tu análisis a fondo con IA",
+      "locked": "En la app móvil"
+    },
+    "mobile": {
+      "title": "Vuelve a jugar en el móvil",
+      "desc": "Gana monedas en cada partida, desbloquea el análisis con IA y sigue con cartas nuevas.",
+      "soon": "Próximamente"
+    },
+    "played": "Ya has jugado a este juego. Abre la app móvil para volver a jugar.",
+    "error": {
+      "start": "No se pudo iniciar el juego. ¿Lo intentas de nuevo?",
+      "complete": "No se pudo guardar tu resultado.",
+      "retry": "Reintentar"
+    },
+    "backHome": "Inicio",
+    "landing": {
+      "badge": "Juego en solitario",
+      "title": "¿Sin pareja? Pruébalo tú solo",
+      "desc": "Campo Minado de Red Flags: 9 cartas boca abajo, 9 situaciones. Marca cada una, descubre tu perfil de tolerancia y compártelo en tus stories.",
+      "cta": "Probar el Campo Minado",
+      "heroLink": "¿Sin pareja? Pruébalo tú solo →"
+    },
+    "promo": {
+      "waitingTitle": "¿Campo Minado mientras esperas?",
+      "waitingDesc": "Prueba el juego en solitario de 2 minutos hasta que llegue tu pareja.",
+      "resultsTitle": "Ahora pruébalo tú solo",
+      "resultsDesc": "Campo Minado de Red Flags: 9 cartas, tu perfil de tolerancia.",
+      "cta": "Jugar",
+      "dismiss": "Cerrar"
+    },
+    "footerLink": "Campo Minado de Red Flags"
+  },
   "feedback": {
     "exitTitle": "¿Antes de irte?",
     "notNow": "Ahora no",

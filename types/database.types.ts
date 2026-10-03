@@ -184,6 +184,90 @@ export type Database = {
           },
         ]
       }
+      solo_scenarios: {
+        Row: {
+          created_at: string
+          game: string
+          id: string
+          insight_tag: string
+          is_active: boolean
+          locale: string
+          scenario_key: string
+          scenario_text: string
+          translation_group_id: string
+        }
+        Insert: {
+          created_at?: string
+          game?: string
+          id?: string
+          insight_tag: string
+          is_active?: boolean
+          locale: string
+          scenario_key: string
+          scenario_text: string
+          translation_group_id: string
+        }
+        Update: {
+          created_at?: string
+          game?: string
+          id?: string
+          insight_tag?: string
+          is_active?: boolean
+          locale?: string
+          scenario_key?: string
+          scenario_text?: string
+          translation_group_id?: string
+        }
+        Relationships: []
+      }
+      solo_sessions: {
+        Row: {
+          ai_analysis: string | null
+          answers: Json | null
+          coins_awarded: number
+          completed_at: string | null
+          created_at: string
+          game: string
+          id: string
+          locale: string
+          platform: string
+          scenario_ids: string[]
+          status: string
+          token_hash: string
+          user_id: string | null
+        }
+        Insert: {
+          ai_analysis?: string | null
+          answers?: Json | null
+          coins_awarded?: number
+          completed_at?: string | null
+          created_at?: string
+          game?: string
+          id?: string
+          locale: string
+          platform?: string
+          scenario_ids: string[]
+          status?: string
+          token_hash: string
+          user_id?: string | null
+        }
+        Update: {
+          ai_analysis?: string | null
+          answers?: Json | null
+          coins_awarded?: number
+          completed_at?: string | null
+          created_at?: string
+          game?: string
+          id?: string
+          locale?: string
+          platform?: string
+          scenario_ids?: string[]
+          status?: string
+          token_hash?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       participants: {
         Row: {
           completed_at: string | null

@@ -187,6 +187,20 @@ Sonuç ekranı mini anketi. Yazma yalnızca `POST /api/feedback` ile; **RLS aç�
 
 Cevap/tahmin içeriği saklanmaz.
 
+### `solo_scenarios` / `solo_sessions` — solo oyunlar (Red Flag Mayın Tarlası)
+
+Ayrı model; `questions` ile karıştırılmaz. RLS açık, policy yok (erişim yalnızca token doğrulayan sunucu endpoint'leri).
+
+`solo_scenarios`: `id`, `game` (default `red_flag`), `scenario_key` (`tema:sıra`), `translation_group_id`, `locale`,
+`scenario_text`, `insight_tag` (`boundaries | trust | communication | jealousy | money_lifestyle | respect`),
+`is_active`, `created_at`. `unique(game, scenario_key, locale)`. Aktif set: 60 senaryo × 3 dil = 180 satır
+(belirlenimci UUID v5; migration `20260605000000_solo_red_flag.sql`, `scripts/build-solo-migration.mjs` üretir).
+
+`solo_sessions`: `id`, `game`, `locale`, `platform` (`web | mobile`), `user_id` (web'de null), `token_hash`,
+`scenario_ids uuid[]` (kart sırası), `answers jsonb` (`{scenarioId: "green"|"yellow"|"red"}`), `status`
+(`started | completed`), `coins_awarded int` (mobil; oturum başına bir kez), `ai_analysis text` (planlı),
+`created_at`, `completed_at`.
+
 ### `purchases` — mobil IAP (Lemon Squeezy / `payments` kullanılmaz)
 
 `user_id`, `product_type` (`premium_package` / `room_credit_pack`; coin+tier modelinde Lite/Premium

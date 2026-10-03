@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { generateToken, hashToken } from "@/lib/token";
@@ -11,43 +10,9 @@ import { generateUniqueRoomCode } from "@/lib/room-code";
 import { getRoomExpiry } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
 import { isRelationshipType } from "@/lib/relationship";
+import { checkRateLimit, ipHashFor } from "@/lib/rate-limit";
 
-const RATE_LIMIT_HOUR = 10;
-const RATE_LIMIT_DAY = 50;
-
-async function checkRateLimit(ipHash: string) {
-  const supabase = createAdminClient();
-  const now = new Date();
-  const hourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-  const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-
-  const { count: hourCount } = await supabase
-    .from("rate_limits")
-    .select("*", { count: "exact", head: true })
-    .eq("key", ipHash)
-    .eq("action", "create_room")
-    .gte("created_at", hourAgo.toISOString());
-
-  if ((hourCount ?? 0) >= RATE_LIMIT_HOUR) return false;
-
-  const { count: dayCount } = await supabase
-    .from("rate_limits")
-    .select("*", { count: "exact", head: true })
-    .eq("key", ipHash)
-    .eq("action", "create_room")
-    .gte("created_at", dayAgo.toISOString());
-
-  if ((dayCount ?? 0) >= RATE_LIMIT_DAY) return false;
-
-  await supabase.from("rate_limits").insert({
-    key: ipHash,
-    action: "create_room",
-    count: 1,
-    window_start: now.toISOString(),
-  });
-
-  return true;
-}
+const RATE_LIMIT = { perHour: 10, perDay: 50 };
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -111,11 +76,7 @@ export async function POST(req: NextRequest) {
   const roomLocale = typeof locale === "string" ? locale : "en";
 
   // Rate limiting
-  const forwarded = req.headers.get("x-forwarded-for")?.split(",")[0];
-  const ip = forwarded || req.headers.get("x-real-ip") || "127.0.0.1";
-  const ipHash = crypto.createHash("sha256").update(ip).digest("hex").substring(0, 32);
-
-  const allowed = await checkRateLimit(ipHash);
+  const allowed = await checkRateLimit(ipHashFor(req), "create_room", RATE_LIMIT);
   if (!allowed) {
     return apiError("RATE_LIMITED", "Kısa sürede çok fazla oda oluşturdunuz.", 429);
   }

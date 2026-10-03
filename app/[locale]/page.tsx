@@ -158,6 +158,7 @@ function GameCardMockup() {
 // ── Main Page ─────────────────────────────────────────────────────
 export default function HomePage() {
   const t = useTranslations("landing");
+  const tSolo = useTranslations("solo");
 
   return (
     <>
@@ -213,6 +214,10 @@ export default function HomePage() {
               <span>{t("hero.howToPlay")}</span>
             </a>
           </div>
+
+          <Link href="/solo/red-flag" className="self-center md:self-start text-label-md font-semibold text-primary hover:underline">
+            {tSolo("landing.heroLink")}
+          </Link>
 
         </div>
 
@@ -293,6 +298,32 @@ export default function HomePage() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── Tek kişilik oyun: Red Flag Mayın Tarlası ───────────────── */}
+      <section className="py-14" id="tek-basina">
+        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[2rem] shadow-soft-card p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 md:gap-14 relative overflow-hidden">
+          <div className="absolute -right-16 -top-16 w-64 h-64 bg-tertiary-container/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="grid grid-cols-3 gap-2.5 w-44 md:w-52 shrink-0 relative" aria-hidden="true">
+            {["#3f9d6b", "#d9a21b", "#e0524a", "#d9a21b", "#3f9d6b", "#e0524a", "#e0524a", "#3f9d6b", "#d9a21b"].map((c, i) => (
+              <div key={i} className="aspect-square rounded-2xl shadow-soft-sm" style={{ background: c, opacity: i % 2 ? 0.9 : 1 }} />
+            ))}
+          </div>
+          <div className="text-center md:text-left relative">
+            <span className="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-label-md mb-4">
+              {tSolo("landing.badge")}
+            </span>
+            <h2 className="text-headline-md md:text-[2rem] text-on-background mb-3 font-bold">{tSolo("landing.title")}</h2>
+            <p className="text-body-lg text-on-surface-variant mb-6 max-w-lg">{tSolo("landing.desc")}</p>
+            <Link
+              href="/solo/red-flag"
+              className="inline-flex items-center gap-2 bg-primary text-on-primary text-body-md font-semibold px-7 py-3.5 rounded-full hover:bg-surface-tint active:scale-95 transition-all shadow-primary-glow"
+            >
+              {tSolo("landing.cta")}
+              <span className="material-symbols-outlined text-xl">arrow_forward</span>
+            </Link>
+          </div>
         </div>
       </section>
 

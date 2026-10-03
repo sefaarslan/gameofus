@@ -2,14 +2,21 @@ import { useTranslations } from "next-intl";
 import { GameOfUsLogo } from "./GameOfUsLogo";
 import { InstagramIcon } from "./InstagramIcon";
 import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/social";
+import { Link } from "@/i18n/navigation";
 
 export function SiteFooter() {
   const t = useTranslations("footer");
+  const tSolo = useTranslations("solo");
 
   return (
     <footer className="border-t border-outline-variant/30">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-8 md:py-6 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-5 text-center">
-        <GameOfUsLogo size="sm" />
+        <div className="flex flex-col items-center md:items-start gap-2">
+          <GameOfUsLogo size="sm" />
+          <Link href="/solo/red-flag" className="text-xs text-on-surface-variant hover:text-primary transition-colors">
+            {tSolo("footerLink")}
+          </Link>
+        </div>
 
         {/* Mobilde alt alta (açıklama + hesap), masaüstünde yan yana */}
         <div className="flex flex-col md:flex-row items-center gap-2.5 md:gap-3">

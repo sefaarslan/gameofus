@@ -9,6 +9,7 @@
 | `API_SPEC.md` | Gerçek API sözleşmeleri (`app/api/**`) |
 | `DATABASE_SCHEMA.md` | Gerçek şema özeti (kaynak: `supabase/migrations/*.sql`) |
 | `SEED_QUESTIONS.md` | Soru bankası v2: yapı, kurallar, iş akışı |
+| `solo-red-flag-{tr,en,es}.md` | Red Flag Mayın Tarlası senaryolarının okunabilir dökümü (`scripts/export-solo-md.mjs`) |
 | `questions-v2-{tr,en,es}.md` | Tüm soruların okunabilir dökümü (`scripts/export-questions-md.mjs` ile üretilir) |
 
 Çelişkide sıra: **PRD → CLAUDE.md → bu klasördeki diğer güncel dosyalar → kod.**

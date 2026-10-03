@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { relKey } from "@/lib/relationship";
+import { SoloPromoCard } from "@/components/solo/SoloPromoCard";
 
 interface WaitingScreenProps {
   roomCode: string;
@@ -113,6 +114,10 @@ export function WaitingScreen({ roomCode, roomLocale, relationshipType }: Waitin
             <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "300ms" }} />
           </div>
           <span className="text-label-md ml-2">{t("waitingDots", { rel })}</span>
+        </div>
+
+        <div className="mt-8 w-full flex justify-center">
+          <SoloPromoCard variant="waiting" />
         </div>
       </div>
     </div>
