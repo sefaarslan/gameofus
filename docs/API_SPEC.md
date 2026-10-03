@@ -290,6 +290,9 @@ aynı satıra eklenir. Yalnızca sonuçlar hazır olduktan sonra kabul edilir. C
 { "roomCode": "X7K2P9QM", "rating": 5, "wantsAi": "yes", "comment": "Çok eğlenceliydi", "platform": "web" }
 ```
 
+- **Solo oyun anketi:** `roomCode` yerine `soloSessionId` gönderilir; token oturumun `token_hash`'ine karşı doğrulanır
+  (`INVALID_TOKEN`), bilinmeyen oturum `SESSION_NOT_FOUND`, tamamlanmamış oturum `RESULT_NOT_READY`. Oturum başına tek
+  kayıt (`solo_session_id` unique, upsert).
 - Token zorunlu (`INVALID_TOKEN`). `rating`: 1–5 tamsayı. `wantsAi`: `yes|maybe|no` (opsiyonel).
   `comment` ≤ 500 karakter (kırpılır). `platform`: `mobile` ise `mobile`, aksi halde `web`.
 - Oda `result_ready`/`completed` değilse `RESULT_NOT_READY`.

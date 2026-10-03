@@ -177,7 +177,9 @@ Sonuç ekranı mini anketi. Yazma yalnızca `POST /api/feedback` ile; **RLS aç�
 | Alan | Tip | Not |
 |---|---|---|
 | id | uuid | PK |
-| room_id, participant_id | uuid | cascade; `unique(room_id, participant_id)` |
+| room_id, participant_id | uuid null | cascade; `unique(room_id, participant_id)`; solo anketinde null |
+| solo_session_id | uuid null | `solo_sessions.id` (cascade); `unique`; `check`: ya (room_id + participant_id) ya `solo_session_id` dolu |
+| game | text null | solo oyun adı (ör. `red_flag`); oda anketinde null |
 | rating | smallint | 1–5 |
 | wants_ai | text null | yes / maybe / no |
 | comment | text null | ≤ 500 karakter |
@@ -223,7 +225,7 @@ başlayan odalar hariç tutulur. Supabase SQL editöründen okunur.
 |---|---|
 | `metrics_daily_funnel` | gün × mod × ilişki türü × dil: açılan oda, partner katılan, sonucu hazır olan, katılım ve tamamlama yüzdesi |
 | `metrics_participant_status` | gün × rol × durum: katılımcı sayısı (oyuncular nerede takılıyor) |
-| `metrics_feedback_summary` | gün × mod × tür × dil: yanıt sayısı, ortalama puan, beğenen/beğenmeyen, AI ilgisi dağılımı, yorumlu sayısı |
+| `metrics_feedback_summary` | gün × mod × tür × dil (+ `source`: `duo` / `solo_<oyun>`): yanıt sayısı, ortalama puan, beğenen/beğenmeyen, AI ilgisi dağılımı, yorumlu sayısı |
 
 ---
 

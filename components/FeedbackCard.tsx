@@ -14,7 +14,10 @@ import {
 const AI_OPTIONS: WantsAi[] = ["yes", "maybe", "no"];
 
 interface FeedbackCardProps {
-  roomCode: string;
+  /** Oda anketi için oda kodu */
+  roomCode?: string;
+  /** Solo oyun anketi için oturum kimliği (roomCode yerine) */
+  soloSessionId?: string;
   participantToken: string;
   /** İlk puan kaydedilince (veya daha önce verilmişse) çağrılır — çıkış istemini bastırmak için */
   onRated?: () => void;
@@ -24,9 +27,9 @@ interface FeedbackCardProps {
  * Sonuç ekranı mini anketi. Yüze dokunur dokunmaz puan kaydedilir (yanıt kaybolmasın),
  * AI ilgisi ve yorum isteğe bağlı olarak aynı kayda eklenir. Hepsi atlanabilir.
  */
-export function FeedbackCard({ roomCode, participantToken, onRated }: FeedbackCardProps) {
+export function FeedbackCard({ roomCode, soloSessionId, participantToken, onRated }: FeedbackCardProps) {
   const t = useTranslations("feedback");
-  const keys = feedbackKeys(roomCode);
+  const keys = feedbackKeys(soloSessionId ? `solo_${soloSessionId}` : (roomCode ?? ""));
 
   const [rating, setRating] = useState<number | null>(null);
   const [wantsAi, setWantsAi] = useState<WantsAi | null>(null);
@@ -45,7 +48,7 @@ export function FeedbackCard({ roomCode, participantToken, onRated }: FeedbackCa
   }, [keys.done]);
 
   const send = (next: { rating: number; wantsAi?: WantsAi | null; comment?: string }) =>
-    sendFeedback({ roomCode, participantToken, ...next });
+    sendFeedback({ roomCode, soloSessionId, participantToken, ...next });
 
   async function handleRate(value: number) {
     setRating(value);

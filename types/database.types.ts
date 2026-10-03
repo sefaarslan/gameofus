@@ -128,42 +128,48 @@ export type Database = {
         Row: {
           comment: string | null
           created_at: string
+          game: string | null
           game_mode: string | null
           id: string
           locale: string | null
-          participant_id: string
+          participant_id: string | null
           platform: string
           rating: number
           relationship_type: string | null
-          room_id: string
+          room_id: string | null
+          solo_session_id: string | null
           updated_at: string
           wants_ai: string | null
         }
         Insert: {
           comment?: string | null
           created_at?: string
+          game?: string | null
           game_mode?: string | null
           id?: string
           locale?: string | null
-          participant_id: string
+          participant_id?: string | null
           platform?: string
           rating: number
           relationship_type?: string | null
-          room_id: string
+          room_id?: string | null
+          solo_session_id?: string | null
           updated_at?: string
           wants_ai?: string | null
         }
         Update: {
           comment?: string | null
           created_at?: string
+          game?: string | null
           game_mode?: string | null
           id?: string
           locale?: string | null
-          participant_id?: string
+          participant_id?: string | null
           platform?: string
           rating?: number
           relationship_type?: string | null
-          room_id?: string
+          room_id?: string | null
+          solo_session_id?: string | null
           updated_at?: string
           wants_ai?: string | null
         }

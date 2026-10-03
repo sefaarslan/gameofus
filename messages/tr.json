@@ -56,8 +56,7 @@
     "share": {
       "story": "Story görseli",
       "storyBusy": "Hazırlanıyor…",
-      "copy": "Sonucumu kopyala",
-      "copied": "Kopyalandı!",
+      "whatsapp": "WhatsApp'ta paylaş",
       "text": "Red Flag Mayın Tarlası’nda “{archetype}” çıktım! Sen de dene:"
     },
     "ai": {
@@ -75,7 +74,8 @@
       "complete": "Sonuç kaydedilemedi.",
       "retry": "Tekrar dene"
     },
-    "backHome": "Ana sayfa",
+    "backHome": "Ana sayfaya dön",
+    "details": { "show": "Detayları gör", "hide": "Detayları gizle" },
     "landing": {
       "badge": "Tek kişilik oyun",
       "title": "Partnerin yok mu? Tek başına dene",

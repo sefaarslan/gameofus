@@ -24,7 +24,10 @@ export function writeFlag(key: string, value = "1") {
 }
 
 export async function sendFeedback(params: {
-  roomCode: string;
+  /** Oda anketi için */
+  roomCode?: string;
+  /** Solo oyun anketi için (roomCode yerine) */
+  soloSessionId?: string;
   participantToken: string;
   rating: number;
   wantsAi?: WantsAi | null;
@@ -35,6 +38,7 @@ export async function sendFeedback(params: {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       roomCode: params.roomCode,
+      soloSessionId: params.soloSessionId,
       participantToken: params.participantToken,
       rating: params.rating,
       wantsAi: params.wantsAi ?? undefined,

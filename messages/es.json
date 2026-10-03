@@ -56,8 +56,7 @@
     "share": {
       "story": "Imagen para stories",
       "storyBusy": "Preparando…",
-      "copy": "Copiar mi resultado",
-      "copied": "¡Copiado!",
+      "whatsapp": "Compartir en WhatsApp",
       "text": "¡Me salió «{archetype}» en el Campo Minado de Red Flags! Pruébalo:"
     },
     "ai": {
@@ -75,7 +74,8 @@
       "complete": "No se pudo guardar tu resultado.",
       "retry": "Reintentar"
     },
-    "backHome": "Inicio",
+    "backHome": "Volver al inicio",
+    "details": { "show": "Ver detalles", "hide": "Ocultar detalles" },
     "landing": {
       "badge": "Juego en solitario",
       "title": "¿Sin pareja? Pruébalo tú solo",

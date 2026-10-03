@@ -14,6 +14,8 @@ import {
   type Flag,
 } from "@/lib/solo";
 import { FlagGlyph } from "./FlagGlyph";
+import { FeedbackCard } from "@/components/FeedbackCard";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 const STORAGE_KEY = "gou_solo_redflag";
 
@@ -32,14 +34,21 @@ interface Result {
   archetype: Archetype;
   grid: string;
 }
+interface SavedGame {
+  result: Result;
+  /** Kart sırasıyla senaryo metni + seçilen bayrak (karnedeki "Detayları gör" için) */
+  details?: { text: string; flag: Flag }[];
+  sessionId?: string;
+  token?: string;
+}
 type Phase = "intro" | "loading" | "playing" | "submitting" | "result" | "startError" | "submitError";
 
-function readSaved(): Result | null {
+function readSaved(): SavedGame | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as { result?: Result };
-    return parsed.result && decodeGrid(parsed.result.grid) ? parsed.result : null;
+    const parsed = JSON.parse(raw) as SavedGame;
+    return parsed.result && decodeGrid(parsed.result.grid) ? parsed : null;
   } catch {
     return null;
   }
@@ -54,17 +63,19 @@ export function RedFlagGame() {
   const [answers, setAnswers] = useState<(Flag | null)[]>(Array(RED_FLAG_CARD_COUNT).fill(null));
   const [openCard, setOpenCard] = useState<number | null>(null);
   const [result, setResult] = useState<Result | null>(null);
+  const [saved, setSaved] = useState<SavedGame | null>(null);
   const [alreadyPlayed, setAlreadyPlayed] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [shareBusy, setShareBusy] = useState(false);
   const [justAnswered, setJustAnswered] = useState<number | null>(null);
   const firstFlagBtn = useRef<HTMLButtonElement>(null);
 
   // Web: yalnızca 1 oyun. Daha önce oynandıysa doğrudan kayıtlı karneyi göster.
   useEffect(() => {
-    const saved = readSaved();
-    if (saved) {
-      setResult(saved);
+    const savedGame = readSaved();
+    if (savedGame) {
+      setSaved(savedGame);
+      setResult(savedGame.result);
       setAlreadyPlayed(true);
       setPhase("result");
     }
@@ -103,8 +114,15 @@ export function RedFlagGame() {
         if (!res.ok) throw new Error("complete failed");
         const data = (await res.json()) as Result;
         setResult(data);
+        const savedGame: SavedGame = {
+          result: data,
+          details: s.scenarios.map((sc, i) => ({ text: sc.text, flag: finalAnswers[i] as Flag })),
+          sessionId: s.id,
+          token: s.token,
+        };
+        setSaved(savedGame);
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify({ result: data, playedAt: new Date().toISOString() }));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...savedGame, playedAt: new Date().toISOString() }));
         } catch {
           /* localStorage kapalı olabilir */
         }
@@ -217,21 +235,25 @@ export function RedFlagGame() {
       }
     }
 
-    async function handleCopy() {
+    function handleWhatsApp() {
       const text = `${t("share.text", { archetype })}\n\n${gridToEmojiText(flags)}\n\n${shareLink()}`;
-      try {
-        await navigator.clipboard.writeText(text);
-        setCopied(true);
-        window.setTimeout(() => setCopied(false), 2000);
-      } catch {
-        /* pano erişimi yok */
-      }
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
     }
 
     return (
       <div className="min-h-[calc(100vh-73px)] bg-background px-6 py-10 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-72 h-72 bg-tertiary-container/20 rounded-full blur-3xl -z-10 pointer-events-none" />
         <div className="w-full max-w-md mx-auto flex flex-col gap-6">
+          <div className="-mb-2">
+            <Link
+              href="/"
+              aria-label={t("backHome")}
+              className="w-11 h-11 rounded-full bg-surface-container-lowest border border-outline-variant/30 shadow-soft-sm flex items-center justify-center text-on-surface hover:bg-surface-container active:scale-95 transition-all"
+            >
+              <span className="material-symbols-outlined text-xl">arrow_back</span>
+            </Link>
+          </div>
+
           {alreadyPlayed && (
             <div className="bg-surface-container text-on-surface-variant text-label-md rounded-xl px-4 py-3 text-center">{t("played")}</div>
           )}
@@ -294,14 +316,48 @@ export function RedFlagGame() {
               {shareBusy ? t("share.storyBusy") : t("share.story")}
             </button>
             <button
-              onClick={handleCopy}
-              className="w-full flex items-center justify-center gap-2 bg-secondary-container text-primary text-label-md font-bold py-3.5 rounded-full active:scale-95 transition-all"
-              aria-live="polite"
+              onClick={handleWhatsApp}
+              className="w-full flex items-center justify-center gap-2 bg-[#25D366] text-white text-label-md font-bold py-3.5 rounded-full active:scale-95 transition-all shadow-soft-sm"
             >
-              <span className="material-symbols-outlined text-xl">{copied ? "check" : "content_copy"}</span>
-              {copied ? t("share.copied") : t("share.copy")}
+              <WhatsAppIcon />
+              {t("share.whatsapp")}
             </button>
           </div>
+
+          {/* Detaylar: hangi kartta ne seçtin */}
+          {saved?.details && saved.details.length === RED_FLAG_CARD_COUNT && (
+            <div className="bg-surface-container-lowest rounded-[24px] border border-outline-variant/20 shadow-soft-sm overflow-hidden">
+              <button
+                onClick={() => setShowDetails((v) => !v)}
+                aria-expanded={showDetails}
+                className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
+              >
+                <span className="text-label-md font-bold text-on-background">{showDetails ? t("details.hide") : t("details.show")}</span>
+                <span className={`material-symbols-outlined text-xl text-on-surface-variant transition-transform ${showDetails ? "rotate-180" : ""}`}>expand_more</span>
+              </button>
+              {showDetails && (
+                <ol className="px-5 pb-5 flex flex-col gap-4">
+                  {saved.details.map((d, i) => (
+                    <li key={i} className="flex gap-3">
+                      <span
+                        className="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0"
+                        style={{ background: FLAG_HEX[d.flag] }}
+                        title={t(`flags.${d.flag}.label`)}
+                      >
+                        <FlagGlyph flag={d.flag} className="w-5 h-5" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-xs text-on-surface-variant/70 mb-0.5">
+                          {t("cardTitle", { n: i + 1 })} · <span className="font-semibold" style={{ color: FLAG_HEX[d.flag] }}>{t(`flags.${d.flag}.label`)}</span>
+                        </p>
+                        <p className="text-body-md text-on-background leading-snug">{d.text}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          )}
 
           {/* AI analizi: webde pasif */}
           <button
@@ -319,6 +375,9 @@ export function RedFlagGame() {
             </span>
           </button>
 
+          {/* Geri bildirim */}
+          {saved?.sessionId && saved.token && <FeedbackCard soloSessionId={saved.sessionId} participantToken={saved.token} />}
+
           {/* Mobil CTA */}
           <div className="bg-gradient-to-br from-tertiary-container/40 to-primary-container/20 rounded-[24px] p-6 text-center border border-outline-variant/20">
             <span className="material-symbols-outlined text-primary icon-fill mb-2" style={{ fontSize: "36px" }}>smartphone</span>
@@ -327,13 +386,6 @@ export function RedFlagGame() {
             <span className="inline-block px-3 py-1 bg-surface text-label-md text-on-surface-variant rounded-full">{t("mobile.soon")}</span>
           </div>
 
-          <Link
-            href="/"
-            className="self-center text-label-md text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-1.5 py-2"
-          >
-            <span className="material-symbols-outlined text-base">home</span>
-            {t("backHome")}
-          </Link>
         </div>
       </div>
     );

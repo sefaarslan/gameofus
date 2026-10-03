@@ -403,6 +403,15 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   (istemci "bitirdim" diyemez); AI analizi 100 coin (önce düş, LLM hatasında iade, oturum başına cache).
   AI'a yalnızca ilk isim (opsiyonel), 9 senaryo metni + bayrak + `insight_tag` ve dil gider; cinsiyet/e-posta
   gitmez ve oyun girişinde **hiçbir şey sorulmaz**.
+- **Karne ekranı:** sol üstte yuvarlak **geri butonu** (ana sayfaya), arketip, mini ızgara, **Story görseli** ve
+  **WhatsApp'ta paylaş** (`wa.me` ile arketip + emoji ızgara + paylaşım linki), **Detayları gör** (9 kartın senaryo metni ve
+  seçilen bayrak; `localStorage` kaydında `details`/`sessionId`/`token` tutulur), pasif AI düğmesi, **geri bildirim kartı**
+  (aynı `FeedbackCard`, `soloSessionId` ile) ve mobil CTA. "Sonucumu kopyala" kaldırıldı.
+- Geri bildirim solo oturumuna da bağlanır: `POST /api/feedback` gövdesinde `soloSessionId` (token oturumun
+  `token_hash`'ine karşı doğrulanır, oturum `completed` olmalı); `feedback.solo_session_id` unique, `feedback.game`.
+  Metrik görünümünde `source` (`duo` / `solo_red_flag`).
+- Dev sunucusunda (Turbopack) yeni Tailwind sınıfları bazen CSS'e girmez (ör. `w-9` boyutsuz görünür); üretim derlemesi
+  doğrudur. Şüphede `next build && next start` ile doğrula.
 - Paylaşım: `GET /api/solo/red-flag/card?g=<9 harf G/Y/R>&l=<dil>[&fmt=og]` (`next/og`, 1080×1920; `fmt=og` yatay
   1200×630 link önizlemesi). Paylaşım linki `…/solo/red-flag?s=<kod>` — önizleme gönderenin karnesini gösterir (kişisel
   veri yok). Satori `React.Fragment` desteklemez (görselde `<g>`/`<div>` kullan); fontlar `public/fonts/*.woff`.

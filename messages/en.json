@@ -56,8 +56,7 @@
     "share": {
       "story": "Story image",
       "storyBusy": "Preparing…",
-      "copy": "Copy my result",
-      "copied": "Copied!",
+      "whatsapp": "Share on WhatsApp",
       "text": "I got “{archetype}” in Red Flag Minefield! Try it:"
     },
     "ai": {
@@ -75,7 +74,8 @@
       "complete": "Couldn't save your result.",
       "retry": "Try again"
     },
-    "backHome": "Home",
+    "backHome": "Back to home",
+    "details": { "show": "See details", "hide": "Hide details" },
     "landing": {
       "badge": "Solo game",
       "title": "No partner? Try it solo",
