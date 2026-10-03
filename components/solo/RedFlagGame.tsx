@@ -108,6 +108,7 @@ export function RedFlagGame() {
   const [justAnswered, setJustAnswered] = useState<number | null>(null);
   const firstFlagBtn = useRef<HTMLButtonElement>(null);
   const choiceLocked = useRef(false);
+  const [confirming, setConfirming] = useState(false);
 
   // Web: yalnızca 1 oyun. Daha önce oynandıysa doğrudan kayıtlı karneyi, yarım kaldıysa aynı oyunu göster.
   useEffect(() => {
@@ -123,8 +124,7 @@ export function RedFlagGame() {
     if (pending) {
       setSession({ id: pending.sessionId, token: pending.token, scenarios: pending.scenarios });
       setAnswers(pending.answers);
-      // Tüm kartlar cevaplanmış ama gönderim yarım kalmışsa yeniden gönderme ekranı
-      setPhase(pending.answers.every(Boolean) ? "submitError" : "playing");
+      setPhase("playing");
       return;
     }
     setPhase("intro");
@@ -188,9 +188,11 @@ export function RedFlagGame() {
   );
 
   function choose(flag: Flag) {
-    // Seçim anında kilitlenir: kart kapanana kadarki kısa sürede ikinci bir dokunuş (çift tık, parmak sekmesi) seçimi ezemez
-    if (openCard === null || !session || choiceLocked.current || answers[openCard]) return;
+    // Seçim anında kilitlenir: kart kapanana kadarki kısa sürede ikinci bir dokunuş (çift tık, parmak sekmesi) seçimi ezemez.
+    // Cevaplı kart yeniden açılıp değiştirilebilir; sunucuya yalnızca "Tamamlandı" ile gider.
+    if (openCard === null || !session || phase !== "playing" || choiceLocked.current) return;
     choiceLocked.current = true;
+    setConfirming(true);
     const i = openCard;
     const next = answers.map((a, idx) => (idx === i ? flag : a));
     setAnswers(next);
@@ -199,8 +201,8 @@ export function RedFlagGame() {
     if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(12);
     window.setTimeout(() => {
       setOpenCard(null);
+      setConfirming(false);
       choiceLocked.current = false;
-      if (next.every(Boolean)) window.setTimeout(() => submit(next, session), 500);
     }, 220);
   }
 
@@ -540,19 +542,21 @@ export function RedFlagGame() {
           {scenarios.map((sc, i) => {
             const flag = answers[i];
             return flag ? (
-              <div
+              <button
                 key={sc.id}
-                className={`aspect-square rounded-2xl flex items-center justify-center text-white shadow-soft-card ${justAnswered === i ? "animate-solo-pop" : ""}`}
+                onClick={() => setOpenCard(i)}
+                disabled={phase !== "playing"}
+                className={`aspect-square rounded-2xl flex items-center justify-center text-white shadow-soft-card active:scale-[0.96] transition-transform ${justAnswered === i ? "animate-solo-pop" : ""}`}
                 style={{ background: FLAG_HEX[flag] }}
-                role="img"
-                aria-label={t("cardDone", { n: i + 1, flag: t(`flags.${flag}.label`) })}
+                aria-label={t("cardDoneEdit", { n: i + 1, flag: t(`flags.${flag}.label`) })}
               >
                 <FlagGlyph flag={flag} className="w-10 h-10" />
-              </div>
+              </button>
             ) : (
               <button
                 key={sc.id}
                 onClick={() => setOpenCard(i)}
+                disabled={phase !== "playing"}
                 aria-label={t("cardClosed", { n: i + 1 })}
                 className="aspect-square rounded-2xl relative overflow-hidden bg-gradient-to-br from-primary-container/70 via-primary-container/40 to-secondary-container/60 shadow-soft-card border border-white/60 active:scale-[0.96] hover:-translate-y-0.5 transition-all flex flex-col items-center justify-center gap-1"
               >
@@ -562,6 +566,19 @@ export function RedFlagGame() {
             );
           })}
         </div>
+
+        {phase === "playing" && answeredCount === RED_FLAG_CARD_COUNT && session && (
+          <div className="flex flex-col items-center gap-2">
+            <button
+              onClick={() => submit(answers, session)}
+              className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary text-body-lg font-semibold py-4 rounded-full hover:bg-surface-tint active:scale-95 transition-all shadow-primary-glow"
+            >
+              {t("finish")}
+              <span className="material-symbols-outlined text-xl">check</span>
+            </button>
+            <p className="text-xs text-on-surface-variant/70 text-center">{t("finishHint")}</p>
+          </div>
+        )}
 
         {phase === "submitting" && (
           <p className="text-center text-label-md text-on-surface-variant animate-pulse" role="status">{t("starting")}</p>
@@ -605,8 +622,12 @@ export function RedFlagGame() {
                   key={f}
                   ref={idx === 0 ? firstFlagBtn : undefined}
                   onClick={() => choose(f)}
-                  className={`w-full min-h-14 rounded-2xl px-4 py-3 flex items-center gap-3 text-white text-left active:scale-[0.97] transition-all shadow-soft-sm ${answers[openCard] && answers[openCard] !== f ? "opacity-40" : ""}`}
-                  style={{ background: FLAG_HEX[f] }}
+                  className={`w-full min-h-14 rounded-2xl px-4 py-3 flex items-center gap-3 text-white text-left active:scale-[0.97] transition-all shadow-soft-sm ${confirming && answers[openCard] !== f ? "opacity-40" : ""}`}
+                  style={{
+                    background: FLAG_HEX[f],
+                    boxShadow: answers[openCard] === f ? `0 0 0 3px #ffffff, 0 0 0 6px ${FLAG_HEX[f]}` : undefined,
+                  }}
+                  aria-pressed={answers[openCard] === f}
                 >
                   <span className="w-10 h-10 rounded-full bg-white/25 flex items-center justify-center shrink-0">
                     <FlagGlyph flag={f} className="w-6 h-6" />

@@ -396,7 +396,8 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   cinsiyetsiz yazılır; tek genel havuz (ilişki türüne bağlı değil). Denetim: `node scripts/check-solo.mjs`.
   Migration: `node scripts/build-solo-migration.mjs` → `supabase/migrations/20260605000000_solo_red_flag.sql`.
 - Veri: `solo_scenarios` ve `solo_sessions` (ayrı model; `questions`'a **karıştırma**). Sunucu 9 senaryoyu seçer
-  (her temadan ≥1), cevaplar kart geçişlerinde sunucuya gitmez, tek `complete` isteğiyle gelir.
+  (her temadan ≥1), cevaplar kart geçişlerinde sunucuya gitmez. Cevaplanan kartlar **düzenlenebilir** (karta dokun → seçimi değiştir); 9/9 olunca
+  otomatik gönderilmez, kullanıcı **"Tamamlandı"** butonuna basınca tek `complete` isteğiyle DB'ye yazılır.
   API: `POST /api/solo/red-flag/start`, `POST /api/solo/[sessionId]/complete`.
 - **Web:** anonim (token), yalnızca **1 oyun** (`localStorage` `gou_solo_redflag`); ikinci ziyarette kayıtlı karne +
   mobil CTA. Yarım kalan oyun `gou_solo_redflag_pending` ile saklanır (sayfa yenilenince aynı oturum/cevaplar devam eder,
