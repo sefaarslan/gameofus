@@ -68,6 +68,7 @@ export function RedFlagGame() {
   const [shareBusy, setShareBusy] = useState(false);
   const [justAnswered, setJustAnswered] = useState<number | null>(null);
   const firstFlagBtn = useRef<HTMLButtonElement>(null);
+  const choiceLocked = useRef(false);
 
   // Web: yalnızca 1 oyun. Daha önce oynandıysa doğrudan kayıtlı karneyi göster.
   useEffect(() => {
@@ -135,7 +136,9 @@ export function RedFlagGame() {
   );
 
   function choose(flag: Flag) {
-    if (openCard === null || !session) return;
+    // Seçim anında kilitlenir: kart kapanana kadarki kısa sürede ikinci bir dokunuş (çift tık, parmak sekmesi) seçimi ezemez
+    if (openCard === null || !session || choiceLocked.current || answers[openCard]) return;
+    choiceLocked.current = true;
     const i = openCard;
     const next = answers.map((a, idx) => (idx === i ? flag : a));
     setAnswers(next);
@@ -143,6 +146,7 @@ export function RedFlagGame() {
     if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(12);
     window.setTimeout(() => {
       setOpenCard(null);
+      choiceLocked.current = false;
       if (next.every(Boolean)) window.setTimeout(() => submit(next, session), 500);
     }, 220);
   }
@@ -516,7 +520,7 @@ export function RedFlagGame() {
                   key={f}
                   ref={idx === 0 ? firstFlagBtn : undefined}
                   onClick={() => choose(f)}
-                  className="w-full min-h-14 rounded-2xl px-4 py-3 flex items-center gap-3 text-white text-left active:scale-[0.97] transition-transform shadow-soft-sm"
+                  className={`w-full min-h-14 rounded-2xl px-4 py-3 flex items-center gap-3 text-white text-left active:scale-[0.97] transition-all shadow-soft-sm ${answers[openCard] && answers[openCard] !== f ? "opacity-40" : ""}`}
                   style={{ background: FLAG_HEX[f] }}
                 >
                   <span className="w-10 h-10 rounded-full bg-white/25 flex items-center justify-center shrink-0">
