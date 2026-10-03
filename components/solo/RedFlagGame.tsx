@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
@@ -9,18 +9,24 @@ import {
   RED_FLAG_CARD_COUNT,
   computeProfile,
   decodeGrid,
+  PACKS,
+  getPack,
   gridToEmojiText,
   isFlag,
   type Flag,
+  type PackInfo,
 } from "@/lib/solo";
 import { FlagGlyph } from "./FlagGlyph";
 import { FeedbackCard } from "@/components/FeedbackCard";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { FlagMark, SoloLogo } from "./SoloLogo";
+import { PackDropdown, type PackOption } from "./PackDropdown";
 
-const STORAGE_KEY = "gou_solo_redflag";
-/** Yarım kalan oyun: sayfa yenilense/kapansa da aynı oturum devam eder (yeniden çekilip "zar atılamaz") */
-const PENDING_KEY = "gou_solo_redflag_pending";
+// Web: her sette 1 oyun. Karneler ve yarım kalan oyunlar set anahtarına göre saklanır.
+// (Eski tek-oyun kaydı `gou_solo_redflag` rastgele kartlıydı; setler gelince yok sayılır.)
+const STORAGE_KEY = "gou_solo_redflag_packs";
+/** Yarım kalan oyun: sayfa yenilense/kapansa da aynı oturum ve cevaplar devam eder */
+const PENDING_KEY = "gou_solo_redflag_pending_packs";
 
 interface Scenario {
   id: string;
@@ -45,17 +51,6 @@ interface SavedGame {
 }
 type Phase = "checking" | "intro" | "loading" | "playing" | "submitting" | "result" | "startError" | "submitError";
 
-function readSaved(): SavedGame | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as SavedGame;
-    return parsed.result && decodeGrid(parsed.result.grid) ? parsed : null;
-  } catch {
-    return null;
-  }
-}
-
 interface PendingGame {
   sessionId: string;
   token: string;
@@ -63,30 +58,36 @@ interface PendingGame {
   answers: (Flag | null)[];
 }
 
-function readPending(): PendingGame | null {
+function readMap<T>(key: string, valid: (v: T) => boolean): Record<string, T> {
   try {
-    const raw = localStorage.getItem(PENDING_KEY);
-    if (!raw) return null;
-    const p = JSON.parse(raw) as PendingGame;
-    const ok =
-      typeof p.sessionId === "string" &&
+    const raw = localStorage.getItem(key);
+    if (!raw) return {};
+    const obj = JSON.parse(raw) as Record<string, T>;
+    return Object.fromEntries(Object.entries(obj).filter(([k, v]) => getPack(k) && valid(v)));
+  } catch {
+    return {};
+  }
+}
+
+const readSavedMap = () => readMap<SavedGame>(STORAGE_KEY, (g) => !!g?.result && !!decodeGrid(g.result.grid));
+const readPendingMap = () =>
+  readMap<PendingGame>(
+    PENDING_KEY,
+    (p) =>
+      typeof p?.sessionId === "string" &&
       typeof p.token === "string" &&
       Array.isArray(p.scenarios) &&
       p.scenarios.length === RED_FLAG_CARD_COUNT &&
       p.scenarios.every((sc) => typeof sc.id === "string" && typeof sc.text === "string") &&
       Array.isArray(p.answers) &&
       p.answers.length === RED_FLAG_CARD_COUNT &&
-      p.answers.every((a) => a === null || isFlag(a));
-    return ok ? p : null;
-  } catch {
-    return null;
-  }
-}
+      p.answers.every((a) => a === null || isFlag(a)),
+  );
 
-function writePending(p: PendingGame | null) {
+function writeMap(key: string, map: Record<string, unknown>) {
   try {
-    if (p) localStorage.setItem(PENDING_KEY, JSON.stringify(p));
-    else localStorage.removeItem(PENDING_KEY);
+    if (Object.keys(map).length) localStorage.setItem(key, JSON.stringify(map));
+    else localStorage.removeItem(key);
   } catch {
     /* localStorage kapalı olabilir */
   }
@@ -102,6 +103,10 @@ export function RedFlagGame() {
   const [openCard, setOpenCard] = useState<number | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [saved, setSaved] = useState<SavedGame | null>(null);
+  const [packKey, setPackKey] = useState<string | null>(null);
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [savedMap, setSavedMap] = useState<Record<string, SavedGame>>({});
+  const [pendingMap, setPendingMap] = useState<Record<string, PendingGame>>({});
   const [alreadyPlayed, setAlreadyPlayed] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [shareBusy, setShareBusy] = useState(false);
@@ -110,47 +115,68 @@ export function RedFlagGame() {
   const choiceLocked = useRef(false);
   const [confirming, setConfirming] = useState(false);
 
-  // Web: yalnızca 1 oyun. Daha önce oynandıysa doğrudan kayıtlı karneyi, yarım kaldıysa aynı oyunu göster.
+  // Kayıtlı karneler ve yarım kalan oyunlar tarayıcıdan okunur; giriş ekranında set seçimi gösterilir.
   useEffect(() => {
-    const savedGame = readSaved();
-    if (savedGame) {
-      setSaved(savedGame);
-      setResult(savedGame.result);
-      setAlreadyPlayed(true);
-      setPhase("result");
-      return;
-    }
-    const pending = readPending();
-    if (pending) {
-      setSession({ id: pending.sessionId, token: pending.token, scenarios: pending.scenarios });
-      setAnswers(pending.answers);
-      setPhase("playing");
-      return;
-    }
+    setSavedMap(readSavedMap());
+    setPendingMap(readPendingMap());
     setPhase("intro");
+  }, []);
+
+  const updatePending = useCallback((key: string, value: PendingGame | null) => {
+    setPendingMap((prev) => {
+      const next = { ...prev };
+      if (value) next[key] = value;
+      else delete next[key];
+      writeMap(PENDING_KEY, next);
+      return next;
+    });
   }, []);
 
   const answeredCount = answers.filter(Boolean).length;
 
-  const start = useCallback(async () => {
-    setPhase("loading");
-    try {
-      const res = await fetch("/api/solo/red-flag/start", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locale }),
-      });
-      if (!res.ok) throw new Error("start failed");
-      const data = await res.json();
-      setSession({ id: data.sessionId, token: data.token, scenarios: data.scenarios });
-      const empty = Array(RED_FLAG_CARD_COUNT).fill(null);
-      setAnswers(empty);
-      writePending({ sessionId: data.sessionId, token: data.token, scenarios: data.scenarios, answers: empty });
-      setPhase("playing");
-    } catch {
-      setPhase("startError");
-    }
-  }, [locale]);
+  /** Set seçimi: karnesi varsa karneyi, yarım kalmışsa aynı oyunu, değilse yeni oturumu açar. */
+  const openPack = useCallback(
+    async (pack: PackInfo) => {
+      setPackKey(pack.key);
+      const done = savedMap[pack.key];
+      if (done) {
+        setSaved(done);
+        setResult(done.result);
+        setAlreadyPlayed(true);
+        setShowDetails(false);
+        setPhase("result");
+        window.scrollTo({ top: 0 });
+        return;
+      }
+      const pending = pendingMap[pack.key];
+      if (pending) {
+        setSession({ id: pending.sessionId, token: pending.token, scenarios: pending.scenarios });
+        setAnswers(pending.answers);
+        setPhase("playing");
+        window.scrollTo({ top: 0 });
+        return;
+      }
+      setPhase("loading");
+      try {
+        const res = await fetch("/api/solo/red-flag/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ locale, pack: pack.key }),
+        });
+        if (!res.ok) throw new Error("start failed");
+        const data = await res.json();
+        setSession({ id: data.sessionId, token: data.token, scenarios: data.scenarios });
+        const empty = Array(RED_FLAG_CARD_COUNT).fill(null);
+        setAnswers(empty);
+        updatePending(pack.key, { sessionId: data.sessionId, token: data.token, scenarios: data.scenarios, answers: empty });
+        setPhase("playing");
+        window.scrollTo({ top: 0 });
+      } catch {
+        setPhase("startError");
+      }
+    },
+    [locale, savedMap, pendingMap, updatePending],
+  );
 
   const submit = useCallback(
     async (finalAnswers: (Flag | null)[], s: Session) => {
@@ -172,19 +198,23 @@ export function RedFlagGame() {
           token: s.token,
         };
         setSaved(savedGame);
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...savedGame, playedAt: new Date().toISOString() }));
-        } catch {
-          /* localStorage kapalı olabilir */
+        setAlreadyPlayed(false);
+        setShowDetails(false);
+        if (packKey) {
+          setSavedMap((prev) => {
+            const next = { ...prev, [packKey]: { ...savedGame, playedAt: new Date().toISOString() } as SavedGame };
+            writeMap(STORAGE_KEY, next);
+            return next;
+          });
+          updatePending(packKey, null);
         }
-        writePending(null);
         setPhase("result");
         window.scrollTo({ top: 0 });
       } catch {
         setPhase("submitError");
       }
     },
-    [],
+    [packKey, updatePending],
   );
 
   function choose(flag: Flag) {
@@ -196,7 +226,7 @@ export function RedFlagGame() {
     const i = openCard;
     const next = answers.map((a, idx) => (idx === i ? flag : a));
     setAnswers(next);
-    writePending({ sessionId: session.id, token: session.token, scenarios: session.scenarios, answers: next });
+    if (packKey) updatePending(packKey, { sessionId: session.id, token: session.token, scenarios: session.scenarios, answers: next });
     setJustAnswered(i);
     if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(12);
     window.setTimeout(() => {
@@ -225,13 +255,29 @@ export function RedFlagGame() {
   // localStorage okunana kadar boş ekran: kayıtlı oyun varsa giriş ekranı bir an görünüp kaybolmasın
   if (phase === "checking") return <div className="min-h-[calc(100vh-73px)] bg-background" aria-busy="true" />;
 
-  // ── Giriş ───────────────────────────────────────────────────────────────
+  // ── Giriş: set seçimi ───────────────────────────────────────────────────
   if (phase === "intro" || phase === "loading" || phase === "startError") {
+    const loading = phase === "loading";
+    // Varsayılan seçim: oynanmamış ilk açık set (hepsi oynandıysa ilk açık set)
+    const webPacks = PACKS.filter((pk) => pk.webAvailable);
+    const selectedPack = webPacks.find((pk) => pk.key === selectedKey) ?? webPacks.find((pk) => !savedMap[pk.key]) ?? webPacks[0] ?? null;
+    const selectedSaved = selectedPack ? savedMap[selectedPack.key] : undefined;
+    const selectedPending = selectedPack ? !selectedSaved && !!pendingMap[selectedPack.key] : false;
+    // Tüm setler düz listede (başlıksız): "Kategori - 101"; kapalı olanlar seçilemez
+    const packOptions: PackOption[] = PACKS.map((pk) => {
+      const done = savedMap[pk.key];
+      return {
+        key: pk.key,
+        label: `${t(`packs.categories.${pk.category}`)} - ${pk.number}`,
+        disabled: !pk.webAvailable,
+        hint: !pk.webAvailable ? t("packs.soon") : done ? `%${done.result.tolerance}` : pendingMap[pk.key] ? t("packs.resume") : undefined,
+      };
+    });
     return (
-      <div className="min-h-[calc(100vh-73px)] bg-background flex items-center justify-center px-6 py-12 relative overflow-hidden">
+      <div className="min-h-[calc(100vh-73px)] bg-background flex justify-center px-6 py-10 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-72 h-72 bg-tertiary-container/20 rounded-full blur-3xl -z-10 pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-primary-container/20 rounded-full blur-3xl -z-10 pointer-events-none" />
-        <div className="w-full max-w-sm flex flex-col items-center text-center gap-6">
+        <div className="w-full max-w-md flex flex-col items-center text-center gap-6">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-label-md">
             {t("badge")}
           </span>
@@ -241,6 +287,7 @@ export function RedFlagGame() {
           </h1>
           <p className="text-body-lg text-on-surface-variant">{t("tagline")}</p>
 
+          {/* Mayın tarlası görseli: 3×3 kapalı kart, her birinde bayrak */}
           <div className="grid grid-cols-3 gap-2.5 w-40" aria-hidden="true">
             {Array.from({ length: 9 }).map((_, i) => (
               <div
@@ -252,22 +299,37 @@ export function RedFlagGame() {
             ))}
           </div>
 
-          <p className="text-body-md text-on-surface-variant">{t("intro")}</p>
-          <span className="text-label-md text-on-surface-variant/70">{t("duration")}</span>
+          <div className="w-full">
+            <h2 className="text-headline-md text-on-background">{t("packs.title")}</h2>
+            <p className="text-body-md text-on-surface-variant mt-1">{t("packs.desc")}</p>
+          </div>
 
           {phase === "startError" && (
             <p className="text-label-md text-error" role="alert">
               {t("error.start")}
             </p>
           )}
+          {/* Tüm setler tek açılır listede: kategoriye göre gruplu; 104-106 "mobilde açılacak" ve seçilemez */}
+          <div className="w-full flex flex-col gap-3 text-left">
+            <PackDropdown
+              options={packOptions}
+              value={selectedPack?.key ?? ""}
+              onChange={setSelectedKey}
+              disabled={loading}
+              ariaLabel={t("packs.title")}
+            />
 
-          <button
-            onClick={start}
-            disabled={phase === "loading"}
-            className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary text-body-lg font-semibold py-4 rounded-full hover:bg-surface-tint disabled:opacity-60 active:scale-95 transition-all shadow-primary-glow"
-          >
-            {phase === "loading" ? t("starting") : phase === "startError" ? t("error.retry") : t("start")}
-          </button>
+            <button
+              type="button"
+              onClick={() => selectedPack && openPack(selectedPack)}
+              disabled={loading || !selectedPack}
+              className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary text-body-lg font-semibold py-4 rounded-full hover:bg-surface-tint disabled:opacity-60 active:scale-95 transition-all shadow-primary-glow"
+            >
+              {loading ? t("preparing") : phase === "startError" ? t("error.retry") : selectedSaved ? t("packs.view") : selectedPending ? t("packs.resume") : t("start")}
+            </button>
+          </div>
+
+          <span className="text-label-md text-on-surface-variant/70">{t("duration")}</span>
           <p className="text-xs text-on-surface-variant/70">{t("private")}</p>
         </div>
       </div>
@@ -289,9 +351,12 @@ export function RedFlagGame() {
       const d = saved?.details?.find((x) => x.flag === f && x.id);
       return d ? [`${f.charAt(0).toUpperCase()}${d.id}`] : [];
     });
-    const cardUrl = `/api/solo/red-flag/card?g=${result.grid}&l=${locale}${picks.length ? `&q=${picks.join(",")}` : ""}`;
+    const pack = getPack(packKey);
+    const packLabel = pack ? t("packs.label", { category: t(`packs.categories.${pack.category}`), n: pack.number }) : null;
+    const packParam = pack ? `&p=${pack.key}` : "";
+    const cardUrl = `/api/solo/red-flag/card?g=${result.grid}&l=${locale}${packParam}${picks.length ? `&q=${picks.join(",")}` : ""}`;
 
-    const shareLink = () => `${window.location.origin}/${locale}/solo/red-flag?s=${result.grid}`;
+    const shareLink = () => `${window.location.origin}/${locale}/solo/red-flag?s=${result.grid}${packParam}`;
 
     async function handleStory() {
       setShareBusy(true);
@@ -332,6 +397,7 @@ export function RedFlagGame() {
               <SoloLogo className="w-8 h-8 shrink-0" />
               {t("gameName")}
             </span>
+            {packLabel && <p className="text-label-md text-on-surface-variant mt-1">{packLabel}</p>}
             <h1 className="text-headline-lg-mobile md:text-headline-lg text-on-background mt-2 leading-tight text-balance">{verdictTitle}</h1>
             <p className="text-body-md text-on-surface-variant mt-3">{verdictLine}</p>
           </div>
@@ -495,6 +561,18 @@ export function RedFlagGame() {
             <span className="inline-block px-3 py-1 bg-surface text-label-md text-on-surface-variant rounded-full">{t("mobile.soon")}</span>
           </div>
 
+          {/* Diğer setler: her sette 1 oyun */}
+          <button
+            onClick={() => {
+              setPhase("intro");
+              window.scrollTo({ top: 0 });
+            }}
+            className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary text-label-md font-bold py-4 rounded-full hover:bg-surface-tint active:scale-95 transition-all shadow-primary-glow"
+          >
+            <span className="material-symbols-outlined text-xl">apps</span>
+            {t("packs.otherSets")}
+          </button>
+
           {/* Sayfanın en sonu */}
           <Link
             href="/"
@@ -581,7 +659,7 @@ export function RedFlagGame() {
         )}
 
         {phase === "submitting" && (
-          <p className="text-center text-label-md text-on-surface-variant animate-pulse" role="status">{t("starting")}</p>
+          <p className="text-center text-label-md text-on-surface-variant animate-pulse" role="status">{t("submitting")}</p>
         )}
         {phase === "submitError" && (
           <div className="text-center flex flex-col items-center gap-3" role="alert">

@@ -198,6 +198,8 @@ export type Database = {
           insight_tag: string
           is_active: boolean
           locale: string
+          pack_key: string | null
+          pack_position: number | null
           scenario_key: string
           scenario_text: string
           translation_group_id: string
@@ -209,6 +211,8 @@ export type Database = {
           insight_tag: string
           is_active?: boolean
           locale: string
+          pack_key?: string | null
+          pack_position?: number | null
           scenario_key: string
           scenario_text: string
           translation_group_id: string
@@ -220,6 +224,8 @@ export type Database = {
           insight_tag?: string
           is_active?: boolean
           locale?: string
+          pack_key?: string | null
+          pack_position?: number | null
           scenario_key?: string
           scenario_text?: string
           translation_group_id?: string
@@ -236,6 +242,7 @@ export type Database = {
           game: string
           id: string
           locale: string
+          pack_key: string | null
           platform: string
           scenario_ids: string[]
           status: string
@@ -251,6 +258,7 @@ export type Database = {
           game?: string
           id?: string
           locale: string
+          pack_key?: string | null
           platform?: string
           scenario_ids: string[]
           status?: string
@@ -266,6 +274,7 @@ export type Database = {
           game?: string
           id?: string
           locale?: string
+          pack_key?: string | null
           platform?: string
           scenario_ids?: string[]
           status?: string

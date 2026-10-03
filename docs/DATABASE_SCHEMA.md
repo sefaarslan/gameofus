@@ -195,10 +195,10 @@ Ayrı model; `questions` ile karıştırılmaz. RLS açık, policy yok (erişim 
 
 `solo_scenarios`: `id`, `game` (default `red_flag`), `scenario_key` (`tema:sıra`), `translation_group_id`, `locale`,
 `scenario_text`, `insight_tag` (`boundaries | trust | communication | jealousy | money_lifestyle | respect`),
-`is_active`, `created_at`. `unique(game, scenario_key, locale)`. Aktif set: 59 senaryo × 3 dil = 177 aktif satır (60 senaryodan `money_lifestyle:1` pasif, migration `20260607000000`)
+`is_active`, `created_at`. `unique(game, scenario_key, locale)`. `pack_key` (ör. `friend-101`, `romantic-103`) + `pack_position` (1-9): senaryonun hangi sette/kaçıncı sırada olduğu; `unique(game, pack_key, pack_position, locale)` (pack_key doluysa). Aktif set: 54 senaryo × 3 dil = 162 aktif satır, 6 set × 9 kart (65 senaryodan 11'i emekli/pasif; migration'lar `20260607000000`, `20260608000000`)
 (belirlenimci UUID v5; migration `20260605000000_solo_red_flag.sql`, `scripts/build-solo-migration.mjs` üretir).
 
-`solo_sessions`: `id`, `game`, `locale`, `platform` (`web | mobile`), `user_id` (web'de null), `token_hash`,
+`solo_sessions`: `id`, `game`, `locale`, `pack_key` (oynanan set), `platform` (`web | mobile`), `user_id` (web'de null), `token_hash`,
 `scenario_ids uuid[]` (kart sırası), `answers jsonb` (`{scenarioId: "green"|"yellow"|"red"}`), `status`
 (`started | completed`), `coins_awarded int` (mobil; oturum başına bir kez), `ai_analysis text` (planlı),
 `created_at`, `completed_at`.

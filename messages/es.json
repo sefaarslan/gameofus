@@ -13,6 +13,22 @@
     "cardDoneEdit": "Carta {n}, elegiste {flag}. Toca para cambiar",
     "finish": "Listo",
     "finishHint": "Aún puedes tocar cualquier carta para cambiar tu respuesta.",
+    "preparing": "Preparando las cartas…",
+    "submitting": "Preparando tu resultado…",
+    "packs": {
+      "title": "Elige un set",
+      "desc": "Cada set tiene 9 cartas fijas. Los resultados del mismo set se pueden comparar entre sí.",
+      "categories": {
+        "friend": "En las amistades",
+        "romantic": "En las relaciones sentimentales"
+      },
+      "play": "Jugar",
+      "resume": "Continuar",
+      "view": "Ver resultado",
+      "soon": "Solo móvil",
+      "label": "{category} · {n}",
+      "otherSets": "Otros sets"
+    },
     "cardClosed": "Carta {n}, cerrada",
     "cardDone": "Carta {n}, elegiste {flag}",
     "cardTitle": "Carta {n}",
@@ -65,7 +81,7 @@
       "desc": "Gana monedas en cada partida, desbloquea el análisis con IA y sigue con cartas nuevas.",
       "soon": "Próximamente"
     },
-    "played": "Ya has jugado a este juego. Abre la app móvil para volver a jugar.",
+    "played": "Ya has jugado este set. Elige otro o abre la app móvil para volver a jugar.",
     "error": {
       "start": "No se pudo iniciar el juego. ¿Lo intentas de nuevo?",
       "complete": "No se pudo guardar tu resultado.",
@@ -76,7 +92,7 @@
     "landing": {
       "badge": "Juego en solitario",
       "title": "¿Sin pareja? Pruébalo tú solo",
-      "desc": "Campo Minado de Red Flags: 9 cartas boca abajo, 9 situaciones. Marca cada una, descubre tu perfil de tolerancia y compártelo en tus stories.",
+      "desc": "Campo Minado de Red Flags: sets listos para amistades y relaciones sentimentales, con 9 cartas boca abajo cada uno. Marca cada una, descubre tu perfil de tolerancia y compártelo en tus stories.",
       "cta": "Probar el Campo Minado",
       "heroLink": "¿Sin pareja? Pruébalo tú solo →"
     },

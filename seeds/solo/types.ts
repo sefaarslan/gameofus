@@ -18,4 +18,9 @@ export interface RedFlagScenario {
   es: string;
   /** Pasife alınmış (silinmez; DB'de `is_active=false`). Yeni oyunlarda seçilmez. */
   inactive?: boolean;
+  /** Set anahtarı (ör. `friend-101`, `romantic-103`) ve sıra (1-9); sette yoksa pasif/emekli */
+  pack?: string;
+  pos?: number;
+  /** Yazım notu: H sağlıklı, G gri, C endişe verici (DB'ye yazılmaz) */
+  tone?: "H" | "G" | "C";
 }

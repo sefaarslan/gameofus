@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 import tr from "@/messages/tr.json";
 import en from "@/messages/en.json";
 import es from "@/messages/es.json";
-import { RED_FLAG_CARD_COUNT, computeProfile, decodeGrid, type Flag } from "@/lib/solo";
+import { RED_FLAG_CARD_COUNT, computeProfile, decodeGrid, getPack, type Flag } from "@/lib/solo";
 import { createAdminClient } from "@/lib/supabase/server";
 
 const MESSAGES = { tr: tr.solo, en: en.solo, es: es.solo } as const;
@@ -83,6 +83,9 @@ export async function GET(req: NextRequest) {
   const t = MESSAGES[lang];
 
   const { counts, tolerance } = computeProfile(flags);
+  // Set etiketi ("Arkadaşlık ilişkilerinde · 101"): yüzdeler yalnızca aynı setle karşılaştırılabilir
+  const pack = getPack(searchParams.get("p"));
+  const packLabel = pack ? t.packs.label.replace("{category}", t.packs.categories[pack.category]).replace("{n}", String(pack.number)) : null;
   const verdict = (t.verdicts as Record<string, { title: string; line: string }>)[String(Math.min(counts.red, RED_FLAG_CARD_COUNT))];
   const [fonts, picks] = await Promise.all([loadFonts(origin), searchParams.get("fmt") === "og" ? [] : loadPicks(searchParams.get("q"))]);
 
@@ -122,6 +125,7 @@ export async function GET(req: NextRequest) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", width: 490 }}>
             <div style={{ display: "flex", fontSize: 28, fontWeight: 700, letterSpacing: 4, color: "#ae2f34", textTransform: "uppercase" }}>{t.gameName}</div>
+            {packLabel && <div style={{ display: "flex", marginTop: 8, fontSize: 26, fontWeight: 500, color: "#584140" }}>{packLabel}</div>}
             <div style={{ display: "flex", marginTop: 18, fontSize: 66, fontWeight: 700, lineHeight: 1.05, letterSpacing: -1 }}>{verdict.title}</div>
             <div style={{ display: "flex", marginTop: 24, fontSize: 26, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#584140" }}>{t.result.tolerance}</div>
             <div style={{ display: "flex", fontSize: 96, fontWeight: 700, lineHeight: 1.05, letterSpacing: -2, color: toleranceColor(tolerance) }}>{`%${tolerance}`}</div>
@@ -172,6 +176,9 @@ export async function GET(req: NextRequest) {
         <div style={{ display: "flex", flexShrink: 0, marginTop: 64, fontSize: 36, fontWeight: 700, letterSpacing: 6, color: "#ae2f34", textTransform: "uppercase" }}>
           {t.gameName}
         </div>
+        {packLabel && (
+          <div style={{ display: "flex", flexShrink: 0, marginTop: 10, fontSize: 30, fontWeight: 500, color: "#584140" }}>{packLabel}</div>
+        )}
 
         <div style={{ display: "flex", flexShrink: 0, marginTop: 28, fontSize: 76, fontWeight: 700, lineHeight: 1.1, textAlign: "center", letterSpacing: -2, justifyContent: "center" }}>
           {verdict.title}

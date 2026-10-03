@@ -13,6 +13,22 @@
     "cardDoneEdit": "Card {n}, {flag} chosen. Tap to change",
     "finish": "Done",
     "finishHint": "You can still tap any card to change your answer.",
+    "preparing": "Getting your cards ready…",
+    "submitting": "Preparing your scorecard…",
+    "packs": {
+      "title": "Pick a set",
+      "desc": "Every set has 9 fixed cards. Results from the same set can be compared with each other.",
+      "categories": {
+        "friend": "In friendships",
+        "romantic": "In romantic relationships"
+      },
+      "play": "Play",
+      "resume": "Continue",
+      "view": "See scorecard",
+      "soon": "Mobile only",
+      "label": "{category} · {n}",
+      "otherSets": "Other sets"
+    },
     "cardClosed": "Card {n}, closed",
     "cardDone": "Card {n}, {flag} chosen",
     "cardTitle": "Card {n}",
@@ -65,7 +81,7 @@
       "desc": "Earn coins every game, unlock AI analysis and keep going with new cards.",
       "soon": "Coming soon"
     },
-    "played": "You've already played this game. Open the mobile app to play again.",
+    "played": "You've already played this set. Pick another one, or open the mobile app to play again.",
     "error": {
       "start": "Couldn't start the game. Want to try again?",
       "complete": "Couldn't save your result.",
@@ -76,7 +92,7 @@
     "landing": {
       "badge": "Solo game",
       "title": "No partner? Try it solo",
-      "desc": "Red Flag Minefield: 9 face-down cards, 9 situations. Flag each one, see your tolerance profile and share it on your story.",
+      "desc": "Red Flag Minefield: ready-made sets for friendships and romantic relationships, 9 face-down cards each. Flag every one, see your tolerance profile and share it on your story.",
       "cta": "Try the Minefield",
       "heroLink": "No partner? Try it solo →"
     },

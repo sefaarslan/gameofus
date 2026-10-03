@@ -50,3 +50,28 @@ export function gridToEmojiText(flags: Flag[]): string {
   for (let i = 0; i < flags.length; i += 3) rows.push(flags.slice(i, i + 3).map((f) => GRID_EMOJI[f]).join(""));
   return rows.join("\n");
 }
+
+// ── Setler (deste) ───────────────────────────────────────────────────────────
+// Her set 9 sabit kart; aynı setteki sonuçlar birbiriyle karşılaştırılabilir. Anahtar: `<kategori>-<no>`.
+export const PACK_CATEGORIES = ["friend", "romantic"] as const;
+export type PackCategory = (typeof PACK_CATEGORIES)[number];
+
+export const PACK_NUMBERS = [101, 102, 103, 104, 105, 106] as const;
+/** Webde oynanabilen setler; diğerleri "mobilde açılacak" (içerik eklenince buraya alınır / mobil açar) */
+export const WEB_PACK_NUMBERS: readonly number[] = [101, 102, 103];
+
+export interface PackInfo {
+  key: string;
+  category: PackCategory;
+  number: number;
+  /** Webde oynanabilir mi (aksi halde "mobilde açılacak") */
+  webAvailable: boolean;
+}
+
+export const PACKS: PackInfo[] = PACK_CATEGORIES.flatMap((category) =>
+  PACK_NUMBERS.map((number) => ({ key: `${category}-${number}`, category, number, webAvailable: WEB_PACK_NUMBERS.includes(number) })),
+);
+
+export function getPack(key: unknown): PackInfo | null {
+  return typeof key === "string" ? (PACKS.find((p) => p.key === key) ?? null) : null;
+}

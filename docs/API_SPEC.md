@@ -241,15 +241,17 @@ mobilde aynı endpoint'ler `platform: "mobile"` ile kullanılır (coin/AI ilerid
 ### `POST /api/solo/red-flag/start`
 
 ```json
-{ "locale": "tr", "platform": "web" }
+{ "locale": "tr", "platform": "web", "pack": "friend-101" }
 ```
 
+- `pack` zorunlu: `friend-101…106`, `romantic-101…106`; geçersizse `INVALID_PAYLOAD`. Webde yalnızca 101-103 açık;
+  diğerleri `403 PACK_UNAVAILABLE` ("mobilde açılacak").
 - IP hash'e göre saatte 30 / günde 100 başlatma sınırı (`RATE_LIMITED`). `locale` geçersizse `en`.
-- Sunucu 9 senaryoyu seçer (her temadan en az biri), oturumu ve anonim token'ı oluşturur. Kart geçişleri istemcide
+- Sunucu, setin 9 kartını sabit sırayla (`pack_position`) döndürür (rastgelelik yok), oturumu (`pack_key`) ve anonim token'ı oluşturur. Kart geçişleri istemcide
   yapılır; cevaplar bu endpoint'e değil `complete`'e gider.
 
 ```json
-{ "sessionId": "uuid", "token": "raw-token", "locale": "tr",
+{ "sessionId": "uuid", "token": "raw-token", "locale": "tr", "pack": "friend-101",
   "scenarios": [ { "id": "uuid", "text": "Sevgilin, eski sevgilisinin hediyesini hâlâ rafta saklıyor." } ] }
 ```
 

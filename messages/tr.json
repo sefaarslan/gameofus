@@ -13,6 +13,22 @@
     "cardDoneEdit": "{n}. kart, {flag} seçildi. Değiştirmek için dokun",
     "finish": "Tamamlandı",
     "finishHint": "İstersen kartlara dokunup cevaplarını değiştirebilirsin.",
+    "preparing": "Kartlar hazırlanıyor…",
+    "submitting": "Karnen hazırlanıyor…",
+    "packs": {
+      "title": "Bir set seç",
+      "desc": "Her sette 9 sabit kart var. Aynı setteki sonuçlar birbiriyle kıyaslanabilir.",
+      "categories": {
+        "friend": "Arkadaşlık ilişkilerinde",
+        "romantic": "Gönül ilişkilerinde"
+      },
+      "play": "Oyna",
+      "resume": "Devam et",
+      "view": "Karneni gör",
+      "soon": "Mobile özel",
+      "label": "{category} · {n}",
+      "otherSets": "Diğer setler"
+    },
     "cardClosed": "{n}. kart, kapalı",
     "cardDone": "{n}. kart, {flag} seçildi",
     "cardTitle": "{n}. kart",
@@ -65,7 +81,7 @@
       "desc": "Her oyunda coin kazan, AI analizini aç ve yeni kartlarla devam et.",
       "soon": "Yakında geliyor"
     },
-    "played": "Bu oyunu zaten oynadın. Tekrar oynamak için mobil uygulamaya gel.",
+    "played": "Bu seti zaten oynadın. Başka bir set seçebilir ya da tekrar oynamak için mobil uygulamaya gelebilirsin.",
     "error": {
       "start": "Oyun başlatılamadı. Tekrar dener misin?",
       "complete": "Sonuç kaydedilemedi.",
@@ -76,7 +92,7 @@
     "landing": {
       "badge": "Tek kişilik oyun",
       "title": "Partnerin yok mu? Tek başına dene",
-      "desc": "Red Flag Mayın Tarlası: 9 kapalı kart, 9 durum. Her birine bir bayrak koy, tolerans profilini gör ve story’de paylaş.",
+      "desc": "Red Flag Mayın Tarlası: arkadaşlık ve gönül ilişkileri için hazır setler, her sette 9 kapalı kart. Her birine bir bayrak koy, tolerans profilini gör ve story’de paylaş.",
       "cta": "Mayın Tarlası’nı dene",
       "heroLink": "Partnerin yok mu? Tek başına dene →"
     },

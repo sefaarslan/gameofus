@@ -391,17 +391,26 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   `(green×2 + yellow) / 18`). **Arketip yoktur**; karnedeki başlık + tek cümlelik yorum yalnızca **Red sayısına (0-9)**
   göre sabittir (`solo.verdicts.<red>` → `title` + `line`, TR/EN/ES). Merak uyandırıcı ve hafif mizahi, kullanıcıyı
   yargılamaz/teşhis koymaz. Share kartı, link önizlemesi ve WhatsApp metni de aynı başlığı kullanır.
-- İçerik: `seeds/solo/red-flag.ts` — 59 aktif senaryo (6 tema; `money_lifestyle:1` pasif, silinmez: `boundaries`, `trust`, `communication`, `jealousy`,
-  `money_lifestyle`, `respect`), TR/EN/ES, **ikinci tekil kişi** ("Sevgilin…", "your partner…", "tu pareja…") ile
-  cinsiyetsiz yazılır; tek genel havuz (ilişki türüne bağlı değil). Denetim: `node scripts/check-solo.mjs`.
-  Migration: `node scripts/build-solo-migration.mjs` → `supabase/migrations/20260605000000_solo_red_flag.sql`.
-- Veri: `solo_scenarios` ve `solo_sessions` (ayrı model; `questions`'a **karıştırma**). Sunucu 9 senaryoyu seçer
-  (her temadan ≥1), cevaplar kart geçişlerinde sunucuya gitmez. Cevaplanan kartlar **düzenlenebilir** (karta dokun → seçimi değiştir); 9/9 olunca
+- **Setler (deste):** Oyun rastgele değil, **sabit setlerle** oynanır; böylece aynı setteki toleranslar karşılaştırılabilir.
+  Her set 9 sabit kart (sabit sıra), 6 temanın tamamını kapsar, ton (sağlıklı/gri/endişe verici) dengelidir. İki kategori:
+  **Arkadaşlık ilişkilerinde** (`friend-101…106`) ve **Gönül ilişkilerinde** (`romantic-101…106`). **Webde yalnızca
+  101-103 açık**; 104-106 "mobilde açılacak" (içerik yok, seçilemez). Set listesi/uygunluk: `lib/solo.ts` (`PACKS`,
+  `WEB_PACK_NUMBERS`). Arkadaşlık setlerinde romantik çağrışım yoktur (check-solo denetler). Yeni set eklerken
+  `seeds/solo/red-flag-packs.ts` içine slotları (pack/pos/tone) yaz, gerekirse senaryo ekle, `check-solo` →
+  `build-solo-packs-migration.mjs` ve (webde açacaksan) `WEB_PACK_NUMBERS`.
+- İçerik: `seeds/solo/red-flag.ts` (+ `red-flag-packs.ts`) — 65 senaryo, **54 aktif** (6 set × 9), 11 emekli (pasif, silinmez;
+  geçmiş oturumlar kimliklerine başvurabilir). 6 tema: `boundaries`, `trust`, `communication`, `jealousy`,
+  `money_lifestyle`, `respect`. TR/EN/ES, **ikinci tekil kişi** ("Sevgilin…", "your partner…", "tu pareja…") ile
+  cinsiyetsiz yazılır. Denetim: `node scripts/check-solo.mjs`.
+  Migration'lar: `20260605000000_solo_red_flag.sql` (ilk), `20260607…_deactivate_money_1.sql`,
+  `20260608000000_solo_packs.sql` (`build-solo-packs-migration.mjs`: pack_key/pack_position, oturumda pack_key, 5 yeni senaryo, emekliler).
+- Veri: `solo_scenarios` ve `solo_sessions` (ayrı model; `questions`'a **karıştırma**). Sunucu seçilen setin 9 kartını
+  sabit sırayla döndürür (`pack_position`), oturuma `pack_key` yazar; cevaplar kart geçişlerinde sunucuya gitmez. Cevaplanan kartlar **düzenlenebilir** (karta dokun → seçimi değiştir); 9/9 olunca
   otomatik gönderilmez, kullanıcı **"Tamamlandı"** butonuna basınca tek `complete` isteğiyle DB'ye yazılır.
-  API: `POST /api/solo/red-flag/start`, `POST /api/solo/[sessionId]/complete`.
-- **Web:** anonim (token), yalnızca **1 oyun** (`localStorage` `gou_solo_redflag`); ikinci ziyarette kayıtlı karne +
-  mobil CTA. Yarım kalan oyun `gou_solo_redflag_pending` ile saklanır (sayfa yenilenince aynı oturum/cevaplar devam eder,
-  bitince silinir); bu istemci tarafı bir UX katmanıdır, çerez/depolama temizlenirse yeniden oynanabilir; AI düğmesi pasif ("Mobil uygulamada"). Coin yoktur.
+  API: `POST /api/solo/red-flag/start` (gövdede `pack` zorunlu), `POST /api/solo/[sessionId]/complete`.
+- **Web:** anonim (token), **her sette 1 oyun** (`localStorage` `gou_solo_redflag_packs`, set anahtarına göre); oynanmış sete
+  tekrar girince kayıtlı karne gösterilir. Giriş ekranında tüm setler tek açılır listede ("Kategori - 101"). Yarım kalan oyun
+  `gou_solo_redflag_pending_packs` ile saklanır (sayfa yenilenince aynı oturum/cevaplar devam eder, bitince silinir); bu istemci tarafı bir UX katmanıdır, çerez/depolama temizlenirse yeniden oynanabilir; AI düğmesi pasif ("Mobil uygulamada"). Coin yoktur.
 - **Mobil (planlı):** oturum başına **bir kez** +20 coin, **günde 3 ödüllü oyun** sınırı, sunucuda doğrulanır
   (istemci "bitirdim" diyemez); AI analizi 100 coin (önce düş, LLM hatasında iade, oturum başına cache).
   AI'a yalnızca ilk isim (opsiyonel), 9 senaryo metni + bayrak + `insight_tag` ve dil gider; cinsiyet/e-posta
@@ -417,8 +426,8 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   Metrik görünümünde `source` (`duo` / `solo_red_flag`).
 - Dev sunucusunda (Turbopack) yeni Tailwind sınıfları bazen CSS'e girmez (ör. `w-9` boyutsuz görünür); üretim derlemesi
   doğrudur. Şüphede `next build && next start` ile doğrula.
-- Paylaşım: `GET /api/solo/red-flag/card?g=<9 harf G/Y/R>&l=<dil>[&q=<G|Y|R><senaryo id>,…][&fmt=og]` (`next/og`, 1080×1920;
-  küçük ızgara + her bayraktan bir soru/cevap kartı (`q`, metin DB'den); `fmt=og` yatay 1200×630 link önizlemesi). Paylaşım linki `…/solo/red-flag?s=<kod>` — önizleme gönderenin karnesini gösterir (kişisel
+- Paylaşım: `GET /api/solo/red-flag/card?g=<9 harf G/Y/R>&l=<dil>[&p=<set>][&q=<G|Y|R><senaryo id>,…][&fmt=og]` (`next/og`, 1080×1920;
+  küçük ızgara + her bayraktan bir soru/cevap kartı (`q`, metin DB'den); `fmt=og` yatay 1200×630 link önizlemesi). Paylaşım linki `…/solo/red-flag?s=<kod>&p=<set>` — önizleme gönderenin karnesini gösterir (kişisel
   veri yok). Satori `React.Fragment` desteklemez (görselde `<g>`/`<div>` kullan); fontlar `public/fonts/*.woff`.
 - Giriş noktaları: landing hero bağlantısı + bölüm (`#tek-basina`), footer, iki kişilik **bekleme** ve **sonuç**
   ekranlarında kapatılabilir `SoloPromoCard`. Oda oluşturma akışına **eklenmez** (oda modu değildir).

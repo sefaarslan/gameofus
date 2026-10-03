@@ -1,4 +1,5 @@
 import type { RedFlagScenario, RedFlagTag } from "./types.ts";
+import { packSlots, retiredKeys } from "./red-flag-packs.ts";
 
 // Red Flag Mayın Tarlası — 60 senaryo (6 tema × 10), TR/EN/ES.
 // Yazım kuralları:
@@ -8,7 +9,7 @@ import type { RedFlagScenario, RedFlagTag } from "./types.ts";
 //  - İstismarı/şiddeti hafife alan veya mağduru yargılayan içerik yok; ton yargısız.
 const s = (tag: RedFlagTag, n: number, tr: string, en: string, es: string): RedFlagScenario => ({ tag, n, tr, en, es });
 
-export const redFlagScenarios: RedFlagScenario[] = [
+const baseScenarios: RedFlagScenario[] = [
   // ── boundaries ──────────────────────────────────────────────────────
   s("boundaries", 1,
     "Sevgilin, eski sevgilisinin hediyesini hâlâ odasındaki rafta saklıyor.",
@@ -178,11 +179,10 @@ export const redFlagScenarios: RedFlagScenario[] = [
     "Tu pareja te compara con otras personas diciendo «otras personas son mucho más atentas»."),
 
   // ── money_lifestyle ─────────────────────────────────────────────────
-  // Pasif (migration 20260607000000_solo_deactivate_money_1.sql): yeni oyunlarda çıkmaz
-  { ...s("money_lifestyle", 1,
+  s("money_lifestyle", 1,
     "Partnerin, ortak bir hedef için aylık birikim yapmayı öneriyor ve kendi payını önceden ayırıyor.",
     "Your partner suggests saving monthly for a shared goal and sets aside their own share in advance.",
-    "Tu pareja propone ahorrar cada mes para una meta común y aparta su parte por adelantado."), inactive: true },
+    "Tu pareja propone ahorrar cada mes para una meta común y aparta su parte por adelantado."),
   s("money_lifestyle", 2,
     "Arkadaşın, her yemekte hesabı “Sonra denkleştiririz” diyerek sana bırakıyor.",
     "At every meal, your friend leaves you the bill, saying “We'll even it out later.”",
@@ -261,4 +261,33 @@ export const redFlagScenarios: RedFlagScenario[] = [
     "Başkalarının yanında sevgilin gülerek sana “Zaten sen bir şey bilmezsin” diyor.",
     "In front of others, your partner laughs and says “You don't know anything anyway.”",
     "Delante de otros, tu pareja se ríe y dice «si tú no sabes nada»."),
+
+  // ── Arkadaşlık setlerini tamamlayan yeni senaryolar (11+) ───────────
+  s("boundaries", 11,
+    "Mesajına hemen cevap veremediğinde arkadaşın üstelemiyor, “Müsait olunca yaz” diyor.",
+    "When you can't reply right away, your friend doesn't push and says “Write back when you're free.”",
+    "Cuando no puedes responder enseguida, tu amigo no insiste y te dice «escríbeme cuando puedas»."),
+  s("boundaries", 12,
+    "Söylediği bir şaka seni rahatsız ettiğinde arkadaşın hemen özür diliyor ve bir daha tekrarlamıyor.",
+    "When a joke of theirs makes you uncomfortable, your friend apologizes right away and doesn't repeat it.",
+    "Cuando una broma suya te incomoda, tu amigo se disculpa enseguida y no la repite."),
+  s("jealousy", 11,
+    "Yeni bir arkadaş grubuna katıldığında arkadaşın “Çok sevindim, bir gün tanıştır bizi” diyor.",
+    "When you join a new group of friends, your friend says “I'm so happy for you, introduce us sometime.”",
+    "Cuando te unes a un nuevo grupo de amigos, tu amigo dice «me alegro mucho, preséntanos algún día»."),
+  s("jealousy", 12,
+    "Başka bir arkadaşınla tatile çıkacağını söylediğinde arkadaşın “Tamam, iyi eğlenin” deyip birkaç gün mesaj atmıyor.",
+    "When you tell your friend you're going on holiday with someone else, they say “Okay, have fun” and don't text for a few days.",
+    "Cuando dices que te vas de vacaciones con otro amigo, tu amigo responde «vale, pasadlo bien» y pasa unos días sin escribir."),
+  s("money_lifestyle", 11,
+    "Ortak yaptığınız bir harcamada arkadaşın hesabı hemen çıkarıp “Payım şu kadar” diye net bir mesaj atıyor.",
+    "After a shared expense, your friend works out the split right away and texts you a clear “My share is this much.”",
+    "Tras un gasto compartido, tu amigo calcula enseguida la cuenta y te manda un mensaje claro: «mi parte es esta»."),
 ];
+
+/** Sete yerleştirme (pack/pos) ve pasif işaretleri seed'e uygulanmış nihai liste */
+export const redFlagScenarios: RedFlagScenario[] = baseScenarios.map((sc) => {
+  const key = `${sc.tag}:${sc.n}`;
+  const slot = packSlots[key];
+  return { ...sc, ...(slot ? { pack: slot.pack, pos: slot.pos, tone: slot.tone } : {}), ...(retiredKeys.includes(key) ? { inactive: true } : {}) };
+});
