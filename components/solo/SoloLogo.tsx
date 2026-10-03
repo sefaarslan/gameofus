@@ -31,3 +31,13 @@ export function SoloLogo({ className = "w-16 h-16" }: { className?: string }) {
     </svg>
   );
 }
+
+/** Kapalı kartların üzerindeki bayrak işareti (tek renk, `currentColor`). */
+export function FlagMark({ size = 40, opacity = 0.3 }: { size?: number; opacity?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} style={{ color: "#ae2f34", opacity }} aria-hidden="true" fill="none">
+      <path d="M7 3.5v17" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+      <path d="M8.6 4.6L19.5 9.4L8.6 14.2Z" fill="currentColor" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    </svg>
+  );
+}

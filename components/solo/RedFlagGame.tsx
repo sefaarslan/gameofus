@@ -16,7 +16,7 @@ import {
 import { FlagGlyph } from "./FlagGlyph";
 import { FeedbackCard } from "@/components/FeedbackCard";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
-import { SoloLogo } from "./SoloLogo";
+import { FlagMark, SoloLogo } from "./SoloLogo";
 
 const STORAGE_KEY = "gou_solo_redflag";
 /** Yarım kalan oyun: sayfa yenilense/kapansa da aynı oturum devam eder (yeniden çekilip "zar atılamaz") */
@@ -241,7 +241,12 @@ export function RedFlagGame() {
 
           <div className="grid grid-cols-3 gap-2.5 w-40" aria-hidden="true">
             {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="aspect-square rounded-lg bg-gradient-to-br from-primary-container/60 to-primary-container/20 shadow-soft-sm" />
+              <div
+                key={i}
+                className="aspect-square rounded-xl bg-gradient-to-br from-primary-container/70 via-primary-container/40 to-secondary-container/60 border border-white/60 shadow-soft-sm flex items-center justify-center"
+              >
+                <FlagMark size={24} opacity={0.35} />
+              </div>
             ))}
           </div>
 
@@ -527,7 +532,7 @@ export function RedFlagGame() {
                 aria-label={t("cardClosed", { n: i + 1 })}
                 className="aspect-square rounded-2xl relative overflow-hidden bg-gradient-to-br from-primary-container/70 via-primary-container/40 to-secondary-container/60 shadow-soft-card border border-white/60 active:scale-[0.96] hover:-translate-y-0.5 transition-all flex flex-col items-center justify-center gap-1"
               >
-                <span className="material-symbols-outlined text-primary/25" style={{ fontSize: "44px" }} aria-hidden="true">chat_bubble</span>
+                <FlagMark size={44} opacity={0.3} />
                 <span className="absolute bottom-2 text-headline-md font-bold text-primary/80">{i + 1}</span>
               </button>
             );
