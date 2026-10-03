@@ -35,29 +35,23 @@
       "toleranceNote": "This isn't a test, just a fun look. There are no right or wrong answers.",
       "gridLabel": "Your picks"
     },
-    "archetypes": {
-      "boundary_guard": {
-        "name": "The Boundary Guard",
-        "desc": "You draw clear lines. Your radar is sharp: the moment something feels off, the flag goes up."
-      },
-      "silver_lining": {
-        "name": "The Silver-Lining Seeker",
-        "desc": "You see the good in people first. You're understanding, though asking “is this actually normal?” now and then never hurts."
-      },
-      "talk_first": {
-        "name": "The Talk-It-Out Type",
-        "desc": "You don't rush to judge, you'd rather talk first. In gray areas, patience is your superpower."
-      },
-      "balanced": {
-        "name": "The Balanced Radar",
-        "desc": "Your radar adjusts to the situation: flexible at times, firm at others. A nicely balanced tolerance profile."
-      }
+    "verdicts": {
+      "0": { "title": "Red flags? Never heard of them.", "line": "Not a single red in nine cards. Either you're a born optimist or you've only met good people." },
+      "1": { "title": "One alarm, and a very clear one.", "line": "You went red on just one card. You know exactly what you'll never accept." },
+      "2": { "title": "Quiet radar, but awake.", "line": "Two reds: you forgive most things, but a few lines stay untouchable." },
+      "3": { "title": "Three reds, still soft-hearted.", "line": "You have your lines, yet you give everyone a chance." },
+      "4": { "title": "Right in the middle.", "line": "Four reds, five not. Neither naive nor suspicious, just about right." },
+      "5": { "title": "Half suspicious.", "line": "Five of nine set off your alarm. Sharp radar, with a little room for tolerance." },
+      "6": { "title": "Your alarm rings a lot.", "line": "Six reds: hardly anything slips past you." },
+      "7": { "title": "Ultra-sensitive radar.", "line": "Seven reds! Even a tiny sign makes you stop." },
+      "8": { "title": "Almost everything is an alarm.", "line": "Eight reds: either you're very experienced or some cards were truly heavy." },
+      "9": { "title": "A full mine-sweeping squad.", "line": "All nine red! You didn't step on a single mine." }
     },
     "share": {
       "story": "Story image",
       "storyBusy": "Preparing…",
       "whatsapp": "Share on WhatsApp",
-      "text": "I got “{archetype}” in Red Flag Minefield! Try it:"
+      "text": "My Red Flag Minefield result: “{title}” Try it:"
     },
     "ai": {
       "button": "Get your in-depth AI analysis",
@@ -75,7 +69,7 @@
       "retry": "Try again"
     },
     "backHome": "Back to home",
-    "details": { "show": "See details", "hide": "Hide details" },
+    "details": { "title": "Review your answers", "desc": "See which flag you picked on each card.", "show": "See details", "hide": "Back to summary", "yourPick": "Your pick" },
     "landing": {
       "badge": "Solo game",
       "title": "No partner? Try it solo",

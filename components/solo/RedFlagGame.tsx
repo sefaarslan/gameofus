@@ -10,7 +10,6 @@ import {
   computeProfile,
   decodeGrid,
   gridToEmojiText,
-  type Archetype,
   type Flag,
 } from "@/lib/solo";
 import { FlagGlyph } from "./FlagGlyph";
@@ -31,7 +30,6 @@ interface Session {
 interface Result {
   counts: Record<Flag, number>;
   tolerance: number;
-  archetype: Archetype;
   grid: string;
 }
 interface SavedGame {
@@ -209,7 +207,10 @@ export function RedFlagGame() {
   if (phase === "result" && result) {
     const flags = decodeGrid(result.grid)!;
     const profile = computeProfile(flags);
-    const archetype = t(`archetypes.${profile.archetype}.name`);
+    // Karnedeki sabit cümle yalnızca Red sayısına (0-9) göre seçilir
+    const verdictKey = String(Math.min(profile.counts.red, RED_FLAG_CARD_COUNT));
+    const verdictTitle = t(`verdicts.${verdictKey}.title`);
+    const verdictLine = t(`verdicts.${verdictKey}.line`);
     const cardUrl = `/api/solo/red-flag/card?g=${result.grid}&l=${locale}`;
 
     const shareLink = () => `${window.location.origin}/${locale}/solo/red-flag?s=${result.grid}`;
@@ -220,7 +221,7 @@ export function RedFlagGame() {
         const blob = await (await fetch(cardUrl)).blob();
         const file = new File([blob], "red-flag-minefield.png", { type: "image/png" });
         if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], text: `${t("share.text", { archetype })} ${shareLink()}` });
+          await navigator.share({ files: [file], text: `${t("share.text", { title: verdictTitle })} ${shareLink()}` });
         } else {
           const a = document.createElement("a");
           a.href = URL.createObjectURL(blob);
@@ -236,7 +237,7 @@ export function RedFlagGame() {
     }
 
     function handleWhatsApp() {
-      const text = `${t("share.text", { archetype })}\n\n${gridToEmojiText(flags)}\n\n${shareLink()}`;
+      const text = `${t("share.text", { title: verdictTitle })}\n\n${gridToEmojiText(flags)}\n\n${shareLink()}`;
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
     }
 
@@ -244,24 +245,14 @@ export function RedFlagGame() {
       <div className="min-h-[calc(100vh-73px)] bg-background px-6 py-10 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-72 h-72 bg-tertiary-container/20 rounded-full blur-3xl -z-10 pointer-events-none" />
         <div className="w-full max-w-md mx-auto flex flex-col gap-6">
-          <div className="-mb-2">
-            <Link
-              href="/"
-              aria-label={t("backHome")}
-              className="w-11 h-11 rounded-full bg-surface-container-lowest border border-outline-variant/30 shadow-soft-sm flex items-center justify-center text-on-surface hover:bg-surface-container active:scale-95 transition-all"
-            >
-              <span className="material-symbols-outlined text-xl">arrow_back</span>
-            </Link>
-          </div>
-
           {alreadyPlayed && (
             <div className="bg-surface-container text-on-surface-variant text-label-md rounded-xl px-4 py-3 text-center">{t("played")}</div>
           )}
 
           <div className="text-center">
             <span className="text-label-md text-primary uppercase tracking-wider">{t("gameName")}</span>
-            <h1 className="text-headline-lg-mobile md:text-headline-lg text-on-background mt-2 leading-tight">{archetype}</h1>
-            <p className="text-body-md text-on-surface-variant mt-3">{t(`archetypes.${profile.archetype}.desc`)}</p>
+            <h1 className="text-headline-lg-mobile md:text-headline-lg text-on-background mt-2 leading-tight text-balance">{verdictTitle}</h1>
+            <p className="text-body-md text-on-surface-variant mt-3">{verdictLine}</p>
           </div>
 
           <div className="bg-surface-container-lowest rounded-[28px] p-6 shadow-soft-card border border-outline-variant/20 flex flex-col items-center gap-5">
@@ -324,39 +315,54 @@ export function RedFlagGame() {
             </button>
           </div>
 
-          {/* Detaylar: hangi kartta ne seçtin */}
+          {/* Cevaplarına göz at: iki kişilik sonuç ekranındaki "Detayları gör" ile aynı dil */}
           {saved?.details && saved.details.length === RED_FLAG_CARD_COUNT && (
-            <div className="bg-surface-container-lowest rounded-[24px] border border-outline-variant/20 shadow-soft-sm overflow-hidden">
-              <button
-                onClick={() => setShowDetails((v) => !v)}
-                aria-expanded={showDetails}
-                className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
-              >
-                <span className="text-label-md font-bold text-on-background">{showDetails ? t("details.hide") : t("details.show")}</span>
-                <span className={`material-symbols-outlined text-xl text-on-surface-variant transition-transform ${showDetails ? "rotate-180" : ""}`}>expand_more</span>
-              </button>
+            <>
+              <section className="bg-surface-container-high rounded-[24px] p-6 text-center shadow-soft-card relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent to-primary/5 pointer-events-none" />
+                <span className="material-symbols-outlined text-primary icon-fill mb-3" style={{ fontSize: "40px" }}>fact_check</span>
+                <h3 className="text-headline-md text-on-surface mb-2">{t("details.title")}</h3>
+                <p className="text-body-md text-on-surface-variant mb-4">{t("details.desc")}</p>
+                <button
+                  onClick={() => setShowDetails((v) => !v)}
+                  aria-expanded={showDetails}
+                  className="px-6 py-2 bg-surface text-primary rounded-full text-label-md font-bold shadow-sm hover:bg-surface-container-lowest active:scale-95 transition-all"
+                >
+                  {showDetails ? t("details.hide") : t("details.show")}
+                </button>
+              </section>
+
               {showDetails && (
-                <ol className="px-5 pb-5 flex flex-col gap-4">
+                <section className="flex flex-col gap-4" aria-label={t("details.title")}>
                   {saved.details.map((d, i) => (
-                    <li key={i} className="flex gap-3">
-                      <span
-                        className="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0"
-                        style={{ background: FLAG_HEX[d.flag] }}
-                        title={t(`flags.${d.flag}.label`)}
-                      >
-                        <FlagGlyph flag={d.flag} className="w-5 h-5" />
-                      </span>
-                      <div className="min-w-0">
-                        <p className="text-xs text-on-surface-variant/70 mb-0.5">
-                          {t("cardTitle", { n: i + 1 })} · <span className="font-semibold" style={{ color: FLAG_HEX[d.flag] }}>{t(`flags.${d.flag}.label`)}</span>
-                        </p>
-                        <p className="text-body-md text-on-background leading-snug">{d.text}</p>
+                    <article key={i} className="bg-surface-container-lowest rounded-xl shadow-soft-card relative overflow-hidden">
+                      <div className="absolute top-0 left-0 w-full h-1" style={{ background: FLAG_HEX[d.flag] }} />
+                      <div className="p-5">
+                        <div className="flex justify-between items-start mb-3">
+                          <span className="inline-flex items-center gap-1.5 bg-surface-container-high px-3 py-1 rounded-full">
+                            <span className="w-2 h-2 rounded-full" style={{ background: FLAG_HEX[d.flag] }} />
+                            <span className="text-label-md text-on-surface-variant">{t(`flags.${d.flag}.label`)}</span>
+                          </span>
+                          <span className="text-label-md text-on-surface-variant">{t("cardTitle", { n: i + 1 })}</span>
+                        </div>
+                        <h4 className="text-body-lg text-on-background leading-snug mb-4">{d.text}</h4>
+                        <div className="flex items-center gap-3">
+                          <span className="w-9 h-9 rounded-full flex items-center justify-center text-white shrink-0" style={{ background: FLAG_HEX[d.flag] }}>
+                            <FlagGlyph flag={d.flag} className="w-5 h-5" />
+                          </span>
+                          <div className="leading-tight">
+                            <p className="text-xs text-on-surface-variant">{t("details.yourPick")}</p>
+                            <p className="text-label-md font-bold text-on-background">
+                              {t(`flags.${d.flag}.label`)} <span className="font-normal text-on-surface-variant">· {t(`flags.${d.flag}.hint`)}</span>
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                    </li>
+                    </article>
                   ))}
-                </ol>
+                </section>
               )}
-            </div>
+            </>
           )}
 
           {/* AI analizi: webde pasif */}
@@ -385,6 +391,15 @@ export function RedFlagGame() {
             <p className="text-body-md text-on-surface-variant mb-3">{t("mobile.desc")}</p>
             <span className="inline-block px-3 py-1 bg-surface text-label-md text-on-surface-variant rounded-full">{t("mobile.soon")}</span>
           </div>
+
+          {/* Sayfanın en sonu */}
+          <Link
+            href="/"
+            className="w-full flex items-center justify-center gap-2 bg-surface-container-high text-primary text-label-md font-bold py-4 rounded-full hover:bg-surface-container-highest active:scale-95 transition-all"
+          >
+            <span className="material-symbols-outlined text-xl">home</span>
+            {t("backHome")}
+          </Link>
 
         </div>
       </div>

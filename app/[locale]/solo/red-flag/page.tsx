@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { RedFlagGame } from "@/components/solo/RedFlagGame";
-import { computeProfile, decodeGrid } from "@/lib/solo";
+import { RED_FLAG_CARD_COUNT, computeProfile, decodeGrid } from "@/lib/solo";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -21,10 +21,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const flags = decodeGrid(s);
   if (!flags) return { title, description: t("tagline"), openGraph: { title, description: t("tagline") } };
 
-  const { archetype } = computeProfile(flags);
-  const name = t(`archetypes.${archetype}.name`);
+  const { counts } = computeProfile(flags);
+  const name = t(`verdicts.${Math.min(counts.red, RED_FLAG_CARD_COUNT)}.title`);
   const image = `/api/solo/red-flag/card?g=${s}&l=${locale}&fmt=og`;
-  const description = t("share.text", { archetype: name });
+  const description = t("share.text", { title: name });
   return {
     title,
     description,

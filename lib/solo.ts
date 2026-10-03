@@ -7,30 +7,23 @@ export type Flag = (typeof FLAGS)[number];
 export const RED_FLAG_GAME = "red_flag";
 export const RED_FLAG_CARD_COUNT = 9;
 
-export type Archetype = "boundary_guard" | "silver_lining" | "talk_first" | "balanced";
-
 export interface SoloProfile {
   counts: Record<Flag, number>;
   /** 0-100: (green×2 + yellow) / (2 × kart sayısı) */
   tolerance: number;
-  archetype: Archetype;
 }
 
 export function isFlag(v: unknown): v is Flag {
   return typeof v === "string" && (FLAGS as readonly string[]).includes(v);
 }
 
-/** Kart sırasıyla seçimlerden profil üretir. Arketip önceliği: Red ≥5 → Green ≥5 → Yellow ≥5 → dengeli. */
+/** Kart sırasıyla seçimlerden profil üretir. Karnedeki sabit cümle yalnızca Red sayısına (0-9) göre seçilir: `solo.verdicts.<red>`. */
 export function computeProfile(flags: Flag[]): SoloProfile {
   const counts: Record<Flag, number> = { green: 0, yellow: 0, red: 0 };
   for (const f of flags) counts[f]++;
   const total = flags.length || 1;
   const tolerance = Math.round(((counts.green * 2 + counts.yellow) / (2 * total)) * 100);
-  let archetype: Archetype = "balanced";
-  if (counts.red >= 5) archetype = "boundary_guard";
-  else if (counts.green >= 5) archetype = "silver_lining";
-  else if (counts.yellow >= 5) archetype = "talk_first";
-  return { counts, tolerance, archetype };
+  return { counts, tolerance };
 }
 
 const LETTER: Record<Flag, string> = { green: "G", yellow: "Y", red: "R" };

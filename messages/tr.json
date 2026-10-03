@@ -35,29 +35,23 @@
       "toleranceNote": "Bu bir test değil, eğlenceli bir bakış. Doğru ya da yanlış cevap yok.",
       "gridLabel": "Seçimlerin"
     },
-    "archetypes": {
-      "boundary_guard": {
-        "name": "Sınır Bekçisi",
-        "desc": "Çizgilerini net çiziyorsun. Radarın hassas: tuhaf bir şey sezdiğinde hemen bayrak kaldırıyorsun."
-      },
-      "silver_lining": {
-        "name": "İyiyi Gören",
-        "desc": "İnsanlarda önce iyiyi görüyorsun. Anlayışlısın; arada “Bu gerçekten normal mi?” diye sormak da fena olmaz."
-      },
-      "talk_first": {
-        "name": "Önce Konuşalım Diyen",
-        "desc": "Hemen hüküm vermiyor, önce konuşmak istiyorsun. Gri alanlarda sabır senin süper gücün."
-      },
-      "balanced": {
-        "name": "Dengeli Radar",
-        "desc": "Radarın duruma göre ayarlanıyor: bazen esnek, bazen net. Dengeli bir tolerans profilin var."
-      }
+    "verdicts": {
+      "0": { "title": "Kırmızı bayrak mı? Hiç görmedim.", "line": "Dokuz kartta tek bir kırmızı bile yok. Ya doğuştan iyimsersin ya da hep iyi insanlarla karşılaştın." },
+      "1": { "title": "Tek alarm, hem de çok net.", "line": "Yalnızca bir kartta kırmızı çektin. Neyi asla kabul etmeyeceğini çok iyi biliyorsun." },
+      "2": { "title": "Radarın sessiz ama uyanık.", "line": "İki kırmızı: çoğu şeyi bağışlıyorsun ama bazı çizgilere asla dokunulmuyor." },
+      "3": { "title": "Üç kırmızı, hâlâ yumuşak kalpli.", "line": "Çizgilerin var ama herkese bir şans tanıyorsun." },
+      "4": { "title": "Tam dengenin ortasındasın.", "line": "Dört kırmızı, beş kırmızı olmayan. Ne safsın ne de şüpheci, tam kararında." },
+      "5": { "title": "Yarı yarıya şüpheci.", "line": "Dokuz kartın beşi alarm verdi. Radarın hassas ama hâlâ bir tolerans payın var." },
+      "6": { "title": "Alarm zilin sık çalıyor.", "line": "Altı kırmızı: gözünden pek bir şey kaçmıyor." },
+      "7": { "title": "Radarın çok hassas.", "line": "Yedi kırmızı! Küçük bir işaret bile seni durduruyor." },
+      "8": { "title": "Neredeyse her şey alarm.", "line": "Sekiz kırmızı: ya çok deneyimlisin ya da bazı kartlar gerçekten ağırdı." },
+      "9": { "title": "Komple mayın arama ekibi.", "line": "Dokuzu da kırmızı! Tek bir mayına bile basmadın." }
     },
     "share": {
       "story": "Story görseli",
       "storyBusy": "Hazırlanıyor…",
       "whatsapp": "WhatsApp'ta paylaş",
-      "text": "Red Flag Mayın Tarlası’nda “{archetype}” çıktım! Sen de dene:"
+      "text": "Red Flag Mayın Tarlası’nda sonucum: “{title}” Sen de dene:"
     },
     "ai": {
       "button": "AI ile derinlemesine analizini al",
@@ -75,7 +69,7 @@
       "retry": "Tekrar dene"
     },
     "backHome": "Ana sayfaya dön",
-    "details": { "show": "Detayları gör", "hide": "Detayları gizle" },
+    "details": { "title": "Cevaplarına göz at", "desc": "Hangi kartta hangi bayrağı seçtiğini tek tek gör.", "show": "Detayları gör", "hide": "Özete dön", "yourPick": "Senin seçimin" },
     "landing": {
       "badge": "Tek kişilik oyun",
       "title": "Partnerin yok mu? Tek başına dene",

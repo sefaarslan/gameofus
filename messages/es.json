@@ -35,29 +35,23 @@
       "toleranceNote": "No es un examen, solo una mirada divertida. No hay respuestas correctas ni incorrectas.",
       "gridLabel": "Tus elecciones"
     },
-    "archetypes": {
-      "boundary_guard": {
-        "name": "El Guardián de los Límites",
-        "desc": "Trazas líneas claras. Tu radar es fino: en cuanto algo no cuadra, levantas la bandera."
-      },
-      "silver_lining": {
-        "name": "Quien Ve Lo Bueno",
-        "desc": "Primero ves lo bueno de la gente. Eres comprensivo, aunque preguntarte de vez en cuando «¿esto es normal?» no viene mal."
-      },
-      "talk_first": {
-        "name": "Primero Hablemos",
-        "desc": "No juzgas con prisa, prefieres hablar primero. En las zonas grises, la paciencia es tu superpoder."
-      },
-      "balanced": {
-        "name": "El Radar Equilibrado",
-        "desc": "Tu radar se ajusta a cada situación: flexible unas veces, firme otras. Un perfil de tolerancia muy equilibrado."
-      }
+    "verdicts": {
+      "0": { "title": "¿Red flags? Ni las he visto.", "line": "Ni una sola roja en nueve cartas. O eres optimista de nacimiento o solo has conocido buena gente." },
+      "1": { "title": "Una alarma, y muy clara.", "line": "Solo marcaste una carta en rojo. Sabes perfectamente lo que jamás aceptarás." },
+      "2": { "title": "Radar tranquilo, pero despierto.", "line": "Dos rojas: perdonas casi todo, pero hay líneas que no se tocan." },
+      "3": { "title": "Tres rojas y aún con buen corazón.", "line": "Tienes tus límites, pero das una oportunidad a todo el mundo." },
+      "4": { "title": "Justo en el medio.", "line": "Cuatro rojas y cinco que no. Ni ingenuidad ni recelo: en su punto." },
+      "5": { "title": "A medio camino del recelo.", "line": "Cinco de nueve dispararon tu alarma. Radar fino, con un poco de margen de tolerancia." },
+      "6": { "title": "Tu alarma suena mucho.", "line": "Seis rojas: casi nada se te escapa." },
+      "7": { "title": "Radar sensibilísimo.", "line": "¡Siete rojas! Hasta una pequeña señal te detiene." },
+      "8": { "title": "Casi todo es una alarma.", "line": "Ocho rojas: o tienes mucha experiencia o algunas cartas eran muy duras." },
+      "9": { "title": "Un equipo de desminado completo.", "line": "¡Las nueve en rojo! No pisaste ni una sola mina." }
     },
     "share": {
       "story": "Imagen para stories",
       "storyBusy": "Preparando…",
       "whatsapp": "Compartir en WhatsApp",
-      "text": "¡Me salió «{archetype}» en el Campo Minado de Red Flags! Pruébalo:"
+      "text": "Mi resultado en el Campo Minado de Red Flags: «{title}» Pruébalo:"
     },
     "ai": {
       "button": "Obtén tu análisis a fondo con IA",
@@ -75,7 +69,7 @@
       "retry": "Reintentar"
     },
     "backHome": "Volver al inicio",
-    "details": { "show": "Ver detalles", "hide": "Ocultar detalles" },
+    "details": { "title": "Revisa tus respuestas", "desc": "Mira qué bandera elegiste en cada carta.", "show": "Ver detalles", "hide": "Volver al resumen", "yourPick": "Tu elección" },
     "landing": {
       "badge": "Juego en solitario",
       "title": "¿Sin pareja? Pruébalo tú solo",

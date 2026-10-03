@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 import tr from "@/messages/tr.json";
 import en from "@/messages/en.json";
 import es from "@/messages/es.json";
-import { computeProfile, decodeGrid, type Flag } from "@/lib/solo";
+import { RED_FLAG_CARD_COUNT, computeProfile, decodeGrid, type Flag } from "@/lib/solo";
 
 const MESSAGES = { tr: tr.solo, en: en.solo, es: es.solo } as const;
 type Lang = keyof typeof MESSAGES;
@@ -53,7 +53,8 @@ export async function GET(req: NextRequest) {
   const lang = (["tr", "en", "es"].includes(searchParams.get("l") ?? "") ? searchParams.get("l") : "en") as Lang;
   const t = MESSAGES[lang];
 
-  const { counts, tolerance, archetype } = computeProfile(flags);
+  const { counts, tolerance } = computeProfile(flags);
+  const verdict = (t.verdicts as Record<string, { title: string; line: string }>)[String(Math.min(counts.red, RED_FLAG_CARD_COUNT))];
   const fonts = await loadFonts(origin);
 
   // Link önizlemesi (WhatsApp/sosyal): yatay 1200×630 varyant
@@ -92,7 +93,7 @@ export async function GET(req: NextRequest) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", width: 490 }}>
             <div style={{ display: "flex", fontSize: 28, fontWeight: 700, letterSpacing: 4, color: "#ae2f34", textTransform: "uppercase" }}>{t.gameName}</div>
-            <div style={{ display: "flex", marginTop: 18, fontSize: 66, fontWeight: 700, lineHeight: 1.05, letterSpacing: -1 }}>{t.archetypes[archetype].name}</div>
+            <div style={{ display: "flex", marginTop: 18, fontSize: 66, fontWeight: 700, lineHeight: 1.05, letterSpacing: -1 }}>{verdict.title}</div>
             <div style={{ display: "flex", marginTop: 28, fontSize: 32, fontWeight: 500, color: "#584140" }}>{`${t.result.tolerance}  %${tolerance}`}</div>
             <div style={{ display: "flex", marginTop: 14, height: 18, width: 400, borderRadius: 9, background: "#f1ddd9" }}>
               <div style={{ display: "flex", width: `${Math.max(tolerance, 3)}%`, height: 18, borderRadius: 9, background: "linear-gradient(90deg, #e0524a, #d9a21b, #3f9d6b)" }} />
@@ -105,8 +106,8 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const cell = 236;
-  const gap = 28;
+  const cell = 208;
+  const gap = 24;
 
   return new ImageResponse(
     (
@@ -117,7 +118,7 @@ export async function GET(req: NextRequest) {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          padding: "110px 90px 100px",
+          padding: "84px 90px 76px",
           background: "linear-gradient(180deg, #ffe9e6 0%, #fff8f6 38%, #fff8f6 70%, #ffeccf 100%)",
           fontFamily: "Quicksand",
           color: "#2b1514",
@@ -138,16 +139,19 @@ export async function GET(req: NextRequest) {
           </div>
         </div>
 
-        <div style={{ display: "flex", marginTop: 90, fontSize: 38, fontWeight: 700, letterSpacing: 6, color: "#ae2f34", textTransform: "uppercase" }}>
+        <div style={{ display: "flex", flexShrink: 0, marginTop: 64, fontSize: 36, fontWeight: 700, letterSpacing: 6, color: "#ae2f34", textTransform: "uppercase" }}>
           {t.gameName}
         </div>
 
-        <div style={{ display: "flex", marginTop: 34, fontSize: 104, fontWeight: 700, lineHeight: 1.05, textAlign: "center", letterSpacing: -2 }}>
-          {t.archetypes[archetype].name}
+        <div style={{ display: "flex", flexShrink: 0, marginTop: 28, fontSize: 76, fontWeight: 700, lineHeight: 1.1, textAlign: "center", letterSpacing: -2, justifyContent: "center" }}>
+          {verdict.title}
+        </div>
+        <div style={{ display: "flex", flexShrink: 0, marginTop: 22, fontSize: 34, fontWeight: 500, lineHeight: 1.3, textAlign: "center", justifyContent: "center", color: "#584140", maxWidth: 880 }}>
+          {verdict.line}
         </div>
 
         {/* 3x3 ızgara */}
-        <div style={{ display: "flex", flexWrap: "wrap", width: cell * 3 + gap * 2, marginTop: 80, gap }}>
+        <div style={{ display: "flex", flexWrap: "wrap", width: cell * 3 + gap * 2, marginTop: 48, gap, flexShrink: 0 }}>
           {flags.map((f, i) => (
             <div
               key={i}
@@ -168,7 +172,7 @@ export async function GET(req: NextRequest) {
         </div>
 
         {/* Sayılar */}
-        <div style={{ display: "flex", marginTop: 76, gap: 56 }}>
+        <div style={{ display: "flex", flexShrink: 0, marginTop: 50, gap: 56 }}>
           {(["green", "yellow", "red"] as Flag[]).map((f) => (
             <div key={f} style={{ display: "flex", alignItems: "center", gap: 18 }}>
               <div style={{ display: "flex", width: 44, height: 44, borderRadius: 22, background: COLORS[f] }} />
@@ -178,7 +182,7 @@ export async function GET(req: NextRequest) {
         </div>
 
         {/* Tolerans */}
-        <div style={{ display: "flex", flexDirection: "column", width: 780, marginTop: 70 }}>
+        <div style={{ display: "flex", flexDirection: "column", flexShrink: 0, width: 780, marginTop: 48 }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 40, fontWeight: 500, color: "#584140" }}>
             <span>{t.result.tolerance}</span>
             <span style={{ fontWeight: 700, color: "#2b1514" }}>{`%${tolerance}`}</span>
@@ -190,9 +194,9 @@ export async function GET(req: NextRequest) {
 
         <div style={{ display: "flex", flexGrow: 1 }} />
 
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-          <div style={{ display: "flex", fontSize: 52, fontWeight: 700, color: "#ae2f34" }}>@gameofus.app</div>
-          <div style={{ display: "flex", fontSize: 36, fontWeight: 500, color: "#584140" }}>gameofus.app</div>
+        <div style={{ display: "flex", flexShrink: 0, flexDirection: "column", alignItems: "center", gap: 4 }}>
+          <div style={{ display: "flex", fontSize: 48, fontWeight: 700, color: "#ae2f34" }}>@gameofus.app</div>
+          <div style={{ display: "flex", fontSize: 32, fontWeight: 500, color: "#584140" }}>gameofus.app</div>
         </div>
       </div>
     ),

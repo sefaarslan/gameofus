@@ -268,11 +268,11 @@ Yanıt `201`. `scenarios` kart sırasıdır.
   aynı sonucu döndürür.
 
 ```json
-{ "counts": { "green": 2, "yellow": 2, "red": 5 }, "tolerance": 33, "archetype": "boundary_guard", "grid": "RRYRGRRYG" }
+{ "counts": { "green": 2, "yellow": 2, "red": 5 }, "tolerance": 33, "grid": "RRYRGRRYG" }
 ```
 
-`tolerance = round((green×2 + yellow)/18 × 100)`. `archetype`: `boundary_guard` (Red ≥5), `silver_lining` (Green ≥5),
-`talk_first` (Yellow ≥5), aksi `balanced`. `grid`: kart sırasıyla 9 harf (G/Y/R).
+`tolerance = round((green×2 + yellow)/18 × 100)`. `grid`: kart sırasıyla 9 harf (G/Y/R). Sunucu başlık/cümle
+döndürmez: istemci ve paylaşım görseli, Red sayısına göre sabit metni (`solo.verdicts.<red>`) kendi dilinde seçer.
 
 ### `GET /api/solo/red-flag/card`
 

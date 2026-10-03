@@ -388,8 +388,9 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
 ### Solo oyun: Red Flag Mayın Tarlası (web canlı; mobil planlı)
 - Tek kişilik, 3×3 kapalı kart; her kartta bir durum ve **Green / Yellow / Red Flag** seçimi. **Doğru cevap yoktur**:
   sonuç yalnızca dağılımdan türeyen **tolerans profili**dir (`lib/solo.ts`: `computeProfile`; tolerans =
-  `(green×2 + yellow) / 18`; arketip: Red ≥5 → Sınır Bekçisi, Green ≥5 → İyiyi Gören, Yellow ≥5 → Önce Konuşalım
-  Diyen, aksi → Dengeli Radar). Başlıklar durumu/eğilimi anlatır, kullanıcıyı yargılamaz.
+  `(green×2 + yellow) / 18`). **Arketip yoktur**; karnedeki başlık + tek cümlelik yorum yalnızca **Red sayısına (0-9)**
+  göre sabittir (`solo.verdicts.<red>` → `title` + `line`, TR/EN/ES). Merak uyandırıcı ve hafif mizahi, kullanıcıyı
+  yargılamaz/teşhis koymaz. Share kartı, link önizlemesi ve WhatsApp metni de aynı başlığı kullanır.
 - İçerik: `seeds/solo/red-flag.ts` — 60 senaryo (6 tema × 10: `boundaries`, `trust`, `communication`, `jealousy`,
   `money_lifestyle`, `respect`), TR/EN/ES, **ikinci tekil kişi** ("Sevgilin…", "your partner…", "tu pareja…") ile
   cinsiyetsiz yazılır; tek genel havuz (ilişki türüne bağlı değil). Denetim: `node scripts/check-solo.mjs`.
@@ -403,10 +404,12 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   (istemci "bitirdim" diyemez); AI analizi 100 coin (önce düş, LLM hatasında iade, oturum başına cache).
   AI'a yalnızca ilk isim (opsiyonel), 9 senaryo metni + bayrak + `insight_tag` ve dil gider; cinsiyet/e-posta
   gitmez ve oyun girişinde **hiçbir şey sorulmaz**.
-- **Karne ekranı:** sol üstte yuvarlak **geri butonu** (ana sayfaya), arketip, mini ızgara, **Story görseli** ve
-  **WhatsApp'ta paylaş** (`wa.me` ile arketip + emoji ızgara + paylaşım linki), **Detayları gör** (9 kartın senaryo metni ve
-  seçilen bayrak; `localStorage` kaydında `details`/`sessionId`/`token` tutulur), pasif AI düğmesi, **geri bildirim kartı**
-  (aynı `FeedbackCard`, `soloSessionId` ile) ve mobil CTA. "Sonucumu kopyala" kaldırıldı.
+- **Karne ekranı:** Red sayısına göre sabit başlık + cümle, mini ızgara, **Story görseli**, **WhatsApp'ta paylaş**
+  (`wa.me` ile başlık + emoji ızgara + paylaşım linki), **"Cevaplarına göz at" kartı** (iki kişilik sonuç ekranındaki
+  "Detayları gör" ile aynı dil: tıklayınca 9 kartın senaryo metni ve seçilen bayrak kart kart açılır; `localStorage`
+  kaydında `details`/`sessionId`/`token` tutulur), pasif AI düğmesi, **geri bildirim kartı** (aynı `FeedbackCard`,
+  `soloSessionId` ile), mobil CTA ve **sayfanın en sonunda "Ana sayfaya dön" butonu** (üstte geri butonu yok).
+  "Sonucumu kopyala" kaldırıldı.
 - Geri bildirim solo oturumuna da bağlanır: `POST /api/feedback` gövdesinde `soloSessionId` (token oturumun
   `token_hash`'ine karşı doğrulanır, oturum `completed` olmalı); `feedback.solo_session_id` unique, `feedback.game`.
   Metrik görünümünde `source` (`duo` / `solo_red_flag`).
