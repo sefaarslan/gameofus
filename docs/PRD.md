@@ -4,14 +4,18 @@
 ## 1. Ürün Özeti
 
 **Ürün adı:** Game of Us
-**Platform:** Web (Next.js, responsive/PWA-ready) + Mobile (Expo/React Native — iOS & Android)
+**Platform:** Web (Next.js, responsive/PWA-ready, `https://gameofus.app`) + Mobile (Expo/React Native — iOS & Android)
 **Dil:** Türkçe, İngilizce ve İspanyolca — üçü de hem arayüz hem soru içeriği için desteklenir.
 **Hedef cihaz:** Mobil öncelikli, masaüstü ve native mobile destekli
 **Teknik yaklaşım:** Link bazlı oda oluşturma, asenkron akış, soft realtime durum güncellemeleri
 
-Game of Us, iki kişinin birbirini daha iyi tanıması için tasarlanmış kısa ve eğlenceli mini oyunlar sunan bir uygulamadır. Kullanıcılar bir oyun odası oluşturur, linki partnerine gönderir; her iki taraf da tek bir turda hem kendi cevabını verir hem de partnerinin cevabını tahmin eder. İki taraf da turunu tamamladığında sonuçlar açılır.
+Game of Us, iki kişinin — arkadaşlar, sevgililer ya da hayat arkadaşları — birbirini daha iyi tanıması için tasarlanmış kısa ve eğlenceli mini oyunlar sunan bir uygulamadır. Kullanıcılar bir oyun odası oluşturur ve oda kurarken aralarındaki bağı seçer (**Kanka / Sevgili / Hayat Arkadaşı**); linki karşı tarafa gönderir; her iki taraf da tek bir turda hem kendi cevabını verir hem de partnerinin cevabını tahmin eder. İki taraf da turunu tamamladığında sonuçlar açılır.
 
 Oyun akışı, her soruda "cevapla + tahmin et" adımlarını tek ekranda birleştirir. Bu birleştirilmiş tur yaklaşımı, oda içinde ileri-geri geçişleri ve bekleme sürelerini azaltarak deneyimi belirgin biçimde kısaltır. Tahmin adımına eklenen güven seviyesi (tahmin / sanırım / eminim) ile oyun, basit bir soru-cevaptan küçük bir bahis-ve-keşif oyununa dönüşür.
+
+> **Terminoloji:** Bu dokümanda "partner", oyundaki *karşı oyuncu* anlamında genel bir terimdir. Arayüzde bu kelime odanın ilişki türüne göre uyarlanır (Kanka / Sevgili / Hayat Arkadaşı; EN: friend / partner; ES: amigo / pareja).
+
+**AI yorumu (mobile, yakında):** Oyuncuların yapılandırılmış cevaplarından, ilişki türünü de dikkate alan sıcak ve yargılayıcı olmayan bir yorum üretilmesi planlanır. Soru bankası bu yüzden cevabı bilgilendirici olan sorular (tercih, ödünleşme, davranış) etrafında kurulmuştur. Özellik henüz yayında değildir; web'de yalnızca "mobil uygulamada, yakında" olarak anlatılır.
 
 Game of Us bir dating app, chat app veya eşleşme uygulaması değildir. Ürünün amacı iki kişi arasında daha iyi konuşmalar başlatmak, birbirini tahmin etme ve keşfetme deneyimini oyunlaştırmaktır.
 
@@ -45,22 +49,19 @@ Vizyon cümlesi:
 
 ## 4. Hedef Kitle
 
-### Birincil hedef kitle
+### Birincil hedef kitle (üç ilişki türü eşit ağırlıkta)
 
-- Sevgililer
-- Evli çiftler
-- Uzun süreli partnerler
-- Yeni ilişkide olan çiftler
+- **Kanka** — yakın arkadaşlar (eğlence, mizah, paylaşılabilirlik; içerikte romantik çağrışım yoktur)
+- **Sevgili** — yeni tanışanlar, flört aşamasındakiler ve sevgililer
+- **Hayat Arkadaşı** — uzun süreli partnerler, birlikte yaşayanlar, evli çiftler
 
 ### İkincil hedef kitle
 
-- Yakın arkadaşlar
-- Flört aşamasındaki kişiler
 - Birbirini daha iyi tanımak isteyen iki kişi
 
 ### Kullanım senaryoları
 
-- Akşam partnerle eğlenceli bir aktivite yapmak
+- Akşam partnerle ya da bir arkadaşla eğlenceli bir aktivite yapmak
 - İlk buluşma sonrası birbirini daha iyi tanımak
 - Uzun ilişkide yeni konuşma konuları açmak
 - Arkadaşla eğlenceli bir tahmin oyunu oynamak
@@ -84,7 +85,7 @@ Game of Us şudur:
 - Birbirini tahmin etme oyunu
 - Konuşma başlatıcı ilişki oyunu
 - Linkle oynanan web app + native mobile app
-- Kısa, sıcak ve tekrar oynanabilir bir çift aktivitesi
+- Kısa, sıcak ve tekrar oynanabilir bir ikili aktivite (arkadaşlar ve çiftler için)
 
 ---
 
@@ -95,7 +96,7 @@ Game of Us şudur:
 Kullanıcıya verilen temel değerler:
 
 - App indirmeden linkle oynama (web)
-- Partnerini tahmin etme eğlencesi
+- Karşı tarafı tahmin etme eğlencesi (arkadaşını, sevgilini ya da hayat arkadaşını)
 - Sonuçlardan konuşma başlatma
 - Yargılayıcı olmayan yumuşak sonuçlar
 - Ücretsiz hızlı deneme
@@ -105,37 +106,38 @@ Kullanıcıya verilen temel değerler:
 
 ## 7. MVP Kapsamı
 
-### Web MVP'sinde olan özellikler (mevcut, stabil)
+### Web MVP'sinde olan özellikler (mevcut, canlıda)
 
-1. Landing page
+1. Landing page (hero, 4 adımlı "Nasıl çalışır" — 4. adım AI yorum, mobil uygulama teaser'ı, footer + Instagram)
 2. Oyun odası oluşturma (anonim, login gerekmez)
-3. Partner adı opsiyonel girme
-4. Oyun modu seçimi
-5. Soru sayısı seçimi
-6. Kategori seçimi (temel kategoriler oynanabilir, premium kategoriler kilitli rozetle gösterilir — bkz. Bölüm 12.5)
-7. Link oluşturma
-8. Link kopyalama
-9. WhatsApp ile paylaşma
-10. Partnerin linkten katılması (anonim guest token ile)
-11. Secret Choice oyun modu
-12. Birleştirilmiş tur: her soruda kendi cevabını verme + partneri tahmin etme (tek ekran)
-13. Tahminlerde güven seviyesi seçimi (tahmin / sanırım / eminim)
-14. Anlık mikro-reveal
-15. Soft realtime durum ekranı
-16. Sonuç hesaplama ve sonuç ekranı
+3. **İlişki türü seçimi: Kanka / Sevgili / Hayat Arkadaşı** (zorunlu; metinler ve kategoriler buna göre uyarlanır)
+4. Karşı oyuncunun adını opsiyonel girme
+5. Oyun modu seçimi — **dört mod: Secret Choice, Prediction, Orderline, Karma**
+6. Soru sayısı seçimi (5 / 10)
+7. Kategori seçimi (dropdown; varsayılan "Karışık Sürpriz"; ilişki türüne göre filtrelenir; premium kategoriler kilitli rozetle gösterilir — bkz. Bölüm 12.5)
+8. Link oluşturma, kopyalama, WhatsApp ile paylaşma
+9. Karşı tarafın linkten katılması (anonim guest token ile)
+10. Birleştirilmiş tur: her soruda kendi cevabını verme + karşı tarafı tahmin etme (tek ekran)
+11. Tahminlerde güven seviyesi seçimi (tahmin / sanırım / eminim)
+12. Anlık mikro-reveal
+13. Soft realtime durum ekranı
+14. Sonuç hesaplama ve sonuç ekranı
+15. **Geri bildirim:** sonuç ekranında isteğe bağlı mini anket + puansız çıkışta bir kez yumuşak istem (bkz. Bölüm 13.6, 19)
+16. Üç dil (TR / EN / ES) — arayüz ve soru içeriği
 17. Temel hata ve boş durum ekranları
 
 ### Mobile MVP'sinde olan özellikler (yeni)
 
 Web'deki tüm özelliklere ek olarak:
 
-1. Signin / Signout (e-posta/şifre + Google + Apple — Supabase Auth)
-2. Geçmiş oyunlar sekmesi (yalnızca login'li kullanıcı, yalnızca sonuç görünümü)
-3. Premium satın alma akışı (tek seferlik paket — bkz. Bölüm 12.5)
-4. Premium kategorilere kalıcı erişim
-5. Oda kredisi sistemi ve kredi paketi satın alma
-6. Push notification (partner katıldı / tamamladı / sonuç hazır)
-7. Deep linking (oda linkleri hem web hem mobile'dan açılabilir)
+1. Signin / Signout (**Google + Apple — Supabase Auth**; mobilde tüm oyun için giriş zorunlu) ve hesap silme
+2. Geçmiş oyunlar sekmesi (yalnızca sonuç görünümü)
+3. Coin + tier modeli: Lite / Premium paketleri, kategori kilitleri (bkz. Bölüm 12.2)
+4. Premium/Lite kategorilere kalıcı erişim
+5. Coin bakiyesi (oda −250, AI yorum −100; kayıt bonusu +500, reklam +100)
+6. **AI yorum** (sonuç ekranında, coin ile; bkz. Bölüm 12.3)
+7. Push notification (partner katıldı / tamamladı / sonuç hazır)
+8. Deep linking (oda linkleri hem web hem mobile'dan açılabilir; `gameofus.app` üzerinden universal link)
 
 ### MVP'de olmayacak özellikler (her iki platform)
 
@@ -144,7 +146,8 @@ Web'deki tüm özelliklere ek olarak:
 - Public profil
 - Sosyal feed
 - Gelişmiş arkadaş listesi
-- AI soru üretimi
+- AI soru üretimi (kullanıcıya soru önerme/üretme; **AI yorum** ayrı bir mobil özellik olarak planlıdır, bkz. Bölüm 12 ve 21)
+- Sonucu Instagram'da paylaşma (henüz yok; Instagram hesabı yalnızca takip bağlantısıdır)
 - Abonelik sistemi (aylık/yıllık — bilinçli olarak tercih edilmedi, bkz. Bölüm 12)
 - Canlı timer'lı realtime oyun
 - Gelişmiş admin panel
@@ -245,13 +248,14 @@ Secret Choice, Prediction ve Orderline modlarının dengeli karışımıdır. MV
 1. Kullanıcı landing page'e gelir (web) veya app'i açar (mobile).
 2. "Oyun Başlat" butonuna tıklar.
 3. İsmini girer.
-4. Partner adını opsiyonel olarak girer.
-5. Oyun modunu seçer.
-6. Kategori seçer (temel kategoriler herkese açık; premium kategoriler platforma göre farklı davranır — bkz. Bölüm 12.5).
-7. Soru sayısını seçer.
-8. "Oyun linki oluştur" butonuna tıklar.
-9. Sistem oda oluşturur.
-10. Kullanıcı link paylaşım ekranına yönlenir.
+4. Karşı oyuncunun adını opsiyonel olarak girer (etiket ilişki türüne göre değişir).
+5. **Aralarındaki bağı seçer: Kanka / Sevgili / Hayat Arkadaşı.** Seçilene kadar kategori alanı pasiftir.
+6. Kategori seçer (ilişki türüne uygun kategoriler listelenir; varsayılan "Karışık Sürpriz"; premium kategoriler platforma göre farklı davranır — bkz. Bölüm 12.5).
+7. Oyun modunu seçer.
+8. Soru sayısını seçer.
+9. "Oyun linki oluştur" butonuna tıklar.
+10. Sistem oda oluşturur: oda dili ve ilişki türü sabitlenir; sorular, ilişki türüne uygun ücretsiz kategorilerden seçilir (bkz. Bölüm 20).
+11. Kullanıcı link paylaşım ekranına yönlenir.
 
 ### 9.2 İlk kullanıcının (owner) tur akışı
 
@@ -279,9 +283,9 @@ Bu link hem web tarayıcısından hem mobile app'ten (deep link / universal link
 
 Kimlik doğrulama iki farklı modelde çalışır:
 
-#### Anonim model (ücretsiz oyun — hem web hem mobile)
+#### Anonim model (ücretsiz oyun — web; mobilde giriş zorunludur)
 
-Ücretsiz oyunda login gerekmez; ancak kimlik doğrulama yalnızca isim eşleştirmesine bırakılmaz. İsim, kullanıcıyı ekranda göstermek için kullanılır; gerçek oda rolü `participant_token` ile doğrulanır.
+Web'de ücretsiz oyunda login gerekmez (mobilde her oyun için giriş zorunludur, ancak oda içi roller yine `participant_token` ile doğrulanır); ancak kimlik doğrulama yalnızca isim eşleştirmesine bırakılmaz. İsim, kullanıcıyı ekranda göstermek için kullanılır; gerçek oda rolü `participant_token` ile doğrulanır.
 
 Oda oluşturulduğunda sistem:
 
@@ -316,15 +320,15 @@ Token saklama:
 - Token veritabanında plaintext tutulmamalıdır.
 - API isteklerinde token, web'de mevcut cookie akışıyla veya `Authorization: Bearer <token>` header'ı ile; mobile'da yalnızca `Authorization: Bearer <token>` header'ı ile taşınır.
 
-#### Kayıtlı kullanıcı modeli (yalnızca mobile, premium için)
+#### Kayıtlı kullanıcı modeli (yalnızca mobile)
 
-Kullanıcı Supabase Auth ile giriş yapmıştır. Bu model **yalnızca mobile app'te** bulunur; web'de hiçbir login ekranı yoktur.
+Kullanıcı Supabase Auth ile (Google / Apple) giriş yapmıştır. Bu model **yalnızca mobile app'te** bulunur; web'de hiçbir login ekranı yoktur.
 
 1. Mobile app açıldığında Supabase JWT oturumu geçerliyse doğrudan ilgili akışa yönlenir.
-2. Oturum yoksa, kullanıcı premium satın almak veya geçmiş oyunlarını görmek istediğinde login ekranı açılır.
+2. Oturum yoksa (ilk açılışta onboarding'den sonra) login ekranı açılır; giriş olmadan oyun oynanmaz.
 3. Yeni oluşturulan odalar, login'li kullanıcı tarafından kurulduysa `user_id` ile hesaba bağlanır.
 4. Kayıtlı kullanıcı kimliği Supabase JWT ile doğrulanır.
-5. Premium hak (`is_premium`) ve oda kredisi (`room_credits`) bu hesap üzerinden yönetilir.
+5. Tier ve coin bakiyesi bu hesap üzerinden, yalnızca sunucuda yönetilir (bkz. Bölüm 12.2).
 
 ### 9.4 Partnerin (guest) tur akışı
 
@@ -446,41 +450,52 @@ Konuşma önerisi:
 
 > Üyelik ve premium satın alma sistemi **tamamen mobile app'e özeldir**. Web tarafında hiçbir satın alma, login veya premium UI'ı yoktur; web sadece kategori kilidinin görsel yansımasını gösterir (bkz. Bölüm 12.5), kullanıcının premium durumunu hiç sormaz veya bilmez.
 
-### 12.1 Ücretsiz kullanım (web + mobile)
+### 12.1 Ücretsiz kullanım
 
-- Login gerekmez
-- Tüm oyun modları
-- Temel (premium olmayan) kategoriler sınırsız oynanabilir
-- Basit sonuç ekranı
-- Oda expire süresi: 24 saat
-- Mobile'da: oda kurma için (henüz netleşmemiş, bkz. Bölüm 12.6) bir günlük limit olabilir; web'de oda kurma limiti yoktur
+- **Web:** Login gerekmez; tüm oyun modları; temel (premium olmayan) kategoriler sınırsız; basit sonuç ekranı; oda expire süresi 24 saat. Ücretsiz kullanıcı tarayıcı başına **bir oda** kurabilir (`localStorage` ile client-side UX katmanı; sunucu tarafı rate limit ayrıca geçerlidir). Limite takılan kullanıcı "mobil uygulamada daha fazlası" mesajını görür.
+- **Mobile:** Her oyun için giriş zorunludur (anonim oyun yoktur). Oda kurmak coin harcar (12.2); kayıt bonusu ve reklam izleme ile coin kazanılır.
 
-### 12.2 Premium paket — tek seferlik satın alma (yalnızca mobile)
+### 12.2 Coin + tier modeli (yalnızca mobile) — güncel karar
 
-Eski modeldeki zaman bazlı "3 günlük sınırsız oda hakkı" yaklaşımı **kaldırılmıştır**. Yerine:
+Eski "tek seferlik premium + oda kredisi" ve daha önceki "3 günlük hak" modelleri **yerini coin + tier modeline bırakmıştır** (ayrıntılı iş listesi: `gameofus-mobile/tasklist.md` B4/B5/C1/C2).
 
-- Kullanıcı mobile app üzerinden **tek seferlik** bir premium paket satın alır (App Store / Play Store IAP üzerinden).
-- Satın alma, kullanıcının önce Supabase Auth ile kayıt olmasını gerektirir (e-posta/şifre, Google veya Apple).
-- Satın alma sonucu **kalıcıdır** — süre dolmaz, tekrar ödeme gerekmez:
-  - Tüm premium kategorilere erişim kalıcı olarak açılır.
-  - Hesaba başlangıç **oda kredisi** (`room_credits`) tanımlanır.
+**Coin ekonomisi:**
 
-### 12.3 Oda kredisi sistemi (yalnızca mobile)
+| Olay | Coin |
+|---|---|
+| Kayıt bonusu | +500 |
+| Ödüllü reklam izleme | +100 |
+| Oda oluşturma | −250 (tüm kullanıcılar, premium dahil) |
+| AI yorum açma | −100 (tüm kullanıcılar, premium dahil — maliyet öngörülebilirliği için bilinçli tercih) |
 
-- Premium kullanıcı her oda kurduğunda `room_credits` bir azalır.
-- `room_credits` sıfırlandığında yeni oda kurma engellenir; kullanıcı **oda kredisi paketi** satın almaya yönlendirilir.
-- Oda kredisi paketi, premium paketten ayrı, küçük tutarlı ve **tekrarlanabilir** bir satın almadır (App Store / Play Store IAP, consumable tipi).
-- Premium paketin başlangıç kredisi miktarı ve oda kredisi paketinin boyutu/fiyatı **henüz belirlenmemiştir** (bkz. Bölüm 12.6).
+**Paketler (tek seferlik, consumable IAP — App Store / Play Store, RevenueCat):**
+
+| Paket | Coin | Fiyat (taslak) | Kalıcı erişim |
+|---|---|---|---|
+| Lite | 2000 | ≈ $6.90 | Lite kategorileri |
+| Premium | 5000 | ≈ $10.90 | Lite + Premium kategorileri (ör. Cesur Sorular) |
+
+Kurallar:
+
+- Paket **her satın almada coin ekler**; `tier` yalnızca **yükselir, asla düşmez** (`tier = max(mevcut, satın_alınan)`). Paket tekrar satın alınabilir.
+- **Kategori erişimi coin ile açılmaz**, yalnızca paket (tier) ile: `categories.min_tier` (`free / lite / premium`) ≥ kullanıcı `tier`'ı ise kilitli. Kategori başına ayrı ödeme yoktur; mesajlaşma net olmalıdır: *"Bir kez satın al, [Lite/Premium] kategorilerine kalıcı olarak eriş."*
+- **Restore Purchases** zorunludur (App Store): restore tier'ı geri yükler, coin'i **tekrar yüklemez** (coin tüketilebilirdir).
+- App Store 3.1.1: fiyat/faturalama net gösterilir; Terms of Use ve Privacy Policy bağlantıları bulunur.
+- Satın alma yalnızca sunucu doğrulamasıyla (`/api/iap/verify`) geçerli olur: `users` üzerinde coin artışı + `tier = GREATEST(mevcut, yeni)`; tüm hareketler `credit_transactions` audit tablosuna yazılır.
+
+### 12.3 AI yorum (mobile, planlanan)
+
+- Sonuç ekranında "100 coin ile aç" butonu (herkes için aynı). Coin yetersizse paket ekranına yönlendirilir.
+- Sunucu `GET /api/rooms/[roomCode]/ai-commentary`: önce coin düşer, sonra LLM çağrısı yapılır; sonuç `results.ai_commentary`'e **cache'lenir** (aynı oda için tekrar ücret/maliyet yok).
+- Girdi: oda ilişki türü, yapılandırılmış cevaplar (seçilen seçenek metni, sıralamalar) ve soruların `insight_tag`'leri. Serbest metin yoktur. İlişki türüne göre ton ayarlanır; ton sıcak ve yargılayıcı olmayan kalır, "uyum puanı/eşleşme" dili kullanılmaz.
+- Gizlilik: cevaplar üçüncü taraf LLM'e gittiği için yayına almadan önce rıza/gizlilik metni netleştirilir (bkz. Bölüm 18).
 
 ### 12.4 Satın alma akışı (mobile)
 
-1. Kullanıcı mobile app'i anonim olarak dener (login yok).
-2. Premium kategoriye girmeye çalıştığında veya geçmiş oyunlarını görmek istediğinde önce login ekranına yönlenir.
-3. Login olur (e-posta/şifre, Google veya Apple).
-4. Premium paket satın alma ekranı gösterilir (App Store / Play Store IAP).
-5. Satın alma tamamlanınca `is_premium = true` olur, başlangıç `room_credits` tanımlanır.
-6. Premium kategoriler kalıcı olarak açılır.
-7. Oda kredisi tükendiğinde, kredi paketi satın alma ekranına yönlendirilir.
+1. Kullanıcı giriş yapar (Google / Apple); kayıt bonusu coin hesabına işlenir.
+2. Oda kurar (−250 coin). Coin biterse reklam izleyerek (+100) ya da paket alarak coin kazanır.
+3. Kilitli bir kategoriye girmeye çalışırsa paket ekranına yönlendirilir.
+4. Paket satın alınır → sunucu doğrular → coin eklenir, `tier` yükselir, kategoriler kalıcı açılır.
 
 Agresif satış, geri sayım, manipülatif metin veya ilişki baskısı kullanılmamalıdır.
 
@@ -488,21 +503,23 @@ Agresif satış, geri sayım, manipülatif metin veya ilişki baskısı kullanı
 
 Kategori seçimi her iki platformda da vardır; davranış platforma göre farklılaşır:
 
-| Durum | Web | Mobile (login'siz / premium değil) | Mobile (premium) |
+| Durum | Web | Mobile (tier yetersiz) | Mobile (tier yeterli) |
 |---|---|---|---|
 | Temel kategori | Seçilebilir, oynanabilir | Seçilebilir, oynanabilir | Seçilebilir, oynanabilir |
-| Premium kategori | Görünür, kilitli rozet; tıklanınca "Bu kategori sadece Game of Us mobile app'te açılır" mesajı + store linkine yönlendirme | Kilitli; tıklanınca login/satın alma akışına yönlendirme | Kalıcı açık |
+| Premium kategori | Görünür, kilitli rozet; tıklanınca "Bu kategori yalnızca Game of Us mobil uygulamasında açılır" mesajı | Kilitli; tıklanınca paket ekranına yönlendirme | Kalıcı açık |
 
-Web'e giren bilgi, kullanıcının premium *durumu* değil, kategorinin *meta verisi* (`is_premium` flag'i kategori seviyesinde tanımlıdır, kullanıcı seviyesinde değil). Web hiçbir zaman "bu kullanıcı premium mu" sorusunu sormaz.
+Web'e giren bilgi, kullanıcının premium *durumu* değil, kategorinin *meta verisi*dir (`is_premium` / `min_tier` kategori seviyesinde tanımlıdır, kullanıcı seviyesinde değil). Web hiçbir zaman "bu kullanıcı premium mu" sorusunu sormaz.
+
+**İlişki türü filtresi (hem web hem mobile):** Kategori listesi seçilen ilişki türüne göre filtrelenir (`categories.relationship_types`). Örnekler: *Kanka Testi* yalnızca Kanka'da, *Romantizm* yalnızca Sevgili'de, *Ev & Para* yalnızca Hayat Arkadaşı'nda görünür; *İletişim, Yaşam Tarzı, Değerler* üçünde de görünür. Sunucu, seçilen kategorinin türe uygunluğunu doğrular.
+
+**Cesur Sorular (premium, yalnızca Sevgili ve Hayat Arkadaşı):** Kanka'da hiç gösterilmez. Mobilde ek olarak (planlanan) her iki oyuncunun 18+ olması gerekir: oda kurulurken kurucunun ve karşı tarafın doğum tarihi alınır (`users.birth_date`, `rooms.partner_birth_date`); karar oda oluşturma anında tek ekranda verilir, karşı taraf katılırken ek yaş akışı yoktur. Web'de bu kategori kilitli olduğu için doğum tarihi **toplanmaz**. App Store: açık cinsel içerik yoktur ("cesur/romantik" çerçeve), yaş derecelendirmesi 17+ olarak ayarlanır.
 
 ### 12.6 Henüz belirlenmemiş noktalar
 
-Aşağıdaki değerler bilinçli olarak açık bırakılmıştır, ayrı bir görüşmede netleştirilecektir:
-
-- Premium paketin fiyatı ve başlangıç `room_credits` miktarı.
-- Oda kredisi paketinin boyutu (kaç kredi) ve fiyatı.
-- Ücretsiz (mobile) kullanıcı için oda kurma limiti olup olmayacağı.
-- IAP entegrasyon detayı (doğrudan App Store/Play Store API mi, RevenueCat gibi bir katman mı kullanılacağı).
+- Paket fiyatlarının yerel para birimi karşılıkları (TL/EUR vb.) ve nihai tutarlar.
+- Reklam izleme için günlük üst sınır olup olmayacağı.
+- AI yorum için LLM sağlayıcısı/modeli, maliyet tavanı ve rıza metni.
+- Doğum tarihinin saklama süresi (oda ile birlikte silinmesi önerilir; oda 24 saatte expire olur).
 
 ### 12.7 Oda expire mantığı
 
@@ -523,13 +540,13 @@ Amaç: Kullanıcının ürünü 10 saniyede anlamasını sağlamak.
 
 İçerikler:
 
-- Hero başlık
-- Alt açıklama
-- Oyun Başlat CTA
-- Nasıl Çalışır bölümü
+- Hero başlık, alt açıklama, Oyun Başlat CTA ("+10k çift oynuyor" gibi doğrulanamayan sosyal kanıt **kullanılmaz**)
+- Nasıl Çalışır bölümü — **4 adım**: Oda oluştur → Linki paylaş → Cevapları birlikte aç → **AI sizi yorumlasın** (4. adım "Mobil uygulamada" rozetiyle)
 - Oyun modları bölümü
 - Sonuç önizlemesi
-- Mobile app indirme teaser'ı (premium kategoriler ve geçmiş oyunlar için)
+- Mobil uygulama teaser'ı (AI yorum, premium kategoriler, geçmiş oyunlar, bildirim; "Yakında geliyor" + Instagram takip bağlantısı)
+- Footer: logo, "Bizi Instagram'da takip et @gameofus.app", telif
+- Hero rozeti kapsayıcıdır (ilişki odaklı değil, arkadaşları da kapsar); hiçbir yerde yalnızca çiftleri varsayan dil kullanılmaz
 
 Örnek metinler:
 
@@ -550,9 +567,10 @@ CTA:
 Alanlar:
 
 - İsmin
-- Partner adı opsiyonel
+- Karşı oyuncunun adı (opsiyonel; etiket ilişki türüne göre: Kanka adı / Sevgili adı / Hayat arkadaşı adı)
+- **İlişki türü** (3 kart: Kanka / Sevgili / Hayat Arkadaşı; zorunlu — seçilmeden buton pasif, kategori alanı pasif)
+- Kategori seçimi (dropdown; varsayılan "Karışık Sürpriz"; ilişki türüne uygun kategoriler + kilitli premium kategoriler; kategoriler sayfa açılırken bir kez çekilip istemcide filtrelenir)
 - Oyun modu
-- Kategori seçimi (temel kategoriler + kilitli premium kategoriler)
 - Soru sayısı
 
 Buton:
@@ -576,7 +594,7 @@ Secret Choice oyun ekranı tek soruda iki bölümlü birleştirilmiş tur yapıs
 - Progress bilgisi ve canlı puan göstergesi
 - Soru kartı
 - Bölüm 1 — Kendi cevabın: cevap seçenekleri (gizli tutulur)
-- Bölüm 2 — Partneri tahmin: aynı seçenekler, farklı vurgu rengi
+- Bölüm 2 — Karşı tarafı tahmin: aynı seçenekler, farklı vurgu rengi (başlık ilişki türüne göre: "Kankan / Sevgilin / Hayat arkadaşın ne cevap verir?")
 - Güven seviyesi seçimi (tahmin / sanırım / eminim)
 - Mikro açıklama
 - "Tahmini kilitle" butonu
@@ -607,7 +625,10 @@ Tahmin kilitlendikten sonra mikro-reveal ekranı gösterilir:
 - Okuma Skoru (yüzde olarak, büyük ve belirgin)
 - Teşvik edici kısa bir metin ("Birbirinizi oldukça iyi okudunuz!")
 - Detayları Gör butonu
+- **Geri bildirim kartı (web):** "Oyunu nasıl buldun?" — 5 yüzle tek dokunuşta puan (dokunur dokunmaz kaydedilir); ardından isteğe bağlı "Mobil uygulamada AI yorumunu kullanır mıydın? (Evet / Belki / Hayır)" ve "Neyi değiştirirdin?" (≤ 500 karakter). Hepsi atlanabilir; teşekkür mesajıyla biter.
+- **Çıkış istemi:** Puan vermeden "Tekrar Oyna" / "Ana Sayfa"ya basan kullanıcıya oda başına **bir kez** alttan açılan sheet (mobil) / ortalı kart (masaüstü): 5 yüz + "Şimdi değil". Arka plana dokunma, Escape ve "Şimdi değil" kullanıcıyı gitmek istediği yere götürür; ikinci basışta doğrudan gider. Anket zorunlu **değildir**.
 - Tekrar Oyna butonu
+- Sade Instagram takip bağlantısı (@gameofus.app); paylaşma/etiketleme çağrısı yoktur (özellik henüz yok)
 
 ### 13.7 Detailed Results (web + mobile)
 
@@ -617,30 +638,30 @@ Tahmin kilitlendikten sonra mikro-reveal ekranı gösterilir:
 - Sonuç etiketi: "Doğru bildi" / "Yakın tahmin" / "Iskaladı"
 - Konuşma önerisi her kart için gösterilir
 - Puan, istatistik veya kategori kırılımı yoktur
+- Karşı tarafın etiketi ilişki türüne göre uyarlanır
 
-### 13.8 Premium Unlock (yalnızca mobile)
-
-İçerikler:
-
-- Premium paket adı
-- Paket faydaları (kalıcı kategori erişimi + başlangıç oda kredisi)
-- Fiyat
-- Satın alma CTA (IAP)
-
-### 13.9 Oda Kredisi Satın Alma (yalnızca mobile, yalnızca premium kullanıcı)
+### 13.8 Paket Ekranı — Lite / Premium (yalnızca mobile)
 
 İçerikler:
 
-- Kalan kredi bilgisi
-- Kredi paketi seçenekleri
-- Satın alma CTA (IAP)
+- Lite ve Premium paket kartları (coin miktarı, fiyat, hangi kategorilere kalıcı erişim verdiği)
+- Net mesaj: "Bir kez satın al, [Lite/Premium] kategorilerine kalıcı olarak eriş"
+- Satın alma CTA (IAP), **Restore Purchases**, Terms of Use ve Privacy Policy bağlantıları
+
+### 13.9 Coin Bakiyesi ve Yetersiz Coin (yalnızca mobile)
+
+İçerikler:
+
+- Profil menüsünde coin bakiyesi
+- Coin yetersizse: reklam izle (+100) veya paket ekranına yönlendirme
+- AI yorum için "100 coin ile aç" (bkz. Bölüm 12.3)
 
 ### 13.10 Signin / Signout (yalnızca mobile)
 
 İçerikler:
 
-- E-posta/şifre, Google, Apple ile giriş
-- Çıkış yap
+- Google ve Apple ile giriş (Supabase Auth; e-posta kaydı yoktur)
+- Çıkış yap, **hesabımı sil** (App Store 5.1.1(v) zorunluluğu)
 
 ### 13.11 Geçmiş Oyunlar (yalnızca mobile, yalnızca login'li kullanıcı)
 
@@ -656,11 +677,11 @@ Durumlar:
 
 - Geçersiz link
 - Oda süresi doldu
-- Partner henüz katılmadı
+- Karşı taraf henüz katılmadı
 - Bağlantı koptu
 - Sonuçlar henüz hazır değil
 - Oyun zaten tamamlandı
-- (Mobile) Oda kredisi yetersiz
+- (Mobile) Coin yetersiz
 - (Mobile) Bu kategori premium gerektiriyor
 
 ---
@@ -727,7 +748,7 @@ Web ve mobile, **ayrı kod tabanları** olarak geliştirilir, **ortak Supabase b
 
 **Dil seçim mekanizması (arayüz dili — oturum/cihaz bazlı):**
 
-- Varsayılan dil, tarayıcı/cihaz dilinden otomatik algılanır (web: `Accept-Language` header; mobile: `expo-localization` ile cihaz locale'i).
+- Varsayılan dil algılanır. **Web:** önce kullanıcının önceki tercihini tutan `NEXT_LOCALE` cookie'si, yoksa `Accept-Language` (q değerleri gözetilerek; bu, tarayıcı dilidir ve çoğu kullanıcıda işletim sistemi diliyle aynıdır); karar next-intl middleware'indedir (`proxy.ts`). **Mobile:** `expo-localization` ile cihaz locale'i.
 - Algılanan dil TR/EN/ES dışındaysa, varsayılan olarak İngilizce gösterilir.
 - Kullanıcı istediği zaman manuel olarak dil değiştirebilir (web: sağ üstten dil seçici, otomatik algılamayı geçersiz kılar; mobile: cihaz dili).
 - Web'de dil tercihi URL prefix'i (`/tr`, `/en`, `/es`) ile; mobile'da cihaz içi tercih olarak saklanır.
@@ -749,6 +770,8 @@ Web ve mobile, **ayrı kod tabanları** olarak geliştirilir, **ortak Supabase b
 - Tailwind CSS
 - Stitch (arayüz tasarımı)
 - next-intl (TR/EN/ES çoklu dil desteği)
+- Fontlar self-host: Quicksand (`next/font`) ve yalnızca kullanılan ikonları içeren ~14 KB'lık Material Symbols alt kümesi (`npm run icons`); harici font isteği yoktur
+- Next.js sürümü sabitlenir (16.2.6)
 
 **Mobile (yeni):**
 
@@ -774,7 +797,7 @@ Web ve mobile, **ayrı kod tabanları** olarak geliştirilir, **ortak Supabase b
 
 **Deploy:**
 
-- Web: Vercel
+- Web: Vercel — fonksiyon bölgesi Supabase ile aynı (Frankfurt, `fra1`); alan adı `gameofus.app`. API route'larında bağımsız sorgular paralel çalıştırılır (bölgeler arası gidiş-dönüş maliyetini ve gecikmeyi azaltmak için)
 - Mobile: Expo Application Services (EAS) ile App Store / Play Store
 
 **Auth:**
@@ -782,21 +805,21 @@ Web ve mobile, **ayrı kod tabanları** olarak geliştirilir, **ortak Supabase b
 - Ücretsiz oyun (web + mobile) anonimdir; login gerekmez.
 - Anonim oyuncular `participant_token` ile tanınır.
 - Token ham hali client tarafında saklanır (web: localStorage; mobile: expo-secure-store); DB'de yalnızca `token_hash` tutulur.
-- Supabase Auth yalnızca mobile'da, premium satın almak ve geçmiş oyunları görmek isteyen kullanıcılar için zorunludur.
-- Supabase Auth seçenekleri: E-posta/şifre, Google OAuth, Apple OAuth.
+- Supabase Auth yalnızca mobile'dadır ve mobilde **tüm oyun için zorunludur** (anonim oyun yalnızca web'de vardır).
+- Supabase Auth seçenekleri: **Google OAuth, Apple OAuth** (e-posta/şifre kaydı yoktur).
 
 **Ödeme:**
 
-- Mobile App Store / Play Store IAP (tek seferlik premium paket + tekrarlanabilir oda kredisi paketi).
+- Mobile App Store / Play Store IAP (RevenueCat; Lite ve Premium paketleri consumable, her satın alma coin ekler ve tier'ı yükseltir — bkz. Bölüm 12.2).
 - Lemon Squeezy veya başka bir web ödeme sağlayıcısı **kullanılmaz** — premium tamamen mobile'a özel olduğu için web'de ödeme entegrasyonu yoktur.
 
 ### Server-side işlem yaklaşımı
 
-Sonuç hesaplama ve token doğrulama gibi işlemler Next.js API route / server action ile yapılır; bu mantık değişmemiştir. Mobile'a özel mantık (premium kontrolü, oda kredisi düşürme, geçmiş oyun sorgusu) bu route'lara eklenebilir veya ayrı route'lar olarak yazılabilir — bu karar mobile geliştirme sırasında netleştirilecektir.
+Sonuç hesaplama ve token doğrulama gibi işlemler Next.js API route / server action ile yapılır; bu mantık değişmemiştir. Mobile'a özel mantık (tier/coin kontrolü ve düşme, IAP doğrulama, AI yorum, geçmiş oyun sorgusu, hesap silme) bu route'lara eklenebilir veya ayrı route'lar olarak yazılabilir — bu karar mobile geliştirme sırasında netleştirilecektir.
 
 Kural:
 
-> Cevap, tahmin, sonuç, premium hak ve oda kredisi gibi kritik işlemler client-only hesaplamaya bırakılmamalıdır. Bu işlemler server-side doğrulanmalıdır.
+> Cevap, tahmin, sonuç, premium hak ve coin gibi kritik işlemler client-only hesaplamaya bırakılmamalıdır. Bu işlemler server-side doğrulanmalıdır.
 
 ### Realtime kapsamı
 
@@ -833,8 +856,12 @@ Yalnızca mobile'da Supabase Auth ile giriş yapan (premium/geçmiş oyun erişi
 |---|---|---|
 | id | uuid | Kullanıcı ID (Supabase Auth UID) |
 | email | text | E-posta adresi |
-| is_premium | boolean | Premium paketi satın aldı mı (kalıcı, süresi yoktur) |
-| room_credits | int | Kalan oda kurma hakkı (premium kullanıcı için) |
+| is_premium | boolean | Mevcut alan; planlanan `tier`'ın öncülü (kalıcı, süresi yoktur) |
+| room_credits | int | Coin bakiyesi (mevcut alan adı; coin modeli için kullanılır) |
+| tier | text (planlanan) | `free / lite / premium`; yalnızca yükselir (`max`) |
+| birth_date | date (planlanan, nullable) | Yaş doğrulama/AI bağlamı; yalnızca mobil |
+
+Planlanan: `credit_transactions` (user_id, delta, reason, created_at) — coin hareketleri için audit tablosu.
 | created_at | timestamptz | Kayıt zamanı |
 
 ### `rooms`
@@ -845,6 +872,8 @@ Yalnızca mobile'da Supabase Auth ile giriş yapan (premium/geçmiş oyun erişi
 | room_code | text | Paylaşılabilir kısa kod; tahmin edilmesi zor olmalıdır |
 | status | text | Oda durumu |
 | game_mode | text | secret_choice / prediction / orderline / mixed |
+| relationship_type | text (nullable) | `friend` / `dating` / `partner` — oda kurulurken seçilen ilişki türü; oda kurulduktan sonra değişmez. Eski odalar ve henüz göndermeyen eski mobil build'ler için `null` (genel "partner" dili, tür filtresi uygulanmaz) |
+| partner_birth_date | date (planlanan, nullable) | Yalnızca mobil, yaş doğrulama için; yalnızca bu oda için |
 | category_id | uuid | Seçilen kategori — `categories` tablosunda `locale = rooms.locale` olan satıra doğrudan referans (düz FK; dil zaten odaya sabit olduğu için çözümleme gerekmez) |
 | question_count | int | Seçilen soru sayısı |
 | owner_id | uuid | Odayı oluşturan participant |
@@ -893,7 +922,9 @@ Kategori adları da dil bazlıdır (örn. "İletişim" / "Communication" / "Comu
 | name | text | Görünen ad, `locale` alanına göre o dildeki karşılığı |
 | locale | text | tr / en / es |
 | is_premium | boolean | Bu kategori premium kilitli mi (slug bazında tüm dillerde aynı olmalı) |
-| sort_order | int | Sıralama |
+| relationship_types | text[] | Kategorinin göründüğü ilişki türleri (`friend` / `dating` / `partner`; en az bir eleman); varsayılan üçü |
+| min_tier | text (planlanan) | `free / lite / premium` — coin+tier modelinde erişim eşiği |
+| sort_order | int | Sıralama (ilişkiye özel kategoriler önce, ortaklar sonra, Cesur Sorular en sonda) |
 
 Önerilen constraint/index:
 
@@ -914,8 +945,9 @@ Kural:
 | category_id | uuid | categories tablosuna referans (ilgili dildeki kategori satırı) |
 | question_text | text | Soru metni, `locale` alanındaki dilde |
 | locale | text | tr / en / es |
-| translation_group_id | uuid (nullable) | Aynı sorunun farklı dillerdeki karşılıklarını birbirine bağlamak için opsiyonel grup kimliği. Kültüre özgü, karşılığı olmayan sorularda null bırakılabilir. |
-| is_active | boolean | Aktiflik |
+| translation_group_id | uuid (nullable) | Aynı sorunun farklı dillerdeki karşılıklarını birbirine bağlamak için opsiyonel grup kimliği. v2 setinde tüm sorular üç dilde eşleşmiştir. |
+| insight_tag | text (nullable) | AI yorumu için tema etiketi (ör. `conflict_style`, `love_language`); kullanıcıya görünmez. v2 sorularında dolu, eski sorularda null |
+| is_active | boolean | Aktiflik — **sorular silinmez, pasife alınır** (cevap/oda geçmişi korunur) |
 | created_at | timestamptz | Oluşturulma zamanı |
 
 Kural:
@@ -941,6 +973,22 @@ Prediction modu için kullanılabilir.
 unique(question_id, sort_order)
 ```
 
+### `feedback`
+
+Sonuç ekranı mini anketi. Yazma yalnızca token doğrulayan `POST /api/feedback` ile; RLS açık, policy yok.
+
+| Alan | Tip | Açıklama |
+|---|---|---|
+| id | uuid | Kayıt ID |
+| room_id / participant_id | uuid | Katılımcı başına oda başına tek kayıt (`unique(room_id, participant_id)`); önce puan, sonra AI ilgisi/yorum aynı satıra eklenir (upsert) |
+| rating | smallint | 1–5 |
+| wants_ai | text (nullable) | `yes / maybe / no` — "mobil uygulamada AI yorumunu kullanır mıydın?" |
+| comment | text (nullable) | ≤ 500 karakter, serbest metin (cevap/tahmin içeriği saklanmaz) |
+| locale, game_mode, relationship_type, platform | text | Oda meta verisi ve `web`/`mobile` |
+| created_at, updated_at | timestamptz | |
+
+**Metrik görünümleri** (`security_invoker`, `anon/authenticated` erişimi kapalı; `TEST-%` katılımcılı odalar hariç): `metrics_daily_funnel` (oda açılan → partner katılan → sonucu hazır olan + oranlar; mod/tür/dile göre), `metrics_participant_status`, `metrics_feedback_summary` (günlük ortalama puan, beğenen/beğenmeyen, AI ilgisi dağılımı).
+
 ### `room_questions`
 
 Oda tek bir dile sabit olduğu için (bkz. Bölüm 16, `rooms.locale`), bir odadaki soru sırası doğrudan `questions.id`'ye (o dildeki satıra) referans verir. Çift-locale çözümlemeye gerek yoktur.
@@ -961,7 +1009,7 @@ unique(room_id, question_id)
 
 Kural:
 
-- Oda kurulurken (owner'ın seçtiği kategori + soru sayısına göre), `categories` ve `questions` tablolarından **doğrudan `rooms.locale` diline ait** satırlar seçilip `room_questions`'a yazılır.
+- Oda kurulurken, `questions` tablosundan **doğrudan `rooms.locale` diline ait**, aktif, ücretsiz ve **odanın ilişki türüne uygun** kategorilerdeki satırlar seçilip `room_questions`'a yazılır. Seçilen kategori önceliklidir; yetmezse aynı güvenli havuzdan tamamlanır (başka türün sorusu ve premium kategori hiçbir zaman karışık havuza girmez). Tüm havuz çekilip gerçekten rastgele seçilir.
 - Guest aynı odaya girdiğinde, kendi cihaz dili ne olursa olsun bu sabit listeyi (oda dilinde) görür.
 - `translation_group_id` (bkz. `questions` tablosu) yalnızca **soru bankası içerik yönetimi** için kullanılır — örn. "TR'deki bu soru, EN'deki hangi soruya karşılık geliyor" bilgisini tutmak için. Oyun akışında veya cevap eşleştirmede kullanılmaz, çünkü artık tüm oda zaten tek dile sabit.
 
@@ -1092,12 +1140,12 @@ unique(provider_transaction_id)
 - Farklı cihazdan aynı ismi giren kişi otomatik owner olarak kabul edilmez.
 - Aynı cihazdan geri dönen oyuncu token ile kaldığı yerden devam eder.
 
-**Kayıtlı kullanıcı modeli (yalnızca mobile, premium/geçmiş oyunlar için):**
+**Kayıtlı kullanıcı modeli (yalnızca mobile; mobilde tüm oyun için zorunlu):**
 
 - Supabase Auth ile kimlik yönetilir; oturum Supabase JWT token ile korunur.
-- E-posta/şifre, Google OAuth veya Apple OAuth ile giriş yapılabilir.
+- Google OAuth veya Apple OAuth ile giriş yapılır.
 - Kayıtlı kullanıcının kurduğu odalar `user_id` ile ilişkilendirilir.
-- Premium hak `users.is_premium` ve oda kredisi `users.room_credits` alanlarıyla kontrol edilir.
+- Tier/coin `users` tablosunda tutulur ve yalnızca sunucuda doğrulanır/değiştirilir (bkz. Bölüm 12.2). Mobilde hesap silme imkânı bulunur.
 
 ### Genel kurallar
 
@@ -1157,6 +1205,8 @@ Anonim oyun oluşturma login gerektirmediği için kötüye kullanım riski vard
 - MVP'de fiziksel silme cron job'u zorunlu değildir.
 - İleride veri minimizasyonu için belirli aralıklarla eski anonim odaların temizlenmesi eklenebilir.
 - Analytics tarafında soru/cevap içeriği değil, event seviyesinde davranış metrikleri tutulmalıdır.
+- **Geri bildirim (`feedback`):** yalnızca puan, AI ilgisi, kısa serbest yorum (≤ 500 karakter) ve oda meta verisi (dil, mod, ilişki türü, platform) tutulur; cevap/tahmin içeriği asla. Kimlik yalnızca `participant_id`'dir (anonim kalır). Yazma token doğrulayan sunucu endpoint'i üzerindendir, tablo ve metrik görünümleri `anon/authenticated` erişimine kapalıdır. Anket yalnızca sonuçlar hazır olduktan sonra kabul edilir.
+- **Partnerin doğum tarihi** (yalnızca mobil, planlanan) ve AI yorum için LLM'e gönderilen veriler gizlilik açısından özel değerlendirme gerektirir; web'de doğum tarihi toplanmaz (bkz. Bölüm 12.5).
 
 ---
 
@@ -1180,12 +1230,22 @@ Anonim oyun oluşturma login gerektirmediği için kötüye kullanım riski vard
 - Tamamlanan oyun sonrası yeni oda oluşturma oranı
 - Web → mobile app indirme dönüşüm oranı (premium kategori kilidi üzerinden)
 
+### Memnuniyet ve ürün-pazar uyumu (web, canlı)
+
+Yatırım kararı için iki katman kullanılır: **söylenen** (anket) ve **yapılan** (davranış). İkincisi herkesi ölçer ve daha dürüsttür.
+
+- **Davranış** (anket gerektirmez; `metrics_daily_funnel`): oda açılan → **partner katılan** → **sonucu hazır olan** oranları; mod, ilişki türü ve dile göre kırılım. Partner katılım ve tamamlama oranı "beğeniyorlar mı"nın en güçlü göstergesidir.
+- **Anket** (`metrics_feedback_summary`): ortalama puan, beğenen (4–5) / beğenmeyen (1–2) sayısı, serbest yorumlar.
+- **AI yorum talebi:** `wants_ai` dağılımı (Evet / Belki / Hayır) — AI yorum yatırımının talep sinyali.
+- Veriler `TEST-` isimli test odaları hariç hesaplanır; sorgular Supabase SQL editöründen çalıştırılır.
+
 ### Gelir metrikleri (mobile)
 
-- Premium paket görüntülenme → satın alma dönüşüm oranı
-- Oda kredisi tükenme → kredi paketi satın alma dönüşüm oranı
+- Paket görüntülenme → satın alma dönüşüm oranı (Lite / Premium ayrı)
+- Coin tükenme → reklam izleme / paket satın alma dönüşümü
+- AI yorum açma oranı ve coin harcaması
 - Kullanıcı başı gelir
-- Premium kullanıcı başına ortalama oda kurma sayısı
+- Kullanıcı başına ortalama oda kurma sayısı
 
 ### İlk MVP başarı kriteri
 
@@ -1197,109 +1257,86 @@ Anonim oyun oluşturma login gerektirmediği için kötüye kullanım riski vard
 
 ---
 
-## 20. İlk Soru Kategorileri
+## 20. Soru Kategorileri (v2 — canlıda)
 
-> **Dil ve çeviri notu:** Aşağıdaki sorular TR olarak listelenmiştir; bu, soru bankasının ilk yazıldığı dildir. EN ve ES setleri bunlardan **elle uyarlanır** (otomatik çeviri değil, bkz. Bölüm 16). Çoğu soru üç dilde birebir anlam taşıyacak şekilde çevrilebilir (örn. "Her gün mesajlaşmak senin için önemli mi?" → "Is it important for you to text every day?" → "¿Es importante para ti enviar mensajes todos los días?"). Ancak bazı sorular/kategoriler kültüre özgü olabilir — bu durumlarda birebir çeviri yerine, o dil/kültür için doğal ve anlamlı bir soru yazılır ve `translation_group_id` boş bırakılır (bkz. Bölüm 17).
+> Önceki 5 kategorili, yalnızca Türkçe/çift odaklı liste **yerini v2 setine bırakmıştır**. Eski sorular silinmedi, pasife alındı (mevcut odalar/sonuçlar bozulmasın diye). Tüm içerik **elle yazılmış/uyarlanmıştır** (otomatik çeviri yok, bkz. Bölüm 16); her soru TR/EN/ES olarak birlikte yazılır ve `translation_group_id` ile eşleşir.
 
-### İletişim
+### Yapı
 
-- Her gün mesajlaşmak senin için önemli mi?
-- Günaydın mesajı almak hoşuna gider mi?
-- Geç cevap verilmesi seni rahatsız eder mi?
-- Telefonda konuşmak yazışmadan daha iyi midir?
-- Gün içinde haberleşmek önemli midir?
+- **11 kategori × 30 soru**: her kategoride **10 Secret Choice + 10 Prediction + 10 Orderline**. Toplam 330 soru/dil, 990 satır.
+- 10'luk bir oyun tek bir modda, tek bir kategoride açılabilsin diye her modda her kategoride tam 10 soru vardır.
+- Prediction ve Orderline'da her soru tam **4 seçenek/kart** içerir; seçenekler birbirinden net ayrışan tavırlardır (AI'ın kişilik tonunu okuyabilmesi için, "iyi/daha iyi" hiyerarşisi yok).
+- Her soru, kullanıcıya görünmeyen bir **`insight_tag`** taşır (`planning_style`, `honesty_vs_tact`, `love_language`, `money_habit` …) — AI yorumu için tema.
 
-### İlk Buluşma / Yakınlaşma
+| Kategori (TR) | Slug | Kanka | Sevgili | Hayat Arkadaşı |
+|---|---|:-:|:-:|:-:|
+| Kanka Testi | `friend_test` | ✓ | | |
+| Çılgın Senaryolar | `wild_scenarios` | ✓ | | |
+| Sosyal Hayat | `social_life` | ✓ | | |
+| Tanışma | `first_date` | | ✓ | |
+| Romantizm | `romance` | | ✓ | |
+| Birlikte Gelecek | `future` | | | ✓ |
+| Ev & Para | `home_money` | | | ✓ |
+| İletişim | `communication` | ✓ | ✓ | ✓ |
+| Yaşam Tarzı | `lifestyle` | ✓ | ✓ | ✓ |
+| Değerler | `values` | ✓ | ✓ | ✓ |
+| Cesur Sorular (premium) | `bold` | | ✓ | ✓ |
 
-- İlk buluşmada el ele tutuşmak doğal mı?
-- İlk buluşmada uzun saatler geçirmek hoşuna gider mi?
-- İlk buluşmada fotoğraf çekmek ister misin?
-- İlk buluşmada ikinci buluşmayı konuşmak doğru mu?
-- İlk buluşmada eski ilişkilerden bahsetmek sorun olur mu?
+Her ilişki türü 6 kategori görür (Sevgili ve Hayat Arkadaşı'nda biri premium olan Cesur Sorular'dır); ücretsiz havuz her modda en az 50 soru içerir (Kanka 60, Sevgili 50, Hayat Arkadaşı 50).
 
-### Sosyal Hayat
+### İçerik kuralları
 
-- Partnerin sık arkadaşlarıyla çıkması normal midir?
-- Karşı cins yakın arkadaş olabilir mi?
-- Sosyal medyada ilişki paylaşmak ister misin?
-- Partnerin yalnız tatile gitmesi normal midir?
-- Kalabalık arkadaş ortamları hoşuna gider mi?
+- **Kanka'ya açık hiçbir kategoride hiçbir soru/seçenek romantik çağrışım taşımaz** ("partner", "sevgili", "aşk", "flört", "evlilik", "kıskançlık", "ilişki", ilk buluşma… ve EN/ES karşılıkları). Ortak kategoriler tür-bağımsız yazılır. Kural `scripts/check-questions.mjs` ile otomatik denetlenir.
+- **Cesur Sorular:** açık cinsel içerik yoktur; "cesur/romantik" çerçevede dürüstlük, kırılganlık, sınırlar, kıskançlık, sırlar. Yalnızca Sevgili ve Hayat Arkadaşı'nda ve premium.
+- **Hayat Arkadaşı:** evlilik/çocuk gibi hassas konular varsayılmaz.
+- Sorular yargılayıcı olmaz; seçenekler "doğru/yanlış" değil "farklı yaklaşım" olarak yazılır.
+- Soruları **silme, pasife al**; metin düzeltmesi belirlenimci kimliklerle (UUID v5) migration ile yapılır.
 
-### Yaşam Tarzı
+### Kaynak ve inceleme
 
-- Hafta sonunu evde geçirmek hoşuna gider mi?
-- Spontane planları sever misin?
-- Erken kalkmayı sever misin?
-- Gelecekte yurt dışında yaşamak ister misin?
-- Evde birlikte yemek yapmak hoşuna gider mi?
-
-### Değerler
-
-- Bir ilişkide özel alan önemli midir?
-- Duygularını kolay ifade eder misin?
-- Planlı yaşamak senin için önemli midir?
-- Aile ilişkileri senin için çok önemli midir?
-- Kariyer ilişkiden önce gelebilir mi?
-
-> Not: Bu kategorilerin hangilerinin premium olacağı (`categories.is_premium`) henüz belirlenmemiştir. Yeni, daha "cesur" veya "derin" kategoriler premium olarak eklenebilir. Bir kategori premium statüsü, o kategorinin TR/EN/ES tüm dil satırlarında aynı olmalıdır (bkz. Bölüm 17).
+- Kaynak: `seeds/v2/` (kategori başına bir dosya). Migration üretimi: `scripts/build-questions-migration.mjs`. Denetim: `scripts/check-questions.mjs`.
+- Okunabilir inceleme belgeleri: `docs/questions-v2-tr.md`, `-en.md`, `-es.md` (`scripts/export-questions-md.mjs`).
+- İngilizce ve İspanyolca içerik Claude ile elle uyarlanmıştır; yayın öncesi ana dili İspanyolca olan birinin gözden geçirmesi önerilir.
 
 ---
 
 ## 21. Geliştirme Fazları
 
-### Faz 1 — Web MVP (tamamlandı, stabil)
+### Faz 1 — Web MVP (tamamlandı)
 
-- Landing
-- Oda oluşturma
+- Landing, oda oluşturma, link paylaşımı, guest join (anonim participant token), token hash saklama
+- Birleştirilmiş tur, soft realtime status, mikro-reveal, server-side sonuç hesaplama, sonuç ekranı
+- Temel RLS / server-side erişim kontrolleri, temel abuse/rate limit
 - Secret Choice modu
-- Link paylaşımı
-- Guest join (anonim participant token ile)
-- Owner/guest token üretimi ve token hash saklama
-- Birleştirilmiş tur akışı
-- Soft realtime status
-- Mikro-reveal
-- Sonuç hesaplama (server-side endpoint)
-- Sonuç ekranı
-- Soru bankası: 50 soru (TR)
-- Temel RLS / server-side veri erişim kontrolleri
-- Temel abuse/rate limit kontrolü
-- Arayüz dil desteği: TR/EN (next-intl)
 
-### Faz 2 — Web Genişletme (kategori sistemi + üç dil)
+### Faz 2 — Web Genişletme (tamamlandı)
 
-- `categories` tablosu (locale bazlı) ve `questions` tablosu (locale bazlı, `translation_group_id` ile); `room_questions`/`answers`/`predictions` düz `question_id` FK ile migration
-- Soru bankasının EN ve ES setlerinin hazırlanması (elle uyarlama, bkz. Bölüm 16/20) ve veritabanına eklenmesi
-- Arayüz dil desteğine İspanyolca eklenmesi (next-intl, üçüncü locale)
-- Create Game Screen'e kategori seçimi UI'ı
-- Premium kategori kilidi (görsel) + mobile app'e yönlendirme
+- `categories` ve `questions` locale bazlı; `room_questions`/`answers`/`predictions` düz `question_id` FK
+- Üç dil (TR/EN/ES): arayüz ve soru bankası
+- Kategori seçimi + premium kategori kilidi (görsel) + mobile'a yönlendirme
+- **Prediction, Orderline ve Karma modları** (web'de canlı)
+- **İlişki türü (Kanka / Sevgili / Hayat Arkadaşı)**: oda alanı, kategori filtresi, tür duyarlı metinler
+- **Soru seti v2**: 11 kategori × 30 soru × 3 dil, `insight_tag`, romantik-çağrışım denetimi
+- **Geri bildirim** (sonuç ekranı anketi + çıkış istemi) ve metrik görünümleri
+- Landing yenilemesi (4 adım, AI/mobil teaser, footer + Instagram), `gameofus.app` alan adı, paylaşım önizlemesi (Open Graph)
+- Performans: API sorgularının paralelleştirilmesi, Vercel bölgesi Supabase ile eşlendi, self-host font/ikon alt kümesi
 - API route'larının CORS + Bearer token desteğiyle mobile'a açılması
 
-### Faz 3 — Mobile MVP
+### Faz 3 — Mobile MVP (devam ediyor; ayrı repo, ayrıntı: `gameofus-mobile/tasklist.md`)
 
-- Expo proje kurulumu
-- Supabase client + anonim participant_token akışı (expo-secure-store)
-- Web API route'larına bağlanan API client
-- Tüm oyun ekranları (Secret Choice, birleştirilmiş tur, sonuç)
-- Mobile arayüz dil desteği (TR/EN/ES, expo-localization + i18n-js)
-- Deep linking (universal link + custom scheme)
-- Signin / Signout (Supabase Auth)
-- Premium satın alma akışı (IAP)
-- Oda kredisi sistemi
-- Geçmiş oyunlar sekmesi
-- Push notification
+- Tüm oyun ekranları ve dört mod (yapıldı), giriş (Google/Apple) zorunlu
+- İlişki türü seçimi ve kategori filtresi (backend hazır; mobil arayüz yapılacak)
+- Coin + tier, paket ekranı, IAP (RevenueCat), restore
+- Geçmiş oyunlar, push notification, deep link / universal link, hesap silme
+- AI yorum (sonuç ekranında, coin ile) ve gerekiyorsa doğum tarihi/yaş doğrulama (Cesur Sorular)
 
-### Faz 4 — İleri Özellikler
+### Faz 4 — Web tarafında sıradaki işler
 
-- Prediction modu
-- Orderline modu
-- Karma oyun
-- PWA install prompt (web)
-- AI destekli soru önerileri
-- Admin panel
-- Eski anonim odalar için otomatik veri temizleme job'u
-- HttpOnly cookie tabanlı token saklama hardening'i (web)
-- Gerekirse Supabase Edge Function'a geçiş (web deploy bağımlılığını azaltmak için)
-- Dördüncü+ dil ekleme (yapı zaten satır-bazlı olduğu için şema değişikliği gerektirmez)
+- Mobil için backend: `users/*` (me, coins/spend, coins/earn), `iap/verify`, `ai-commentary`, hesap silme; `users.tier`, `categories.min_tier`, `credit_transactions`, `results.ai_commentary`
+- Universal link dosyaları (`apple-app-site-association`, `assetlinks.json`) — `gameofus.app`
+- Sonuç paylaşım kartları ve (sonra) Instagram'a paylaşma
+- PWA install prompt, admin panel, eski anonim odalar için veri temizleme job'u, HttpOnly cookie hardening, gerekirse Edge Function'a geçiş
+- Dördüncü+ dil ekleme (yapı satır-bazlı olduğu için şema değişikliği gerektirmez)
 
 ---
 
@@ -1307,17 +1344,24 @@ Anonim oyun oluşturma login gerektirmediği için kötüye kullanım riski vard
 
 | Karar | Sonuç |
 |---|---|
-| Domain | .app uzantısı hedefleniyor (gameofus.app), kesinleşmedi |
 | Token mimarisi | Anonim kullanıcılar için owner/guest `participant_token` üretilecek; DB'de yalnızca `token_hash` tutulacak |
 | Owner tanıma | Owner yalnızca token/JWT ile tanınır; isim eşleştirmesi owner olmak için yeterli değildir |
 | Guest tanıma | Guest ilk katılımda token alır; aynı cihazdan token ile devam eder |
 | Token saklama | Web: localStorage (hardening'de HttpOnly cookie); Mobile: expo-secure-store |
-| Auth | Supabase Auth yalnızca mobile'da premium/geçmiş oyun akışında zorunlu; ücretsiz oyun (her iki platform) anonimdir |
-| **Premium modeli** | **Tek seferlik satın alma → kalıcı kategori erişimi + oda kredisi; zaman bazlı model kaldırıldı** |
-| **Ödeme sağlayıcısı** | **Mobile App Store / Play Store IAP; Lemon Squeezy kullanılmıyor** |
+| Auth | Web'de ücretsiz oyun anonimdir (login yok). **Mobilde her oyun için Google/Apple girişi zorunludur** (anonim oyun yok); Supabase Auth yalnızca mobildedir |
+| **Premium modeli** | **Coin + tier: Lite (≈$6.90, 2000 coin) ve Premium (≈$10.90, 5000 coin) tek seferlik consumable paketler; paket tier'ı kalıcı yükseltir (asla düşürmez) ve coin ekler; kategori erişimi yalnızca tier ile (coin ile açılmaz). Eski "tek seferlik premium + oda kredisi" ve zaman bazlı modeller kaldırıldı** |
+| **Coin ekonomisi** | **Kayıt +500, reklam +100, oda −250, AI yorum −100 (herkes için)** |
+| **Ödeme sağlayıcısı** | **Mobile App Store / Play Store IAP (RevenueCat); Lemon Squeezy kullanılmıyor** |
 | **Premium kapsamı** | **Yalnızca mobile; web hiçbir premium/login mantığı barındırmaz** |
-| Premium paket fiyatı / başlangıç kredisi | Henüz belirlenmedi |
-| Oda kredisi paketi boyutu / fiyatı | Henüz belirlenmedi |
+| Paket fiyatlarının yerel karşılıkları, reklam günlük limiti | Henüz belirlenmedi |
+| **İlişki türleri** | **Kanka (`friend`) / Sevgili (`dating`) / Hayat Arkadaşı (`partner`); oda kurulurken zorunlu, kurulduktan sonra değişmez; slug teknik, görünen isim çeviri. İngilizce: friend/partner, İspanyolca: amigo/pareja** |
+| **Kanka içerik kuralı** | **Kanka'ya açık hiçbir kategoride romantik çağrışım yok (otomatik denetim); ortak kategoriler tür-bağımsız** |
+| **Kategori filtresi** | **`categories.relationship_types` ile; sunucu doğrular; "Karışık Sürpriz" yalnızca uygun, ücretsiz kategorilerden çeker** |
+| **Geri bildirim** | **Sonuç ekranında isteğe bağlı mini anket (puan, AI ilgisi, yorum) + oda başına bir kez yumuşak çıkış istemi; zorunlu değil. Davranış metrikleri (partner katılımı, tamamlama) asıl memnuniyet sinyalidir** |
+| **AI yorum** | **Mobil, coin ile (−100), `insight_tag` + yapılandırılmış cevaplardan; yayın öncesi rıza/gizlilik netleştirilir; web'de yalnızca "yakında" olarak anlatılır** |
+| **Yaş doğrulama** | **Yalnızca mobilde (Cesur Sorular için, Sevgili/Hayat Arkadaşı + her iki oyuncu 18+); web'de Cesur Sorular kilitli olduğu için doğum tarihi toplanmaz** |
+| **Domain** | **`gameofus.app` (satın alındı, canlı); Instagram `@gameofus.app`** |
+| **Altyapı** | **Vercel fonksiyonları Supabase ile aynı bölgede (Frankfurt); Next.js sürümü sabit; fontlar/ikonlar self-host** |
 | Sonuç hesaplama | Server-side endpoint üzerinden yapılır |
 | Realtime kapsamı | Sadece oda/participant status güncellemeleri; answers/predictions realtime'a açılmaz |
 | Oda expire | 24 saat (tüm odalar için, premium ayrımı yok) |
@@ -1330,7 +1374,8 @@ Anonim oyun oluşturma login gerektirmediği için kötüye kullanım riski vard
 | **Kültüre özgü soru farklılaşması** | **İzin verilir; `translation_group_id` opsiyoneldir, birebir karşılığı olmayan sorular bağımsız satır olarak eklenebilir** |
 | Dil seçimi | Varsayılan: tarayıcı/cihaz dilinden otomatik algılama (Accept-Language / expo-localization); kullanıcı manuel değiştirebilir (arayüz dili, oturum bazlı) |
 | **Oda dili modeli** | **Oda, owner'ın kurduğu andaki arayüz diline sabitlenir (`rooms.locale`); guest kendi cihaz dili ne olursa olsun odanın diline tabi olur (hem arayüz hem soru içeriği). Çift-locale çözümleme veya `question_ref` mantığına gerek yoktur — `room_questions`/`answers`/`predictions` düz `question_id` FK kullanır.** |
-| Soru bankası | 50 soru (TR), EN ve ES setleri Faz 2'de elle uyarlanacak, seeds dosyasından migration ile insert edilir |
+| Soru bankası | **v2: 11 kategori × 30 soru × 3 dil (990 satır), elle yazılmış; eskiler pasife alındı (silinmedi); `seeds/v2` → üretilen migration** |
+| Dil algılama (web) | Cookie (önceki tercih) → `Accept-Language` → `en`; middleware tek karar noktası |
 
 ---
 
@@ -1350,12 +1395,12 @@ MVP başarılı sayılacaktır eğer:
 
 ## 24. Özet
 
-Game of Us, iki kişinin birbirini tahmin ederek ve cevapları birlikte açarak daha iyi tanımasını sağlayan link bazlı bir uygulamadır. Web'de stabil bir MVP olarak çalışır; mobile app, aynı oyun deneyimini native bir katmanla (push notification, geçmiş oyunlar, premium kategoriler) genişletir.
+Game of Us, iki kişinin — arkadaşlar, sevgililer ya da hayat arkadaşları — birbirini tahmin ederek ve cevapları birlikte açarak daha iyi tanımasını sağlayan link bazlı bir uygulamadır. Web'de stabil bir MVP olarak çalışır; mobile app, aynı oyun deneyimini native bir katmanla (push notification, geçmiş oyunlar, premium kategoriler) genişletir.
 
-Ücretsiz oyun, her iki platformda da tamamen anonimdir — link paylaşımı, iki kişilik oyun ve sonuç ekranı için kayıt gerekmez. Kayıt ve satın alma yalnızca mobile app'te, premium kategorilere kalıcı erişim ve oda kredisi almak isteyen kullanıcıdan istenir.
+Web'de oyun tamamen anonimdir — link paylaşımı, iki kişilik oyun ve sonuç ekranı için kayıt gerekmez. Mobil uygulamada giriş (Google/Apple) zorunludur; satın alma ve coin yalnızca orada vardır: Lite/Premium paketleri kategorilere kalıcı erişim ve coin verir, coin oda kurmak ve AI yorumu açmak için harcanır.
 
 Ürünün en kritik varsayımı teknik değil, davranışsaldır:
 
-> İnsanlar partnerine veya yakın olduğu bir kişiye bu oyun linkini göndermek isteyecek mi?
+> İnsanlar arkadaşına, partnerine veya yakın olduğu bir kişiye bu oyun linkini göndermek isteyecek mi?
 
 MVP'nin temel amacı bu varsayımı hızlı, düşük maliyetli ve ölçülebilir şekilde test etmektir. Mobile genişleme, bu varsayım doğrulandıktan sonra ürünü derinleştirme ve sürdürülebilir gelir modeli kurma adımıdır.

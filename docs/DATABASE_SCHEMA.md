@@ -1,316 +1,225 @@
 # DATABASE_SCHEMA.md — Game of Us
 
-Bu doküman Supabase Postgres veri modelini tanımlar. Migration üretiminde bu dosya esas alınmalıdır.
+Supabase Postgres veri modeli. **Gerçek şemanın tek kaynağı `supabase/migrations/*.sql` dosyalarıdır**;
+bu doküman onların okunabilir özetidir. Çelişkide migration'lar geçerlidir. Tipler:
+`types/database.types.ts`.
 
 ---
 
 ## 1. Genel İlkeler
 
-- UUID primary key kullanılır.
-- Zaman alanları `timestamptz` olmalıdır.
+- UUID primary key; zaman alanları `timestamptz`.
 - Kritik duplicate kayıtlar unique constraint ile engellenir.
-- Token DB'de plaintext tutulmaz, yalnızca hash tutulur.
-- Reveal öncesi partner cevapları client'a ham veri olarak açılmaz.
-- Ücretsiz oda 24 saat, premium oda 72 saat geçerlidir.
+- Token DB'de plaintext tutulmaz, yalnızca `token_hash`.
+- Reveal öncesi partner cevapları client'a ham veri olarak açılmaz; tüm yazma/okuma server-side
+  endpoint'ler (service role) üzerinden yapılır. RLS açıktır, doğrudan client erişimi kısıtlıdır.
+- **Tüm odalar 24 saat geçerlidir** (`expires_at`); premium ayrımı yoktur. Expire okuma anında
+  `expires_at < now()` ile kontrol edilir.
+- **Sorular silinmez, pasife alınır** (`questions.is_active = false`): `room_questions` cascade ile
+  silinir, `answers`/`predictions` soruya cascade'siz bağlıdır.
 
 ---
 
 ## 2. Enum / Check Değerleri
 
-### room status
+| Ad | Değerler |
+|---|---|
+| `room_status` | `created`, `waiting_guest`, `guest_joined`, `owner_playing`, `guest_playing`, `owner_completed`, `guest_completed`, `result_ready`, `completed`, `expired` |
+| `participant_role` | `owner`, `guest` |
+| `participant_status` | `invited`, `joined`, `playing`, `completed` |
+| `game_mode` | `secret_choice`, `prediction`, `orderline`, `mixed` (`questions.mode` yalnızca ilk üçünü kullanır) |
+| `confidence_level` | `guess` (×1), `think` (×2), `sure` (×3) |
+| `rooms.relationship_type` | `friend`, `dating`, `partner` (check; nullable) |
+| `categories.relationship_types` | bu üç değerin boş olmayan alt kümesi (`text[]`) |
+| `feedback.wants_ai` | `yes`, `maybe`, `no` |
 
-```txt
-created
-waiting_guest
-guest_joined
-owner_playing
-guest_playing
-owner_completed
-guest_completed
-result_ready
-completed
-expired
-```
+`answer_value` / `predicted_value` (jsonb) formatları:
 
-### participant role
-
-```txt
-owner
-guest
-```
-
-### participant status
-
-```txt
-invited
-joined
-playing
-completed
-```
-
-### game mode
-
-```txt
-secret_choice
-prediction
-orderline
-mixed
-```
-
-MVP'de sadece `secret_choice` aktiftir.
-
-### secret choice values
-
-```txt
-yes
-unsure
-no
-```
-
-### confidence level
-
-```txt
-guess
-think
-sure
-```
+| Mod | Format |
+|---|---|
+| secret_choice | `{ "value": "yes" \| "unsure" \| "no" }` |
+| prediction | `{ "option_id": "<question_options.id>" }` |
+| orderline | `{ "order": ["<option_id>", …] }` (1. eleman en önemli/tercihli) |
 
 ---
 
 ## 3. Tablolar
 
-## `users`
-
-Yalnızca Faz 2 premium kullanıcıları için kullanılır. Supabase Auth UID ile ilişkilidir.
+### `users` — yalnızca mobil (Supabase Auth)
 
 | Alan | Tip | Not |
 |---|---|---|
 | id | uuid | Supabase Auth UID |
-| email | text | Kullanıcı e-postası |
-| premium_until | timestamptz nullable | Premium bitiş zamanı |
-| created_at | timestamptz | default now() |
+| email | text | |
+| is_premium | boolean | default false |
+| room_credits | int | default 0 — **coin bakiyesi** için kullanılır |
+| created_at | timestamptz | |
 
----
+Planlanan (coin + tier modeli, bkz. PRD 12.2): `tier text default 'free' check in ('free','lite','premium')`,
+`birth_date date null`, ayrıca `credit_transactions` (user_id, delta, reason, created_at) audit tablosu.
+`premium_until` kaldırılmıştır.
 
-## `rooms`
+### `rooms`
 
 | Alan | Tip | Not |
 |---|---|---|
-| id | uuid | primary key |
-| room_code | text | public link kodu, unique |
-| status | text | room status |
-| game_mode | text | MVP: secret_choice |
-| question_count | int | seçilen soru sayısı |
-| owner_id | uuid nullable | participants.id |
-| user_id | uuid nullable | users.id, anonim odalarda null |
-| is_premium_room | boolean | default false |
+| id | uuid | PK |
+| room_code | text | unique, tahmin edilemez |
+| status | room_status | |
+| game_mode | game_mode | secret_choice / prediction / orderline / mixed |
+| question_count | int | 5 veya 10 |
+| owner_id | uuid null | participants.id |
+| user_id | uuid null | users.id; anonim odalarda null |
 | max_participants | int | default 2 |
-| join_locked | boolean | default false |
+| join_locked | boolean | oda dolunca true |
+| locale | text | `tr` / `en` / `es`; oda kurulurken sabitlenir |
+| category_id | uuid null | `categories.id` (odanın dilindeki satır) |
+| relationship_type | text null | `friend` / `dating` / `partner`; eski odalarda ve alanı göndermeyen mobil build'lerde null |
+| created_at | timestamptz | |
+| expires_at | timestamptz | +24 saat |
+
+`is_premium_room` kaldırılmıştır. Planlanan: `partner_birth_date date null` (yalnızca mobil, yaş doğrulama).
+
+Index: `unique(room_code)`, `status`, `expires_at`, `user_id`, `category_id`.
+
+### `participants`
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | uuid | PK |
+| room_id | uuid | rooms.id (cascade) |
+| role | participant_role | |
+| display_name | text | yalnızca gösterim |
+| status | participant_status | |
+| token_hash | text | SHA-256, ham token tutulmaz |
+| last_seen_at, completed_at | timestamptz null | |
+| created_at | timestamptz | |
+
+Constraint: `unique(room_id, role)`, `unique(room_id, token_hash)`.
+
+### `categories`
+
+Satır bazlı locale: aynı kategorinin TR/EN/ES için ayrı satırı vardır.
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | uuid | PK |
+| slug | text | dil bağımsız kimlik (`friend_test`, `communication`…) |
+| name | text | o dildeki görünen ad |
+| locale | text | `tr` / `en` / `es` |
+| is_premium | boolean | slug bazında tüm dillerde aynı olmalı |
+| relationship_types | text[] | kategorinin göründüğü ilişki türleri; default `{friend,dating,partner}` |
+| sort_order | int | |
+| created_at | timestamptz | |
+
+Constraint: `unique(slug, locale)`, `check (relationship_types <@ {friend,dating,partner} and cardinality > 0)`.
+Planlanan: `min_tier text` (free/lite/premium).
+
+Güncel kategoriler (v2, 11): `friend_test`, `wild_scenarios`, `social_life` (friend) · `first_date`, `romance`
+(dating) · `future`, `home_money` (partner) · `communication`, `lifestyle`, `values` (üçü) · `bold`
+(dating + partner, premium). Ayrıntı: PRD Bölüm 20.
+
+### `questions`
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | uuid | PK (v2 sorularda belirlenimci UUID v5) |
+| mode | game_mode | secret_choice / prediction / orderline |
+| category_id | uuid | categories.id (ilgili dildeki satır) |
+| question_text | text | `locale` dilinde |
 | locale | text | default 'tr' |
-| created_at | timestamptz | default now() |
-| expires_at | timestamptz | free: +24h, premium: +72h |
+| translation_group_id | uuid null | aynı sorunun dilleri; yalnızca içerik yönetimi için |
+| insight_tag | text null | AI yorumu için tema etiketi; v2'de dolu, eski sorularda null; kullanıcıya görünmez |
+| is_active | boolean | **silme, pasife al** |
+| created_at | timestamptz | |
 
-### Constraint / Index
+Eski `category` (text) kolonu kaldırılmış, yerine `category_id` gelmiştir. Aktif set: 990 satır
+(11 kategori × 30 soru × 3 dil; mod başına 10). Eski 150 soru pasiftir (`insight_tag is null`).
 
-```sql
-unique(room_code)
-index(status)
-index(expires_at)
-index(user_id)
-```
+### `question_options`
 
----
-
-## `participants`
+Prediction ve Orderline için (her soruda tam **4** seçenek); Secret Choice'ta kullanılmaz.
 
 | Alan | Tip | Not |
 |---|---|---|
-| id | uuid | primary key |
-| room_id | uuid | rooms.id |
-| role | text | owner / guest |
-| display_name | text | yalnızca gösterim için |
-| status | text | joined / playing / completed |
-| token_hash | text | raw token değil, hash |
-| last_seen_at | timestamptz nullable | opsiyonel |
-| completed_at | timestamptz nullable | oyuncu bitirme zamanı |
-| created_at | timestamptz | default now() |
+| id | uuid | PK |
+| question_id | uuid | questions.id (cascade) |
+| option_text | text | soru dilinde |
+| sort_order | int | 1'den başlar; Orderline'da yalnızca görüntüleme sırası |
 
-### Constraint / Index
+Constraint: `unique(question_id, sort_order)`.
 
-```sql
-unique(room_id, role)
-unique(room_id, token_hash)
-index(room_id)
-index(status)
-```
+### `room_questions`
 
----
+`room_id`, `question_id` (düz FK, oda dilindeki soru), `round_order`.
+Constraint: `unique(room_id, round_order)`, `unique(room_id, question_id)`.
 
-## `questions`
+### `answers`
 
-| Alan | Tip | Not |
-|---|---|---|
-| id | uuid | primary key |
-| mode | text | secret_choice / prediction / orderline |
-| category | text | communication, social_life vb. |
-| question_tr | text | Türkçe soru |
-| question_en | text nullable | İngilizce soru, Faz 1'de opsiyonel |
-| is_active | boolean | default true |
-| created_at | timestamptz | default now() |
+`room_id`, `question_id`, `participant_id`, `answer_value jsonb`, `locked_at`, `created_at`.
+Constraint: `unique(room_id, question_id, participant_id)`. Kilitlendikten sonra güncellenmez.
 
-### Index
+### `predictions`
 
-```sql
-index(mode)
-index(category)
-index(is_active)
-```
+`room_id`, `question_id`, `predictor_participant_id`, `target_participant_id`, `predicted_value jsonb`,
+`confidence_level`, `confidence_multiplier` (1/2/3), `locked_at`, `created_at`.
+Constraint: `unique(room_id, question_id, predictor_participant_id, target_participant_id)`.
 
----
+### `results`
 
-## `question_options`
+`room_id` (unique), `reading_score numeric` (0–100), `details_json jsonb` (soru bazlı sonuçlar), `created_at`.
+Planlanan: `ai_commentary text null`.
 
-Prediction modu için kullanılır. Secret Choice için seçenekler sabittir.
+### `feedback`
+
+Sonuç ekranı mini anketi. Yazma yalnızca `POST /api/feedback` ile; **RLS açık, policy yok**.
 
 | Alan | Tip | Not |
 |---|---|---|
-| id | uuid | primary key |
-| question_id | uuid | questions.id |
-| option_tr | text | Türkçe seçenek |
-| option_en | text nullable | İngilizce seçenek |
-| sort_order | int | gösterim sırası |
+| id | uuid | PK |
+| room_id, participant_id | uuid | cascade; `unique(room_id, participant_id)` |
+| rating | smallint | 1–5 |
+| wants_ai | text null | yes / maybe / no |
+| comment | text null | ≤ 500 karakter |
+| locale, game_mode, relationship_type | text null | oda meta verisi |
+| platform | text | `web` / `mobile` |
+| created_at, updated_at | timestamptz | |
 
-### Constraint
+Cevap/tahmin içeriği saklanmaz.
 
-```sql
-unique(question_id, sort_order)
-```
+### `purchases` — mobil IAP (Lemon Squeezy / `payments` kullanılmaz)
 
----
+`user_id`, `product_type` (`premium_package` / `room_credit_pack`; coin+tier modelinde Lite/Premium
+paketleri için genişletilecek), `provider` (`app_store` / `play_store`), `provider_transaction_id`
+(unique), `amount`, `currency`, `status`, `created_at`. RLS: kullanıcı yalnızca kendi satırını okur.
 
-## `room_questions`
+### `rate_limits`
 
-| Alan | Tip | Not |
-|---|---|---|
-| id | uuid | primary key |
-| room_id | uuid | rooms.id |
-| question_id | uuid | questions.id |
-| round_order | int | oyun içi sıra |
-
-### Constraint / Index
-
-```sql
-unique(room_id, round_order)
-unique(room_id, question_id)
-index(room_id)
-```
+`key` (IP hash), `action` (`create_room`), `count`, `window_start`, `created_at`.
+Limitler: IP başına saatte 10, günde 50 oda.
 
 ---
 
-## `answers`
+## 4. Metrik görünümleri
 
-| Alan | Tip | Not |
-|---|---|---|
-| id | uuid | primary key |
-| room_id | uuid | rooms.id |
-| question_id | uuid | questions.id |
-| participant_id | uuid | participants.id |
-| answer_value | jsonb | secret_choice için string value tutulabilir |
-| locked_at | timestamptz | kilit zamanı |
-| created_at | timestamptz | default now() |
+`security_invoker = true`; `anon`/`authenticated` erişimi `revoke` edilmiştir. Katılımcı adı `TEST-%` ile
+başlayan odalar hariç tutulur. Supabase SQL editöründen okunur.
 
-### Constraint / Index
-
-```sql
-unique(room_id, question_id, participant_id)
-index(room_id)
-index(participant_id)
-```
+| Görünüm | İçerik |
+|---|---|
+| `metrics_daily_funnel` | gün × mod × ilişki türü × dil: açılan oda, partner katılan, sonucu hazır olan, katılım ve tamamlama yüzdesi |
+| `metrics_participant_status` | gün × rol × durum: katılımcı sayısı (oyuncular nerede takılıyor) |
+| `metrics_feedback_summary` | gün × mod × tür × dil: yanıt sayısı, ortalama puan, beğenen/beğenmeyen, AI ilgisi dağılımı, yorumlu sayısı |
 
 ---
 
-## `predictions`
+## 5. Migration Notları
 
-| Alan | Tip | Not |
-|---|---|---|
-| id | uuid | primary key |
-| room_id | uuid | rooms.id |
-| question_id | uuid | questions.id |
-| predictor_participant_id | uuid | tahmini yapan |
-| target_participant_id | uuid | tahmin edilen |
-| predicted_value | jsonb | secret_choice için string value |
-| confidence_level | text | guess / think / sure |
-| confidence_multiplier | int | 1 / 2 / 3 |
-| locked_at | timestamptz | kilit zamanı |
-| created_at | timestamptz | default now() |
-
-### Constraint / Index
-
-```sql
-unique(room_id, question_id, predictor_participant_id, target_participant_id)
-index(room_id)
-index(predictor_participant_id)
-index(target_participant_id)
-```
-
----
-
-## `results`
-
-| Alan | Tip | Not |
-|---|---|---|
-| id | uuid | primary key |
-| room_id | uuid | rooms.id |
-| reading_score | numeric | 0-100 |
-| details_json | jsonb | soru bazlı sonuçlar |
-| created_at | timestamptz | default now() |
-
-### Constraint
-
-```sql
-unique(room_id)
-```
-
----
-
-## `payments` — Faz 2
-
-| Alan | Tip | Not |
-|---|---|---|
-| id | uuid | primary key |
-| user_id | uuid | users.id |
-| room_id | uuid nullable | ilgili oda varsa |
-| provider | text | lemonsqueezy |
-| provider_event_id | text | webhook event id |
-| amount | numeric | 2.99 |
-| currency | text | USD |
-| status | text | pending / paid / failed / refunded |
-| created_at | timestamptz | default now() |
-
-### Constraint
-
-```sql
-unique(provider_event_id)
-```
-
----
-
-## `rate_limits` — Opsiyonel
-
-| Alan | Tip | Not |
-|---|---|---|
-| id | uuid | primary key |
-| ip_hash | text | IP hash |
-| action | text | create_room vb. |
-| count | int | istek sayısı |
-| window_start | timestamptz | pencere başlangıcı |
-| created_at | timestamptz | default now() |
-
----
-
-## 4. Migration Notları
-
-- `answers` ve `predictions` kayıtları kilitlendikten sonra güncellenmemelidir.
-- Duplicate submit durumunda API aynı kaydı ikinci kez yazmamalı; uygun hata veya mevcut durum dönmelidir.
-- Expire için cron gerekmez; `expires_at < now()` kontrolü okuma anında yapılır.
-- Eski anonim oda temizleme job'u Faz 3'e bırakılır.
+- Migration'lar tarih damgalı dosyalardır; sıra önemlidir. Soru seti v2 migration'ları üretilir
+  (`scripts/build-questions-migration.mjs`): `…_questions_v2_schema` → `…part1..4` (sorular pasif eklenir) →
+  `…activate` (sayı/kategori/seçenek doğrulaması + eskileri pasife alıp yenileri aktifleştirir, atomik).
+  Üretilen dosyaları elle düzenleme; `seeds/v2` düzeltip yeniden üret.
+- Geri dönüş: eski set silinmediği için `update questions set is_active = (insight_tag is null);` eski seti geri getirir.
+- `answers` ve `predictions` kayıtları kilitlendikten sonra güncellenmez.
+- Duplicate submit'te aynı kayıt ikinci kez yazılmaz.
+- Eski anonim oda temizleme job'u ileri bir fazdadır.
