@@ -415,8 +415,8 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   Metrik görünümünde `source` (`duo` / `solo_red_flag`).
 - Dev sunucusunda (Turbopack) yeni Tailwind sınıfları bazen CSS'e girmez (ör. `w-9` boyutsuz görünür); üretim derlemesi
   doğrudur. Şüphede `next build && next start` ile doğrula.
-- Paylaşım: `GET /api/solo/red-flag/card?g=<9 harf G/Y/R>&l=<dil>[&fmt=og]` (`next/og`, 1080×1920; `fmt=og` yatay
-  1200×630 link önizlemesi). Paylaşım linki `…/solo/red-flag?s=<kod>` — önizleme gönderenin karnesini gösterir (kişisel
+- Paylaşım: `GET /api/solo/red-flag/card?g=<9 harf G/Y/R>&l=<dil>[&q=<G|Y|R><senaryo id>,…][&fmt=og]` (`next/og`, 1080×1920;
+  küçük ızgara + her bayraktan bir soru/cevap kartı (`q`, metin DB'den); `fmt=og` yatay 1200×630 link önizlemesi). Paylaşım linki `…/solo/red-flag?s=<kod>` — önizleme gönderenin karnesini gösterir (kişisel
   veri yok). Satori `React.Fragment` desteklemez (görselde `<g>`/`<div>` kullan); fontlar `public/fonts/*.woff`.
 - Giriş noktaları: landing hero bağlantısı + bölüm (`#tek-basina`), footer, iki kişilik **bekleme** ve **sonuç**
   ekranlarında kapatılabilir `SoloPromoCard`. Oda oluşturma akışına **eklenmez** (oda modu değildir).

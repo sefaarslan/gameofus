@@ -40,7 +40,7 @@ GET  /api/rooms/[roomCode]/results
 POST /api/feedback
 POST /api/solo/red-flag/start
 POST /api/solo/[sessionId]/complete
-GET  /api/solo/red-flag/card?g=&l=&fmt=
+GET  /api/solo/red-flag/card?g=&l=&q=&fmt=
 ```
 
 Ayrı bir `calculate-results` endpoint'i **yoktur**: sonuç, ikinci oyuncu `complete` çağırdığında aynı
@@ -277,7 +277,9 @@ döndürmez: istemci ve paylaşım görseli, Red sayısına göre sabit metni (`
 ### `GET /api/solo/red-flag/card`
 
 Paylaşım görseli (PNG, `next/og`): `g` (9 harf `[GYR]`, aksi 400), `l` (`tr|en|es`), `fmt=og` ile yatay 1200×630
-link önizlemesi (varsayılan 1080×1920 story). Uzun süreli cache; kişisel veri içermez.
+link önizlemesi (varsayılan 1080×1920 story). Story'de isteğe bağlı `q` = virgülle ayrılmış en fazla 3
+`<G|Y|R><senaryo uuid>`: her bayraktan bir senaryo metni DB'den okunup karta eklenir (geçersiz/bilinmeyen id
+yok sayılır). Uzun süreli cache; cevap verisi içermez, yalnızca oyuncunun paylaşmak için seçtiği senaryo metinleri.
 
 ---
 

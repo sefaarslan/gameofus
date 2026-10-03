@@ -4,6 +4,7 @@ import tr from "@/messages/tr.json";
 import en from "@/messages/en.json";
 import es from "@/messages/es.json";
 import { RED_FLAG_CARD_COUNT, computeProfile, decodeGrid, type Flag } from "@/lib/solo";
+import { createAdminClient } from "@/lib/supabase/server";
 
 const MESSAGES = { tr: tr.solo, en: en.solo, es: es.solo } as const;
 type Lang = keyof typeof MESSAGES;
@@ -13,10 +14,10 @@ const W = 1080;
 const H = 1920;
 
 // Basit, font bağımsız glifler (Satori için inline SVG)
-function Glyph({ flag }: { flag: Flag }) {
+function Glyph({ flag, size = 104 }: { flag: Flag; size?: number }) {
   const common = { stroke: "#ffffff", strokeWidth: 3, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, fill: "none" };
   return (
-    <svg width="104" height="104" viewBox="0 0 24 24">
+    <svg width={size} height={size} viewBox="0 0 24 24">
       {flag === "green" && <path d="M5 12.5l4.5 4.5L19 7.5" {...common} />}
       {flag === "yellow" && (
         <g>
@@ -46,6 +47,32 @@ async function loadFonts(origin: string) {
   );
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const FLAG_BY_LETTER: Record<string, Flag> = { G: "green", Y: "yellow", R: "red" };
+
+/** `q` = virgülle ayrılmış `<G|Y|R><senaryo uuid>` (en fazla 3, bayrak başına bir senaryo). Metin DB'den okunur. */
+async function loadPicks(raw: string | null): Promise<{ flag: Flag; text: string }[]> {
+  if (!raw) return [];
+  const parsed = raw
+    .split(",")
+    .slice(0, 3)
+    .flatMap((part) => {
+      const flag = FLAG_BY_LETTER[part.charAt(0)];
+      const id = part.slice(1);
+      return flag && UUID_RE.test(id) ? [{ flag, id }] : [];
+    });
+  if (parsed.length === 0) return [];
+  const { data } = await createAdminClient()
+    .from("solo_scenarios")
+    .select("id, scenario_text")
+    .in("id", parsed.map((p) => p.id));
+  const textById = new Map((data ?? []).map((r) => [r.id as string, r.scenario_text as string]));
+  return parsed.flatMap((p) => {
+    const text = textById.get(p.id);
+    return text ? [{ flag: p.flag, text }] : [];
+  });
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams, origin } = new URL(req.url);
   const flags = decodeGrid(searchParams.get("g"));
@@ -55,7 +82,7 @@ export async function GET(req: NextRequest) {
 
   const { counts, tolerance } = computeProfile(flags);
   const verdict = (t.verdicts as Record<string, { title: string; line: string }>)[String(Math.min(counts.red, RED_FLAG_CARD_COUNT))];
-  const fonts = await loadFonts(origin);
+  const [fonts, picks] = await Promise.all([loadFonts(origin), searchParams.get("fmt") === "og" ? [] : loadPicks(searchParams.get("q"))]);
 
   // Link önizlemesi (WhatsApp/sosyal): yatay 1200×630 varyant
   if (searchParams.get("fmt") === "og") {
@@ -106,8 +133,8 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const cell = 208;
-  const gap = 24;
+  const cell = 124;
+  const gap = 14;
 
   return new ImageResponse(
     (
@@ -150,47 +177,74 @@ export async function GET(req: NextRequest) {
           {verdict.line}
         </div>
 
-        {/* 3x3 ızgara */}
-        <div style={{ display: "flex", flexWrap: "wrap", width: cell * 3 + gap * 2, marginTop: 48, gap, flexShrink: 0 }}>
-          {flags.map((f, i) => (
-            <div
-              key={i}
-              style={{
-                width: cell,
-                height: cell,
-                borderRadius: 44,
-                background: COLORS[f],
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 14px 30px rgba(43,21,20,0.14)",
-              }}
-            >
-              <Glyph flag={f} />
-            </div>
-          ))}
-        </div>
-
-        {/* Sayılar */}
-        <div style={{ display: "flex", flexShrink: 0, marginTop: 50, gap: 56 }}>
-          {(["green", "yellow", "red"] as Flag[]).map((f) => (
-            <div key={f} style={{ display: "flex", alignItems: "center", gap: 18 }}>
-              <div style={{ display: "flex", width: 44, height: 44, borderRadius: 22, background: COLORS[f] }} />
-              <div style={{ display: "flex", fontSize: 72, fontWeight: 700 }}>{counts[f]}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Tolerans */}
-        <div style={{ display: "flex", flexDirection: "column", flexShrink: 0, width: 780, marginTop: 48 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 40, fontWeight: 500, color: "#584140" }}>
-            <span>{t.result.tolerance}</span>
-            <span style={{ fontWeight: 700, color: "#2b1514" }}>{`%${tolerance}`}</span>
+        {/* Küçük ızgara + sayılar + tolerans yan yana */}
+        <div style={{ display: "flex", flexShrink: 0, alignItems: "center", marginTop: 44, gap: 56 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", width: cell * 3 + gap * 2, gap, flexShrink: 0 }}>
+            {flags.map((f, i) => (
+              <div
+                key={i}
+                style={{
+                  width: cell,
+                  height: cell,
+                  borderRadius: 30,
+                  background: COLORS[f],
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 10px 22px rgba(43,21,20,0.14)",
+                }}
+              >
+                <Glyph flag={f} size={62} />
+              </div>
+            ))}
           </div>
-          <div style={{ display: "flex", marginTop: 20, height: 28, borderRadius: 14, background: "#f1ddd9" }}>
-            <div style={{ display: "flex", width: `${Math.max(tolerance, 3)}%`, height: 28, borderRadius: 14, background: "linear-gradient(90deg, #e0524a, #d9a21b, #3f9d6b)" }} />
+          <div style={{ display: "flex", flexDirection: "column", flexShrink: 0, width: 400 }}>
+            <div style={{ display: "flex", gap: 36 }}>
+              {(["green", "yellow", "red"] as Flag[]).map((f) => (
+                <div key={f} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ display: "flex", width: 30, height: 30, borderRadius: 15, background: COLORS[f] }} />
+                  <div style={{ display: "flex", fontSize: 60, fontWeight: 700 }}>{counts[f]}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 34, fontSize: 34, fontWeight: 500, color: "#584140" }}>
+              <span>{t.result.tolerance}</span>
+              <span style={{ fontWeight: 700, color: "#2b1514" }}>{`%${tolerance}`}</span>
+            </div>
+            <div style={{ display: "flex", marginTop: 14, height: 24, borderRadius: 12, background: "#f1ddd9" }}>
+              <div style={{ display: "flex", width: `${Math.max(tolerance, 3)}%`, height: 24, borderRadius: 12, background: "linear-gradient(90deg, #e0524a, #d9a21b, #3f9d6b)" }} />
+            </div>
           </div>
         </div>
+
+        {/* Her bayraktan bir soru + cevap */}
+        {picks.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", flexShrink: 0, width: 900, marginTop: 44, gap: 18 }}>
+            {picks.map((p, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  flexShrink: 0,
+                  alignItems: "stretch",
+                  borderRadius: 28,
+                  background: "#ffffff",
+                  boxShadow: "0 8px 22px rgba(43,21,20,0.10)",
+                  overflow: "hidden",
+                }}
+              >
+                <div style={{ display: "flex", flexShrink: 0, width: 16, background: COLORS[p.flag] }} />
+                <div style={{ display: "flex", flexDirection: "column", flexShrink: 0, flexGrow: 1, width: 0, padding: "22px 30px", gap: 10 }}>
+                  <div style={{ display: "flex", flexShrink: 0, fontSize: 30, fontWeight: 500, lineHeight: 1.3, color: "#2b1514" }}>{p.text}</div>
+                  <div style={{ display: "flex", flexShrink: 0, alignItems: "center", gap: 12 }}>
+                    <div style={{ display: "flex", width: 20, height: 20, borderRadius: 10, background: COLORS[p.flag] }} />
+                    <div style={{ display: "flex", fontSize: 28, fontWeight: 700, color: COLORS[p.flag] }}>{t.flags[p.flag].label}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div style={{ display: "flex", flexGrow: 1 }} />
 

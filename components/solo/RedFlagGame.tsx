@@ -35,7 +35,7 @@ interface Result {
 interface SavedGame {
   result: Result;
   /** Kart sırasıyla senaryo metni + seçilen bayrak (karnedeki "Detayları gör" için) */
-  details?: { text: string; flag: Flag }[];
+  details?: { id?: string; text: string; flag: Flag }[];
   sessionId?: string;
   token?: string;
 }
@@ -114,7 +114,7 @@ export function RedFlagGame() {
         setResult(data);
         const savedGame: SavedGame = {
           result: data,
-          details: s.scenarios.map((sc, i) => ({ text: sc.text, flag: finalAnswers[i] as Flag })),
+          details: s.scenarios.map((sc, i) => ({ id: sc.id, text: sc.text, flag: finalAnswers[i] as Flag })),
           sessionId: s.id,
           token: s.token,
         };
@@ -211,7 +211,12 @@ export function RedFlagGame() {
     const verdictKey = String(Math.min(profile.counts.red, RED_FLAG_CARD_COUNT));
     const verdictTitle = t(`verdicts.${verdictKey}.title`);
     const verdictLine = t(`verdicts.${verdictKey}.line`);
-    const cardUrl = `/api/solo/red-flag/card?g=${result.grid}&l=${locale}`;
+    // Story kartı: her bayraktan (kart sırasına göre ilk) bir senaryo; eski kayıtlarda id yoksa yalnızca özet
+    const picks = (["green", "yellow", "red"] as Flag[]).flatMap((f) => {
+      const d = saved?.details?.find((x) => x.flag === f && x.id);
+      return d ? [`${f.charAt(0).toUpperCase()}${d.id}`] : [];
+    });
+    const cardUrl = `/api/solo/red-flag/card?g=${result.grid}&l=${locale}${picks.length ? `&q=${picks.join(",")}` : ""}`;
 
     const shareLink = () => `${window.location.origin}/${locale}/solo/red-flag?s=${result.grid}`;
 
