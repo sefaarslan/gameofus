@@ -67,7 +67,9 @@
       "9": { "title": "Un equipo de desminado completo.", "line": "¡Las nueve en rojo! No pisaste ni una sola mina." }
     },
     "share": {
-      "story": "Imagen para stories",
+      "story": "Compartir story",
+      "myAnswers": "Mis respuestas:",
+      "tryLink": "Pruébalo:",
       "storyBusy": "Preparando…",
       "whatsapp": "Compartir en WhatsApp",
       "text": "Mi resultado en el Campo Minado de Red Flags: «{title}» Pruébalo:"

@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import {
   FLAGS,
   FLAG_HEX,
+  GRID_EMOJI,
   RED_FLAG_CARD_COUNT,
   computeProfile,
   decodeGrid,
@@ -380,7 +381,17 @@ export function RedFlagGame() {
     }
 
     function handleWhatsApp() {
-      const text = `${t("share.text", { title: verdictTitle })}\n\n${gridToEmojiText(flags)}\n\n${shareLink()}`;
+      // Metin olarak: başlık + yorum cümlesi + tolerans + ızgara + "Detayları gör"deki tüm soru ve cevaplar + link
+      const head = [`*${t("gameName")}*${packLabel ? ` · ${packLabel}` : ""}`, `“${verdictTitle}”`, verdictLine].join("\n");
+      const stats = `${t("result.tolerance")}: %${profile.tolerance}\n${gridToEmojiText(flags)}`;
+      const details =
+        saved?.details && saved.details.length === RED_FLAG_CARD_COUNT
+          ? `${t("share.myAnswers")}\n` +
+            saved.details
+              .map((d, i) => `${i + 1}. ${d.text}\n${GRID_EMOJI[d.flag]} ${t(`flags.${d.flag}.label`)}`)
+              .join("\n\n")
+          : null;
+      const text = [head, stats, details, `${t("share.tryLink")} ${shareLink()}`].filter(Boolean).join("\n\n");
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
     }
 

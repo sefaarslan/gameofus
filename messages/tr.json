@@ -67,7 +67,9 @@
       "9": { "title": "Komple mayın arama ekibi.", "line": "Dokuzu da kırmızı! Tek bir mayına bile basmadın." }
     },
     "share": {
-      "story": "Story görseli",
+      "story": "Story paylaş",
+      "myAnswers": "Cevaplarım:",
+      "tryLink": "Sen de dene:",
       "storyBusy": "Hazırlanıyor…",
       "whatsapp": "WhatsApp'ta paylaş",
       "text": "Red Flag Mayın Tarlası’nda sonucum: “{title}” Sen de dene:"

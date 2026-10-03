@@ -67,7 +67,9 @@
       "9": { "title": "A full mine-sweeping squad.", "line": "All nine red! You didn't step on a single mine." }
     },
     "share": {
-      "story": "Story image",
+      "story": "Share story",
+      "myAnswers": "My answers:",
+      "tryLink": "Try it:",
       "storyBusy": "Preparing…",
       "whatsapp": "Share on WhatsApp",
       "text": "My Red Flag Minefield result: “{title}” Try it:"
