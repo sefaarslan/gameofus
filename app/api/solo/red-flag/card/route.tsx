@@ -10,6 +10,8 @@ const MESSAGES = { tr: tr.solo, en: en.solo, es: es.solo } as const;
 type Lang = keyof typeof MESSAGES;
 
 const COLORS: Record<Flag, string> = { green: "#3f9d6b", yellow: "#d9a21b", red: "#e0524a" };
+// Tolerans rengi: düşük kırmızı, orta sarı, yüksek yeşil (karne sayfasıyla aynı eşikler)
+const toleranceColor = (n: number) => (n < 34 ? COLORS.red : n < 67 ? COLORS.yellow : COLORS.green);
 const W = 1080;
 const H = 1920;
 
@@ -121,9 +123,10 @@ export async function GET(req: NextRequest) {
           <div style={{ display: "flex", flexDirection: "column", width: 490 }}>
             <div style={{ display: "flex", fontSize: 28, fontWeight: 700, letterSpacing: 4, color: "#ae2f34", textTransform: "uppercase" }}>{t.gameName}</div>
             <div style={{ display: "flex", marginTop: 18, fontSize: 66, fontWeight: 700, lineHeight: 1.05, letterSpacing: -1 }}>{verdict.title}</div>
-            <div style={{ display: "flex", marginTop: 28, fontSize: 32, fontWeight: 500, color: "#584140" }}>{`${t.result.tolerance}  %${tolerance}`}</div>
-            <div style={{ display: "flex", marginTop: 14, height: 18, width: 400, borderRadius: 9, background: "#f1ddd9" }}>
-              <div style={{ display: "flex", width: `${Math.max(tolerance, 3)}%`, height: 18, borderRadius: 9, background: "linear-gradient(90deg, #e0524a, #d9a21b, #3f9d6b)" }} />
+            <div style={{ display: "flex", marginTop: 24, fontSize: 26, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#584140" }}>{t.result.tolerance}</div>
+            <div style={{ display: "flex", fontSize: 96, fontWeight: 700, lineHeight: 1.05, letterSpacing: -2, color: toleranceColor(tolerance) }}>{`%${tolerance}`}</div>
+            <div style={{ display: "flex", marginTop: 10, height: 22, width: 440, borderRadius: 11, background: "#f1ddd9" }}>
+              <div style={{ display: "flex", width: `${Math.max(tolerance, 4)}%`, height: 22, borderRadius: 11, background: "linear-gradient(90deg, #e0524a, #d9a21b, #3f9d6b)" }} />
             </div>
             <div style={{ display: "flex", marginTop: 40, fontSize: 36, fontWeight: 700, color: "#ae2f34" }}>@gameofus.app</div>
           </div>
@@ -198,21 +201,38 @@ export async function GET(req: NextRequest) {
               </div>
             ))}
           </div>
-          <div style={{ display: "flex", flexDirection: "column", flexShrink: 0, width: 400 }}>
-            <div style={{ display: "flex", gap: 36 }}>
+          <div style={{ display: "flex", flexDirection: "column", flexShrink: 0, width: 440 }}>
+            <div style={{ display: "flex", gap: 34 }}>
               {(["green", "yellow", "red"] as Flag[]).map((f) => (
                 <div key={f} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ display: "flex", width: 30, height: 30, borderRadius: 15, background: COLORS[f] }} />
-                  <div style={{ display: "flex", fontSize: 60, fontWeight: 700 }}>{counts[f]}</div>
+                  <div style={{ display: "flex", width: 28, height: 28, borderRadius: 14, background: COLORS[f] }} />
+                  <div style={{ display: "flex", fontSize: 56, fontWeight: 700 }}>{counts[f]}</div>
                 </div>
               ))}
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 34, fontSize: 34, fontWeight: 500, color: "#584140" }}>
-              <span>{t.result.tolerance}</span>
-              <span style={{ fontWeight: 700, color: "#2b1514" }}>{`%${tolerance}`}</span>
+            <div style={{ display: "flex", marginTop: 26, fontSize: 28, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#584140" }}>
+              {t.result.tolerance}
             </div>
-            <div style={{ display: "flex", marginTop: 14, height: 24, borderRadius: 12, background: "#f1ddd9" }}>
-              <div style={{ display: "flex", width: `${Math.max(tolerance, 3)}%`, height: 24, borderRadius: 12, background: "linear-gradient(90deg, #e0524a, #d9a21b, #3f9d6b)" }} />
+            <div style={{ display: "flex", marginTop: 2, fontSize: 124, fontWeight: 700, lineHeight: 1.05, letterSpacing: -3, color: toleranceColor(tolerance) }}>
+              {`%${tolerance}`}
+            </div>
+            <div style={{ display: "flex", position: "relative", marginTop: 14, width: 440, height: 40 }}>
+              <div style={{ display: "flex", position: "absolute", top: 8, left: 0, width: 440, height: 24, borderRadius: 12, background: "#f1ddd9" }} />
+              <div style={{ display: "flex", position: "absolute", top: 8, left: 0, width: Math.max(Math.round(4.4 * tolerance), 18), height: 24, borderRadius: 12, background: "linear-gradient(90deg, #e0524a, #d9a21b, #3f9d6b)" }} />
+              <div
+                style={{
+                  display: "flex",
+                  position: "absolute",
+                  top: 0,
+                  left: Math.min(Math.max(Math.round(4.4 * tolerance), 20), 420) - 20,
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  background: "#ffffff",
+                  border: `7px solid ${toleranceColor(tolerance)}`,
+                  boxShadow: "0 4px 10px rgba(43,21,20,0.25)",
+                }}
+              />
             </div>
           </div>
         </div>

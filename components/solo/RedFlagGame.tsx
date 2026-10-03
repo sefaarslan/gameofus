@@ -278,6 +278,8 @@ export function RedFlagGame() {
     const profile = computeProfile(flags);
     // Karnedeki sabit cümle yalnızca Red sayısına (0-9) göre seçilir
     const verdictKey = String(Math.min(profile.counts.red, RED_FLAG_CARD_COUNT));
+    // Tolerans sayısı ve işaretçisi eşik rengini alır: düşük kırmızı, orta sarı, yüksek yeşil
+    const toleranceColor = profile.tolerance < 34 ? FLAG_HEX.red : profile.tolerance < 67 ? FLAG_HEX.yellow : FLAG_HEX.green;
     const verdictTitle = t(`verdicts.${verdictKey}.title`);
     const verdictLine = t(`verdicts.${verdictKey}.line`);
     // Story kartı: her bayraktan (kart sırasına göre ilk) bir senaryo; eski kayıtlarda id yoksa yalnızca özet
@@ -355,19 +357,41 @@ export function RedFlagGame() {
               ))}
             </div>
 
-            <div className="w-full">
-              <div className="flex justify-between text-label-md text-on-surface-variant mb-2">
-                <span>{t("result.tolerance")}</span>
-                <span className="font-bold text-on-background">%{profile.tolerance}</span>
-              </div>
-              <div className="h-3 rounded-full bg-surface-container-high overflow-hidden">
+            <div className="w-full rounded-2xl bg-surface-container-low p-5">
+              <p className="text-label-md text-on-surface-variant uppercase tracking-wider text-center">{t("result.tolerance")}</p>
+              <p
+                className="font-bold text-center leading-none mt-2"
+                style={{ fontSize: "56px", color: toleranceColor }}
+                aria-label={`${t("result.tolerance")}: %${profile.tolerance}`}
+              >
+                %{profile.tolerance}
+              </p>
+              <div className="relative mt-5">
+                <div className="h-5 rounded-full bg-surface-container-high overflow-hidden">
+                  <div
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${Math.max(profile.tolerance, 4)}%`,
+                      background: `linear-gradient(90deg, ${FLAG_HEX.red}, ${FLAG_HEX.yellow}, ${FLAG_HEX.green})`,
+                    }}
+                  />
+                </div>
                 <div
-                  className="h-full rounded-full"
+                  className="absolute rounded-full bg-white shadow-soft-card"
                   style={{
-                    width: `${Math.max(profile.tolerance, 3)}%`,
-                    background: `linear-gradient(90deg, ${FLAG_HEX.red}, ${FLAG_HEX.yellow}, ${FLAG_HEX.green})`,
+                    top: "50%",
+                    left: `${Math.min(Math.max(profile.tolerance, 4), 96)}%`,
+                    width: 26,
+                    height: 26,
+                    transform: "translate(-50%, -50%)",
+                    border: `4px solid ${toleranceColor}`,
                   }}
+                  aria-hidden="true"
                 />
+              </div>
+              <div className="flex justify-between text-xs text-on-surface-variant/70 mt-2" aria-hidden="true">
+                <span>%0</span>
+                <span>%100</span>
               </div>
               <p className="text-xs text-on-surface-variant/70 mt-3 text-center">{t("result.toleranceNote")}</p>
             </div>
