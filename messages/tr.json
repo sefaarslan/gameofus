@@ -106,7 +106,8 @@
   "meta": { "description": "Birbirinizi ne kadar iyi tanıyorsunuz?" },
   "nav": {
     "howItWorks": "Nasıl Çalışır",
-    "modes": "Modlar",
+    "modes": "Oyun Modları",
+    "solo": "Solo",
     "premium": "Premium",
     "start": "Hemen Başla",
     "menu": "Menü"
@@ -125,9 +126,9 @@
       "start": "Oyun Başlat"
     },
     "how": {
-      "title": "Nasıl çalışır?",
-      "badge": "Basit & Hızlı",
-      "subtitle": "Birkaç adımda bağınızı güçlendirin",
+      "title": "İki kişilik oyun nasıl çalışır?",
+      "badge": "İki kişilik oyun",
+      "subtitle": "Arkadaşınla, sevgilinle ya da hayat arkadaşınla: birkaç basit adım",
       "step1": "Oda oluştur",
       "step2": "Linki paylaş",
       "step3": "Cevapları birlikte aç",
@@ -139,8 +140,8 @@
       "step4Badge": "Mobil uygulamada"
     },
     "modes": {
-      "title": "Oyun Modları",
-      "subtitle": "Farklı duygular için farklı oyun kurguları",
+      "title": "İki Kişilik Oyun Modları",
+      "subtitle": "İkiniz için, farklı duygulara göre farklı oyun kurguları",
       "explore": "Hepsini keşfet",
       "popular": "POPÜLER",
       "sc": {

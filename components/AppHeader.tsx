@@ -114,6 +114,12 @@ export function AppHeader({ locale }: AppHeaderProps) {
               {tNav("modes")}
             </Link>
             <Link
+              href={`/${locale}#tek-basina`}
+              className="text-label-md text-on-surface-variant hover:text-primary transition-colors"
+            >
+              {tNav("solo")}
+            </Link>
+            <Link
               href={`/${locale}#premium`}
               className="text-label-md text-on-surface-variant hover:text-primary transition-colors"
             >
@@ -173,6 +179,13 @@ export function AppHeader({ locale }: AppHeaderProps) {
               onClick={() => setMobileOpen(false)}
             >
               {tNav("modes")}
+            </Link>
+            <Link
+              href={`/${locale}#tek-basina`}
+              className="text-body-md text-on-surface-variant hover:text-primary py-3 border-b border-outline-variant/10 transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              {tNav("solo")}
             </Link>
             <Link
               href={`/${locale}#premium`}

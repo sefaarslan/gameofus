@@ -15,6 +15,7 @@ import {
 import { FlagGlyph } from "./FlagGlyph";
 import { FeedbackCard } from "@/components/FeedbackCard";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { SoloLogo } from "./SoloLogo";
 
 const STORAGE_KEY = "gou_solo_redflag";
 
@@ -172,7 +173,10 @@ export function RedFlagGame() {
           <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-label-md">
             {t("badge")}
           </span>
-          <h1 className="text-headline-lg-mobile md:text-headline-lg text-on-background leading-tight">{t("gameName")}</h1>
+          <h1 className="flex items-center justify-center gap-3 text-headline-lg-mobile md:text-headline-lg text-on-background leading-tight text-left w-full justify-center">
+            <SoloLogo className="w-14 h-14 shrink-0 drop-shadow-md" />
+            <span className="text-balance">{t("gameName")}</span>
+          </h1>
           <p className="text-body-lg text-on-surface-variant">{t("tagline")}</p>
 
           <div className="grid grid-cols-3 gap-2.5 w-40" aria-hidden="true">
@@ -255,7 +259,10 @@ export function RedFlagGame() {
           )}
 
           <div className="text-center">
-            <span className="text-label-md text-primary uppercase tracking-wider">{t("gameName")}</span>
+            <span className="inline-flex items-center gap-2 text-label-md text-primary uppercase tracking-wider">
+              <SoloLogo className="w-8 h-8 shrink-0" />
+              {t("gameName")}
+            </span>
             <h1 className="text-headline-lg-mobile md:text-headline-lg text-on-background mt-2 leading-tight text-balance">{verdictTitle}</h1>
             <p className="text-body-md text-on-surface-variant mt-3">{verdictLine}</p>
           </div>
@@ -422,7 +429,10 @@ export function RedFlagGame() {
         {/* İlerleme */}
         <div className="flex flex-col gap-3" aria-live="polite">
           <div className="flex items-center justify-between">
-            <h1 className="text-label-md text-primary uppercase tracking-wider">{t("gameName")}</h1>
+            <h1 className="flex items-center gap-2 text-label-md text-primary uppercase tracking-wider">
+              <SoloLogo className="w-7 h-7 shrink-0" />
+              {t("gameName")}
+            </h1>
             <span className="text-label-md text-on-surface-variant" aria-label={t("progressLabel", { done: answeredCount, total: RED_FLAG_CARD_COUNT })}>
               {t("progress", { done: answeredCount, total: RED_FLAG_CARD_COUNT })}
             </span>

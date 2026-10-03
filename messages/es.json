@@ -106,7 +106,8 @@
   "meta": { "description": "¿Cuánto os conocéis realmente?" },
   "nav": {
     "howItWorks": "Cómo Funciona",
-    "modes": "Modos",
+    "modes": "Modos de juego",
+    "solo": "Solo",
     "premium": "Premium",
     "start": "Empezar",
     "menu": "Menú"
@@ -125,9 +126,9 @@
       "start": "Iniciar juego"
     },
     "how": {
-      "title": "Cómo funciona",
-      "badge": "Simple y rápido",
-      "subtitle": "Fortalece tu vínculo en pocos pasos",
+      "title": "Cómo funciona el juego de a dos",
+      "badge": "Juego de a dos",
+      "subtitle": "Con un amigo, una cita o tu pareja: unos pocos pasos",
       "step1": "Crea una sala",
       "step2": "Comparte el link",
       "step3": "Descúbranse juntos",
@@ -139,8 +140,8 @@
       "step4Badge": "En la app"
     },
     "modes": {
-      "title": "Modos de juego",
-      "subtitle": "Distintas experiencias para distintos momentos",
+      "title": "Modos de juego para dos",
+      "subtitle": "Distintas experiencias para distintos momentos, pensadas para dos",
       "explore": "Ver todos",
       "popular": "POPULAR",
       "sc": {

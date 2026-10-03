@@ -106,7 +106,8 @@
   "meta": { "description": "How well do you really know each other?" },
   "nav": {
     "howItWorks": "How It Works",
-    "modes": "Modes",
+    "modes": "Game Modes",
+    "solo": "Solo",
     "premium": "Premium",
     "start": "Start Now",
     "menu": "Menu"
@@ -125,9 +126,9 @@
       "start": "Start Game"
     },
     "how": {
-      "title": "How it works",
-      "badge": "Simple & Fast",
-      "subtitle": "Strengthen your bond in a few steps",
+      "title": "How the two-player game works",
+      "badge": "Two-player game",
+      "subtitle": "With a friend, a date or a partner: a few simple steps",
       "step1": "Create a room",
       "step2": "Share the link",
       "step3": "Reveal together",
@@ -139,8 +140,8 @@
       "step4Badge": "In the app"
     },
     "modes": {
-      "title": "Game Modes",
-      "subtitle": "Different setups for different moods",
+      "title": "Two-Player Game Modes",
+      "subtitle": "Different setups for different moods, made for two",
       "explore": "Explore all",
       "popular": "POPULAR",
       "sc": {

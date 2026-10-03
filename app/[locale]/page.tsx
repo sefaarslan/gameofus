@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { SiteFooter } from "@/components/SiteFooter";
 import { InstagramIcon } from "@/components/InstagramIcon";
 import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/social";
+import { SoloLogo } from "@/components/solo/SoloLogo";
 
 // ── Hero Game Card Mockup ─────────────────────────────────────────
 function GameCardMockup() {
@@ -301,32 +302,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Tek kişilik oyun: Red Flag Mayın Tarlası ───────────────── */}
-      <section className="py-14" id="tek-basina">
-        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[2rem] shadow-soft-card p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 md:gap-14 relative overflow-hidden">
-          <div className="absolute -right-16 -top-16 w-64 h-64 bg-tertiary-container/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="grid grid-cols-3 gap-2.5 w-44 md:w-52 shrink-0 relative" aria-hidden="true">
-            {["#3f9d6b", "#d9a21b", "#e0524a", "#d9a21b", "#3f9d6b", "#e0524a", "#e0524a", "#3f9d6b", "#d9a21b"].map((c, i) => (
-              <div key={i} className="aspect-square rounded-2xl shadow-soft-sm" style={{ background: c, opacity: i % 2 ? 0.9 : 1 }} />
-            ))}
-          </div>
-          <div className="text-center md:text-left relative">
-            <span className="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-label-md mb-4">
-              {tSolo("landing.badge")}
-            </span>
-            <h2 className="text-headline-md md:text-[2rem] text-on-background mb-3 font-bold">{tSolo("landing.title")}</h2>
-            <p className="text-body-lg text-on-surface-variant mb-6 max-w-lg">{tSolo("landing.desc")}</p>
-            <Link
-              href="/solo/red-flag"
-              className="inline-flex items-center gap-2 bg-primary text-on-primary text-body-md font-semibold px-7 py-3.5 rounded-full hover:bg-surface-tint active:scale-95 transition-all shadow-primary-glow"
-            >
-              {tSolo("landing.cta")}
-              <span className="material-symbols-outlined text-xl">arrow_forward</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* ── Oyun Modları ───────────────────────────────────────────── */}
       <section className="py-16" id="oyun-modlari">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
@@ -401,6 +376,38 @@ export default function HomePage() {
               </span>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── Tek kişilik oyun: Red Flag Mayın Tarlası ───────────────── */}
+      <section className="py-14" id="tek-basina">
+        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[2rem] shadow-soft-card p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 md:gap-14 relative overflow-hidden">
+          <div className="absolute -right-16 -top-16 w-64 h-64 bg-tertiary-container/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="grid grid-cols-3 gap-2.5 w-44 md:w-52 shrink-0 relative" aria-hidden="true">
+            {["#3f9d6b", "#d9a21b", "#e0524a", "#d9a21b", "#3f9d6b", "#e0524a", "#e0524a", "#3f9d6b", "#d9a21b"].map((c, i) => (
+              <div key={i} className="aspect-square rounded-2xl shadow-soft-sm" style={{ background: c, opacity: i % 2 ? 0.9 : 1 }} />
+            ))}
+          </div>
+          <div className="text-center md:text-left relative">
+            <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+              <SoloLogo className="w-14 h-14 shrink-0 drop-shadow-sm" />
+              <div className="flex flex-col items-start gap-1 text-left">
+                <span className="text-label-md text-primary font-bold uppercase tracking-wider">{tSolo("gameName")}</span>
+                <span className="inline-block px-3 py-0.5 bg-secondary-container text-on-secondary-container rounded-full text-label-md">
+                  {tSolo("landing.badge")}
+                </span>
+              </div>
+            </div>
+            <h2 className="text-headline-md md:text-[2rem] text-on-background mb-3 font-bold">{tSolo("landing.title")}</h2>
+            <p className="text-body-lg text-on-surface-variant mb-6 max-w-lg">{tSolo("landing.desc")}</p>
+            <Link
+              href="/solo/red-flag"
+              className="inline-flex items-center gap-2 bg-primary text-on-primary text-body-md font-semibold px-7 py-3.5 rounded-full hover:bg-surface-tint active:scale-95 transition-all shadow-primary-glow"
+            >
+              {tSolo("landing.cta")}
+              <span className="material-symbols-outlined text-xl">arrow_forward</span>
+            </Link>
+          </div>
         </div>
       </section>
 
