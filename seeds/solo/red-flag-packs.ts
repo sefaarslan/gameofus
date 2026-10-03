@@ -1,7 +1,7 @@
 // Red Flag Mayın Tarlası — set (deste) dağılımı. Üreten: tek seferlik atama; kartlar sabit sırayla (pos) sunulur.
 // Her set 9 kart: 6 temanın tamamını kapsar, ton (sağlıklı/gri/endişe verici) dengelidir. Yalnızca aynı set içindeki
 // tolerans yüzdeleri karşılaştırılabilir.
-//  - friend-10x  : "Arkadaşlık ilişkilerinde"   - romantic-10x : "Gönül ilişkilerinde"
+//  - friend-10x  : "Arkadaşlık"   - romantic-10x : "Sevgili"
 //  - 101-103 webde oynanır; 104-106 ileride (mobilde açılacak) doldurulur.
 //  - tone: H = sağlıklı, G = gri, C = endişe verici (yalnızca yazım/inceleme notu; DB'ye yazılmaz).
 export interface PackSlot { pack: string; pos: number; tone: "H" | "G" | "C" }

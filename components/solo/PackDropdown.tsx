@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 export interface PackOption {
   key: string;
-  /** Ana metin, ör. "Arkadaşlık ilişkilerinde - 101" */
+  /** Ana metin, ör. "Arkadaşlık - 101" */
   label: string;
   /** Sağda küçük durum metni (tolerans, "Devam et", "Mobilde açılacak") */
   hint?: string;

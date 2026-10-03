@@ -393,7 +393,7 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   yargılamaz/teşhis koymaz. Share kartı, link önizlemesi ve WhatsApp metni de aynı başlığı kullanır.
 - **Setler (deste):** Oyun rastgele değil, **sabit setlerle** oynanır; böylece aynı setteki toleranslar karşılaştırılabilir.
   Her set 9 sabit kart (sabit sıra), 6 temanın tamamını kapsar, ton (sağlıklı/gri/endişe verici) dengelidir. İki kategori:
-  **Arkadaşlık ilişkilerinde** (`friend-101…106`) ve **Gönül ilişkilerinde** (`romantic-101…106`). **Webde yalnızca
+  **Arkadaşlık** (`friend-101…106`) ve **Sevgili** (`romantic-101…106`). **Webde yalnızca
   101-103 açık**; 104-106 "mobilde açılacak" (içerik yok, seçilemez). Set listesi/uygunluk: `lib/solo.ts` (`PACKS`,
   `WEB_PACK_NUMBERS`). Arkadaşlık setlerinde romantik çağrışım yoktur (check-solo denetler). Yeni set eklerken
   `seeds/solo/red-flag-packs.ts` içine slotları (pack/pos/tone) yaz, gerekirse senaryo ekle, `check-solo` →

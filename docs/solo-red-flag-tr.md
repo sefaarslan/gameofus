@@ -2,7 +2,7 @@
 
 54 aktif senaryo, 6 set × 9 kart. Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır. Yüzdeler yalnızca aynı set içinde karşılaştırılabilir. 104-106 setleri mobilde açılacaktır (henüz içerik yok).
 
-## Arkadaşlık ilişkilerinde · 101  `friend-101`
+## Arkadaşlık · 101  `friend-101`
 
 1. Arkadaşın, borç aldığı parayı geri verirken küçük bir hediye ekleyip teşekkür ediyor.  _(Para & Yaşam Tarzı · sağlıklı)_
 2. Fikrini söylediğinde arkadaşın “Abartıyorsun” diyerek konuyu kapatıyor.  _(İletişim · endişe verici)_
@@ -14,7 +14,7 @@
 8. Arkadaşın, seninle konuşurken sürekli telefonuna bakıyor ama “Seni dinliyorum” diyor.  _(Saygı · gri)_
 9. Arkadaşın, sana ait özel bir şeyi herkesin içinde gülerek anlattı ve “Şaka yaptım” dedi.  _(Sınırlar · endişe verici)_
 
-## Arkadaşlık ilişkilerinde · 102  `friend-102`
+## Arkadaşlık · 102  `friend-102`
 
 1. Mesajına hemen cevap veremediğinde arkadaşın üstelemiyor, “Müsait olunca yaz” diyor.  _(Sınırlar · sağlıklı)_
 2. Arkadaşın, sana ait bir sırrı “Sadece en yakın arkadaşıma anlattım” diyerek başkasıyla paylaştı.  _(Güven · endişe verici)_
@@ -26,7 +26,7 @@
 8. Arkadaşın mesajlarına günlerce cevap vermiyor ama sosyal medyada aktif.  _(İletişim · gri)_
 9. Terfi aldığında arkadaşın sevinmek yerine “Demek bu kadar şanslısın” diyerek soğuk karşılıyor.  _(Kıskançlık / Sahiplenme · endişe verici)_
 
-## Arkadaşlık ilişkilerinde · 103  `friend-103`
+## Arkadaşlık · 103  `friend-103`
 
 1. Söylediği bir şaka seni rahatsız ettiğinde arkadaşın hemen özür diliyor ve bir daha tekrarlamıyor.  _(Sınırlar · sağlıklı)_
 2. Seninle tartışırken arkadaşın geçmişteki hatalarını tek tek sayıp döküyor.  _(Saygı · endişe verici)_
@@ -38,7 +38,7 @@
 8. Arkadaşın, planları son dakikada tekrar tekrar iptal edip “Enerjim yok” diyor.  _(Para & Yaşam Tarzı · gri)_
 9. Başka biriyle yakınlaştığında arkadaşın “Beni artık sevmiyorsun” diyerek küsüyor.  _(Kıskançlık / Sahiplenme · endişe verici)_
 
-## Gönül ilişkilerinde · 101  `romantic-101`
+## Sevgili · 101  `romantic-101`
 
 1. Tartışma sırasında partnerin “Çok geriliyorum, yarım saat sakinleşip konuşalım mı?” diyor.  _(İletişim · sağlıklı)_
 2. Partnerin hesap ekstrelerini sana hiç göstermiyor ama ortak giderlerdeki payını her ay zamanında ödüyor.  _(Güven · gri)_
@@ -50,7 +50,7 @@
 8. İlişkinizin ilk ayında partnerin tüm sosyal medya şifrelerini paylaşmayı önerdi.  _(Sınırlar · endişe verici)_
 9. Sevgilin, tatil planlarını tek başına yapıp sana yalnızca tarihleri bildiriyor.  _(Para & Yaşam Tarzı · endişe verici)_
 
-## Gönül ilişkilerinde · 102  `romantic-102`
+## Sevgili · 102  `romantic-102`
 
 1. Onsuz gittiğin bir etkinliği partnerin hevesle dinleyip “Çok sevindim, anlat bakalım” diyor.  _(Kıskançlık / Sahiplenme · sağlıklı)_
 2. Partnerin, taşınma gibi önemli bir kararı seni bilgilendirmeden verip sonra “Sana söyleyecektim” diyor.  _(İletişim · endişe verici)_
@@ -62,7 +62,7 @@
 8. Hafta sonunu tek başına geçirmek istediğini söyleyince sevgilin “Tamam, kendine iyi bak” dedi.  _(Sınırlar · sağlıklı)_
 9. Yokluğunda arkadaşlarınla neler konuştuğunu öğrenmek için sevgilin sana soru yağdırıyor.  _(Kıskançlık / Sahiplenme · endişe verici)_
 
-## Gönül ilişkilerinde · 103  `romantic-103`
+## Sevgili · 103  `romantic-103`
 
 1. Sevgilin, kariyer fırsatın için başka şehre taşınmanı destekleyip uzak mesafeyi denemeyi öneriyor.  _(Para & Yaşam Tarzı · sağlıklı)_
 2. Sevgilin, eski sevgilisinin hediyesini hâlâ odasındaki rafta saklıyor.  _(Sınırlar · gri)_

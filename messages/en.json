@@ -19,8 +19,8 @@
       "title": "Pick a set",
       "desc": "Every set has 9 fixed cards. Results from the same set can be compared with each other.",
       "categories": {
-        "friend": "In friendships",
-        "romantic": "In romantic relationships"
+        "friend": "Friendship",
+        "romantic": "Romantic"
       },
       "play": "Play",
       "resume": "Continue",

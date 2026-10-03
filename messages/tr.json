@@ -19,8 +19,8 @@
       "title": "Bir set seç",
       "desc": "Her sette 9 sabit kart var. Aynı setteki sonuçlar birbiriyle kıyaslanabilir.",
       "categories": {
-        "friend": "Arkadaşlık ilişkilerinde",
-        "romantic": "Gönül ilişkilerinde"
+        "friend": "Arkadaşlık",
+        "romantic": "Sevgili"
       },
       "play": "Oyna",
       "resume": "Devam et",

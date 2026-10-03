@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
   const t = MESSAGES[lang];
 
   const { counts, tolerance } = computeProfile(flags);
-  // Set etiketi ("Arkadaşlık ilişkilerinde · 101"): yüzdeler yalnızca aynı setle karşılaştırılabilir
+  // Set etiketi ("Arkadaşlık · 101"): yüzdeler yalnızca aynı setle karşılaştırılabilir
   const pack = getPack(searchParams.get("p"));
   const packLabel = pack ? t.packs.label.replace("{category}", t.packs.categories[pack.category]).replace("{n}", String(pack.number)) : null;
   const verdict = (t.verdicts as Record<string, { title: string; line: string }>)[String(Math.min(counts.red, RED_FLAG_CARD_COUNT))];

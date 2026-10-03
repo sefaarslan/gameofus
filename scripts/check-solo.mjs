@@ -7,7 +7,7 @@ const TAGS = ["boundaries", "trust", "communication", "jealousy", "money_lifesty
 const LANGS = ["tr", "en", "es"];
 const MAX_N = 12; // 1-10 ilk set, 11-12 arkadaşlık setlerini tamamlayan yeni senaryolar
 const PACKS = ["friend-101", "friend-102", "friend-103", "romantic-101", "romantic-102", "romantic-103"];
-// Arkadaşlık setlerinde romantik çağrışım yasak (kategori "Arkadaşlık ilişkilerinde")
+// Arkadaşlık setlerinde romantik çağrışım yasak (kategori "Arkadaşlık")
 const ROMANTIC = { tr: ["sevgili", "partner", "flört", "romantik", "eski sevgili"], en: ["partner", "boyfriend", "girlfriend", "dating", "romantic", "lover", "ex "], es: ["pareja", "novi", "romántic", "amante", " ex "] };
 // Cinsiyetli zamir/ad denetimi (metinler cinsiyetsiz olmalı): kelime başı/sonu eşleşmesi
 const GENDERED = {

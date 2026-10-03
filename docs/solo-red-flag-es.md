@@ -2,7 +2,7 @@
 
 54 aktif senaryo, 6 set × 9 kart. Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır. Yüzdeler yalnızca aynı set içinde karşılaştırılabilir. 104-106 setleri mobilde açılacaktır (henüz içerik yok).
 
-## Arkadaşlık ilişkilerinde · 101  `friend-101`
+## Arkadaşlık · 101  `friend-101`
 
 1. Un amigo te devuelve el dinero que le prestaste y añade un pequeño regalo de agradecimiento.  _(Para & Yaşam Tarzı · sağlıklı)_
 2. Cuando das tu opinión, tu amigo cierra el tema con «estás exagerando».  _(İletişim · endişe verici)_
@@ -14,7 +14,7 @@
 8. Mientras le hablas, tu amigo no deja de mirar el móvil, pero dice «te escucho».  _(Saygı · gri)_
 9. Un amigo contó entre risas algo privado tuyo delante de todos y dijo «era broma».  _(Sınırlar · endişe verici)_
 
-## Arkadaşlık ilişkilerinde · 102  `friend-102`
+## Arkadaşlık · 102  `friend-102`
 
 1. Cuando no puedes responder enseguida, tu amigo no insiste y te dice «escríbeme cuando puedas».  _(Sınırlar · sağlıklı)_
 2. Un amigo contó tu secreto a otra persona diciendo «solo se lo conté a mi mejor amigo».  _(Güven · endişe verici)_
@@ -26,7 +26,7 @@
 8. Tu amigo tarda días en responder tus mensajes, pero está activo en redes sociales.  _(İletişim · gri)_
 9. Cuando te ascienden, tu amigo lo recibe con frialdad: «así que tienes tanta suerte».  _(Kıskançlık / Sahiplenme · endişe verici)_
 
-## Arkadaşlık ilişkilerinde · 103  `friend-103`
+## Arkadaşlık · 103  `friend-103`
 
 1. Cuando una broma suya te incomoda, tu amigo se disculpa enseguida y no la repite.  _(Sınırlar · sağlıklı)_
 2. Cuando discute contigo, tu amigo enumera tus errores del pasado uno por uno.  _(Saygı · endişe verici)_
@@ -38,7 +38,7 @@
 8. Tu amigo cancela los planes a última hora una y otra vez diciendo «no tengo energía».  _(Para & Yaşam Tarzı · gri)_
 9. Cuando te acercas a otra persona, tu amigo se enfada diciendo «ya no me quieres».  _(Kıskançlık / Sahiplenme · endişe verici)_
 
-## Gönül ilişkilerinde · 101  `romantic-101`
+## Sevgili · 101  `romantic-101`
 
 1. En plena discusión, tu pareja dice «me estoy alterando demasiado, ¿nos calmamos media hora y hablamos?».  _(İletişim · sağlıklı)_
 2. Tu pareja nunca te enseña sus extractos bancarios, pero paga a tiempo su parte de los gastos comunes cada mes.  _(Güven · gri)_
@@ -50,7 +50,7 @@
 8. En el primer mes, tu pareja propuso compartir todas vuestras contraseñas de redes sociales.  _(Sınırlar · endişe verici)_
 9. Tu pareja organiza las vacaciones sin ti y solo te comunica las fechas.  _(Para & Yaşam Tarzı · endişe verici)_
 
-## Gönül ilişkilerinde · 102  `romantic-102`
+## Sevgili · 102  `romantic-102`
 
 1. Tu pareja escucha con ganas cómo te fue en un evento al que no pudo acompañarte y dice «me alegro mucho, cuéntamelo todo».  _(Kıskançlık / Sahiplenme · sağlıklı)_
 2. Tu pareja toma una decisión importante, como mudarse, sin contártelo y luego dice «iba a decírtelo».  _(İletişim · endişe verici)_
@@ -62,7 +62,7 @@
 8. Cuando dijiste que querías pasar el fin de semana a solas, tu pareja respondió «vale, cuídate».  _(Sınırlar · sağlıklı)_
 9. Tu pareja te acribilla a preguntas sobre lo que hablaste con tus amigos en su ausencia.  _(Kıskançlık / Sahiplenme · endişe verici)_
 
-## Gönül ilişkilerinde · 103  `romantic-103`
+## Sevgili · 103  `romantic-103`
 
 1. Tu pareja te apoya para mudarte de ciudad por una oportunidad profesional y propone probar la distancia.  _(Para & Yaşam Tarzı · sağlıklı)_
 2. Tu pareja sigue guardando un regalo de su ex en una estantería de su habitación.  _(Sınırlar · gri)_

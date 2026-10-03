@@ -2,7 +2,7 @@
 
 54 aktif senaryo, 6 set × 9 kart. Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır. Yüzdeler yalnızca aynı set içinde karşılaştırılabilir. 104-106 setleri mobilde açılacaktır (henüz içerik yok).
 
-## Arkadaşlık ilişkilerinde · 101  `friend-101`
+## Arkadaşlık · 101  `friend-101`
 
 1. A friend returns money they borrowed and adds a small gift as thanks.  _(Para & Yaşam Tarzı · sağlıklı)_
 2. When you share your view, your friend shuts it down with “You're overreacting.”  _(İletişim · endişe verici)_
@@ -14,7 +14,7 @@
 8. While you talk, your friend keeps checking their phone but says “I'm listening.”  _(Saygı · gri)_
 9. A friend laughingly told a group something private about you and said “I was only joking.”  _(Sınırlar · endişe verici)_
 
-## Arkadaşlık ilişkilerinde · 102  `friend-102`
+## Arkadaşlık · 102  `friend-102`
 
 1. When you can't reply right away, your friend doesn't push and says “Write back when you're free.”  _(Sınırlar · sağlıklı)_
 2. A friend shared your secret with someone else, saying “I only told my closest friend.”  _(Güven · endişe verici)_
@@ -26,7 +26,7 @@
 8. Your friend doesn't answer your messages for days but is active on social media.  _(İletişim · gri)_
 9. When you get a promotion, your friend greets it coldly with “So you're just that lucky.”  _(Kıskançlık / Sahiplenme · endişe verici)_
 
-## Arkadaşlık ilişkilerinde · 103  `friend-103`
+## Arkadaşlık · 103  `friend-103`
 
 1. When a joke of theirs makes you uncomfortable, your friend apologizes right away and doesn't repeat it.  _(Sınırlar · sağlıklı)_
 2. When arguing with you, your friend lists your past mistakes one by one.  _(Saygı · endişe verici)_
@@ -38,7 +38,7 @@
 8. Your friend cancels plans at the last minute again and again, saying “I have no energy.”  _(Para & Yaşam Tarzı · gri)_
 9. When you get closer to someone else, your friend sulks, saying “You don't like me anymore.”  _(Kıskançlık / Sahiplenme · endişe verici)_
 
-## Gönül ilişkilerinde · 101  `romantic-101`
+## Sevgili · 101  `romantic-101`
 
 1. During an argument, your partner says “I'm getting too worked up, can we cool off for half an hour and talk?”  _(İletişim · sağlıklı)_
 2. Your partner never shows you their bank statements but pays their share of joint costs on time every month.  _(Güven · gri)_
@@ -50,7 +50,7 @@
 8. In the first month, your partner suggested you share all your social media passwords.  _(Sınırlar · endişe verici)_
 9. Your partner plans the whole vacation alone and only tells you the dates.  _(Para & Yaşam Tarzı · endişe verici)_
 
-## Gönül ilişkilerinde · 102  `romantic-102`
+## Sevgili · 102  `romantic-102`
 
 1. Your partner eagerly listens about an event you went to without them and says “I'm so glad, tell me everything.”  _(Kıskançlık / Sahiplenme · sağlıklı)_
 2. Your partner makes a big decision, like moving, without telling you, then says “I was going to tell you.”  _(İletişim · endişe verici)_
@@ -62,7 +62,7 @@
 8. When you said you wanted a weekend to yourself, your partner said “Okay, take care of yourself.”  _(Sınırlar · sağlıklı)_
 9. Your partner bombards you with questions about what you talked about with friends while they weren't there.  _(Kıskançlık / Sahiplenme · endişe verici)_
 
-## Gönül ilişkilerinde · 103  `romantic-103`
+## Sevgili · 103  `romantic-103`
 
 1. Your partner supports you moving cities for a career opportunity and suggests trying long distance.  _(Para & Yaşam Tarzı · sağlıklı)_
 2. Your partner still keeps a gift from their ex on a shelf in their room.  _(Sınırlar · gri)_

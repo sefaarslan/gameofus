@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 const lang = process.argv[2] ?? "tr";
 const { redFlagScenarios: list } = await import(pathToFileURL(resolve("seeds/solo/red-flag.ts")).href);
 const NAMES = { boundaries: "Sınırlar", trust: "Güven", communication: "İletişim", jealousy: "Kıskançlık / Sahiplenme", money_lifestyle: "Para & Yaşam Tarzı", respect: "Saygı" };
-const CATS = { friend: "Arkadaşlık ilişkilerinde", romantic: "Gönül ilişkilerinde" };
+const CATS = { friend: "Arkadaşlık", romantic: "Sevgili" };
 const TONE = { H: "sağlıklı", G: "gri", C: "endişe verici" };
 const active = list.filter((s) => !s.inactive);
 let out = `# Red Flag Mayın Tarlası — Setler (${lang.toUpperCase()})\n\n${active.length} aktif senaryo, 6 set × 9 kart. Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır. Yüzdeler yalnızca aynı set içinde karşılaştırılabilir. 104-106 setleri mobilde açılacaktır (henüz içerik yok).\n\n`;

@@ -19,8 +19,8 @@
       "title": "Elige un set",
       "desc": "Cada set tiene 9 cartas fijas. Los resultados del mismo set se pueden comparar entre sí.",
       "categories": {
-        "friend": "En las amistades",
-        "romantic": "En las relaciones sentimentales"
+        "friend": "Amistad",
+        "romantic": "Pareja"
       },
       "play": "Jugar",
       "resume": "Continuar",
