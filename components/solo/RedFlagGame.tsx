@@ -173,9 +173,9 @@ export function RedFlagGame() {
           <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-label-md">
             {t("badge")}
           </span>
-          <h1 className="flex items-center justify-center gap-3 text-headline-lg-mobile md:text-headline-lg text-on-background leading-tight text-left w-full justify-center">
+          <h1 className="flex items-center justify-center gap-3 text-headline-lg-mobile md:text-headline-lg text-on-background leading-tight justify-center">
             <SoloLogo className="w-14 h-14 shrink-0 drop-shadow-md" />
-            <span className="text-balance">{t("gameName")}</span>
+            <span className="text-balance text-center max-w-[7.6em]">{t("gameName")}</span>
           </h1>
           <p className="text-body-lg text-on-surface-variant">{t("tagline")}</p>
 
