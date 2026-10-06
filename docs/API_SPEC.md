@@ -40,12 +40,14 @@ GET  /api/rooms/[roomCode]/results
 POST /api/feedback
 POST /api/solo/red-flag/start
 POST /api/solo/[sessionId]/complete
-GET  /api/solo/red-flag/card?g=&l=&q=&fmt=
+GET  /api/solo/red-flag/card?g=&l=&p=&q=&fmt=
+GET  /api/users/me                (mobil, Bearer JWT)
+POST /api/users/coins/spend       (mobil, Bearer JWT)
+POST /api/users/coins/earn        (mobil, Bearer JWT)
 ```
 
 Ayrı bir `calculate-results` endpoint'i **yoktur**: sonuç, ikinci oyuncu `complete` çağırdığında aynı
-istek içinde hesaplanır. Planlanan (mobil için): `GET /api/users/me`, `POST /api/users/coins/spend`,
-`POST /api/users/coins/earn`, `POST /api/iap/verify`, `GET /api/rooms/[roomCode]/ai-commentary`,
+istek içinde hesaplanır. Planlanan (mobil için): `POST /api/iap/verify`, `GET /api/rooms/[roomCode]/ai-commentary`,
 `DELETE /api/users/me`. Lemon Squeezy webhook'u **kullanılmaz**.
 
 ---
@@ -282,6 +284,25 @@ Paylaşım görseli (PNG, `next/og`): `g` (9 harf `[GYR]`, aksi 400), `l` (`tr|e
 link önizlemesi (varsayılan 1080×1920 story). Story'de isteğe bağlı `q` = virgülle ayrılmış en fazla 3
 `<G|Y|R><senaryo uuid>`: her bayraktan bir senaryo metni DB'den okunup karta eklenir (geçersiz/bilinmeyen id
 yok sayılır). Uzun süreli cache; cevap verisi içermez, yalnızca oyuncunun paylaşmak için seçtiği senaryo metinleri.
+
+---
+
+## 10a. Mobil: kullanıcı ve coin endpoint'leri
+
+Kimlik: `Authorization: Bearer <Supabase JWT>` (Google/Apple girişi). Web anonimdir ve bunları **hiç çağırmaz**.
+Geçersiz/eksik JWT → `401 UNAUTHORIZED`. Coin yazımı yalnızca sunucuda, atomik ve idempotent (`apply_coins`, SQL).
+Ekonomi: kayıt +500 (Auth trigger'ı, otomatik) · reklam +100 (günde en fazla 5) · oda −250 · AI yorum −100 · solo AI −100 ·
+solo +20 (solo `complete` içinde, bkz. gelecek iş). **Miktarı istemci göndermez**, yalnızca `reason`.
+
+- `GET /api/users/me` → `{ id, coins, tier }`
+- `POST /api/users/coins/spend` `{ "reason": "ai_commentary" | "solo_ai", "refId": "…" }` → `{ balance, applied, spent }`;
+  yetersiz bakiye `402 INSUFFICIENT_COINS`; aynı `refId` ikinci kez düşmez (`applied: false`). Oda coin'i `rooms/create`
+  içinde düşülür.
+- `POST /api/users/coins/earn` `{ "reason": "ad_reward", "refId": "…" }` → `{ balance, applied, earned }`; günlük sınır
+  `429 AD_LIMIT_REACHED`.
+- `POST /api/rooms/create` (mobil): `platform: "mobile"` + Bearer JWT zorunlu (`401`); oda −250 coin düşülür
+  (`402 INSUFFICIENT_COINS`), oda başarısız olursa iade edilir, `rooms.user_id` bağlanır. `platform` göndermeyen anonim
+  web istekleri ücretsizdir ve değişmez.
 
 ---
 

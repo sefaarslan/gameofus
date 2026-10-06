@@ -143,9 +143,12 @@ bkz. Bölüm 7 — Performans & Veri Akışı Kuralları.)
 ### Kayıtlı kullanıcı modeli (yalnızca mobil)
 - **Web'de ücretsiz oyun anonimdir.** Mobilde her oyun için giriş zorunludur (Google / Apple,
   Supabase Auth); oturum Supabase JWT ile korunur.
-- Mobil odalar `user_id` ile ilişkilendirilir. Premium/coin durumu `users` tablosunda tutulur
-  (mevcut: `is_premium`, `room_credits`; planlanan: `tier`, coin hareketleri için
-  `credit_transactions`). **Web bu bilgiyi hiçbir API isteğinde sormaz veya taşımaz.**
+- Mobil odalar `user_id` ile ilişkilendirilir. Coin ve tier `users` tablosunda (`room_credits` = coin bakiyesi, `tier`),
+  tüm coin hareketleri `credit_transactions`'ta tutulur. **Coin yalnızca sunucuda** `apply_coins` (SQL, atomik + idempotent,
+  yalnızca service role) ile değişir; istemci miktar göndermez, yalnızca `reason`/`refId` bildirir. Kimlik doğrulama
+  `lib/auth.ts` (`getAuthUser`: Bearer Supabase JWT); katılımcı token'ı (64 hex) ile karışmaz. Fiyatlar/ödüller `lib/coins.ts`.
+  Ekonomi: kayıt +500 (Auth trigger'ı) · reklam +100 (günde 5) · oda −250 · AI yorum −100 · solo +20 / solo AI −100.
+  **Web bu bilgiyi hiçbir API isteğinde sormaz veya taşımaz** (web odaları anonim ve ücretsiz kalır).
 
 ### Public link yapısı
 - Public link yalnızca `room_code` içerir: `/game/room/{room_code}`

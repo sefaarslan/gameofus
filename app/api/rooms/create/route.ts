@@ -11,6 +11,8 @@ import { getRoomExpiry } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
 import { isRelationshipType } from "@/lib/relationship";
 import { checkRateLimit, ipHashFor } from "@/lib/rate-limit";
+import { getAuthUser } from "@/lib/auth";
+import { COIN_PRICES, CoinError, applyCoins } from "@/lib/coins";
 
 const RATE_LIMIT = { perHour: 10, perDay: 50 };
 
@@ -48,8 +50,14 @@ export async function POST(req: NextRequest) {
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { displayName, partnerName, gameMode, questionCount, locale, categoryId, relationshipType } =
+  const { displayName, partnerName, gameMode, questionCount, locale, categoryId, relationshipType, platform } =
     body as Record<string, unknown>;
+
+  // Mobil (giriş zorunlu): geçerli Supabase JWT'si gerekir; oda coin ile açılır (−250). Web anonimdir ve ücretsiz kalır.
+  const authUser = await getAuthUser(req);
+  if (platform === "mobile" && !authUser) {
+    return apiError("UNAUTHORIZED", "Giriş gereklidir.", 401);
+  }
 
   const selectedCategoryId = typeof categoryId === "string" && categoryId.length > 0
     ? categoryId
@@ -183,6 +191,26 @@ export async function POST(req: NextRequest) {
 
   const expiresAt = getRoomExpiry(false);
 
+  // Coin: oda açılmadan önce düşülür (idempotent: ref = oda kodu); sonraki bir adım başarısız olursa iade edilir
+  if (authUser) {
+    try {
+      await applyCoins(authUser.id, -COIN_PRICES.room_create, "room_create", roomCode);
+    } catch (e) {
+      if (e instanceof CoinError && e.code === "INSUFFICIENT_COINS") {
+        return apiError("INSUFFICIENT_COINS", "Oda açmak için yeterli coin yok.", 402);
+      }
+      return apiError("INTERNAL_ERROR", "Coin düşülemedi.", 500);
+    }
+  }
+  const refundCoins = async () => {
+    if (!authUser) return;
+    try {
+      await applyCoins(authUser.id, COIN_PRICES.room_create, "room_create_refund", roomCode);
+    } catch {
+      /* iade başarısız olursa kayıt credit_transactions'ta düşüm olarak kalır; elle düzeltilir */
+    }
+  };
+
   // Room insert
   const { data: room, error: roomErr } = await supabase
     .from("rooms")
@@ -192,6 +220,7 @@ export async function POST(req: NextRequest) {
       question_count: count,
       locale: roomLocale,
       expires_at: expiresAt.toISOString(),
+      ...(authUser ? { user_id: authUser.id } : {}),
       ...(selectedCategoryId ? { category_id: selectedCategoryId } : {}),
       ...(selectedRelationship ? { relationship_type: selectedRelationship } : {}),
     })
@@ -199,6 +228,7 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (roomErr || !room) {
+    await refundCoins();
     return apiError("INTERNAL_ERROR", "Oda oluşturulamadı.", 500);
   }
 
@@ -219,6 +249,7 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (partErr || !participant) {
+    await refundCoins();
     return apiError("INTERNAL_ERROR", "Katılımcı oluşturulamadı.", 500);
   }
 
@@ -234,6 +265,7 @@ export async function POST(req: NextRequest) {
 
   const { error: rqErr } = await supabase.from("room_questions").insert(roomQuestionsPayload);
   if (rqErr) {
+    await refundCoins();
     return apiError("INTERNAL_ERROR", "Sorular atanamadı.", 500);
   }
 

@@ -72,6 +72,44 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_transactions: {
+        Row: {
+          balance_after: number
+          created_at: string
+          delta: number
+          id: string
+          reason: string
+          ref_id: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after: number
+          created_at?: string
+          delta: number
+          id?: string
+          reason: string
+          ref_id?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number
+          created_at?: string
+          delta?: number
+          id?: string
+          reason?: string
+          ref_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       answers: {
         Row: {
           answer_value: Json
@@ -687,6 +725,7 @@ export type Database = {
           id: string
           is_premium: boolean
           room_credits: number
+          tier: string
         }
         Insert: {
           created_at?: string
@@ -694,6 +733,7 @@ export type Database = {
           id: string
           is_premium?: boolean
           room_credits?: number
+          tier?: string
         }
         Update: {
           created_at?: string
@@ -701,6 +741,7 @@ export type Database = {
           id?: string
           is_premium?: boolean
           room_credits?: number
+          tier?: string
         }
         Relationships: []
       }
@@ -753,7 +794,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      apply_coins: {
+        Args: { p_delta: number; p_reason: string; p_ref?: string; p_user: string }
+        Returns: { applied: boolean; balance: number }[]
+      }
     }
     Enums: {
       confidence_level: "guess" | "think" | "sure"

@@ -52,12 +52,24 @@ bu doküman onların okunabilir özetidir. Çelişkide migration'lar geçerlidir
 | id | uuid | Supabase Auth UID |
 | email | text | |
 | is_premium | boolean | default false |
-| room_credits | int | default 0 — **coin bakiyesi** için kullanılır |
+| room_credits | int | default 0 — **coin bakiyesi** (yalnızca `apply_coins` ile değişir) |
+| tier | text | `free` / `lite` / `premium`, default `free`; yalnızca yükselir (migration `20260609000000`) |
 | created_at | timestamptz | |
 
-Planlanan (coin + tier modeli, bkz. PRD 12.2): `tier text default 'free' check in ('free','lite','premium')`,
-`birth_date date null`, ayrıca `credit_transactions` (user_id, delta, reason, created_at) audit tablosu.
-`premium_until` kaldırılmıştır.
+Yeni Supabase Auth kullanıcısı için satır + **+500 kayıt bonusu** `on_auth_user_created` trigger'ıyla otomatik oluşur.
+Planlanan: `birth_date date null`. `premium_until` kaldırılmıştır.
+
+### `credit_transactions` — coin hareketleri (audit + idempotency)
+
+`id`, `user_id` (users, cascade), `delta int` (≠0), `balance_after int` (≥0), `reason` (`signup_bonus`, `ad_reward`,
+`room_create`, `room_create_refund`, `ai_commentary`, `ai_commentary_refund`, `solo_reward`, `solo_ai`,
+`solo_ai_refund`, `purchase`, `admin_adjust`), `ref_id text null` (oda kodu / solo oturumu / satın alma kimliği),
+`created_at`. `unique(user_id, reason, ref_id) where ref_id is not null` → aynı işlem iki kez uygulanmaz. RLS açık;
+kullanıcı yalnızca kendi satırlarını okur, yazım yalnızca service role.
+
+**`apply_coins(p_user, p_delta, p_reason, p_ref)`** (SQL fonksiyonu, `security definer`, yalnızca `service_role`):
+kullanıcı satırını kilitler, idempotency kontrolü yapar, bakiye negatife düşerse `INSUFFICIENT_COINS` fırlatır,
+bakiyeyi günceller ve `credit_transactions`'a yazar. İstemci doğrudan coin yazamaz.
 
 ### `rooms`
 
