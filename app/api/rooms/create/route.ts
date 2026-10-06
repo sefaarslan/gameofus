@@ -13,6 +13,8 @@ import { isRelationshipType } from "@/lib/relationship";
 import { checkRateLimit, ipHashFor } from "@/lib/rate-limit";
 import { getAuthUser } from "@/lib/auth";
 import { COIN_PRICES, CoinError, applyCoins } from "@/lib/coins";
+import { canAccessTier, isTier, type Tier } from "@/lib/tier";
+import { ageOn, parseBirthDate } from "@/lib/age";
 
 const RATE_LIMIT = { perHour: 10, perDay: 50 };
 
@@ -50,7 +52,7 @@ export async function POST(req: NextRequest) {
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { displayName, partnerName, gameMode, questionCount, locale, categoryId, relationshipType, platform } =
+  const { displayName, partnerName, gameMode, questionCount, locale, categoryId, relationshipType, platform, birthDate, partnerBirthDate } =
     body as Record<string, unknown>;
 
   // Mobil (giriş zorunlu): geçerli Supabase JWT'si gerekir; oda coin ile açılır (−250). Web anonimdir ve ücretsiz kalır.
@@ -91,15 +93,51 @@ export async function POST(req: NextRequest) {
 
   const supabase = createAdminClient();
 
-  // Seçilen kategori bu ilişki türüne uygun mu (sunucu tarafı doğrulama)
-  if (selectedCategoryId && selectedRelationship) {
+  // Doğum tarihleri (opsiyonel; gönderildiyse geçerli olmalı). Partnerinki yalnızca bu oda için saklanır.
+  const ownerBirth = birthDate == null ? null : parseBirthDate(birthDate);
+  const partnerBirth = partnerBirthDate == null ? null : parseBirthDate(partnerBirthDate);
+  if ((birthDate != null && !ownerBirth) || (partnerBirthDate != null && !partnerBirth)) {
+    return apiError("INVALID_PAYLOAD", "Geçersiz doğum tarihi (YYYY-AA-GG).");
+  }
+
+  // Seçilen kategori bu ilişki türüne uygun mu, paket ve yaş koşulları (sunucu tarafı doğrulama)
+  if (selectedCategoryId) {
     const { data: cat } = await supabase
       .from("categories")
-      .select("relationship_types")
+      .select("relationship_types, min_tier, min_age")
       .eq("id", selectedCategoryId)
       .maybeSingle();
-    if (!cat || !cat.relationship_types.includes(selectedRelationship)) {
+    if (selectedRelationship && (!cat || !cat.relationship_types.includes(selectedRelationship))) {
       return apiError("INVALID_PAYLOAD", "Bu kategori seçilen ilişki türüne uygun değil.");
+    }
+
+    if (cat) {
+      // Paket kilidi: yalnızca giriş yapmış (mobil) ve yeterli tier'a sahip kullanıcı seçebilir (web'de premium kategori yoktur)
+      const minTier: Tier = isTier(cat.min_tier) ? cat.min_tier : "free";
+      if (minTier !== "free" && !authUser) {
+        return apiError("TIER_REQUIRED", "Bu kategori mobil uygulamada, paketle açılır.", 403);
+      }
+      let userBirth: string | null = null;
+      if (authUser && (minTier !== "free" || cat.min_age > 0)) {
+        const { data: u } = await supabase.from("users").select("tier, birth_date").eq("id", authUser.id).maybeSingle();
+        const userTier: Tier = isTier(u?.tier) ? u.tier : "free";
+        if (!canAccessTier(userTier, minTier)) {
+          return apiError("TIER_REQUIRED", `Bu kategori ${minTier === "premium" ? "Premium" : "Lite"} paket gerektirir.`, 403);
+        }
+        userBirth = u?.birth_date ?? null;
+      }
+
+      // Yaş koşulu (Cesur Sorular 18+): kurucu ve partner, ikisi de; ilişki türü zorunlu (kategori yalnızca sevgili/hayat arkadaşı)
+      if (cat.min_age > 0) {
+        if (!selectedRelationship) return apiError("INVALID_PAYLOAD", "Bu kategori için ilişki türü gereklidir.");
+        const owner = ownerBirth ?? parseBirthDate(userBirth);
+        if (!owner || !partnerBirth) {
+          return apiError("AGE_VERIFICATION_REQUIRED", "Bu kategori için kurucu ve partnerin doğum tarihi gereklidir.");
+        }
+        if (ageOn(owner) < cat.min_age || ageOn(partnerBirth) < cat.min_age) {
+          return apiError("AGE_RESTRICTED", `Bu kategori yalnızca ${cat.min_age}+ oyuncular içindir.`, 403);
+        }
+      }
     }
   }
 
@@ -221,6 +259,7 @@ export async function POST(req: NextRequest) {
       locale: roomLocale,
       expires_at: expiresAt.toISOString(),
       ...(authUser ? { user_id: authUser.id } : {}),
+      ...(partnerBirthDate && partnerBirth ? { partner_birth_date: partnerBirthDate as string } : {}),
       ...(selectedCategoryId ? { category_id: selectedCategoryId } : {}),
       ...(selectedRelationship ? { relationship_type: selectedRelationship } : {}),
     })
@@ -268,6 +307,11 @@ export async function POST(req: NextRequest) {
   if (rqErr) {
     await refundCoins();
     return apiError("INTERNAL_ERROR", "Sorular atanamadı.", 500);
+  }
+
+  // Kurucunun doğum tarihi profile yazılır (varsa üzerine yazar: "bazen şu bazen bu" olmaz)
+  if (authUser && ownerBirth && typeof birthDate === "string") {
+    await supabase.from("users").update({ birth_date: birthDate }).eq("id", authUser.id);
   }
 
   const baseUrl = process.env.APP_BASE_URL ?? "";

@@ -45,6 +45,8 @@ export type Database = {
           id: string
           is_premium: boolean
           locale: string
+          min_age: number
+          min_tier: string
           name: string
           relationship_types: string[]
           slug: string
@@ -55,6 +57,8 @@ export type Database = {
           id?: string
           is_premium?: boolean
           locale?: string
+          min_age?: number
+          min_tier?: string
           name: string
           relationship_types?: string[]
           slug: string
@@ -65,6 +69,8 @@ export type Database = {
           id?: string
           is_premium?: boolean
           locale?: string
+          min_age?: number
+          min_tier?: string
           name?: string
           relationship_types?: string[]
           slug?: string
@@ -594,6 +600,7 @@ export type Database = {
           id: string
           reading_score: number
           room_id: string
+          ai_commentary: string | null
         }
         Insert: {
           created_at?: string
@@ -601,6 +608,7 @@ export type Database = {
           id?: string
           reading_score: number
           room_id: string
+          ai_commentary?: string | null
         }
         Update: {
           created_at?: string
@@ -608,6 +616,7 @@ export type Database = {
           id?: string
           reading_score?: number
           room_id?: string
+          ai_commentary?: string | null
         }
         Relationships: [
           {
@@ -671,6 +680,7 @@ export type Database = {
           room_code: string
           status: Database["public"]["Enums"]["room_status"]
           user_id: string | null
+          partner_birth_date: string | null
         }
         Insert: {
           category_id?: string | null
@@ -687,6 +697,7 @@ export type Database = {
           room_code: string
           status?: Database["public"]["Enums"]["room_status"]
           user_id?: string | null
+          partner_birth_date?: string | null
         }
         Update: {
           category_id?: string | null
@@ -703,6 +714,7 @@ export type Database = {
           room_code?: string
           status?: Database["public"]["Enums"]["room_status"]
           user_id?: string | null
+          partner_birth_date?: string | null
         }
         Relationships: [
           {
@@ -729,6 +741,7 @@ export type Database = {
           is_premium: boolean
           room_credits: number
           tier: string
+          birth_date: string | null
         }
         Insert: {
           created_at?: string
@@ -737,6 +750,7 @@ export type Database = {
           is_premium?: boolean
           room_credits?: number
           tier?: string
+          birth_date?: string | null
         }
         Update: {
           created_at?: string
@@ -745,6 +759,7 @@ export type Database = {
           is_premium?: boolean
           room_credits?: number
           tier?: string
+          birth_date?: string | null
         }
         Relationships: []
       }

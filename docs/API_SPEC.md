@@ -61,9 +61,14 @@ geçersizse `INVALID_PAYLOAD`). Verilirse yalnızca o türe uygun kategoriler d�
 ```json
 [
   { "id": "uuid", "name": "Kanka Testi", "slug": "friend_test", "is_premium": false,
-    "sort_order": 1, "relationship_types": ["friend"] }
+    "sort_order": 1, "relationship_types": ["friend"], "min_tier": "free", "min_age": 0, "locked": false }
 ]
 ```
+
+`min_tier` (`free|lite|premium`) kategoriye erişim için gereken paket, `min_age` asgari yaş (Cesur = 18). **`locked`**: bu
+istemci kategoriyi seçemez. Anonim web'de `min_tier ≠ free` olanlar kilitlidir (mobile yönlendirme); `Authorization: Bearer
+<Supabase JWT>` ile kullanıcının tier'ına göre hesaplanır (`premium` ≥ `lite` ≥ `free`; tier yalnızca yükselir). Yaş koşulu
+(`min_age`) burada değil, oda kurarken doğrulanır.
 
 Web, kategorileri sayfa açılırken bir kez (tür filtresi olmadan) çekip tür değişince **istemcide**
 filtreler; sunucu uyumu `rooms/create`'te yine doğrular.
@@ -82,7 +87,9 @@ Oda ve owner participant oluşturur, soruları seçip `room_questions`'a yazar.
   "questionCount": 10,
   "locale": "tr",
   "relationshipType": "friend",
-  "categoryId": "uuid"
+  "categoryId": "uuid",
+  "birthDate": "1990-01-31",
+  "partnerBirthDate": "1992-05-05"
 }
 ```
 
@@ -95,6 +102,13 @@ Doğrulama:
 - `categoryId` opsiyonel. Hem `categoryId` hem `relationshipType` varsa kategori o türe uygun olmalı
   (`categories.relationship_types`), yoksa `INVALID_PAYLOAD`.
 - IP hash'e göre saatte 10 / günde 50 oda sınırı (`RATE_LIMITED`).
+- **Paket kilidi (mobil):** kategorinin `min_tier`'ı `free` değilse yalnızca giriş yapmış ve tier'ı yeterli kullanıcı seçebilir;
+  anonim web veya yetersiz tier → `403 TIER_REQUIRED`. Coin düşümünden **önce** kontrol edilir.
+- **Yaş koşulu:** `min_age > 0` olan kategoride (Cesur = 18) `relationshipType` zorunlu (kategori yalnızca `dating|partner`),
+  kurucu (`birthDate` gövdede ya da profilden `users.birth_date`) ve partner (`partnerBirthDate`) **ikisi de** asgari yaşta
+  olmalı: tarih eksikse `400 AGE_VERIFICATION_REQUIRED`, biri küçükse `403 AGE_RESTRICTED`. Tarihler `YYYY-AA-GG`; geçersiz/gelecek →
+  `INVALID_PAYLOAD`. Her durumda opsiyonel gönderilebilir: `partnerBirthDate` yalnızca bu odada (`rooms.partner_birth_date`) saklanır,
+  `birthDate` profile yazılır.
 
 **Soru seçimi:** Havuz = oda dili + `is_active` + ücretsiz + ilişki türüne uygun kategoriler. Seçilen kategori
 önceliklidir; yetmezse yalnızca aynı havuzdan tamamlanır, hâlâ yetmezse `tr` havuzu. Tüm havuz çekilip
@@ -313,7 +327,8 @@ Geçersiz/eksik JWT → `401 UNAUTHORIZED`. Coin yazımı yalnızca sunucuda, at
 Ekonomi: kayıt +500 (Auth trigger'ı, otomatik) · reklam +100 (günde en fazla 5) · oda −250 · AI yorum −100 · solo AI −100 ·
 solo +20 (solo `complete` içinde, bkz. gelecek iş). **Miktarı istemci göndermez**, yalnızca `reason`.
 
-- `GET /api/users/me` → `{ id, coins, tier }`
+- `GET /api/users/me` → `{ id, coins, tier, birthDate }`
+- `PATCH /api/users/me` `{ "birthDate": "YYYY-AA-GG" }` → profil doğum tarihi (geçersiz `400`, 13 yaş altı `403 AGE_RESTRICTED`)
 - `DELETE /api/users/me` `{ "confirm": true }` → `{ deleted: true }` — **hesap silme** (App Store 5.1.1(v) / Google Play). Silinen: kurulan odalar
   (içeriğiyle), solo oyunlar, coin kayıtları, kullanıcı ve Auth kaydı. Başkalarının odalarındaki katılım anonimleştirilir
   (ad kaldırılır, `user_id` null). `purchases` satırları kalır, kullanıcıdan ayrılır (yasal muhasebe). Onay yoksa `400`.

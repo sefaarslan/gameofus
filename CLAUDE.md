@@ -149,6 +149,10 @@ bkz. Bölüm 7 — Performans & Veri Akışı Kuralları.)
   `lib/auth.ts` (`getAuthUser`: Bearer Supabase JWT); katılımcı token'ı (64 hex) ile karışmaz. Fiyatlar/ödüller `lib/coins.ts`.
   Ekonomi: kayıt +500 (Auth trigger'ı) · reklam +100 (günde 5) · oda −250 · AI yorum −100 · solo +20 / solo AI −100.
   **Web bu bilgiyi hiçbir API isteğinde sormaz veya taşımaz** (web odaları anonim ve ücretsiz kalır).
+  **Kategori erişimi yalnızca tier ile** (`categories.min_tier`, `lib/tier.ts`: `premium ≥ lite ≥ free`; per-kategori takip yok) ve
+  asgari yaşla (`categories.min_age`, Cesur=18: kurucu ve partner ikisi de; `lib/age.ts`). Her ikisi `POST /api/rooms/create`'te
+  coin düşümünden önce sunucuda doğrulanır (`TIER_REQUIRED` / `AGE_VERIFICATION_REQUIRED` / `AGE_RESTRICTED`); "Karışık Sürpriz"
+  havuzu her zaman yalnızca ücretsiz kategorilerden çeker (kilitli kategoriler yalnızca açıkça seçilince).
   **Mobilde misafir/anonim yoktur:** oda kuran da katılan da giriş yapmıştır (`platform: "mobile"` + Bearer JWT, yoksa 401);
   katılımcı `participants.user_id`'ye bağlanır (geçmiş ve hesap silme için). **Hesap silme:** `DELETE /api/users/me`
   (`delete_user_account` RPC + Auth kaydı); kurulan odalar silinir, başkalarının odalarındaki katılım anonimleştirilir,

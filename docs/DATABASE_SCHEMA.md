@@ -54,6 +54,7 @@ bu doküman onların okunabilir özetidir. Çelişkide migration'lar geçerlidir
 | is_premium | boolean | default false |
 | room_credits | int | default 0 — **coin bakiyesi** (yalnızca `apply_coins` ile değişir) |
 | tier | text | `free` / `lite` / `premium`, default `free`; yalnızca yükselir (migration `20260609000000`) |
+| birth_date | date null | Kurucunun doğum tarihi (Cesur 18+ doğrulaması, ileride AI bağlamı); oda kurarken güncellenebilir (migration `20260612000000`) |
 | created_at | timestamptz | |
 
 Yeni Supabase Auth kullanıcısı için satır + **+500 kayıt bonusu** `on_auth_user_created` trigger'ıyla otomatik oluşur.
@@ -91,11 +92,12 @@ solo oturum ve geri bildirimlerini siler, `users` satırını (coin hareketleriy
 | join_locked | boolean | oda dolunca true |
 | locale | text | `tr` / `en` / `es`; oda kurulurken sabitlenir |
 | category_id | uuid null | `categories.id` (odanın dilindeki satır) |
+| partner_birth_date | date null | Yalnızca mobil, kurucunun girdiği partner doğum tarihi (bu oda için; oda silinince gider) |
 | relationship_type | text null | `friend` / `dating` / `partner`; eski odalarda ve alanı göndermeyen mobil build'lerde null |
 | created_at | timestamptz | |
 | expires_at | timestamptz | +24 saat |
 
-`is_premium_room` kaldırılmıştır. Planlanan: `partner_birth_date date null` (yalnızca mobil, yaş doğrulama).
+`is_premium_room` kaldırılmıştır.
 
 Index: `unique(room_code)`, `status`, `expires_at`, `user_id`, `category_id`.
 
@@ -127,6 +129,8 @@ Satır bazlı locale: aynı kategorinin TR/EN/ES için ayrı satırı vardır.
 | locale | text | `tr` / `en` / `es` |
 | is_premium | boolean | slug bazında tüm dillerde aynı olmalı |
 | relationship_types | text[] | kategorinin göründüğü ilişki türleri; default `{friend,dating,partner}` |
+| min_tier | text | `free` / `lite` / `premium` (erişim için gereken paket); `is_premium = (min_tier <> 'free')` check ile tutarlı |
+| min_age | int | Asgari yaş (Cesur `bold` = 18); kurucu **ve** partner için oda kurarken sunucuda doğrulanır |
 | sort_order | int | |
 | created_at | timestamptz | |
 

@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/auth";
 import { corsOptions } from "@/lib/cors";
 import { apiError, apiOk } from "@/lib/api";
+import { MIN_APP_AGE, ageOn, parseBirthDate } from "@/lib/age";
 
 export function OPTIONS() {
   return corsOptions();
@@ -15,12 +16,35 @@ export async function GET(req: NextRequest) {
 
   const { data } = await createAdminClient()
     .from("users")
-    .select("room_credits, tier")
+    .select("room_credits, tier, birth_date")
     .eq("id", user.id)
     .maybeSingle();
   if (!data) return apiError("INTERNAL_ERROR", "Kullanıcı kaydı bulunamadı.", 500);
 
-  return apiOk({ id: user.id, coins: data.room_credits, tier: data.tier });
+  return apiOk({ id: user.id, coins: data.room_credits, tier: data.tier, birthDate: data.birth_date });
+}
+
+/**
+ * Profil: doğum tarihi (`{ "birthDate": "YYYY-AA-GG" }`). Cesur Sorular gibi yaş koşullu kategoriler ve (planlanan) AI yorum
+ * için kullanılır; oda kurarken de gönderilebilir (profile yazılır). Asgari uygulama yaşı altı reddedilir.
+ */
+export async function PATCH(req: NextRequest) {
+  const user = await getAuthUser(req);
+  if (!user) return apiError("UNAUTHORIZED", "Giriş gereklidir.", 401);
+
+  let body: Record<string, unknown>;
+  try {
+    body = (await req.json()) as Record<string, unknown>;
+  } catch {
+    return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
+  }
+  const birth = parseBirthDate(body.birthDate);
+  if (!birth) return apiError("INVALID_PAYLOAD", "Geçersiz doğum tarihi (YYYY-AA-GG).");
+  if (ageOn(birth) < MIN_APP_AGE) return apiError("AGE_RESTRICTED", `Uygulama ${MIN_APP_AGE} yaş ve üzeri içindir.`, 403);
+
+  const { error } = await createAdminClient().from("users").update({ birth_date: body.birthDate as string }).eq("id", user.id);
+  if (error) return apiError("INTERNAL_ERROR", "Profil güncellenemedi.", 500);
+  return apiOk({ birthDate: body.birthDate });
 }
 
 /**
