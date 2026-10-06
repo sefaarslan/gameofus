@@ -247,6 +247,14 @@ başlayan odalar hariç tutulur. Supabase SQL editöründen okunur.
 
 ---
 
+**Arşiv ve saklama (migration `20260611000000`):** `metrics_funnel_archive`, `metrics_participant_archive`,
+`metrics_feedback_archive` yalnızca kişisel olmayan günlük toplamları tutar; `metrics_*` görünümleri canlı veri + arşivi
+birleştirir (sütunlar aynı, `game_mode`/`role`/`status` artık `text`). `cleanup_expired_data(p_room_days=14, p_solo_days=90,
+p_rate_days=7, p_batch=500, p_user_days=90)` (SQL, `security definer`, yalnızca `service_role`): eski anonim odaları
+(`expires_at` + 14 gün), kullanıcıya bağlı (mobil) odaları (`expires_at` + 90 gün), solo oturumları (anonim 90 gün, kullanıcıya
+bağlı 90 gün) ve eski `rate_limits` satırlarını önce arşivleyip siler; `credit_transactions` ve `purchases` kalır. `/api/cron/cleanup`
+(Vercel Cron) günde bir çağırır.
+
 ## 5. Migration Notları
 
 - Migration'lar tarih damgalı dosyalardır; sıra önemlidir. Soru seti v2 migration'ları üretilir

@@ -62,10 +62,12 @@ Hizmet sağlayıcılarımızın bir kısmı Türkiye ve AB/AEA dışında olabil
 
 | Veri | Süre |
 |---|---|
-| Web odaları (anonim): oda 24 saat sonra erişilemez | Erişimden sonra [30] gün içinde silinir **[DİKKAT: otomatik temizleme işi kurulmalı]** |
-| Tek kişilik web oyunu (anonim) | [90] gün **[temizleme işi kurulmalı]** |
-| IP özeti (hız sınırı) | [30] gün **[temizleme işi kurulmalı]** |
-| Mobil hesap, oyun geçmişi, coin kayıtları | Hesabınızı silene kadar |
+| Web odaları (anonim): oda 24 saat sonra erişilemez | Erişime kapandıktan **14 gün** sonra otomatik silinir (günlük temizleme işi) |
+| Tek kişilik web oyunu (anonim) | **90 gün** sonra otomatik silinir |
+| IP özeti (hız sınırı) | **7 gün** sonra otomatik silinir |
+| Anonim toplu istatistik (günlük oda/tamamlanma/geri bildirim sayıları) | Kişisel veri içermez; silme sonrası da tutulur |
+| Mobil hesap ve coin kayıtları | Hesabınızı silene kadar |
+| Mobil oyun geçmişi (kurduğunuz/katıldığınız odalar, tek kişilik oyunlar) | **90 gün** sonra otomatik silinir (veya hesabınızı silince hemen) |
 | Satın alma kayıtları | Yasal saklama süresi boyunca (muhasebe/vergi mevzuatı: [10 yıl — DOĞRULA]) **kimliğinizden ayrılmış (anonim)** halde; hesap silindiğinde kullanıcı bağlantısı kaldırılır |
 | Geri bildirim | İlişkili oda/oyun silindiğinde birlikte silinir |
 

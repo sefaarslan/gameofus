@@ -797,6 +797,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_data: {
+        Args: { p_batch?: number; p_rate_days?: number; p_room_days?: number; p_solo_days?: number; p_user_days?: number }
+        Returns: { rate_deleted: number; rooms_deleted: number; solo_deleted: number }[]
+      }
       delete_user_account: {
         Args: { p_user: string }
         Returns: undefined

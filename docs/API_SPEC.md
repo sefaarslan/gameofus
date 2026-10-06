@@ -301,6 +301,11 @@ yok sayılır). Uzun süreli cache; cevap verisi içermez, yalnızca oyuncunun p
 
 ---
 
+## 10b. `GET /api/cron/cleanup` (dahili, Vercel Cron)
+
+`Authorization: Bearer <CRON_SECRET>` zorunlu (env yoksa `503`, yanlışsa `401`). Süresi dolmuş anonim verileri siler (bkz.
+`docs/DATABASE_SCHEMA.md`, `lib/retention.ts`) ve `{ ok, rooms, solo, rateLimits, rounds }` döner. İstemciler çağırmaz.
+
 ## 10a. Mobil: kullanıcı ve coin endpoint'leri
 
 Kimlik: `Authorization: Bearer <Supabase JWT>` (Google/Apple girişi). Web anonimdir ve bunları **hiç çağırmaz**.

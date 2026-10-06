@@ -326,6 +326,12 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   - Premium kullanıcı yalnızca kendi `user_id`'sine bağlı odaları yönetir.
 - Expire kontrolü **okuma anında** `expires_at < now()` ile yapılır; cron job gerekmez.
 - Ücretsiz oda **24 saat**, premium oda **72 saat** sonra inaktif sayılır.
+- **Saklama/temizleme:** `/api/cron/cleanup` (Vercel Cron, günde bir; `CRON_SECRET` yoksa 503, yanlışsa 401) `cleanup_expired_data()` SQL
+  fonksiyonunu çağırır: anonim web odaları `expires_at` + **14 gün**, anonim solo oturumlar **90 gün**, `rate_limits` (IP özeti) **7 gün**
+  sonra silinir; **mobil (kullanıcıya bağlı) oda ve solo geçmişi de 90 gün** sonra silinir (mobil Geçmiş ekranı son 90 günü gösterir).
+  Süreler `lib/retention.ts` (Gizlilik Politikası ile uyumlu tut). `credit_transactions` hesap silinene kadar kalır (solo ödül
+  idempotency'si buna dayanır), `purchases` yasal süre boyunca kullanıcıdan ayrılmış tutulur — ikisi bu işle silinmez. Silmeden önce kişisel olmayan günlük toplamlar `metrics_*_archive` tablolarına yazılır; `metrics_*` görünümleri
+  canlı + arşivi birleştirir (metrik geçmişi kaybolmaz).
 - Analytics event'lerinde **bireysel cevap içeriği tutulmaz**, yalnızca davranış metrikleri. Aynı kural
   `feedback` tablosu için de geçerlidir: puan, AI ilgisi, kısa yorum (≤ 500 karakter) ve oda meta verisi
   (dil, mod, ilişki türü) tutulur; cevap/tahmin içeriği tutulmaz.
