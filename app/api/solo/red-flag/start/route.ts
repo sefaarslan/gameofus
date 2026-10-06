@@ -5,6 +5,7 @@ import { corsOptions } from "@/lib/cors";
 import { apiError, apiOk } from "@/lib/api";
 import { checkRateLimit, ipHashFor } from "@/lib/rate-limit";
 import { RED_FLAG_CARD_COUNT, RED_FLAG_GAME, getPack } from "@/lib/solo";
+import { getAuthUser } from "@/lib/auth";
 
 export function OPTIONS() {
   return corsOptions();
@@ -53,6 +54,10 @@ export async function POST(req: NextRequest) {
   const locale = typeof body.locale === "string" && LOCALES.includes(body.locale) ? body.locale : "en";
   const platform = body.platform === "mobile" ? "mobile" : "web";
 
+  // Mobil (giriş zorunlu): geçerli Supabase JWT'si gerekir; oturum kullanıcıya bağlanır (coin ödülü, geçmiş). Web anonimdir.
+  const authUser = await getAuthUser(req);
+  if (platform === "mobile" && !authUser) return apiError("UNAUTHORIZED", "Giriş gereklidir.", 401);
+
   const pack = getPack(body.pack);
   if (!pack) return apiError("INVALID_PAYLOAD", "Geçerli bir set seçilmelidir.");
   // Web yalnızca açık setleri oynatır; diğerleri mobilde açılacak
@@ -64,7 +69,8 @@ export async function POST(req: NextRequest) {
     loadPack(pack.key, locale),
   ]);
   if (!allowed) return apiError("RATE_LIMITED", "Kısa sürede çok fazla oyun başlattınız.", 429);
-  if (!scenarios) return apiError("INTERNAL_ERROR", "Set bulunamadı.", 500);
+  // İçeriği henüz hazır olmayan set (ör. 104-106): web/mobil fark etmez, oynanamaz
+  if (!scenarios) return apiError("PACK_UNAVAILABLE", "Bu set henüz hazır değil.", 404);
 
   const supabase = createAdminClient();
   const token = generateToken();
@@ -76,6 +82,7 @@ export async function POST(req: NextRequest) {
       locale,
       platform,
       pack_key: pack.key,
+      ...(authUser && platform === "mobile" ? { user_id: authUser.id } : {}),
       token_hash: hashToken(token),
       scenario_ids: scenarios.map((s) => s.id),
     })

@@ -414,8 +414,10 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
 - **Web:** anonim (token), **her sette 1 oyun** (`localStorage` `gou_solo_redflag_packs`, set anahtarına göre); oynanmış sete
   tekrar girince kayıtlı karne gösterilir. Giriş ekranında tüm setler tek açılır listede ("Kategori - 101"). Yarım kalan oyun
   `gou_solo_redflag_pending_packs` ile saklanır (sayfa yenilenince aynı oturum/cevaplar devam eder, bitince silinir); bu istemci tarafı bir UX katmanıdır, çerez/depolama temizlenirse yeniden oynanabilir; AI düğmesi pasif ("Mobil uygulamada"). Coin yoktur.
-- **Mobil (planlı):** oturum başına **bir kez** +20 coin, **günde 3 ödüllü oyun** sınırı, sunucuda doğrulanır
-  (istemci "bitirdim" diyemez); AI analizi 100 coin (önce düş, LLM hatasında iade, oturum başına cache).
+- **Mobil:** giriş zorunlu (`platform: "mobile"` + Bearer JWT, yoksa 401); oturum `user_id`'ye bağlanır. **Coin ödülü +20,
+  her set için kullanıcı başına YALNIZCA BİR KEZ** (aynı seti tekrar oynamak ödülsüz; idempotency ref = set anahtarı) ve
+  **günde en fazla 3 ödüllü oyun**; hepsi sunucuda `complete` içinde verilir (istemci "bitirdim" diyemez). Yanıtta
+  `reward: { earned, balance?, reason? }` (`already_rewarded` / `daily_limit`). Geçmiş: `GET /api/users/solo-history` (+ `/[sessionId]`). AI analizi 100 coin (önce düş, LLM hatasında iade, oturum başına cache).
   AI'a yalnızca ilk isim (opsiyonel), 9 senaryo metni + bayrak + `insight_tag` ve dil gider; cinsiyet/e-posta
   gitmez ve oyun girişinde **hiçbir şey sorulmaz**.
 - **Karne ekranı:** Red sayısına göre sabit başlık + cümle, mini ızgara, **Story görseli**, **WhatsApp'ta paylaş**

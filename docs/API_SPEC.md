@@ -42,6 +42,7 @@ POST /api/solo/red-flag/start
 POST /api/solo/[sessionId]/complete
 GET  /api/solo/red-flag/card?g=&l=&p=&q=&fmt=
 GET  /api/users/me                (mobil, Bearer JWT)
+GET  /api/users/solo-history      (mobil, Bearer JWT; + /[sessionId])
 POST /api/users/coins/spend       (mobil, Bearer JWT)
 POST /api/users/coins/earn        (mobil, Bearer JWT)
 ```
@@ -243,12 +244,14 @@ mobilde aynı endpoint'ler `platform: "mobile"` ile kullanılır (coin/AI ilerid
 ### `POST /api/solo/red-flag/start`
 
 ```json
-{ "locale": "tr", "platform": "web", "pack": "friend-101" }
+{ "locale": "tr", "platform": "web" | "mobile", "pack": "friend-101" }
 ```
 
 - `pack` zorunlu: `friend-101…106`, `romantic-101…106`; geçersizse `INVALID_PAYLOAD`. Webde yalnızca 101-103 açık;
   diğerleri `403 PACK_UNAVAILABLE` ("mobilde açılacak").
 - IP hash'e göre saatte 30 / günde 100 başlatma sınırı (`RATE_LIMITED`). `locale` geçersizse `en`.
+- `platform: "mobile"` ise geçerli Supabase JWT (`Authorization: Bearer`) zorunlu (`401`); oturum `user_id`'ye bağlanır, mobilde tüm setler
+  oynanabilir. İçeriği olmayan set (ör. 104-106) → `404 PACK_UNAVAILABLE`.
 - Sunucu, setin 9 kartını sabit sırayla (`pack_position`) döndürür (rastgelelik yok), oturumu (`pack_key`) ve anonim token'ı oluşturur. Kart geçişleri istemcide
   yapılır; cevaplar bu endpoint'e değil `complete`'e gider.
 
@@ -277,6 +280,17 @@ Yanıt `201`. `scenarios` kart sırasıdır.
 
 `tolerance = round((green×2 + yellow)/18 × 100)`. `grid`: kart sırasıyla 9 harf (G/Y/R). Sunucu başlık/cümle
 döndürmez: istemci ve paylaşım görseli, Red sayısına göre sabit metni (`solo.verdicts.<red>`) kendi dilinde seçer.
+
+**Mobil (kullanıcıya bağlı oturum) yanıtına `reward` eklenir:** `{ "earned": 20, "balance": 520 }` veya ödül yoksa
+`{ "earned": 0, "reason": "already_rewarded" | "daily_limit" }`. Kural: **+20 coin, her set için kullanıcı başına yalnızca bir
+kez** (aynı seti tekrar oynamak ödülsüz), **günde en fazla 3 ödüllü oyun**; idempotent (aynı oturum tekrar `complete` edilirse
+ek coin yok). Web (anonim) yanıtında `reward` alanı yoktur.
+
+### `GET /api/users/solo-history` ve `GET /api/users/solo-history/[sessionId]` (mobil)
+
+`Authorization: Bearer <Supabase JWT>`. Liste: kullanıcının tamamlanmış solo oyunları (en yeni önce, en fazla 100):
+`{ items: [{ sessionId, pack, locale, completedAt, coinsEarned, grid, counts, tolerance }] }`. Ayrıntı: aynı alanlar +
+`cards: [{ id, text, flag }]` (kart sırasıyla metin ve seçilen bayrak). Başkasının/web oturumu `404 SESSION_NOT_FOUND`.
 
 ### `GET /api/solo/red-flag/card`
 

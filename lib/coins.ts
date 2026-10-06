@@ -15,6 +15,9 @@ export const COIN_REWARDS = {
 } as const;
 export type EarnReason = "ad_reward";
 
+/** Solo oyun ödülü: aynı kullanıcı için her set yalnızca BİR kez ödül verir (tekrar oynama ödülsüz); günde en fazla 3 ödüllü oyun */
+export const SOLO_REWARD_DAILY_LIMIT = 3;
+
 /** Reklam ödülü günlük üst sınırı (AdMob sunucu doğrulaması gelene kadar kötüye kullanımı sınırlar) */
 export const AD_REWARD_DAILY_LIMIT = 5;
 
