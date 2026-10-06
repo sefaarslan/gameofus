@@ -149,6 +149,10 @@ bkz. Bölüm 7 — Performans & Veri Akışı Kuralları.)
   `lib/auth.ts` (`getAuthUser`: Bearer Supabase JWT); katılımcı token'ı (64 hex) ile karışmaz. Fiyatlar/ödüller `lib/coins.ts`.
   Ekonomi: kayıt +500 (Auth trigger'ı) · reklam +100 (günde 5) · oda −250 · AI yorum −100 · solo +20 / solo AI −100.
   **Web bu bilgiyi hiçbir API isteğinde sormaz veya taşımaz** (web odaları anonim ve ücretsiz kalır).
+  **Mobilde misafir/anonim yoktur:** oda kuran da katılan da giriş yapmıştır (`platform: "mobile"` + Bearer JWT, yoksa 401);
+  katılımcı `participants.user_id`'ye bağlanır (geçmiş ve hesap silme için). **Hesap silme:** `DELETE /api/users/me`
+  (`delete_user_account` RPC + Auth kaydı); kurulan odalar silinir, başkalarının odalarındaki katılım anonimleştirilir,
+  satın alma kayıtları kullanıcıdan ayrılmış halde yasal süre tutulur.
 
 ### Public link yapısı
 - Public link yalnızca `room_code` içerir: `/game/room/{room_code}`

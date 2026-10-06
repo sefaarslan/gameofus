@@ -4,6 +4,7 @@ import { generateToken, hashToken, verifyToken, extractToken } from "@/lib/token
 import { isRoomExpired } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
 import { corsOptions } from "@/lib/cors";
+import { getAuthUser } from "@/lib/auth";
 
 export function OPTIONS() {
   return corsOptions();
@@ -22,13 +23,17 @@ export async function POST(
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { displayName } = body as Record<string, unknown>;
+  const { displayName, platform } = body as Record<string, unknown>;
   const rawBodyToken = (body as Record<string, unknown>).participantToken;
   const participantToken = extractToken(req, typeof rawBodyToken === "string" ? rawBodyToken : null);
 
   if (!displayName || typeof displayName !== "string" || displayName.trim().length === 0) {
     return apiError("INVALID_PAYLOAD", "İsim zorunludur.");
   }
+
+  // Mobil (giriş zorunlu): misafir de giriş yapmış olmalı; katılımcı kullanıcıya bağlanır (geçmiş, hesap silme). Web anonimdir.
+  const authUser = await getAuthUser(req);
+  if (platform === "mobile" && !authUser) return apiError("UNAUTHORIZED", "Giriş gereklidir.", 401);
 
   const supabase = createAdminClient();
 
@@ -81,6 +86,7 @@ export async function POST(
       display_name: displayName.trim(),
       status: "joined",
       token_hash: tokenHash,
+      ...(authUser ? { user_id: authUser.id } : {}),
     })
     .select("id")
     .single();

@@ -309,11 +309,16 @@ Ekonomi: kayıt +500 (Auth trigger'ı, otomatik) · reklam +100 (günde en fazla
 solo +20 (solo `complete` içinde, bkz. gelecek iş). **Miktarı istemci göndermez**, yalnızca `reason`.
 
 - `GET /api/users/me` → `{ id, coins, tier }`
+- `DELETE /api/users/me` `{ "confirm": true }` → `{ deleted: true }` — **hesap silme** (App Store 5.1.1(v) / Google Play). Silinen: kurulan odalar
+  (içeriğiyle), solo oyunlar, coin kayıtları, kullanıcı ve Auth kaydı. Başkalarının odalarındaki katılım anonimleştirilir
+  (ad kaldırılır, `user_id` null). `purchases` satırları kalır, kullanıcıdan ayrılır (yasal muhasebe). Onay yoksa `400`.
 - `POST /api/users/coins/spend` `{ "reason": "ai_commentary" | "solo_ai", "refId": "…" }` → `{ balance, applied, spent }`;
   yetersiz bakiye `402 INSUFFICIENT_COINS`; aynı `refId` ikinci kez düşmez (`applied: false`). Oda coin'i `rooms/create`
   içinde düşülür.
 - `POST /api/users/coins/earn` `{ "reason": "ad_reward", "refId": "…" }` → `{ balance, applied, earned }`; günlük sınır
   `429 AD_LIMIT_REACHED`.
+- `POST /api/rooms/[roomCode]/join` (mobil): `platform: "mobile"` + Bearer JWT zorunlu (`401`); misafir katılımcı `user_id`'ye bağlanır
+  (geçmiş ve hesap silme için). Katılımcı token'ı gövdede `participantToken` ile gönderilir (Authorization'da JWT varsa).
 - `POST /api/rooms/create` (mobil): `platform: "mobile"` + Bearer JWT zorunlu (`401`); oda −250 coin düşülür
   (`402 INSUFFICIENT_COINS`), oda başarısız olursa iade edilir, `rooms.user_id` bağlanır. `platform` göndermeyen anonim
   web istekleri ücretsizdir ve değişmez.

@@ -71,6 +71,11 @@ kullanıcı yalnızca kendi satırlarını okur, yazım yalnızca service role.
 kullanıcı satırını kilitler, idempotency kontrolü yapar, bakiye negatife düşerse `INSUFFICIENT_COINS` fırlatır,
 bakiyeyi günceller ve `credit_transactions`'a yazar. İstemci doğrudan coin yazamaz.
 
+**`delete_user_account(p_user)`** (SQL, `security definer`, yalnızca `service_role`; migration `20260610000000`): kullanıcının
+kurduğu odaları (içeriğiyle) siler, başkalarının odalarındaki katılımını anonimleştirir (`display_name` null, `user_id` null),
+solo oturum ve geri bildirimlerini siler, `users` satırını (coin hareketleriyle) kaldırır; `purchases` satırları kalır
+(`user_id` null). Auth kaydını `DELETE /api/users/me` route'u siler.
+
 ### `rooms`
 
 | Alan | Tip | Not |
@@ -104,6 +109,7 @@ Index: `unique(room_code)`, `status`, `expires_at`, `user_id`, `category_id`.
 | display_name | text | yalnızca gösterim |
 | status | participant_status | |
 | token_hash | text | SHA-256, ham token tutulmaz |
+| user_id | uuid null | `users.id`; mobil (giriş yapmış) oyuncular için; web'de null. Hesap silmede null'lanır ve ad kaldırılır |
 | last_seen_at, completed_at | timestamptz null | |
 | created_at | timestamptz | |
 
@@ -217,7 +223,7 @@ Ayrı model; `questions` ile karıştırılmaz. RLS açık, policy yok (erişim 
 
 ### `purchases` — mobil IAP (Lemon Squeezy / `payments` kullanılmaz)
 
-`user_id`, `product_type` (`premium_package` / `room_credit_pack`; coin+tier modelinde Lite/Premium
+`user_id` (null olabilir: hesap silinince bağlantı kopar, kayıt yasal süre için kalır), `product_type` (`premium_package` / `room_credit_pack`; coin+tier modelinde Lite/Premium
 paketleri için genişletilecek), `provider` (`app_store` / `play_store`), `provider_transaction_id`
 (unique), `amount`, `currency`, `status`, `created_at`. RLS: kullanıcı yalnızca kendi satırını okur.
 

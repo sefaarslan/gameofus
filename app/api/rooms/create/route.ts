@@ -244,6 +244,7 @@ export async function POST(req: NextRequest) {
       display_name: displayName.trim(),
       status: "joined",
       token_hash: tokenHash,
+      ...(authUser ? { user_id: authUser.id } : {}),
     })
     .select("id")
     .single();

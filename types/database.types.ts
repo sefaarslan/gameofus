@@ -332,6 +332,7 @@ export type Database = {
           room_id: string
           status: Database["public"]["Enums"]["participant_status"]
           token_hash: string
+          user_id: string | null
         }
         Insert: {
           completed_at?: string | null
@@ -343,6 +344,7 @@ export type Database = {
           room_id: string
           status?: Database["public"]["Enums"]["participant_status"]
           token_hash: string
+          user_id?: string | null
         }
         Update: {
           completed_at?: string | null
@@ -354,6 +356,7 @@ export type Database = {
           room_id?: string
           status?: Database["public"]["Enums"]["participant_status"]
           token_hash?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -755,7 +758,7 @@ export type Database = {
           provider: string
           provider_transaction_id: string
           status: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           amount?: number | null
@@ -766,7 +769,7 @@ export type Database = {
           provider: string
           provider_transaction_id: string
           status?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           amount?: number | null
@@ -777,7 +780,7 @@ export type Database = {
           provider?: string
           provider_transaction_id?: string
           status?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -794,6 +797,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_user_account: {
+        Args: { p_user: string }
+        Returns: undefined
+      }
       apply_coins: {
         Args: { p_delta: number; p_reason: string; p_ref?: string; p_user: string }
         Returns: { applied: boolean; balance: number }[]

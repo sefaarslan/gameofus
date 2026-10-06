@@ -19,7 +19,8 @@ export function extractToken(req: NextRequest, fallback?: string | null): string
   const authHeader = req.headers.get("authorization");
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.slice(7).trim();
-    if (token) return token;
+    // Supabase JWT (3 parça) katılımcı token'ı değildir (64 hex, nokta içermez): mobil kullanıcı kimliği için ayrılmıştır
+    if (token && token.split(".").length !== 3) return token;
   }
   return fallback ?? null;
 }
