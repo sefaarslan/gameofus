@@ -9,6 +9,7 @@ import { isGender, type Gender } from "@/lib/gender";
 import { GenderPicker } from "@/components/create/GenderPicker";
 import { StickFigureIcon } from "@/components/create/StickFigureIcon";
 import { ChapterPicker } from "@/components/create/ChapterPicker";
+import { SCENE_MODE_ENABLED } from "@/lib/scene-chapters";
 
 type GameMode = "secret_choice" | "prediction" | "orderline" | "mixed" | "scene";
 
@@ -82,7 +83,7 @@ function readDraft(): Partial<CreateDraft> | null {
       gender: isGender(d.gender) ? d.gender : null,
       partnerGender: isGender(d.partnerGender) ? d.partnerGender : null,
       relationshipType: isRelationshipType(d.relationshipType) ? d.relationshipType : null,
-      gameMode: GAME_MODES.includes(d.gameMode as GameMode) ? (d.gameMode as GameMode) : "mixed",
+      gameMode: GAME_MODES.includes(d.gameMode as GameMode) && (d.gameMode !== "scene" || SCENE_MODE_ENABLED) ? (d.gameMode as GameMode) : "mixed",
       questionCount: d.questionCount === 10 ? 10 : 5,
       categoryId: idOrNull(d.categoryId),
       chapterId: idOrNull(d.chapterId),
@@ -537,34 +538,6 @@ export default function CreatePage() {
                     <label className="text-label-md text-on-surface-variant">{t("mode.label")}</label>
 
                     <div className="grid grid-cols-2 gap-3">
-                      {/* Sahne: diğer modlarla aynı kart dili, listenin başında tam genişlikte */}
-                      <button
-                        type="button"
-                        onClick={selectScene}
-                        aria-pressed={gameMode === "scene"}
-                        className={`col-span-2 relative flex items-center gap-3 p-4 rounded-[20px] border-2 text-left transition-all ${
-                          gameMode === "scene"
-                            ? "border-primary bg-primary-container/10 shadow-soft-card"
-                            : "border-outline-variant/30 bg-surface-container-lowest hover:border-outline"
-                        }`}
-                      >
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
-                          gameMode === "scene" ? "bg-primary text-on-primary" : "bg-surface-container text-on-surface-variant"
-                        }`}>
-                          <StickFigureIcon className="w-6 h-6" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <span className="block text-label-md text-on-surface">{t("mode.scene.name")}</span>
-                          <span className="block text-xs text-on-surface-variant mt-0.5">{t("mode.scene.desc")}</span>
-                        </div>
-                        {gameMode === "scene" ? (
-                          <span className="material-symbols-outlined text-primary text-base icon-fill">check_circle</span>
-                        ) : (
-                          <span className="shrink-0 rounded-full bg-tertiary-container px-2.5 py-1 text-[11px] font-semibold text-on-tertiary-container">
-                            {t("mode.scene.new")}
-                          </span>
-                        )}
-                      </button>
                       {modes.map(({ value }) => (
                         <button
                           key={value}
@@ -590,6 +563,37 @@ export default function CreatePage() {
                           )}
                         </button>
                       ))}
+                      {/* Sahne: diğer modlarla aynı kart dili, listenin sonunda tam genişlikte; backend hazır olana kadar pasif ("Yakında") */}
+                      <button
+                        type="button"
+                        disabled={!SCENE_MODE_ENABLED}
+                        onClick={selectScene}
+                        aria-pressed={gameMode === "scene"}
+                        className={`col-span-2 relative flex items-center gap-3 p-4 rounded-[20px] border-2 text-left transition-all ${
+                          !SCENE_MODE_ENABLED
+                            ? "border-outline-variant/30 bg-surface-container-lowest opacity-70 cursor-not-allowed"
+                            : gameMode === "scene"
+                            ? "border-primary bg-primary-container/10 shadow-soft-card"
+                            : "border-outline-variant/30 bg-surface-container-lowest hover:border-outline"
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                          gameMode === "scene" ? "bg-primary text-on-primary" : "bg-surface-container text-on-surface-variant"
+                        }`}>
+                          <StickFigureIcon className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="block text-label-md text-on-surface">{t("mode.scene.name")}</span>
+                          <span className="block text-xs text-on-surface-variant mt-0.5">{t("mode.scene.desc")}</span>
+                        </div>
+                        {gameMode === "scene" ? (
+                          <span className="material-symbols-outlined text-primary text-base icon-fill">check_circle</span>
+                        ) : (
+                          <span className="shrink-0 rounded-full bg-tertiary-container px-2.5 py-1 text-[11px] font-semibold text-on-tertiary-container">
+                            {SCENE_MODE_ENABLED ? t("mode.scene.new") : t("mode.scene.soon")}
+                          </span>
+                        )}
+                      </button>
                     </div>
                   </div>
 

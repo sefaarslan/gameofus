@@ -260,7 +260,7 @@ Secret Choice, Prediction ve Orderline modlarının dengeli karışımıdır. MV
 - **Karakterler:** cinsiyet (oda kurulurken opsiyonel) saç/aksesuar katmanını belirler; belirtilmediyse nötr. Karakter kimlikleri renkle ayrışır (A turkuaz, B pembe).
 - **Monetizasyon:** oynamak ve skor/özet ücretsiz. **Animasyonlu "Sonları izle" yalnızca mobilde coin ile açılır (100 coin, kilit odaya bağlıdır: biri açınca ikisi de izler; her kullanıcının ilk bölüm izlemesi ücretsiz; bölüm başına fiyat `chapters` tablosunda).** Sahne odası da diğer odalar gibi 250 coin. Web'de coin yoktur: web oynar, skor/özeti görür, izleme için "Uygulamada izle" CTA'sı çıkar. AI analizi izleme kilidine dahildir (yapılandırılabilir).
 - **Mimari kararları:** mevcut kalıba uyar: anonim katılımcı token'ı, service-role API route'ları (RPC/`auth.uid()` RLS'i değil), yeni tablolarda RLS açık + policy yok; ayrı model (`chapters`, `scene_answers`, `room_unlocks`, `room_ai_analyses`; `questions`'a karıştırılmaz); partnerin cevapları kendi 5 cevabını mühürlemeden dönmez; coin için `apply_coins` (reason `scene_watch`, ref = oda). Hesap silme, saklama temizliği ve metrik arşivi yeni tablolara genişletilir. Oda süresi sahne için ayrıca değerlendirilecek (partner geç bitirirse izleme penceresi kapanmasın).
-- **Durum:** oda oluşturma sayfasında seçilebilir mod kartı olarak yer alır; seçilince kategori/soru sayısı yerine bölüm seçimi gelir, bölüm kartları içerik hazır olana kadar "Yakında" ve pasiftir, oda kurma butonu pasif kalır (Bölüm 13.2); önce web demosu (tek sahne, veritabanı/API'siz) ile görsel/performans doğrulaması, sonra şema ve API. Dizi/katalog (sezon, bölüm) çerçevesi ve süreklilik sonraya bırakıldı; `chapters`'a `series_id/season/episode/available_from-until` alanları metadata olarak şimdiden eklenir.
+- **Durum:** oda oluşturma sayfasında mod listesinin sonunda **pasif ("Yakında") kart** olarak yer alır (`SCENE_MODE_ENABLED = false`); bölüm seçimi arayüzü hazır bekler: açıldığında seçilince kategori/soru sayısı yerine bölüm seçimi gelir (Bölüm 13.2); önce web demosu (tek sahne, veritabanı/API'siz) ile görsel/performans doğrulaması, sonra şema ve API. Dizi/katalog (sezon, bölüm) çerçevesi ve süreklilik sonraya bırakıldı; `chapters`'a `series_id/season/episode/available_from-until` alanları metadata olarak şimdiden eklenir.
 
 ---
 
@@ -279,7 +279,7 @@ Oda oluşturma **iki adımlı sihirbazdır** (web mobil/masaüstü ve mobil uygu
 5. **Aralarındaki bağı seçer: Kanka / Sevgili / Hayat Arkadaşı** (zorunlu; ileri butonu seçilene kadar pasiftir). "Oyun modunu seç" ile 2. adıma geçer.
 
 **Adım 2 — Ne oynuyoruz?**
-6. Oyun modunu seçer: tek listede beş mod, hepsi aynı kart diliyle: **Sahne** (listenin başında tam genişlikte, "Yeni" rozetli, seçilebilir), Secret Choice, Prediction, Orderline, Karma. Sahne seçilince kategori ve soru sayısı gizlenir, alt kısım **bölüm seçimine** döner (ilişki türüne göre filtreli; bağ için bölüm yoksa "yakında" boş durumu; içerik hazır olana kadar bölüm kartları pasif ve oda kurma butonu pasif); klasik modlarda 7-8 gösterilir.
+6. Oyun modunu seçer: tek listede beş mod, hepsi aynı kart diliyle: Secret Choice, Prediction, Orderline, Karma ve listenin **sonunda tam genişlikte Sahne** (backend hazır olana kadar pasif, "Yakında" rozetli; hazır olunca "Yeni" rozetli ve seçilebilir). Sahne seçilebilir olduğunda seçilince kategori ve soru sayısı gizlenir, alt kısım **bölüm seçimine** döner (ilişki türüne göre filtreli; bağ için bölüm yoksa "yakında" boş durumu; içerik hazır olana kadar bölüm kartları pasif ve oda kurma butonu pasif); klasik modlarda 7-8 gösterilir.
 7. Kategori seçer (ilişki türüne uygun kategoriler listelenir; varsayılan "Karışık Sürpriz"; premium kategoriler platforma göre farklı davranır — bkz. Bölüm 12.5).
 8. Soru sayısını seçer.
 9. "Oyun linki oluştur" butonuna tıklar. Geri düğmesi/tarayıcı geri tuşu 1. adıma döner, girilen bilgiler korunur. Sayfa yenilense veya kullanıcı başka sayfaya gidip dönse de sihirbaz kaldığı adımdan, girilen bilgilerle devam eder (taslak yalnızca tarayıcı oturumunda tutulur, oda kurulunca silinir).
@@ -604,10 +604,10 @@ CTA:
 Buton: > Oyun modunu seç
 
 **Adım 2 — Ne oynuyoruz?**
-- Oyun modu: tek listede aynı kart diliyle beş mod (başta **Sahne** — "Yeni" rozetli, seçilebilir; sonra Secret Choice, Prediction, Orderline, Karma; varsayılan Karma). Modlar arasında başlık/stil ayrımı yoktur
+- Oyun modu: tek listede aynı kart diliyle beş mod (Secret Choice, Prediction, Orderline, Karma; varsayılan Karma; listenin sonunda **Sahne** — şimdilik pasif, "Yakında"). Modlar arasında başlık/stil ayrımı yoktur
 - Kategori seçimi (dropdown; varsayılan "Karışık Sürpriz"; ilişki türüne uygun kategoriler + kilitli premium kategoriler; kategoriler sayfa açılırken bir kez çekilip istemcide filtrelenir)
 - Soru sayısı
-- Sahne seçiliyse kategori ve soru sayısı yerine **bölüm seçimi**: kartlarda ad, açıklama, sahne sayısı (coin bilgisi yalnızca mobilde); ilk bölüm varsayılan seçili gelecek. Şimdilik bölüm içeriği olmadığı için kartlar "Yakında" ve pasif
+- Sahne açıldığında seçiliyse kategori ve soru sayısı yerine **bölüm seçimi**: kartlarda ad, açıklama, sahne sayısı (coin bilgisi yalnızca mobilde); ilk bölüm varsayılan seçili gelecek. Şimdilik bölüm içeriği olmadığı için kartlar "Yakında" ve pasif
 
 Butonlar: geri (←) ve > Oyun linki oluştur
 
