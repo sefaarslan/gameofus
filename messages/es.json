@@ -205,15 +205,40 @@
     }
   },
   "create": {
-    "title": "Crear nuevo juego",
-    "subtitle": "Elige la configuración y comparte el link con tu {rel, select, friend {amigo} other {pareja}}.",
     "sideTitle": "Nuevo juego",
     "sideSubtitle": "Comienza una experiencia.",
-    "sideStep1": "Paso 1: Ingresa tu info",
-    "sideStep2": "Paso 2: Comparte el link",
-    "sideStep3": "Paso 3: ¡A jugar!",
-    "name": { "label": "Tu nombre", "placeholder": "Tu nombre" },
-    "partner": { "label": "Nombre de tu {rel, select, friend {amigo} other {pareja}}", "optional": "Opcional", "placeholder": "Nombre de tu {rel, select, friend {amigo} other {pareja}}" },
+    "sideStep1": "Paso 1: ¿Quiénes juegan?",
+    "sideStep2": "Paso 2: ¿A qué jugamos?",
+    "sideStep3": "Paso 3: Comparte el link y ¡a jugar!",
+    "progress": "Paso {current} / {total}",
+    "step1": {
+      "title": "¿Quiénes juegan?",
+      "subtitle": "Primero conozcámonos, luego eliges el juego.",
+      "next": "Elegir modo de juego",
+      "you": "Tú",
+      "partner": "{rel, select, friend {Tu amigo} other {Tu pareja}}"
+    },
+    "step2": {
+      "title": "¿A qué jugamos?",
+      "subtitle": "Elige el juego y comparte el link con tu {rel, select, friend {amigo} other {pareja}}.",
+      "back": "Atrás"
+    },
+    "gender": {
+      "label": "Género",
+      "hint": "Se usa para dibujar vuestros personajes y escribir comentarios más acertados. Puedes elegir Otro y seguir.",
+      "female": "Mujer",
+      "male": "Hombre",
+      "unspecified": "Otro"
+    },
+    "name": {
+      "label": "Tu nombre",
+      "placeholder": "Tu nombre"
+    },
+    "partner": {
+      "label": "Nombre de tu {rel, select, friend {amigo} other {pareja}}",
+      "optional": "Opcional",
+      "placeholder": "Nombre de tu {rel, select, friend {amigo} other {pareja}}"
+    },
     "mode": {
       "label": "Modo de juego",
       "options": {
@@ -227,6 +252,22 @@
         "prediction": "Opción múltiple",
         "orderline": "Adivina el orden",
         "mixed": "Un poco de todo"
+      },
+      "scene": {
+        "name": "Escena",
+        "desc": "Minihistorias animadas con monigotes",
+        "soon": "Próximamente",
+        "new": "Nuevo",
+        "chapterLabel": "Elige un capítulo",
+        "chapterHint": "Los capítulos se están preparando, muy pronto aquí.",
+        "sceneCount": "{count} escenas",
+        "emptyForBond": "Pronto habrá capítulos para este vínculo.",
+        "chapters": {
+          "first_date": {
+            "title": "Primera cita",
+            "desc": "La cuenta, un mensaje de un ex, una bebida derramada…"
+          }
+        }
       }
     },
     "questions": {
@@ -237,13 +278,21 @@
     "relationship": {
       "label": "¿Qué vínculo os une?",
       "hint": "Elegiremos preguntas que os encajen.",
-      "friend": { "name": "Colega", "desc": "Amistad de toda la vida" },
-      "dating": { "name": "Pareja", "desc": "Corazones a mil" },
-      "partner": { "name": "Media naranja", "desc": "Juntos en el camino" }
+      "friend": {
+        "name": "Colega",
+        "desc": "Amistad de toda la vida"
+      },
+      "dating": {
+        "name": "Pareja",
+        "desc": "Corazones a mil"
+      },
+      "partner": {
+        "name": "Media naranja",
+        "desc": "Juntos en el camino"
+      }
     },
     "category": {
       "label": "Categoría",
-      "pickRelationshipFirst": "Primero elige vuestro vínculo",
       "all": "Sorpréndeme"
     },
     "premiumModal": {

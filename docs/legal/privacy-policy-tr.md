@@ -17,9 +17,10 @@ Bu politika, KVKK (6698), GDPR ve ilgili mağaza (App Store / Google Play) kural
 ### 2.1. Web'de (hesap gerekmez, anonim)
 - **Oyunda görünen ad:** Odayı kurarken/katılırken yazdığınız ad. Gerçek adınızı yazmak zorunda değilsiniz; takma ad kullanabilirsiniz. Kimliğiniz ad ile doğrulanmaz.
 - **Oyun içeriği:** Verdiğiniz cevaplar, tahminleriniz, güven seviyeleriniz ve oda ayarları (dil, ilişki türü, kategori, oyun modu, soru sayısı). Partnerinizin cevabı, siz tahmininizi kilitleyene kadar size gösterilmez.
+- **Cinsiyet (isteğe bağlı):** Oda kurarken sizin ve (isteğe bağlı) oyun arkadaşınızın cinsiyeti; yalnızca animasyonlu karakterleri çizmek ve yapay zekâ yorumlarında dil bilgisini doğru kurmak için kullanılır. Boş bırakabilirsiniz. Hesabınıza yazılmaz, yalnızca ilgili odayla birlikte tutulur ve oda silinince silinir.
 - **Tek kişilik oyun:** "Green/Yellow/Red Flag" seçimleriniz ve tolerans sonucunuz.
 - **Geri bildirim (isteğe bağlı):** Puan, AI yorumuna ilginiz ve en fazla 500 karakterlik yorum. Cevap/tahmin içeriği geri bildirim kaydına eklenmez.
-- **Cihazınızda saklananlar:** Oda kodu, katılımcı anahtarınız (token) ve karneleriniz tarayıcınızın yerel depolamasında tutulur; dil tercihiniz bir çerezde (`NEXT_LOCALE`) saklanır. Katılımcı anahtarının yalnızca özeti (hash) sunucuda tutulur; ham anahtar adreste taşınmaz.
+- **Cihazınızda saklananlar:** Oda kodu, katılımcı anahtarınız (token) ve karneleriniz tarayıcınızın yerel depolamasında tutulur; oyun kurarken girdiğiniz bilgiler (adlar, seçimler) sayfa yenilenirse kaybolmasın diye yalnızca tarayıcı oturumunda geçici olarak tutulur ve oyun kurulunca ya da sekmeyi kapatınca silinir; dil tercihiniz bir çerezde (`NEXT_LOCALE`) saklanır. Katılımcı anahtarının yalnızca özeti (hash) sunucuda tutulur; ham anahtar adreste taşınmaz.
 - **Teknik veriler:** Kötüye kullanımı önlemek için IP adresinizin **geri döndürülemez özeti** (hash) saklanır; ham IP adresi saklanmaz. Barındırma sağlayıcımız standart sunucu günlükleri tutabilir.
 
 ### 2.2. Mobil uygulamada (giriş zorunlu)

@@ -205,15 +205,40 @@
     }
   },
   "create": {
-    "title": "Create a new game",
-    "subtitle": "Choose your game settings and share the link with your {rel, select, friend {friend} other {partner}}.",
     "sideTitle": "New Game",
     "sideSubtitle": "Start an experience.",
-    "sideStep1": "Step 1: Enter Your Info",
-    "sideStep2": "Step 2: Share the Link",
-    "sideStep3": "Step 3: Play!",
-    "name": { "label": "Your name", "placeholder": "Your name" },
-    "partner": { "label": "{rel, select, friend {Friend} other {Partner}} name", "optional": "Optional", "placeholder": "Your {rel, select, friend {friend} other {partner}}'s name" },
+    "sideStep1": "Step 1: Who's playing?",
+    "sideStep2": "Step 2: What are we playing?",
+    "sideStep3": "Step 3: Share the link, play!",
+    "progress": "Step {current} / {total}",
+    "step1": {
+      "title": "Who's playing?",
+      "subtitle": "Let's meet you two first, then you'll pick the game.",
+      "next": "Choose game mode",
+      "you": "You",
+      "partner": "{rel, select, friend {Your friend} other {Your partner}}"
+    },
+    "step2": {
+      "title": "What are we playing?",
+      "subtitle": "Pick a game and share the link with your {rel, select, friend {friend} other {partner}}.",
+      "back": "Back"
+    },
+    "gender": {
+      "label": "Gender",
+      "hint": "Used to draw your characters and to write more fitting comments. You can just pick Other.",
+      "female": "Female",
+      "male": "Male",
+      "unspecified": "Other"
+    },
+    "name": {
+      "label": "Your name",
+      "placeholder": "Your name"
+    },
+    "partner": {
+      "label": "{rel, select, friend {Friend} other {Partner}} name",
+      "optional": "Optional",
+      "placeholder": "Your {rel, select, friend {friend} other {partner}}'s name"
+    },
     "mode": {
       "label": "Game mode",
       "options": {
@@ -227,6 +252,22 @@
         "prediction": "Multiple choice",
         "orderline": "Guess the order",
         "mixed": "A bit of everything"
+      },
+      "scene": {
+        "name": "Scene",
+        "desc": "Animated stick-figure mini scenes",
+        "soon": "Coming soon",
+        "new": "New",
+        "chapterLabel": "Pick a chapter",
+        "chapterHint": "Chapters are being prepared, coming very soon.",
+        "sceneCount": "{count} scenes",
+        "emptyForBond": "Chapters for this bond are coming soon.",
+        "chapters": {
+          "first_date": {
+            "title": "First Date",
+            "desc": "The bill, a text from an ex, a spilled drink…"
+          }
+        }
       }
     },
     "questions": {
@@ -237,13 +278,21 @@
     "relationship": {
       "label": "What's your bond?",
       "hint": "We'll pick questions that fit you two.",
-      "friend": { "name": "Bestie", "desc": "Friends for life" },
-      "dating": { "name": "Sweetheart", "desc": "Hearts racing" },
-      "partner": { "name": "Partner for Life", "desc": "On the road together" }
+      "friend": {
+        "name": "Bestie",
+        "desc": "Friends for life"
+      },
+      "dating": {
+        "name": "Sweetheart",
+        "desc": "Hearts racing"
+      },
+      "partner": {
+        "name": "Partner for Life",
+        "desc": "On the road together"
+      }
     },
     "category": {
       "label": "Category",
-      "pickRelationshipFirst": "Pick your bond first",
       "all": "Surprise Me"
     },
     "premiumModal": {

@@ -15,6 +15,7 @@ import { getAuthUser } from "@/lib/auth";
 import { COIN_PRICES, CoinError, applyCoins } from "@/lib/coins";
 import { canAccessTier, isTier, type Tier } from "@/lib/tier";
 import { ageOn, parseBirthDate } from "@/lib/age";
+import { parseGender } from "@/lib/gender";
 
 const RATE_LIMIT = { perHour: 10, perDay: 50 };
 
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { displayName, partnerName, gameMode, questionCount, locale, categoryId, relationshipType, platform, birthDate, partnerBirthDate } =
+  const { displayName, partnerName, gameMode, questionCount, locale, categoryId, relationshipType, platform, birthDate, partnerBirthDate, gender, partnerGender } =
     body as Record<string, unknown>;
 
   // Mobil (giriş zorunlu): geçerli Supabase JWT'si gerekir; oda coin ile açılır (−250). Web anonimdir ve ücretsiz kalır.
@@ -84,6 +85,10 @@ export async function POST(req: NextRequest) {
     : 5;
 
   const roomLocale = typeof locale === "string" ? locale : "en";
+
+  // Cinsiyet (opsiyonel; boş/geçersiz = belirtilmedi). Çöp adam karakteri ve AI dili için; yalnızca bu odada saklanır.
+  const ownerGender = parseGender(gender);
+  const partnerGenderValue = parseGender(partnerGender);
 
   // Rate limiting
   const allowed = await checkRateLimit(ipHashFor(req), "create_room", RATE_LIMIT);
@@ -260,6 +265,7 @@ export async function POST(req: NextRequest) {
       expires_at: expiresAt.toISOString(),
       ...(authUser ? { user_id: authUser.id } : {}),
       ...(partnerBirthDate && partnerBirth ? { partner_birth_date: partnerBirthDate as string } : {}),
+      ...(partnerGenderValue ? { partner_gender: partnerGenderValue } : {}),
       ...(selectedCategoryId ? { category_id: selectedCategoryId } : {}),
       ...(selectedRelationship ? { relationship_type: selectedRelationship } : {}),
     })
@@ -283,6 +289,7 @@ export async function POST(req: NextRequest) {
       display_name: displayName.trim(),
       status: "joined",
       token_hash: tokenHash,
+      ...(ownerGender ? { gender: ownerGender } : {}),
       ...(authUser ? { user_id: authUser.id } : {}),
     })
     .select("id")

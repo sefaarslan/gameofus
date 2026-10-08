@@ -5,6 +5,7 @@ import { isRoomExpired } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
 import { corsOptions } from "@/lib/cors";
 import { getAuthUser } from "@/lib/auth";
+import { parseGender } from "@/lib/gender";
 
 export function OPTIONS() {
   return corsOptions();
@@ -23,7 +24,7 @@ export async function POST(
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { displayName, platform } = body as Record<string, unknown>;
+  const { displayName, platform, gender } = body as Record<string, unknown>;
   const rawBodyToken = (body as Record<string, unknown>).participantToken;
   const participantToken = extractToken(req, typeof rawBodyToken === "string" ? rawBodyToken : null);
 
@@ -39,7 +40,7 @@ export async function POST(
 
   const { data: room } = await supabase
     .from("rooms")
-    .select("id, status, join_locked, expires_at, game_mode, question_count")
+    .select("id, status, join_locked, expires_at, game_mode, question_count, partner_gender")
     .eq("room_code", roomCode)
     .maybeSingle();
 
@@ -77,6 +78,7 @@ export async function POST(
 
   const rawToken = generateToken();
   const tokenHash = hashToken(rawToken);
+  const guestGender = parseGender(gender) ?? parseGender(room.partner_gender);
 
   const { data: guest, error: guestErr } = await supabase
     .from("participants")
@@ -86,6 +88,8 @@ export async function POST(
       display_name: displayName.trim(),
       status: "joined",
       token_hash: tokenHash,
+      // Katılan kendi değerini gönderdiyse o, yoksa kurucunun partner için girdiği değer
+      ...(guestGender ? { gender: guestGender } : {}),
       ...(authUser ? { user_id: authUser.id } : {}),
     })
     .select("id")

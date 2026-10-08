@@ -252,6 +252,16 @@ Secret Choice, Prediction ve Orderline modlarının dengeli karışımıdır. MV
 - **Konumlandırma:** oda oluşturma akışında bir mod **değildir** (link/partner/oda yok). Girişler: landing hero bağlantısı ve bölümü, footer, iki kişilik bekleme ve sonuç ekranlarında kapatılabilir kart; mobilde ana sayfa kartı (+20 coin rozeti, "bugün x/3").
 - **Sonraki sürümler:** kalabalık yüzdeleri, "arkadaşına gönder, aynı 9 kartı o da oynasın ve karşılaştırın" köprüsü (solo → iki kişilik ana döngü), yeni solo oyunlar (`solo_*` tabloları `game` alanıyla genişlemeye hazır).
 
+### 8.6 Sahne — animasyonlu senaryo modu (planlı)
+
+İki kişilik, merak odaklı tahmin modu: oyuncular kısa animasyonlu sahneler izler; sahne kritik anda donar, oyuncu hem kendi tepkisini seçer hem partnerinin ne yapacağını tahmin eder (birleşik tur ilkesiyle aynı). 5 sahnelik bir **bölüm**de cevaplar mühürlenir; partner de bitirince **gerçek sonlar animasyonla izlenir** (partnerin karakteri gerçek seçimini canlandırır). Sonra skor ("sen onu / o seni"), sorular-cevaplar ve AI analizi.
+
+- **Görsel yöntem (karar):** kodla çizilen SVG çöp adam (kafa dışında 5-6 px çizgiler, mitten eller), 2 kemikli IK kollar, yüz/poz/hareket sözlükleri, mekân ve yakın plan ara kare (insert panel) kütüphanesi; harici avatar/animasyon servisi, Rive, Lottie, DiceBear kullanılmaz. Geniş planda temas çizilmez, temas anları yakın plan ara karelerle anlatılır. İçerik veridir (bölüm JSON'u: sahneler, 4 seçenek, her seçeneğin kendi sonu; TR/EN/ES). Yeni bölüm yalnızca mevcut mekân/prop/ara kare kütüphanesi kapsıyorsa kod gerektirmez; yeni mekân/ara kare SVG parçasıdır. Fon müziği bölüm başına tek parça (CC0/özgün, `docs/music-licenses.md`), ses efekti yok.
+- **Karakterler:** cinsiyet (oda kurulurken opsiyonel) saç/aksesuar katmanını belirler; belirtilmediyse nötr. Karakter kimlikleri renkle ayrışır (A turkuaz, B pembe).
+- **Monetizasyon:** oynamak ve skor/özet ücretsiz. **Animasyonlu "Sonları izle" yalnızca mobilde coin ile açılır (100 coin, kilit odaya bağlıdır: biri açınca ikisi de izler; her kullanıcının ilk bölüm izlemesi ücretsiz; bölüm başına fiyat `chapters` tablosunda).** Sahne odası da diğer odalar gibi 250 coin. Web'de coin yoktur: web oynar, skor/özeti görür, izleme için "Uygulamada izle" CTA'sı çıkar. AI analizi izleme kilidine dahildir (yapılandırılabilir).
+- **Mimari kararları:** mevcut kalıba uyar: anonim katılımcı token'ı, service-role API route'ları (RPC/`auth.uid()` RLS'i değil), yeni tablolarda RLS açık + policy yok; ayrı model (`chapters`, `scene_answers`, `room_unlocks`, `room_ai_analyses`; `questions`'a karıştırılmaz); partnerin cevapları kendi 5 cevabını mühürlemeden dönmez; coin için `apply_coins` (reason `scene_watch`, ref = oda). Hesap silme, saklama temizliği ve metrik arşivi yeni tablolara genişletilir. Oda süresi sahne için ayrıca değerlendirilecek (partner geç bitirirse izleme penceresi kapanmasın).
+- **Durum:** oda oluşturma sayfasında seçilebilir mod kartı olarak yer alır; seçilince kategori/soru sayısı yerine bölüm seçimi gelir, bölüm kartları içerik hazır olana kadar "Yakında" ve pasiftir, oda kurma butonu pasif kalır (Bölüm 13.2); önce web demosu (tek sahne, veritabanı/API'siz) ile görsel/performans doğrulaması, sonra şema ve API. Dizi/katalog (sezon, bölüm) çerçevesi ve süreklilik sonraya bırakıldı; `chapters`'a `series_id/season/episode/available_from-until` alanları metadata olarak şimdiden eklenir.
+
 ---
 
 ## 9. Ana Kullanıcı Akışı
@@ -260,13 +270,19 @@ Secret Choice, Prediction ve Orderline modlarının dengeli karışımıdır. MV
 
 1. Kullanıcı landing page'e gelir (web) veya app'i açar (mobile).
 2. "Oyun Başlat" butonuna tıklar.
-3. İsmini girer.
-4. Karşı oyuncunun adını opsiyonel olarak girer (etiket ilişki türüne göre değişir).
-5. **Aralarındaki bağı seçer: Kanka / Sevgili / Hayat Arkadaşı.** Seçilene kadar kategori alanı pasiftir.
-6. Kategori seçer (ilişki türüne uygun kategoriler listelenir; varsayılan "Karışık Sürpriz"; premium kategoriler platforma göre farklı davranır — bkz. Bölüm 12.5).
-7. Oyun modunu seçer.
+
+Oda oluşturma **iki adımlı sihirbazdır** (web mobil/masaüstü ve mobil uygulama aynı yapıyı kullanır; adımlar arasında sunucuya gidilmez, tek `POST /api/rooms/create`):
+
+**Adım 1 — Kimler oynuyor?** (hangi mod seçilirse seçilsin aynıdır)
+3. İsmini girer ve (opsiyonel) cinsiyetini seçer: Kadın / Erkek / Diğer (varsayılan; Diğer = belirtilmedi, nötr karakter ve nötr dil).
+4. Karşı oyuncunun adını (opsiyonel; etiket ilişki türüne göre değişir) ve cinsiyetini girer.
+5. **Aralarındaki bağı seçer: Kanka / Sevgili / Hayat Arkadaşı** (zorunlu; ileri butonu seçilene kadar pasiftir). "Oyun modunu seç" ile 2. adıma geçer.
+
+**Adım 2 — Ne oynuyoruz?**
+6. Oyun modunu seçer: tek listede beş mod, hepsi aynı kart diliyle: **Sahne** (listenin başında tam genişlikte, "Yeni" rozetli, seçilebilir), Secret Choice, Prediction, Orderline, Karma. Sahne seçilince kategori ve soru sayısı gizlenir, alt kısım **bölüm seçimine** döner (ilişki türüne göre filtreli; bağ için bölüm yoksa "yakında" boş durumu; içerik hazır olana kadar bölüm kartları pasif ve oda kurma butonu pasif); klasik modlarda 7-8 gösterilir.
+7. Kategori seçer (ilişki türüne uygun kategoriler listelenir; varsayılan "Karışık Sürpriz"; premium kategoriler platforma göre farklı davranır — bkz. Bölüm 12.5).
 8. Soru sayısını seçer.
-9. "Oyun linki oluştur" butonuna tıklar.
+9. "Oyun linki oluştur" butonuna tıklar. Geri düğmesi/tarayıcı geri tuşu 1. adıma döner, girilen bilgiler korunur. Sayfa yenilense veya kullanıcı başka sayfaya gidip dönse de sihirbaz kaldığı adımdan, girilen bilgilerle devam eder (taslak yalnızca tarayıcı oturumunda tutulur, oda kurulunca silinir).
 10. Sistem oda oluşturur: oda dili ve ilişki türü sabitlenir; sorular, ilişki türüne uygun ücretsiz kategorilerden seçilir (bkz. Bölüm 20).
 11. Kullanıcı link paylaşım ekranına yönlenir.
 
@@ -577,18 +593,23 @@ CTA:
 
 ### 13.2 Create Game Screen (web + mobile)
 
-Alanlar:
+İki adımlı sihirbaz; üstte ilerleme göstergesi ("Adım 1 / 2"), masaüstünde yan panelde adım listesi (Kimler oynuyor? → Ne oynuyoruz? → Linki paylaş, oynayın!).
 
-- İsmin
-- Karşı oyuncunun adı (opsiyonel; etiket ilişki türüne göre: Kanka adı / Sevgili adı / Hayat arkadaşı adı)
-- **İlişki türü** (3 kart: Kanka / Sevgili / Hayat Arkadaşı; zorunlu — seçilmeden buton pasif, kategori alanı pasif)
+**Adım 1 — Kimler oynuyor?** İki kart ("Sen" ve karşı oyuncu; etiket ilişki türüne göre):
+- İsmin (zorunlu) + cinsiyet (Kadın / Erkek / Diğer; varsayılan Diğer = belirtilmedi (null))
+- Karşı oyuncunun adı (opsiyonel; Kanka adı / Sevgili adı / Hayat arkadaşı adı) + cinsiyeti (aynı seçenekler)
+- Cinsiyet notu: "Karakterlerinizi çizmek ve yorumları daha doğru yazmak için kullanılır. İstersen boş bırakabilirsin."
+- **İlişki türü** (3 kart: Kanka / Sevgili / Hayat Arkadaşı; zorunlu — seçilmeden ileri butonu pasif)
+
+Buton: > Oyun modunu seç
+
+**Adım 2 — Ne oynuyoruz?**
+- Oyun modu: tek listede aynı kart diliyle beş mod (başta **Sahne** — "Yeni" rozetli, seçilebilir; sonra Secret Choice, Prediction, Orderline, Karma; varsayılan Karma). Modlar arasında başlık/stil ayrımı yoktur
 - Kategori seçimi (dropdown; varsayılan "Karışık Sürpriz"; ilişki türüne uygun kategoriler + kilitli premium kategoriler; kategoriler sayfa açılırken bir kez çekilip istemcide filtrelenir)
-- Oyun modu
 - Soru sayısı
+- Sahne seçiliyse kategori ve soru sayısı yerine **bölüm seçimi**: kartlarda ad, açıklama, sahne sayısı (coin bilgisi yalnızca mobilde); ilk bölüm varsayılan seçili gelecek. Şimdilik bölüm içeriği olmadığı için kartlar "Yakında" ve pasif
 
-Buton:
-
-> Oyun linki oluştur
+Butonlar: geri (←) ve > Oyun linki oluştur
 
 ### 13.3 Share Link Screen (web + mobile)
 
@@ -887,6 +908,7 @@ Planlanan: `credit_transactions` (user_id, delta, reason, created_at) — coin h
 | game_mode | text | secret_choice / prediction / orderline / mixed |
 | relationship_type | text (nullable) | `friend` / `dating` / `partner` — oda kurulurken seçilen ilişki türü; oda kurulduktan sonra değişmez. Eski odalar ve henüz göndermeyen eski mobil build'ler için `null` (genel "partner" dili, tür filtresi uygulanmaz) |
 | partner_birth_date | date (planlanan, nullable) | Yalnızca mobil, yaş doğrulama için; yalnızca bu oda için |
+| partner_gender | text (nullable) | `female` / `male`; kurucunun partner için girdiği değer (opsiyonel); partner katılınca `participants.gender`'a kopyalanır; yalnızca bu oda için |
 | category_id | uuid | Seçilen kategori — `categories` tablosunda `locale = rooms.locale` olan satıra doğrudan referans (düz FK; dil zaten odaya sabit olduğu için çözümleme gerekmez) |
 | question_count | int | Seçilen soru sayısı |
 | owner_id | uuid | Odayı oluşturan participant |
@@ -912,6 +934,7 @@ unique(room_code)
 | role | text | owner / guest |
 | display_name | text | Kullanıcı adı; kimlik doğrulama için tek başına kullanılmaz |
 | status | text | joined / playing / completed |
+| gender | text (nullable) | `female` / `male`; opsiyonel, null = belirtilmedi. Sahne modunda karakter çizimi ve ikili AI yorumunda dil bilgisi için; hesaba/profile yazılmaz, oda silinince gider, metriklere girmez |
 | token_hash | text | Participant token'ın hashlenmiş değeri; ham token DB'de tutulmaz |
 | last_seen_at | timestamptz | Son aktivite zamanı |
 | completed_at | timestamptz | Oyunu tamamlama zamanı |
@@ -1227,6 +1250,7 @@ Anonim oyun oluşturma login gerektirmediği için kötüye kullanım riski vard
 - İleride veri minimizasyonu için belirli aralıklarla eski anonim odaların temizlenmesi eklenebilir.
 - Analytics tarafında soru/cevap içeriği değil, event seviyesinde davranış metrikleri tutulmalıdır.
 - **Geri bildirim (`feedback`):** yalnızca puan, AI ilgisi, kısa serbest yorum (≤ 500 karakter) ve oda meta verisi (dil, mod, ilişki türü, platform) tutulur; cevap/tahmin içeriği asla. Kimlik yalnızca `participant_id`'dir (anonim kalır). Yazma token doğrulayan sunucu endpoint'i üzerindendir, tablo ve metrik görünümleri `anon/authenticated` erişimine kapalıdır. Anket yalnızca sonuçlar hazır olduktan sonra kabul edilir.
+- **Cinsiyet** (opsiyonel; web ve mobil, oda oluştururken kurucu ve partner için): yalnızca `participants.gender` / `rooms.partner_gender`'da, oda silinince gider; hesap profiline, metrik görünümlerine, arşiv tablolarına ve loglara yazılmaz; hesap silmede başkalarının odalarındaki katılımdan da kaldırılır. İki oyuncunun cinsiyeti ve ilişki türü birlikte hassas olduğundan ayrıca sızdırılmaz. AI'a (yalnızca ikili AI yorum/sahne analizi) rıza metninde belirtilerek gider; prompt'ta cinsiyetin yalnızca dil bilgisi/doğal ifade için kullanılması, genelleme/klişe üretilmemesi zorunludur. Solo AI'a gitmez. Gizlilik politikasına ve mağaza veri beyanına eklenir.
 - **Partnerin doğum tarihi** (yalnızca mobil, planlanan) ve AI yorum için LLM'e gönderilen veriler gizlilik açısından özel değerlendirme gerektirir; web'de doğum tarihi toplanmaz (bkz. Bölüm 12.5).
 
 ---

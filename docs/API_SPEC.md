@@ -109,6 +109,9 @@ Doğrulama:
   olmalı: tarih eksikse `400 AGE_VERIFICATION_REQUIRED`, biri küçükse `403 AGE_RESTRICTED`. Tarihler `YYYY-AA-GG`; geçersiz/gelecek →
   `INVALID_PAYLOAD`. Her durumda opsiyonel gönderilebilir: `partnerBirthDate` yalnızca bu odada (`rooms.partner_birth_date`) saklanır,
   `birthDate` profile yazılır.
+- **Cinsiyet (opsiyonel):** `gender` (kurucu) ve `partnerGender` (partner için) `female` | `male`; boş/geçersiz = belirtilmedi (hata vermez).
+  Kurucununki `participants.gender`'a, partnerinki `rooms.partner_gender`'a yazılır (yalnızca bu oda için; profile yazılmaz). Katılımda
+  (`POST /api/rooms/{roomCode}/join`) gövdede `gender` gönderilirse o, yoksa `rooms.partner_gender` katılımcıya yazılır.
 
 **Soru seçimi:** Havuz = oda dili + `is_active` + ücretsiz + ilişki türüne uygun kategoriler. Seçilen kategori
 önceliklidir; yetmezse yalnızca aynı havuzdan tamamlanır, hâlâ yetmezse `tr` havuzu. Tüm havuz çekilip

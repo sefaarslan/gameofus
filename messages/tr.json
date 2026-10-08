@@ -205,15 +205,40 @@
     }
   },
   "create": {
-    "title": "Yeni oyun oluştur",
-    "subtitle": "Oyun ayarlarını seç ve linki {rel, select, friend {kankanla} dating {sevgilinle} partner {hayat arkadaşınla} other {partnerinle}} paylaş.",
     "sideTitle": "Yeni Oyun",
     "sideSubtitle": "Bir deneyim başlat.",
-    "sideStep1": "Adım 1: Bilgilerini Gir",
-    "sideStep2": "Adım 2: Linki Paylaş",
-    "sideStep3": "Adım 3: Oynayın!",
-    "name": { "label": "İsmin", "placeholder": "Adın" },
-    "partner": { "label": "{rel, select, friend {Kanka} dating {Sevgili} partner {Hayat arkadaşı} other {Partner}} adı", "optional": "Opsiyonel", "placeholder": "{rel, select, friend {Kankanın} dating {Sevgilinin} partner {Hayat arkadaşının} other {Partnerinin}} adı" },
+    "sideStep1": "Adım 1: Kimler oynuyor?",
+    "sideStep2": "Adım 2: Ne oynuyoruz?",
+    "sideStep3": "Adım 3: Linki paylaş, oynayın!",
+    "progress": "Adım {current} / {total}",
+    "step1": {
+      "title": "Kimler oynuyor?",
+      "subtitle": "Önce sizi tanıyalım, sonra oyunu seçeceksin.",
+      "next": "Oyun modunu seç",
+      "you": "Sen",
+      "partner": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Hayat arkadaşın} other {Partnerin}}"
+    },
+    "step2": {
+      "title": "Ne oynuyoruz?",
+      "subtitle": "Oyunu seç ve linki {rel, select, friend {kankanla} dating {sevgilinle} partner {hayat arkadaşınla} other {partnerinle}} paylaş.",
+      "back": "Geri"
+    },
+    "gender": {
+      "label": "Cinsiyet",
+      "hint": "Karakterlerinizi çizmek ve yorumları daha doğru yazmak için kullanılır. Dilersen Diğer'i seçip geçebilirsin.",
+      "female": "Kadın",
+      "male": "Erkek",
+      "unspecified": "Diğer"
+    },
+    "name": {
+      "label": "İsmin",
+      "placeholder": "Adın"
+    },
+    "partner": {
+      "label": "{rel, select, friend {Kanka} dating {Sevgili} partner {Hayat arkadaşı} other {Partner}} adı",
+      "optional": "Opsiyonel",
+      "placeholder": "{rel, select, friend {Kankanın} dating {Sevgilinin} partner {Hayat arkadaşının} other {Partnerinin}} adı"
+    },
     "mode": {
       "label": "Oyun modu",
       "options": {
@@ -227,6 +252,22 @@
         "prediction": "Çoktan seçmeli",
         "orderline": "Sırayı tahmin et",
         "mixed": "Hepsinden biraz"
+      },
+      "scene": {
+        "name": "Sahne",
+        "desc": "Çöp adam animasyonlu mini senaryolar",
+        "soon": "Yakında",
+        "new": "Yeni",
+        "chapterLabel": "Bölüm seç",
+        "chapterHint": "Bölümler hazırlanıyor, çok yakında burada.",
+        "sceneCount": "{count} sahne",
+        "emptyForBond": "Bu bağ için bölümler yakında.",
+        "chapters": {
+          "first_date": {
+            "title": "İlk Buluşma",
+            "desc": "Hesap, eski sevgili mesajı, dökülen içecek…"
+          }
+        }
       }
     },
     "questions": {
@@ -237,13 +278,21 @@
     "relationship": {
       "label": "Aranızdaki bağ ne?",
       "hint": "Soruları buna göre seçelim.",
-      "friend": { "name": "Kanka", "desc": "Bir ömürlük dost" },
-      "dating": { "name": "Sevgili", "desc": "Kalpler çarpıyor" },
-      "partner": { "name": "Hayat Arkadaşı", "desc": "Birlikte yoldayız" }
+      "friend": {
+        "name": "Kanka",
+        "desc": "Bir ömürlük dost"
+      },
+      "dating": {
+        "name": "Sevgili",
+        "desc": "Kalpler çarpıyor"
+      },
+      "partner": {
+        "name": "Hayat Arkadaşı",
+        "desc": "Birlikte yoldayız"
+      }
     },
     "category": {
       "label": "Kategori",
-      "pickRelationshipFirst": "Önce aranızdaki bağı seç",
       "all": "Karışık Sürpriz"
     },
     "premiumModal": {

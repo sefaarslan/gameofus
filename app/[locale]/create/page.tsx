@@ -4,10 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
-import { useParams } from "next/navigation";
-import { RELATIONSHIP_TYPES, relKey, type RelationshipType } from "@/lib/relationship";
+import { RELATIONSHIP_TYPES, isRelationshipType, relKey, type RelationshipType } from "@/lib/relationship";
+import { isGender, type Gender } from "@/lib/gender";
+import { GenderPicker } from "@/components/create/GenderPicker";
+import { StickFigureIcon } from "@/components/create/StickFigureIcon";
+import { ChapterPicker } from "@/components/create/ChapterPicker";
 
-type GameMode = "secret_choice" | "prediction" | "orderline" | "mixed";
+type GameMode = "secret_choice" | "prediction" | "orderline" | "mixed" | "scene";
 
 interface Category {
   id: string;
@@ -18,7 +21,7 @@ interface Category {
   relationship_types: RelationshipType[];
 }
 
-const MODE_ICONS: Record<GameMode, string> = {
+const MODE_ICONS: Record<Exclude<GameMode, "scene">, string> = {
   secret_choice: "visibility_off",
   prediction: "timeline",
   orderline: "format_list_numbered",
@@ -45,6 +48,50 @@ const CATEGORY_ICONS: Record<string, string> = {
   home_money: "home",
 };
 
+/**
+ * Sihirbaz taslağı: sayfa yenilenince / başka sayfaya gidip dönünce kaldığın yerden devam etmek için tarayıcı OTURUMUNDA
+ * (sessionStorage; sekme kapanınca silinir) tutulur. Oda kurulunca silinir; sunucuya hiçbir şey gitmez.
+ */
+const DRAFT_KEY = "gou_create_draft";
+const GAME_MODES: readonly GameMode[] = ["secret_choice", "prediction", "orderline", "mixed", "scene"];
+
+interface CreateDraft {
+  step: 1 | 2;
+  displayName: string;
+  partnerName: string;
+  gender: Gender | null;
+  partnerGender: Gender | null;
+  relationshipType: RelationshipType | null;
+  gameMode: GameMode;
+  questionCount: 5 | 10;
+  categoryId: string | null;
+  chapterId: string | null;
+}
+
+function readDraft(): Partial<CreateDraft> | null {
+  try {
+    const raw = sessionStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const d = JSON.parse(raw) as Record<string, unknown>;
+    const str = (v: unknown, max: number) => (typeof v === "string" ? v.slice(0, max) : "");
+    const idOrNull = (v: unknown) => (typeof v === "string" && v.length > 0 && v.length <= 64 ? v : null);
+    return {
+      step: d.step === 2 ? 2 : 1,
+      displayName: str(d.displayName, 30),
+      partnerName: str(d.partnerName, 30),
+      gender: isGender(d.gender) ? d.gender : null,
+      partnerGender: isGender(d.partnerGender) ? d.partnerGender : null,
+      relationshipType: isRelationshipType(d.relationshipType) ? d.relationshipType : null,
+      gameMode: GAME_MODES.includes(d.gameMode as GameMode) ? (d.gameMode as GameMode) : "mixed",
+      questionCount: d.questionCount === 10 ? 10 : 5,
+      categoryId: idOrNull(d.categoryId),
+      chapterId: idOrNull(d.chapterId),
+    };
+  } catch {
+    return null;
+  }
+}
+
 function getCategoryIcon(slug: string): string {
   return CATEGORY_ICONS[slug] ?? "category";
 }
@@ -54,14 +101,20 @@ export default function CreatePage() {
   const tErr = useTranslations("error");
   const router = useRouter();
   const locale = useLocale();
-  const params = useParams<{ locale: string }>();
 
+  // İki adımlı sihirbaz: 1 = kimler oynuyor, 2 = ne oynuyoruz. Durum bileşende tutulur, sunucuya yalnızca son adımda gidilir.
+  const [step, setStep] = useState<1 | 2>(1);
   const [displayName, setDisplayName] = useState("");
   const [partnerName, setPartnerName] = useState("");
+  const [gender, setGender] = useState<Gender | null>(null);
+  const [partnerGender, setPartnerGender] = useState<Gender | null>(null);
   const [relationshipType, setRelationshipType] = useState<RelationshipType | null>(null);
   const rel = relKey(relationshipType);
-  const [gameMode, setGameMode] = useState<GameMode>("secret_choice");
+  const [gameMode, setGameMode] = useState<GameMode>("mixed");
   const [questionCount, setQuestionCount] = useState<5 | 10>(5);
+  const [chapterId, setChapterId] = useState<string | null>(null);
+  const chapterRef = useRef<HTMLDivElement>(null);
+  const [draftLoaded, setDraftLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -119,15 +172,86 @@ export default function CreatePage() {
     };
   }, [categoryOpen]);
 
+  // Taslağı geri yükle (yalnızca istemcide, mount sonrası; sunucu çıktısıyla uyuşmazlık olmasın diye ilk karede gizli kalır)
+  useEffect(() => {
+    const d = readDraft();
+    if (d) {
+      if (d.displayName) setDisplayName(d.displayName);
+      if (d.partnerName) setPartnerName(d.partnerName);
+      setGender(d.gender ?? null);
+      setPartnerGender(d.partnerGender ?? null);
+      setRelationshipType(d.relationshipType ?? null);
+      if (d.gameMode) setGameMode(d.gameMode);
+      if (d.questionCount) setQuestionCount(d.questionCount);
+      setSelectedCategoryId(d.categoryId ?? null);
+      setChapterId(d.chapterId ?? null);
+      // 2. adımda yenilendiyse yine 2. adımdan devam et (gerekli alanlar dolu olmalı)
+      if (d.step === 2 && d.displayName?.trim() && d.relationshipType) setStep(2);
+    }
+    setDraftLoaded(true);
+  }, []);
+
+  // Her değişiklikte taslağı güncelle (geri yükleme bitmeden yazma: boş durum taslağı ezmesin)
+  useEffect(() => {
+    if (!draftLoaded) return;
+    try {
+      const draft: CreateDraft = {
+        step, displayName, partnerName, gender, partnerGender, relationshipType,
+        gameMode, questionCount, categoryId: selectedCategoryId, chapterId,
+      };
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    } catch {
+      /* depolama kapalı/dolu: taslak tutulmaz, sihirbaz yine çalışır */
+    }
+  }, [draftLoaded, step, displayName, partnerName, gender, partnerGender, relationshipType, gameMode, questionCount, selectedCategoryId, chapterId]);
+
+  // Geri yüklenen kategori artık listede yoksa (kategori seti değişti / dil değişti) seçimi temizle
+  useEffect(() => {
+    if (categoriesLoading || selectedCategoryId === null) return;
+    if (!allCategories.some((c) => c.id === selectedCategoryId)) setSelectedCategoryId(null);
+  }, [categoriesLoading, allCategories, selectedCategoryId]);
+
+  // Tarayıcı/telefon geri tuşu 2. adımdan sayfadan çıkarmak yerine 1. adıma döner
+  useEffect(() => {
+    function onPopState(e: PopStateEvent) {
+      setStep(e.state?.createStep === 2 ? 2 : 1);
+      window.scrollTo(0, 0);
+    }
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  function goToStep2() {
+    window.history.pushState({ createStep: 2 }, "");
+    setStep(2);
+    window.scrollTo(0, 0);
+  }
+
+  function goToStep1() {
+    // Geri tuşuyla aynı yolu izle (history girdisini tüket)
+    if (window.history.state?.createStep === 2) window.history.back();
+    else setStep(1);
+  }
+
   const categories = relationshipType
     ? allCategories.filter((c) => c.relationship_types.includes(relationshipType))
     : allCategories;
 
   function handleRelationshipChange(value: RelationshipType) {
     setRelationshipType(value);
+    setChapterId(null);
     setSelectedCategoryId((prev) => {
       const cat = allCategories.find((c) => c.id === prev);
       return cat && cat.relationship_types.includes(value) ? prev : null;
+    });
+  }
+
+  function selectScene() {
+    setGameMode("scene");
+    // Bölüm seçimi mod listesinin altında kalabilir (özellikle mobilde): seçimden sonra yumuşakça görünür yap
+    requestAnimationFrame(() => {
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      chapterRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
     });
   }
 
@@ -145,6 +269,12 @@ export default function CreatePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!displayName.trim() || !relationshipType) return;
+    if (step === 1) {
+      goToStep2();
+      return;
+    }
+    // Sahne bölümleri hazır olana kadar oda kurulamaz (sunucu da bu modu henüz kabul etmez)
+    if (gameMode === "scene") return;
 
     // Double-check limit before submitting
     const stored = localStorage.getItem("gou_my_room");
@@ -169,6 +299,8 @@ export default function CreatePage() {
           questionCount,
           locale,
           categoryId: selectedCategoryId,
+          gender,
+          partnerGender,
         }),
       });
       const data = await res.json();
@@ -184,6 +316,11 @@ export default function CreatePage() {
       localStorage.setItem(`gou_token_${roomCode}`, participant.token);
       // Store the created room to enforce the free tier limit
       localStorage.setItem("gou_my_room", roomCode);
+      try {
+        sessionStorage.removeItem(DRAFT_KEY);
+      } catch {
+        /* yoksay */
+      }
       router.push(`/game/room/${roomCode}`);
     } catch {
       setError(tErr("generic"));
@@ -192,7 +329,7 @@ export default function CreatePage() {
     }
   }
 
-  const modes: Array<{ value: GameMode }> = [
+  const modes: Array<{ value: Exclude<GameMode, "scene"> }> = [
     { value: "secret_choice" },
     { value: "prediction" },
     { value: "orderline" },
@@ -248,71 +385,115 @@ export default function CreatePage() {
             <p className="text-body-md text-on-surface-variant">{t("sideSubtitle")}</p>
           </div>
           <ul className="space-y-3">
-            {[
-              { label: t("sideStep1"), active: true },
-              { label: t("sideStep2"), active: false },
-              { label: t("sideStep3"), active: false },
-            ].map((step) => (
-              <li
-                key={step.label}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                  step.active
-                    ? "bg-primary-container/15 text-primary font-semibold border-l-4 border-primary"
-                    : "text-on-surface-variant"
-                }`}
-              >
-                <span className="material-symbols-outlined text-sm icon-fill">
-                  {step.active ? "radio_button_checked" : "radio_button_unchecked"}
-                </span>
-                <span className="text-body-md">{step.label}</span>
-              </li>
-            ))}
+            {[t("sideStep1"), t("sideStep2"), t("sideStep3")].map((label, i) => {
+              const number = i + 1;
+              const active = number === step;
+              const done = number < step;
+              return (
+                <li
+                  key={label}
+                  aria-current={active ? "step" : undefined}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                    active
+                      ? "bg-primary-container/15 text-primary font-semibold border-l-4 border-primary"
+                      : done
+                      ? "text-primary"
+                      : "text-on-surface-variant"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-sm icon-fill">
+                    {done ? "check_circle" : active ? "radio_button_checked" : "radio_button_unchecked"}
+                  </span>
+                  <span className="text-body-md">{label}</span>
+                </li>
+              );
+            })}
           </ul>
         </aside>
 
         {/* ── Main content ────────────────────────────────────────── */}
-        <main className="flex-1 flex flex-col items-center justify-start px-6 md:px-16 py-10 overflow-y-auto">
+        <main className={`flex-1 flex flex-col items-center justify-start px-6 md:px-16 pt-3 pb-10 md:py-10 overflow-y-auto ${draftLoaded ? "" : "invisible"}`}>
           <div className="w-full max-w-lg">
-            <h1 className="text-headline-lg-mobile md:text-headline-lg text-on-background mb-2">{t("title")}</h1>
-            <p className="text-body-md text-on-surface-variant mb-8">{t("subtitle", { rel })}</p>
-
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-              {/* Name fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-label-md text-on-surface-variant">{t("name.label")}</label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-xl">person</span>
-                    <input
-                      type="text"
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder={t("name.placeholder")}
-                      maxLength={30}
-                      required
-                      className="w-full pl-11 pr-4 py-3.5 bg-surface-container-lowest border-2 border-outline-variant/40 rounded-xl text-body-md text-on-surface placeholder-on-surface-variant/50 focus:outline-none focus:border-primary transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="text-label-md text-on-surface-variant">
-                    {t("partner.label", { rel })}
-                    <span className="text-on-surface-variant/50 font-normal ml-1">({t("partner.optional")})</span>
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-xl">person_add</span>
-                    <input
-                      type="text"
-                      value={partnerName}
-                      onChange={(e) => setPartnerName(e.target.value)}
-                      placeholder={t("partner.placeholder", { rel })}
-                      maxLength={30}
-                      className="w-full pl-11 pr-4 py-3.5 bg-surface-container-lowest border-2 border-outline-variant/40 rounded-xl text-body-md text-on-surface placeholder-on-surface-variant/50 focus:outline-none focus:border-primary transition-colors"
-                    />
-                  </div>
-                </div>
+            {/* Progress (mobil + masaüstü) */}
+            <div className="mb-5" role="progressbar" aria-valuemin={1} aria-valuemax={2} aria-valuenow={step}>
+              <div className="flex items-center justify-between h-9 mb-1">
+                {step === 2 ? (
+                  <button
+                    type="button"
+                    onClick={goToStep1}
+                    className="-ml-2 flex items-center gap-1 pl-2 pr-3 h-9 rounded-full text-label-md text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all"
+                  >
+                    <span className="material-symbols-outlined text-xl">arrow_back</span>
+                    {t("step2.back")}
+                  </button>
+                ) : (
+                  <span />
+                )}
+                <p className="text-label-md text-on-surface-variant">{t("progress", { current: step, total: 2 })}</p>
               </div>
+              <div className="flex gap-2">
+                <div className="h-1.5 flex-1 rounded-full bg-primary" />
+                <div className={`h-1.5 flex-1 rounded-full transition-colors ${step === 2 ? "bg-primary" : "bg-outline-variant/40"}`} />
+              </div>
+            </div>
+
+            <h1 className="text-headline-lg-mobile md:text-headline-lg text-on-background mb-1.5">
+              {step === 1 ? t("step1.title") : t("step2.title")}
+            </h1>
+            <p className="text-body-md text-on-surface-variant mb-6">
+              {step === 1 ? t("step1.subtitle") : t("step2.subtitle", { rel })}
+            </p>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              {step === 1 && (
+                <>
+                  {/* You */}
+                  <section className="flex flex-col gap-3 rounded-[20px] border border-outline-variant/30 bg-surface-container-low p-3.5">
+                    <h2 className="text-label-md font-semibold text-on-surface">{t("step1.you")}</h2>
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="create-name" className="text-xs text-on-surface-variant">{t("name.label")}</label>
+                      <div className="relative">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">person</span>
+                        <input
+                          id="create-name"
+                          type="text"
+                          value={displayName}
+                          onChange={(e) => setDisplayName(e.target.value)}
+                          placeholder={t("name.placeholder")}
+                          maxLength={30}
+                          required
+                          className="w-full pl-10 pr-4 py-2.5 bg-surface-container-lowest border-2 border-outline-variant/40 rounded-full text-body-md text-on-surface placeholder-on-surface-variant/50 focus:outline-none focus:border-primary transition-colors"
+                        />
+                      </div>
+                    </div>
+                    <GenderPicker label={t("gender.label")} value={gender} onChange={setGender} />
+                  </section>
+
+                  {/* Partner */}
+                  <section className="flex flex-col gap-3 rounded-[20px] border border-outline-variant/30 bg-surface-container-low p-3.5">
+                    <h2 className="text-label-md font-semibold text-on-surface">{t("step1.partner", { rel })}</h2>
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="create-partner" className="text-xs text-on-surface-variant">
+                        {t("partner.label", { rel })}
+                        <span className="text-on-surface-variant/50 font-normal ml-1">({t("partner.optional")})</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">person_add</span>
+                        <input
+                          id="create-partner"
+                          type="text"
+                          value={partnerName}
+                          onChange={(e) => setPartnerName(e.target.value)}
+                          placeholder={t("partner.placeholder", { rel })}
+                          maxLength={30}
+                          className="w-full pl-10 pr-4 py-2.5 bg-surface-container-lowest border-2 border-outline-variant/40 rounded-full text-body-md text-on-surface placeholder-on-surface-variant/50 focus:outline-none focus:border-primary transition-colors"
+                        />
+                      </div>
+                    </div>
+                    <GenderPicker label={t("gender.label")} value={partnerGender} onChange={setPartnerGender} />
+                  </section>
+
+                  <p className="text-xs text-on-surface-variant/70 -mt-2">{t("gender.hint")}</p>
 
               {/* Relationship type */}
               <div className="flex flex-col gap-3">
@@ -328,13 +509,13 @@ export default function CreatePage() {
                       role="radio"
                       aria-checked={relationshipType === value}
                       onClick={() => handleRelationshipChange(value)}
-                      className={`relative flex flex-col items-center gap-2 px-2 py-4 rounded-[20px] border-2 text-center transition-all ${
+                      className={`relative flex flex-col items-center gap-1.5 px-2 py-3 rounded-[20px] border-2 text-center transition-all ${
                         relationshipType === value
                           ? "border-primary bg-primary-container/10 shadow-soft-card"
                           : "border-outline-variant/30 bg-surface-container-lowest hover:border-outline"
                       }`}
                     >
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
                         relationshipType === value ? "bg-primary text-on-primary" : "bg-surface-container text-on-surface-variant"
                       }`}>
                         <span className="material-symbols-outlined text-lg">{RELATIONSHIP_ICONS[value]}</span>
@@ -346,14 +527,83 @@ export default function CreatePage() {
                 </div>
               </div>
 
+                </>
+              )}
+
+              {step === 2 && (
+                <>
+                  {/* Game mode: Sahne öne çıkan kart + klasik soru oyunları */}
+                  <div className="flex flex-col gap-3">
+                    <label className="text-label-md text-on-surface-variant">{t("mode.label")}</label>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Sahne: diğer modlarla aynı kart dili, listenin başında tam genişlikte */}
+                      <button
+                        type="button"
+                        onClick={selectScene}
+                        aria-pressed={gameMode === "scene"}
+                        className={`col-span-2 relative flex items-center gap-3 p-4 rounded-[20px] border-2 text-left transition-all ${
+                          gameMode === "scene"
+                            ? "border-primary bg-primary-container/10 shadow-soft-card"
+                            : "border-outline-variant/30 bg-surface-container-lowest hover:border-outline"
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                          gameMode === "scene" ? "bg-primary text-on-primary" : "bg-surface-container text-on-surface-variant"
+                        }`}>
+                          <StickFigureIcon className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="block text-label-md text-on-surface">{t("mode.scene.name")}</span>
+                          <span className="block text-xs text-on-surface-variant mt-0.5">{t("mode.scene.desc")}</span>
+                        </div>
+                        {gameMode === "scene" ? (
+                          <span className="material-symbols-outlined text-primary text-base icon-fill">check_circle</span>
+                        ) : (
+                          <span className="shrink-0 rounded-full bg-tertiary-container px-2.5 py-1 text-[11px] font-semibold text-on-tertiary-container">
+                            {t("mode.scene.new")}
+                          </span>
+                        )}
+                      </button>
+                      {modes.map(({ value }) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => setGameMode(value)}
+                          className={`relative flex items-center gap-3 p-4 rounded-[20px] border-2 text-left transition-all ${
+                            gameMode === value
+                              ? "border-primary bg-primary-container/10 shadow-soft-card"
+                              : "border-outline-variant/30 bg-surface-container-lowest hover:border-outline"
+                          }`}
+                        >
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                            gameMode === value ? "bg-primary text-on-primary" : "bg-surface-container text-on-surface-variant"
+                          }`}>
+                            <span className="material-symbols-outlined text-lg">{MODE_ICONS[value]}</span>
+                          </div>
+                          <div>
+                            <span className="block text-label-md text-on-surface">{t(`mode.options.${value}`)}</span>
+                            <span className="block text-xs text-on-surface-variant mt-0.5">{t(`mode.descs.${value}`)}</span>
+                          </div>
+                          {gameMode === value && (
+                            <span className="absolute top-3 right-3 material-symbols-outlined text-primary text-base icon-fill">check_circle</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+              {gameMode === "scene" ? (
+                <div ref={chapterRef} className="scroll-mt-4">
+                  <ChapterPicker relationshipType={relationshipType} selectedId={chapterId} onSelect={setChapterId} />
+                </div>
+              ) : (
+                <>
               {/* Category selector (dropdown) */}
               {(categoriesLoading || allCategories.length > 0) && (
                 <div className="flex flex-col gap-2" ref={categoryRef}>
                   <div>
                     <label id="category-label" className="text-label-md text-on-surface-variant">{t("category.label")}</label>
-                    {!relationshipType && (
-                      <p className="text-xs text-on-surface-variant/70 mt-0.5">{t("category.pickRelationshipFirst")}</p>
-                    )}
                   </div>
                   <div className="relative">
                     <button
@@ -433,38 +683,6 @@ export default function CreatePage() {
                 </div>
               )}
 
-              {/* Game mode */}
-              <div className="flex flex-col gap-3">
-                <label className="text-label-md text-on-surface-variant">{t("mode.label")}</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {modes.map(({ value }) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setGameMode(value)}
-                      className={`relative flex items-center gap-3 p-4 rounded-[20px] border-2 text-left transition-all ${
-                        gameMode === value
-                          ? "border-primary bg-primary-container/10 shadow-soft-card"
-                          : "border-outline-variant/30 bg-surface-container-lowest hover:border-outline"
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
-                        gameMode === value ? "bg-primary text-on-primary" : "bg-surface-container text-on-surface-variant"
-                      }`}>
-                        <span className="material-symbols-outlined text-lg">{MODE_ICONS[value]}</span>
-                      </div>
-                      <div>
-                        <span className="block text-label-md text-on-surface">{t(`mode.options.${value}`)}</span>
-                        <span className="block text-xs text-on-surface-variant mt-0.5">{t(`mode.descs.${value}`)}</span>
-                      </div>
-                      {gameMode === value && (
-                        <span className="absolute top-3 right-3 material-symbols-outlined text-primary text-base icon-fill">check_circle</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Question count */}
               <div className="flex flex-col gap-3">
                 <label className="text-label-md text-on-surface-variant">{t("questions.label")}</label>
@@ -491,6 +709,11 @@ export default function CreatePage() {
                 </div>
               </div>
 
+                </>
+              )}
+                </>
+              )}
+
               {/* Error */}
               {error && (
                 <div className="flex items-center gap-3 bg-error-container text-error rounded-xl px-4 py-3">
@@ -499,24 +722,26 @@ export default function CreatePage() {
                 </div>
               )}
 
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={loading || !displayName.trim() || !relationshipType}
-                className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary text-body-lg font-semibold py-4 rounded-full hover:bg-surface-tint disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-primary-glow mt-2"
-              >
-                {loading ? (
-                  <>
-                    <span className="material-symbols-outlined animate-spin text-xl">refresh</span>
-                    {t("creating")}
-                  </>
-                ) : (
-                  <>
-                    {t("submit")}
-                    <span className="material-symbols-outlined text-xl">arrow_forward</span>
-                  </>
-                )}
-              </button>
+              {/* Actions */}
+              <div className="flex items-center gap-3 mt-1">
+                <button
+                  type="submit"
+                  disabled={loading || !displayName.trim() || !relationshipType || (step === 2 && gameMode === "scene")}
+                  className="flex-1 flex items-center justify-center gap-2 bg-primary text-on-primary text-body-md font-semibold py-3.5 rounded-full hover:bg-surface-tint disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-primary-glow"
+                >
+                  {loading ? (
+                    <>
+                      <span className="material-symbols-outlined animate-spin text-xl">refresh</span>
+                      {t("creating")}
+                    </>
+                  ) : (
+                    <>
+                      {step === 1 ? t("step1.next") : t("submit")}
+                      <span className="material-symbols-outlined text-xl">arrow_forward</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </main>

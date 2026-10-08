@@ -332,6 +332,7 @@ export type Database = {
           completed_at: string | null
           created_at: string
           display_name: string | null
+          gender: string | null
           id: string
           last_seen_at: string | null
           role: Database["public"]["Enums"]["participant_role"]
@@ -344,6 +345,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           display_name?: string | null
+          gender?: string | null
           id?: string
           last_seen_at?: string | null
           role: Database["public"]["Enums"]["participant_role"]
@@ -356,6 +358,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           display_name?: string | null
+          gender?: string | null
           id?: string
           last_seen_at?: string | null
           role?: Database["public"]["Enums"]["participant_role"]
@@ -681,6 +684,7 @@ export type Database = {
           status: Database["public"]["Enums"]["room_status"]
           user_id: string | null
           partner_birth_date: string | null
+          partner_gender: string | null
         }
         Insert: {
           category_id?: string | null
@@ -698,6 +702,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["room_status"]
           user_id?: string | null
           partner_birth_date?: string | null
+          partner_gender?: string | null
         }
         Update: {
           category_id?: string | null
@@ -715,6 +720,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["room_status"]
           user_id?: string | null
           partner_birth_date?: string | null
+          partner_gender?: string | null
         }
         Relationships: [
           {

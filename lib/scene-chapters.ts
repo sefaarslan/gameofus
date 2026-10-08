@@ -1,0 +1,17 @@
+import type { RelationshipType } from "@/lib/relationship";
+
+/**
+ * GEÇİCİ: Sahne bölümlerinin kataloğu. Bölüm içeriği (sahneler) ve `chapters` tablosu/API'si hazır olana kadar yalnızca
+ * oda oluşturma sayfasında "Yakında" kartı göstermek için kullanılır; API gelince bu liste sunucudan çekilir ve dosya kalkar.
+ */
+export interface SceneChapterPreview {
+  id: string;
+  relationshipTypes: RelationshipType[];
+  sceneCount: number;
+  /** false = içerik hazır değil, seçilemez */
+  available: boolean;
+}
+
+export const SCENE_CHAPTER_PREVIEWS: SceneChapterPreview[] = [
+  { id: "first_date", relationshipTypes: ["dating", "partner"], sceneCount: 5, available: false },
+];

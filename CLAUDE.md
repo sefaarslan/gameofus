@@ -336,6 +336,12 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   Süreler `lib/retention.ts` (Gizlilik Politikası ile uyumlu tut). `credit_transactions` hesap silinene kadar kalır (solo ödül
   idempotency'si buna dayanır), `purchases` yasal süre boyunca kullanıcıdan ayrılmış tutulur — ikisi bu işle silinmez. Silmeden önce kişisel olmayan günlük toplamlar `metrics_*_archive` tablolarına yazılır; `metrics_*` görünümleri
   canlı + arşivi birleştirir (metrik geçmişi kaybolmaz).
+- **Cinsiyet (opsiyonel, `participants.gender` / `rooms.partner_gender`):** yalnızca sahne modunda çöp adam karakterini çizmek ve
+  ikili (oda) AI yorumunda dil bilgisi/doğal ifade için alınır; kurucu partner için de girer, partner katılırken `participants.gender`'a
+  kopyalanır (katılan kendi değerini göndererek geçersiz kılabilir). **Hesap profiline yazılmaz, oda silinince gider**, metrik
+  görünümlerine/arşiv tablolarına/loglara **girmez** (iki oyuncunun cinsiyeti + ilişki türü birlikte hassastır); hesap silmede
+  başkalarının odalarındaki katılımdan da silinir. AI'a yalnızca ikili AI'da ve rıza metninde belirtilerek gider; prompt'ta "cinsiyeti
+  yalnızca dil bilgisi/doğal ifade için kullan, genelleme/klişe üretme" kuralı zorunludur. Solo AI'a cinsiyet **gitmez**.
 - Analytics event'lerinde **bireysel cevap içeriği tutulmaz**, yalnızca davranış metrikleri. Aynı kural
   `feedback` tablosu için de geçerlidir: puan, AI ilgisi, kısa yorum (≤ 500 karakter) ve oda meta verisi
   (dil, mod, ilişki türü) tutulur; cevap/tahmin içeriği tutulmaz.
@@ -387,7 +393,13 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
 
 ### Oda oluşturma ve soru seçimi (`POST /api/rooms/create`)
 - Girdi: ad, (opsiyonel) partner adı, `gameMode`, `questionCount` (5/10), `locale`, `relationshipType`,
-  (opsiyonel) `categoryId`. Akış sırası: **ilişki türü → kategori → mod → soru sayısı**.
+  (opsiyonel) `categoryId`, (opsiyonel) `gender` / `partnerGender` (`female` | `male`; boş = belirtilmedi).
+  **Oda oluşturma sayfası iki adımlı sihirbazdır (web + mobil görünüm; durum bileşende, sunucuya yalnızca son adımda tek istek):**
+  **Adım 1 "Kimler oynuyor?"** (ad + cinsiyet, partner adı (opsiyonel) + cinsiyet, ilişki türü; mod ne olursa olsun aynı) →
+  **Adım 2 "Ne oynuyoruz?"** (mod seçici → kategori → soru sayısı). Akış sırası: **ilişki türü → mod → kategori → soru sayısı**.
+  Geri tuşu 2. adımdan 1. adıma döner (`history.pushState({ createStep: 2 })`). **Taslak korunur:** sihirbaz durumu (adım, adlar, cinsiyetler, ilişki türü, mod, kategori, soru sayısı, bölüm) `sessionStorage` `gou_create_draft` anahtarında tutulur; sayfa yenilenince/başka sayfaya gidip dönünce kaldığı adımdan devam eder, oda kurulunca silinir, sekme kapanınca gider; sunucuya hiçbir şey gitmez (geri yüklenen değerler doğrulanır, listede olmayan kategori temizlenir). Mod seçicide **Sahne** (animasyonlu senaryo modu,
+  planlı) diğer 4 modla **aynı kart diliyle, tek listede** durur (ayrı başlık/farklı stil yok; hepsi birer oyun modudur), listenin
+  başında tam genişlikte; "Yeni" rozetiyle **seçilebilir**. Sahne seçilince kategori ve soru sayısı gizlenir (durumları korunur), yerine **bölüm seçimi** (`components/create/ChapterPicker.tsx`) gelir; bölüm içeriği/`chapters` API'si hazır olana kadar bölüm kartları "Yakında" ve pasiftir (geçici katalog: `lib/scene-chapters.ts`), oda oluşturma butonu Sahne seçiliyken pasif kalır ve istemci/sunucu `gameMode: "scene"` ile oda kurmaz. Bölümler ilişki türüne göre filtrelenir (bağ için bölüm yoksa boş durum); bölüm seçimi ilişki türü değişince sıfırlanır.
 - Kategori seçimi dropdown'dır; varsayılan seçenek "Karışık Sürpriz" (kategori yok). Kategoriler sayfa
   açılırken bir kez çekilir, tür değişince istemcide filtrelenir; sunucu yine de uyumu doğrular
   (uyumsuzsa `INVALID_PAYLOAD`).

@@ -93,6 +93,7 @@ solo oturum ve geri bildirimlerini siler, `users` satırını (coin hareketleriy
 | locale | text | `tr` / `en` / `es`; oda kurulurken sabitlenir |
 | category_id | uuid null | `categories.id` (odanın dilindeki satır) |
 | partner_birth_date | date null | Yalnızca mobil, kurucunun girdiği partner doğum tarihi (bu oda için; oda silinince gider) |
+| partner_gender | text null | `female` / `male` (check); kurucunun partner için girdiği değer, katılınca participants.gender'a kopyalanır; oda silinince gider |
 | relationship_type | text null | `friend` / `dating` / `partner`; eski odalarda ve alanı göndermeyen mobil build'lerde null |
 | created_at | timestamptz | |
 | expires_at | timestamptz | +24 saat |
@@ -111,6 +112,7 @@ Index: `unique(room_code)`, `status`, `expires_at`, `user_id`, `category_id`.
 | display_name | text | yalnızca gösterim |
 | status | participant_status | |
 | token_hash | text | SHA-256, ham token tutulmaz |
+| gender | text null | `female` / `male` (check); opsiyonel, null = belirtilmedi. Karakter çizimi ve ikili AI dili için; profile/metriklere yazılmaz. Hesap silmede null'lanır |
 | user_id | uuid null | `users.id`; mobil (giriş yapmış) oyuncular için; web'de null. Hesap silmede null'lanır ve ad kaldırılır |
 | last_seen_at, completed_at | timestamptz null | |
 | created_at | timestamptz | |
