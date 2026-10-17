@@ -54,7 +54,7 @@ function SecretChoiceButtons({
   const options: ScChoice[] = ["yes", "unsure", "no"];
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="grid grid-cols-3 gap-2">
       {options.map((v) => {
         const isSelected = selected === v;
         const answerSelected = variant === "answer" && isSelected;
@@ -64,7 +64,8 @@ function SecretChoiceButtons({
             key={v}
             type="button"
             onClick={() => onSelect(v)}
-            className={`w-full text-left px-6 py-4 rounded-xl border-2 text-headline-md transition-all flex justify-between items-center ${
+            aria-pressed={isSelected}
+            className={`w-full text-center px-2 py-3.5 rounded-2xl border-2 text-body-md font-semibold transition-all flex justify-center items-center ${
               answerSelected
                 ? "border-primary bg-primary-fixed text-on-primary-fixed"
                 : predSelected
@@ -73,13 +74,6 @@ function SecretChoiceButtons({
             }`}
           >
             <span>{t(v)}</span>
-            {isSelected && (
-              <span
-                className={`material-symbols-outlined icon-fill text-xl ${answerSelected ? "text-primary" : "text-tertiary-container"}`}
-              >
-                check_circle
-              </span>
-            )}
           </button>
         );
       })}
@@ -100,7 +94,7 @@ function PredictionButtons({
   variant?: "answer" | "prediction";
 }) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       {options.map((o) => {
         const isSelected = selected === o.id;
         const answerSelected = variant === "answer" && isSelected;
@@ -110,7 +104,7 @@ function PredictionButtons({
             key={o.id}
             type="button"
             onClick={() => onSelect(o.id)}
-            className={`w-full text-left px-6 py-4 rounded-xl border-2 text-body-lg transition-all flex justify-between items-center ${
+            className={`w-full text-left px-4 py-3 rounded-2xl border-2 text-body-md font-semibold transition-all flex justify-between items-center gap-3 ${
               answerSelected
                 ? "border-primary bg-primary-fixed text-on-primary-fixed"
                 : predSelected
@@ -121,7 +115,7 @@ function PredictionButtons({
             <span>{o.optionText}</span>
             {isSelected && (
               <span
-                className={`material-symbols-outlined icon-fill text-xl flex-shrink-0 ${answerSelected ? "text-primary" : "text-tertiary-container"}`}
+                className={`material-symbols-outlined icon-fill text-lg flex-shrink-0 ${answerSelected ? "text-primary" : "text-tertiary-container"}`}
               >
                 check_circle
               </span>
@@ -160,7 +154,7 @@ function OrderlineRanker({
   return (
     <div className="flex flex-col gap-2">
       <p className="text-label-md text-on-surface-variant flex items-center gap-1.5 mb-1">
-        <span className="material-symbols-outlined text-lg">touch_app</span>
+        <span className="material-symbols-outlined text-base">touch_app</span>
         {guide}
       </p>
       {options.map((o) => {
@@ -175,10 +169,10 @@ function OrderlineRanker({
             key={o.id}
             type="button"
             onClick={() => handleTap(o.id)}
-            className={`flex items-center gap-4 w-full p-4 rounded-[24px] border-2 text-body-lg transition-all shadow-soft-card ${bg}`}
+            className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-2xl border-2 text-body-md font-semibold transition-all ${bg}`}
           >
             <div
-              className={`w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full text-headline-md font-bold ${
+              className={`w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full text-label-md font-bold ${
                 isSelected
                   ? variant === "answer" ? "bg-primary text-on-primary" : "bg-tertiary-container text-on-tertiary"
                   : "bg-surface-container text-on-surface-variant"
@@ -188,7 +182,7 @@ function OrderlineRanker({
             </div>
             <span className="flex-1 text-left text-on-surface">{o.optionText}</span>
             {isSelected && (
-              <span className="material-symbols-outlined text-on-surface-variant/50 text-2xl">drag_handle</span>
+              <span className="material-symbols-outlined text-on-surface-variant/50 text-xl">drag_handle</span>
             )}
           </button>
         );
@@ -348,18 +342,18 @@ export function GameScreen({
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col max-w-[720px] mx-auto w-full px-6 py-8 pb-32 gap-0">
+      <div className="flex-1 flex flex-col max-w-[720px] mx-auto w-full px-5 py-5 pb-28 gap-0">
         {/* Question */}
-        <div className="text-center px-2 mb-8">
-          <h1 className="text-headline-lg-mobile md:text-headline-lg text-on-surface leading-snug">
+        <div className="text-center px-2 mb-5">
+          <h1 className="text-headline-sm md:text-headline-md text-on-surface leading-snug">
             {question.questionText}
           </h1>
         </div>
 
         {/* My answer section */}
-        <div className="glass-card rounded-[2rem] p-6 shadow-soft-card relative mb-0">
-          <div className="flex items-center gap-2 mb-5 text-primary">
-            <span className="material-symbols-outlined text-xl icon-fill">lock</span>
+        <div className="glass-card rounded-[24px] p-4 shadow-soft-card relative mb-0">
+          <div className="flex items-center gap-2 mb-3 text-primary">
+            <span className="material-symbols-outlined text-lg icon-fill">lock</span>
             <h2 className="text-label-md uppercase tracking-wide">{t("yourAnswer")} — {t("yourAnswerNote", { rel })}</h2>
           </div>
 
@@ -390,14 +384,14 @@ export function GameScreen({
         </div>
 
         {/* Connector */}
-        <div className="flex justify-center my-0 relative z-10 py-1">
-          <div className="h-10 border-l-2 border-dashed border-outline-variant" />
+        <div className="flex justify-center my-0 relative z-10 py-0.5">
+          <div className="h-5 border-l-2 border-dashed border-outline-variant" />
         </div>
 
         {/* Partner prediction section */}
-        <div className="glass-card rounded-[2rem] p-6 shadow-soft-card">
-          <div className="flex items-center gap-2 mb-5 text-tertiary-container">
-            <span className="material-symbols-outlined text-xl icon-fill">psychology</span>
+        <div className="glass-card rounded-[24px] p-4 shadow-soft-card">
+          <div className="flex items-center gap-2 mb-3 text-tertiary-container">
+            <span className="material-symbols-outlined text-lg icon-fill">psychology</span>
             <h2 className="text-label-md uppercase tracking-wide">{t("partnerGuess", { rel })}</h2>
           </div>
 
@@ -427,7 +421,7 @@ export function GameScreen({
           )}
 
           {/* Confidence pills */}
-          <div className="mt-6 space-y-3">
+          <div className="mt-4 space-y-2">
             <p className="text-label-md text-on-surface-variant text-center">{t("confidence")}</p>
             <div className="grid grid-cols-3 gap-2 sm:flex sm:justify-center">
               {confidenceLevels.map(({ level, icon }) => (
@@ -435,7 +429,7 @@ export function GameScreen({
                   key={level}
                   type="button"
                   onClick={() => setConfidence(level)}
-                  className={`flex items-center justify-center gap-1.5 min-w-0 px-2 sm:px-5 py-2 rounded-full text-label-md whitespace-nowrap transition-all ${
+                  className={`flex items-center justify-center gap-1.5 min-w-0 px-2 sm:px-5 py-1.5 rounded-full text-label-md whitespace-nowrap transition-all ${
                     confidence === level
                       ? "border border-transparent bg-tertiary-container text-on-tertiary shadow-md"
                       : "border border-outline-variant bg-surface text-on-surface-variant hover:bg-surface-container"
@@ -459,18 +453,18 @@ export function GameScreen({
       </div>
 
       {/* Sticky CTA */}
-      <div className="fixed bottom-0 left-0 w-full bg-gradient-to-t from-surface via-surface/95 to-transparent pt-12 pb-8 px-6 z-40 flex justify-center">
+      <div className="fixed bottom-0 left-0 w-full bg-gradient-to-t from-surface via-surface/95 to-transparent pt-8 pb-5 px-5 z-40 flex justify-center">
         <div className="w-full max-w-[720px]">
           <button
             type="button"
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="w-full bg-primary text-on-primary h-16 rounded-full flex items-center justify-center gap-2 shadow-primary-glow hover:bg-surface-tint disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 text-headline-md"
+            className="w-full bg-primary text-on-primary h-14 rounded-full flex items-center justify-center gap-2 shadow-primary-glow hover:bg-surface-tint disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 text-body-lg font-semibold"
           >
             {submitting ? (
               <span className="material-symbols-outlined animate-spin text-xl">refresh</span>
             ) : (
-              <span className="material-symbols-outlined text-xl">lock_clock</span>
+              <span className="material-symbols-outlined text-lg">lock_clock</span>
             )}
             {submitting ? t("locking") : t("lock")}
           </button>

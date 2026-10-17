@@ -88,6 +88,7 @@ export default {
         "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "700" }],
         "headline-lg-mobile": ["28px", { lineHeight: "34px", fontWeight: "700" }],
         "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "700" }],
         "body-lg": ["18px", { lineHeight: "28px", fontWeight: "500" }],
         "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
         "label-md": ["14px", { lineHeight: "20px", fontWeight: "600" }],

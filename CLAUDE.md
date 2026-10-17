@@ -537,6 +537,7 @@ eskileri pasife alır, yenileri aktifleştirir (atomik). Eski seed dosyaları (`
 - UI metnine "partner" yazma; `rel` select kalıbını kullan. Yeni ikon adı ekledinse `npm run icons`.
 - API route'larında bağımsız Supabase sorgularını `Promise.all` ile paralel çalıştır; önce kritik
   yazmanın başarısını gerektiren adımları (ör. sonuç satırı → oda durumu) sıralı bırak.
+- Oyun ekranı (`GameScreen`) ölçüleri mobil uygulamayla aynı tutulur: soru metni `headline-sm` (20px; masaüstünde `headline-md`), bölüm kartları `p-4`/`rounded-[24px]`, Evet/Kararsız/Hayır **tek satırda 3 düğme** (`py-3.5`, 16px), Senaryo/Sıralama satırları `py-3`/`py-2.5` ve 16px, kilitle düğmesi `h-14` ve 18px. Büyütme; mobilde ekrana sığması öncelik.
 - Oyun sayfalarında mobilde header sabit değildir ve her yeni soru ekranı sayfa başından açılır
   (`scrollTo(0)`); bu davranışı bozma.
 - Test odaları açarken katılımcı adını `TEST-` ile başlat (metrik görünümleri bunları hariç tutar);
