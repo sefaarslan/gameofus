@@ -69,7 +69,9 @@ export async function GET(
   ]);
 
   const participants = allParticipants ?? [];
-  const { participant: me, viaUser } = await findParticipant(req, token, participants);
+  const { participant: me, viaUser, jwt } = await findParticipant(req, token, participants);
+  // Geçersiz/süresi dolmuş JWT → 401 (istemci oturumu yenileyebilir); geçerli JWT ama odada katılımcı değil / geçersiz token → 403
+  if (!me && jwt === "invalid") return apiError("UNAUTHORIZED", "Oturum geçersiz, tekrar giriş yapın.", 401);
   if (!me) return apiError("INVALID_TOKEN", "Geçersiz token.", 403);
   if (expired && !viaUser) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
 

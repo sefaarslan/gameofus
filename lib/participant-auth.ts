@@ -17,21 +17,22 @@ export interface ParticipantAuthRow {
  * Aynı kullanıcı aynı odada iki rolde de katılmışsa (kendi odasına kendi hesabıyla girmek) ilk eşleşen döner; token'ı olan
  * taraf token yoluyla her zaman doğru rolü bulur.
  */
+export type JwtStatus = "none" | "invalid" | "valid";
+
 export async function findParticipant<T extends ParticipantAuthRow>(
   req: NextRequest,
   token: string | null,
   participants: T[],
-): Promise<{ participant: T | null; viaUser: boolean }> {
+): Promise<{ participant: T | null; viaUser: boolean; jwt: JwtStatus }> {
   if (token) {
     const match = participants.find((p) => verifyToken(token, p.token_hash));
-    if (match) return { participant: match, viaUser: false };
+    if (match) return { participant: match, viaUser: false, jwt: "none" };
   }
   if (bearerJwt(req)) {
     const user = await getAuthUser(req);
-    if (user) {
-      const match = participants.find((p) => p.user_id === user.id);
-      if (match) return { participant: match, viaUser: true };
-    }
+    if (!user) return { participant: null, viaUser: false, jwt: "invalid" };
+    const match = participants.find((p) => p.user_id === user.id);
+    return { participant: match ?? null, viaUser: !!match, jwt: "valid" };
   }
-  return { participant: null, viaUser: false };
+  return { participant: null, viaUser: false, jwt: "none" };
 }

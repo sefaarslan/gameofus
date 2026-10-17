@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { extractToken } from "@/lib/token";
 import { findParticipant } from "@/lib/participant-auth";
+import { bearerJwt } from "@/lib/auth";
 import { isRoomExpired } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
 import { corsOptions } from "@/lib/cors";
@@ -37,7 +38,14 @@ export async function GET(
   const participants = allParticipants ?? [];
 
   // Token ile (yoksa giriş yapmış mobil kullanıcının JWT'siyle) mevcut participant'ı bul
-  const { participant: me } = await findParticipant(req, token, participants);
+  const { participant: me, jwt } = await findParticipant(req, token, participants);
+  // Kimlik olarak JWT gönderilmiş ama kimlik doğrulanamadıysa sessizce "katılımcı yok" dönme: geçersiz JWT → 401, bu odanın katılımcısı değilse → 403.
+  // (Hiç kimlik göndermeyen web/anonim istek eskisi gibi `participant: null` ile oda önizlemesi alır.)
+  if (!me && bearerJwt(req)) {
+    return jwt === "invalid"
+      ? apiError("UNAUTHORIZED", "Oturum geçersiz, tekrar giriş yapın.", 401)
+      : apiError("INVALID_TOKEN", "Bu odanın katılımcısı değilsiniz.", 403);
+  }
 
   // Questions (options dahil — tek seferde yüklenir)
   const { data: roomQuestions } = await supabase

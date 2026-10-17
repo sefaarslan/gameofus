@@ -42,7 +42,7 @@ POST /api/solo/red-flag/start
 POST /api/solo/[sessionId]/complete
 GET  /api/solo/red-flag/card?g=&l=&p=&q=&fmt=
 GET  /api/users/me                (mobil, Bearer JWT)
-GET  /api/users/history           (mobil, Bearer JWT; oda geçmişi, son 90 gün)
+GET  /api/users/history           (mobil, Bearer JWT; oda geçmişi, son 90 gün; düz dizi)
 GET  /api/users/solo-history      (mobil, Bearer JWT; + /[sessionId])
 POST /api/users/coins/spend       (mobil, Bearer JWT)
 POST /api/users/coins/earn        (mobil, Bearer JWT)
@@ -157,7 +157,9 @@ tutar. Token verilirse `participant` ve `progress` o oyuncuya göre dolar. Cevap
 
 **Kimlik (mobil):** token yoksa `Authorization: Bearer <Supabase JWT>` ile de oyuncu belirlenir: `participants.user_id`
 giriş yapmış kullanıcıyla eşleşen katılımcı o kullanıcıdır (başka cihazda/yeniden kurulumda oyuna devam). Token yolu
-öncelikli (JWT doğrulaması yalnızca token yoksa yapılır). Oda hâlâ süre kontrolüne tabidir (`ROOM_EXPIRED`).
+öncelikli (JWT doğrulaması yalnızca token yoksa yapılır). Oda hâlâ süre kontrolüne tabidir (`ROOM_EXPIRED`, 400).
+JWT gönderildiği hâlde oyuncu belirlenemezse: **geçersiz/süresi dolmuş JWT → `401 UNAUTHORIZED`**, geçerli JWT ama bu odanın
+katılımcısı değil → **`403 INVALID_TOKEN`**. Hiç kimlik göndermeyen (web/anonim) istek eskisi gibi `200` ve `participant: null` alır.
 
 ```json
 {
@@ -231,7 +233,7 @@ yapılır; başarısız olursa oda "hazır" görünmez.)
 Kimlik zorunlu: katılımcı token'ı **ya da (mobil) giriş yapmış kullanıcının Supabase JWT'si** (`participants.user_id`
 eşleşmesi). Oda `result_ready`/`completed` değilse `RESULT_NOT_READY`. **Süresi dolmuş odalar yalnızca JWT ile açılır**
 (geçmiş: saklama süresi, `expires_at` + 90 gün boyunca); token ile süresi dolmuş odada `ROOM_EXPIRED`. Odada katılımcısı
-olmayan JWT → `403 INVALID_TOKEN`.
+olmayan JWT → `403 INVALID_TOKEN`; geçersiz/süresi dolmuş JWT → `401 UNAUTHORIZED`; hiç kimlik yok → `403 INVALID_TOKEN`.
 
 ```json
 {
@@ -334,10 +336,12 @@ Ekonomi: kayıt +500 (Auth trigger'ı, otomatik) · reklam +100 (günde en fazla
 solo +20 (solo `complete` içinde, bkz. gelecek iş). **Miktarı istemci göndermez**, yalnızca `reason`.
 
 - `GET /api/users/me` → `{ id, coins, tier, birthDate }`
-- `GET /api/users/history` → `{ items: [{ roomCode, locale, relationshipType, gameMode, questionCount, status, role, partnerName, createdAt, expiresAt, expired, resultReady, readingScore, completedAt }] }`
-  (en yeni önce, en çok 100). Kullanıcının (`participants.user_id`) odaları; yalnızca `expires_at` son 90 gün içinde olanlar (saklama süresiyle aynı).
-  `partnerName`: karşı oyuncunun adı (hesabını sildiyse `null`); `readingScore`/`completedAt` sonuç hazırsa dolu. Sonuç ayrıntısı
-  için `GET /api/rooms/{roomCode}/results` aynı JWT ile açılır (süresi dolmuş odada da).
+- `GET /api/users/history` → **düz dizi** (sarmalayıcı yok), en yeni önce (`created_at` azalan), en çok 100:
+  `[{ roomCode, locale, relationshipType, status, role, partnerName, readingScore, completedAt, createdAt, gameMode, questionCount, expiresAt, expired, resultReady }]`.
+  Kullanıcının (`participants.user_id`) tüm odaları; yalnızca `created_at` son 90 gün içinde olanlar. `status` ham `rooms.status`
+  (`created … result_ready | completed | expired`); `role` `owner|guest`; `partnerName` karşı oyuncunun adı (yoksa/hesabını sildiyse `null`);
+  `readingScore`/`completedAt` yalnızca sonuç hazırsa dolu (aksi `null`); `expired`/`resultReady` kolaylık alanları. Hata: JWT yoksa/geçersizse
+  `401 UNAUTHORIZED` (katılımcı token'ı kabul edilmez). Sonuç ayrıntısı için `GET /api/rooms/{roomCode}/results` aynı JWT ile açılır (süresi dolmuş odada da).
 - `PATCH /api/users/me` `{ "birthDate": "YYYY-AA-GG" }` → profil doğum tarihi (geçersiz `400`, 13 yaş altı `403 AGE_RESTRICTED`)
 - `DELETE /api/users/me` `{ "confirm": true }` → `{ deleted: true }` — **hesap silme** (App Store 5.1.1(v) / Google Play). Silinen: kurulan odalar
   (içeriğiyle), solo oyunlar, coin kayıtları, kullanıcı ve Auth kaydı. Başkalarının odalarındaki katılım anonimleştirilir

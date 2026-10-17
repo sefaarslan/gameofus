@@ -11,8 +11,9 @@ export function OPTIONS() {
 
 /**
  * Mobil: kullanıcının oda geçmişi (en yeni önce). Bearer Supabase JWT.
- * Kapsam: `participants.user_id = kullanıcı` olan odalar (kurucu ya da katılımcı olarak); yalnızca son 90 gün
- * (saklama süresiyle aynı: `expires_at` + userHistoryDays sonra silinir). Sonuç ayrıntısı için
+ * Kapsam: `participants.user_id = kullanıcı` olan odalar (kurucu ya da katılımcı olarak); yalnızca `created_at` son 90 gün
+ * içinde olanlar (saklama temizliği odayı expires_at + userHistoryDays sonra siler, yani liste her zaman silinmemiş veridir).
+ * Yanıt düz dizidir (sarmalayıcı yok). Sonuç ayrıntısı için
  * `GET /api/rooms/{roomCode}/results` aynı JWT ile açılır (süresi dolmuş odada da, bu pencerede).
  */
 export async function GET(req: NextRequest) {
@@ -27,7 +28,7 @@ export async function GET(req: NextRequest) {
     .select("id, room_id, role")
     .eq("user_id", user.id);
   const myRows = mine ?? [];
-  if (myRows.length === 0) return apiOk({ items: [] });
+  if (myRows.length === 0) return apiOk([]);
 
   const roomIds = myRows.map((p) => p.room_id);
   const [{ data: rooms }, { data: everyone }, { data: results }] = await Promise.all([
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
       .from("rooms")
       .select("id, room_code, locale, relationship_type, status, game_mode, question_count, created_at, expires_at")
       .in("id", roomIds)
-      .gte("expires_at", since)
+      .gte("created_at", since)
       .order("created_at", { ascending: false })
       .limit(100),
     supabase.from("participants").select("id, room_id, role, display_name").in("room_id", roomIds),
@@ -72,5 +73,5 @@ export async function GET(req: NextRequest) {
     ];
   });
 
-  return apiOk({ items });
+  return apiOk(items);
 }
