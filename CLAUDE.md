@@ -180,7 +180,7 @@ Tek soru ekranında sıra:
 2. Aynı ekranda partnerinin cevabını **aynı format** ile tahmin eder.
 3. Tahmine güven seviyesi ekler.
 4. Tahmini kilitler.
-5. Kilitleyince **doğrudan sonraki soruya geçilir (ara ekran/kart yok)**; son soruda sunucuya `complete` gider ve bekleme/sonuç ekranına geçilir. Kilitle düğmesinin altında küçük bir not durur: "Yanıtlar, tüm soruları cevapladıktan sonra en sonda görünecek." **Soru başına anlık sonuç (doğru/yakın/ıskaladı, puan) yoktur** — partner zaten cevaplamış olsa da; yanıtlar yalnızca iki taraf da bitirince sonuç ekranında açılır.
+5. Kilitleyince **doğrudan sonraki soruya geçilir (ara ekran/kart yok)**: kilitle düğmesi kısa süre yeşil "✓ Kaydedildi" olur, içerik solar ve yeni soru yana kayarak gelir (`prefers-reduced-motion`'da anında); son soruda sunucuya `complete` gider ve bekleme/sonuç ekranına geçilir. Kilitle düğmesinin altında küçük bir not durur: "Yanıtlar, tüm soruları cevapladıktan sonra en sonda görünecek." **Soru başına anlık sonuç (doğru/yakın/ıskaladı, puan) yoktur** — partner zaten cevaplamış olsa da; yanıtlar yalnızca iki taraf da bitirince sonuç ekranında açılır.
 
 ### Güven seviyesi
 - `guess` (tahmin) — çarpan ×1
@@ -537,7 +537,7 @@ eskileri pasife alır, yenileri aktifleştirir (atomik). Eski seed dosyaları (`
 - UI metnine "partner" yazma; `rel` select kalıbını kullan. Yeni ikon adı ekledinse `npm run icons`.
 - API route'larında bağımsız Supabase sorgularını `Promise.all` ile paralel çalıştır; önce kritik
   yazmanın başarısını gerektiren adımları (ör. sonuç satırı → oda durumu) sıralı bırak.
-- Oyun ekranı (`GameScreen`) ölçüleri mobil uygulamayla aynı tutulur: soru metni `headline-sm` (20px; masaüstünde `headline-md`), bölüm kartları `p-4`/`rounded-[24px]`, Evet/Kararsız/Hayır **tek satırda 3 düğme** (`py-3.5`, 16px), Senaryo/Sıralama satırları `py-3`/`py-2.5` ve 16px, kilitle düğmesi `h-14` ve 18px. Büyütme; mobilde ekrana sığması öncelik.
+- Oyun ekranı (`GameScreen`) ölçüleri mobil uygulamayla aynı tutulur: soru metni `headline-sm` (20px; masaüstünde `headline-md`), bölüm kartları `p-4`/`rounded-[24px]`, Evet/Kararsız/Hayır **tek satırda 3 düğme** (`py-3.5`, 16px), Senaryo/Sıralama satırları `py-3`/`py-2.5` ve 16px, kilitle düğmesi `h-14` ve 18px. Büyütme; mobilde ekrana sığması öncelik. Soru, mobildeki gibi mod rozetli (**"SORU n/N · MOD"**) beyaz bir kartta durur. Bölüm başlıkları karşı oyuncunun **adını** kullanır (katıldıktan sonra bilinir; `partnerName` prop'u): "Deniz ne cevap verir?", "Kendi cevabın — Deniz görmez"; ad yoksa `rel` kalıpları (ad kalıpları ek gerektirmeyecek biçimde yazılır: Türkçe ünlü uyumu/ek sorunu olmasın). Evet/Kararsız/Hayır mobille aynı renk dilini kullanır (yeşil / turuncu / kırmızı; seçili = renkli çerçeve + dolgu + tik), seçilmemişler ince çerçeveli. Kendi cevabını verince partner bölümü ekranın altında kalıyorsa sayfa oraya yumuşakça kayar (soru başına bir kez).
 - Oyun sayfalarında mobilde header sabit değildir ve her yeni soru ekranı sayfa başından açılır
   (`scrollTo(0)`); bu davranışı bozma.
 - Test odaları açarken katılımcı adını `TEST-` ile başlat (metrik görünümleri bunları hariç tutar);

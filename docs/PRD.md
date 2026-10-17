@@ -618,15 +618,16 @@ Butonlar: geri (←) ve > Oyun linki oluştur
 
 Secret Choice oyun ekranı tek soruda iki bölümlü birleştirilmiş tur yapısına sahip olmalıdır:
 
-- Progress bilgisi ve canlı puan göstergesi
-- Soru kartı
-- Bölüm 1 — Kendi cevabın: cevap seçenekleri (gizli tutulur)
-- Bölüm 2 — Karşı tarafı tahmin: aynı seçenekler, farklı vurgu rengi (başlık ilişki türüne göre: "Kankan / Sevgilin / Hayat arkadaşın ne cevap verir?")
+- Progress bilgisi (soru n/N + çubuk)
+- Soru kartı: beyaz kart, mod rozeti ("SORU n/N · MOD") ve soru metni (web ve mobilde aynı)
+- Bölüm 1 — Kendi cevabın: cevap seçenekleri (gizli tutulur); başlık karşı oyuncunun adını kullanır ("Kendi cevabın — Deniz görmez")
+- Bölüm 2 — Karşı tarafı tahmin: aynı seçenekler, farklı vurgu rengi (başlık karşı oyuncunun adıyla: "Deniz ne cevap verir?"; ad henüz bilinmiyorsa ilişki türüne göre: "Kankan / Sevgilin / Hayat arkadaşın ne cevap verir?"). Kendi cevabı tamamlanınca bu bölüm ekranın altında kalıyorsa sayfa oraya yumuşakça kayar (soru başına bir kez)
+- Evet / Kararsız / Hayır renk dili: yeşil / turuncu / kırmızı; seçili durum renkli çerçeve + dolgu + tik, seçilmemişler ince çerçeveli (yalnızca renge bağlı kalmaz)
 - Güven seviyesi seçimi (tahmin / sanırım / eminim)
 - Mikro açıklama
 - "Tahmini kilitle" butonu ve altında küçük not: "Yanıtlar, tüm soruları cevapladıktan sonra en sonda görünecek."
 
-Tahmin kilitlendikten sonra **ara ekran yoktur**: doğrudan sonraki soru açılır (son soruda bekleme/sonuç ekranına geçilir). Anlık sonuç, puan veya partnerin cevabı gösterilmez.
+Tahmin kilitlendikten sonra **ara ekran yoktur**: kilitle düğmesi kısa süre yeşil "✓ Kaydedildi" olur, içerik solar ve doğrudan sonraki soru yana kayarak açılır (son soruda bekleme/sonuç ekranına geçilir; hareketi azalt ayarında geçişler anında). Anlık sonuç, puan veya partnerin cevabı gösterilmez.
 
 ### 13.5 Waiting Screen (web + mobile)
 

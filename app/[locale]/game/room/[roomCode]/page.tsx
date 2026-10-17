@@ -248,6 +248,7 @@ export default function RoomPage() {
         questions={stateData.questions}
         initialIndex={stateData.progress.answeredCount}
         relationshipType={stateData.room.relationshipType}
+        partnerName={stateData.participants.find((x) => x.role !== stateData.participant?.role)?.displayName ?? null}
         onComplete={handleGameComplete}
       />
     );

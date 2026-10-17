@@ -100,6 +100,10 @@ export default {
         "primary-glow": "0 16px 32px rgba(174, 47, 52, 0.20)",
       },
       keyframes: {
+        "slide-in": {
+          "0%": { transform: "translateX(16px)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
         "soft-pulse": {
           "0%": { transform: "scale(0.95)", boxShadow: "0 0 0 0 rgba(255, 107, 107, 0.4)" },
           "70%": { transform: "scale(1)", boxShadow: "0 0 0 6px rgba(255, 107, 107, 0)" },
@@ -120,6 +124,7 @@ export default {
         "soft-pulse": "soft-pulse 2s infinite",
         "float-up": "float-up 3s ease-in-out infinite",
         "pop-in": "pop-in 0.4s ease-out forwards",
+        "slide-in": "slide-in 0.25s ease-out",
       },
     },
   },

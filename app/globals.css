@@ -75,4 +75,5 @@
 .animate-solo-pop  { animation: solo-pop 320ms ease-out both; }
 @media (prefers-reduced-motion: reduce) {
   .animate-solo-flip, .animate-solo-pop { animation: none; }
+  .animate-slide-in { animation: none; }
 }
