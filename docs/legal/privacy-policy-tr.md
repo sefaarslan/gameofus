@@ -17,7 +17,8 @@ Bu politika, KVKK (6698), GDPR ve ilgili mağaza (App Store / Google Play) kural
 ### 2.1. Web'de (hesap gerekmez, anonim)
 - **Oyunda görünen ad:** Odayı kurarken/katılırken yazdığınız ad. Gerçek adınızı yazmak zorunda değilsiniz; takma ad kullanabilirsiniz. Kimliğiniz ad ile doğrulanmaz.
 - **Oyun içeriği:** Verdiğiniz cevaplar, tahminleriniz, güven seviyeleriniz ve oda ayarları (dil, ilişki türü, kategori, oyun modu, soru sayısı). Partnerinizin cevabı, siz tahmininizi kilitleyene kadar size gösterilmez.
-- **Cinsiyet (isteğe bağlı):** Oda kurarken sizin ve (isteğe bağlı) oyun arkadaşınızın cinsiyeti; yalnızca animasyonlu karakterleri çizmek ve yapay zekâ yorumlarında dil bilgisini doğru kurmak için kullanılır. Boş bırakabilirsiniz. Hesabınıza yazılmaz, yalnızca ilgili odayla birlikte tutulur ve oda silinince silinir.
+- **Doğum tarihi (isteğe bağlı):** Oda kurarken ya da davetle odaya katılırken isteğe bağlı olarak yalnızca **kendi** doğum tarihiniz; yorumları kişiselleştirmek için kullanılır. Hesabınıza yazılmaz, yalnızca ilgili odayla birlikte tutulur ve oda silinince silinir. 13 yaşından küçükler uygulamayı kullanamaz, bu nedenle daha küçük bir tarih kabul edilmez ve saklanmaz.
+- **Cinsiyet (isteğe bağlı):** Oda kurarken ya da odaya katılırken yalnızca **kendi** cinsiyetiniz (kimse başkası adına girmez); yalnızca animasyonlu karakterleri çizmek ve yapay zekâ yorumlarında dil bilgisini doğru kurmak için kullanılır. Boş bırakabilirsiniz. Hesabınıza yazılmaz, yalnızca ilgili odayla birlikte tutulur ve oda silinince silinir.
 - **Tek kişilik oyun:** "Green/Yellow/Red Flag" seçimleriniz ve tolerans sonucunuz.
 - **Geri bildirim (isteğe bağlı):** Puan, AI yorumuna ilginiz ve en fazla 500 karakterlik yorum. Cevap/tahmin içeriği geri bildirim kaydına eklenmez.
 - **Cihazınızda saklananlar:** Oda kodu, katılımcı anahtarınız (token) ve karneleriniz tarayıcınızın yerel depolamasında tutulur; oyun kurarken girdiğiniz bilgiler (adlar, seçimler) sayfa yenilenirse kaybolmasın diye yalnızca tarayıcı oturumunda geçici olarak tutulur ve oyun kurulunca ya da sekmeyi kapatınca silinir; dil tercihiniz bir çerezde (`NEXT_LOCALE`) saklanır. Katılımcı anahtarının yalnızca özeti (hash) sunucuda tutulur; ham anahtar adreste taşınmaz.
@@ -27,7 +28,7 @@ Bu politika, KVKK (6698), GDPR ve ilgili mağaza (App Store / Google Play) kural
 - **Hesap:** Google veya Apple ile giriş yaptığınızda e-posta adresiniz ve hesap kimliğiniz.
 - **Coin ve satın alma:** Coin bakiyeniz ve hareketleriniz (kazanma/harcama), satın alma kayıtlarınız (işlem kimliği, tutar, para birimi, tarih). **Kart/ödeme bilgileriniz bize ulaşmaz;** ödeme Apple/Google tarafından işlenir.
 - **Oyun geçmişi:** Kurduğunuz odalar, tek kişilik oyun geçmişiniz ve sonuçlar.
-- **(planlanan) Doğum tarihi:** +18 kategorileri korumak ve yorumları kişiselleştirmek için, yalnızca oda kurarken sizin ve oyun arkadaşınızın doğum tarihi.
+- **Doğum tarihi (hesap):** +18 kategorileri korumak için hesabınızdaki **kendi** doğum tarihiniz; oyun arkadaşınızın doğum tarihini siz girmezsiniz, o kendi hesabından doğrulanır.
 - **(planlanan) Bildirim:** Anlık bildirim göndermek için cihaz bildirim anahtarı.
 - **(planlanan) Reklam:** Ödüllü reklam gösterimi için reklam sağlayıcısının topladığı veriler; ilgili izinler (ATT/rıza) ayrıca sorulur.
 

@@ -22,7 +22,7 @@ Bu doküman soru bankasının **güncel (v2)** yapısını ve nasıl yönetildi�
 
 ## 2. Kategoriler ve ilişki türü matrisi
 
-| Kategori (TR) | Slug | Kanka | Sevgili | Hayat Arkadaşı |
+| Kategori (TR) | Slug | Kanka | Sevgili | Evli |
 |---|---|:-:|:-:|:-:|
 | Kanka Testi | `friend_test` | ✓ | | |
 | Çılgın Senaryolar | `wild_scenarios` | ✓ | | |
@@ -36,7 +36,7 @@ Bu doküman soru bankasının **güncel (v2)** yapısını ve nasıl yönetildi�
 | Değerler | `values` | ✓ | ✓ | ✓ |
 | Cesur Sorular (premium, 18+) | `bold` | | ✓ | ✓ |
 
-Ücretsiz havuz (premium hariç) her modda: Kanka 60, Sevgili 50, Hayat Arkadaşı 50 soru.
+Ücretsiz havuz (premium hariç) her modda: Kanka 60, Sevgili 50, Evli 50 soru.
 `sort_order`: ilişkiye özel kategoriler önce, ortaklar sonra, Cesur Sorular en sonda.
 
 ## 3. Yazım kuralları
@@ -45,7 +45,7 @@ Bu doküman soru bankasının **güncel (v2)** yapısını ve nasıl yönetildi�
   "aşk", "flört", "evlilik", "kıskançlık", "ilişki", ilk buluşma… ve EN/ES karşılıkları yasaktır.
   Ortak kategoriler (İletişim, Yaşam Tarzı, Değerler) tür-bağımsız yazılır. Otomatik denetlenir.
 - **Cesur Sorular:** açık cinsel içerik yok; "cesur/romantik" çerçevede dürüstlük, kırılganlık, sınırlar.
-- **Hayat Arkadaşı:** evlilik/çocuk gibi hassas konular varsayılmaz.
+- **Evli:** evli bir çift olduğu varsayılabilir; çocuk sahibi olma gibi hassas konular varsayılmaz.
 - **AI için bilgilendirici cevap:** soru bir tercih, ödünleşme ya da davranış ortaya koymalı; Prediction/Orderline
   seçenekleri "iyi/daha iyi" değil, birbirinden net ayrışan **farklı tavırlar** olmalı.
 - Ton sıcak, yargılayıcı olmayan. Soru metni ≤ 160 karakter, seçenek ≤ 80 karakter.

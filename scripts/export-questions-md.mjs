@@ -11,7 +11,7 @@ for (const f of readdirSync(DIR).filter((f) => f.endsWith(".ts") && !["types.ts"
   for (const v of Object.values(mod)) if (v?.slug && v?.questions) cats.push(v);
 }
 cats.sort((a, b) => a.sortOrder - b.sortOrder);
-const TYPE = { friend: "Kanka", dating: "Sevgili", partner: "Hayat Arkadaşı" };
+const TYPE = { friend: "Kanka", dating: "Sevgili", partner: "Evli" };
 const MODE = { secret_choice: "Evet / Kararsız / Hayır", prediction: "Çoktan seçmeli", orderline: "Sıralama" };
 let out = `# Game of Us — Soru Seti v2 (${lang.toUpperCase()})\n\n${cats.length} kategori, ${cats.reduce((n, c) => n + c.questions.length, 0)} soru.\n\n`;
 for (const c of cats) {

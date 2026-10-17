@@ -6,6 +6,7 @@ import { apiError, apiOk } from "@/lib/api";
 import { corsOptions } from "@/lib/cors";
 import { getAuthUser } from "@/lib/auth";
 import { parseGender } from "@/lib/gender";
+import { MIN_APP_AGE, ageOn, parseBirthDate } from "@/lib/age";
 
 export function OPTIONS() {
   return corsOptions();
@@ -24,12 +25,21 @@ export async function POST(
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { displayName, platform, gender } = body as Record<string, unknown>;
+  const { displayName, platform, gender, birthDate } = body as Record<string, unknown>;
   const rawBodyToken = (body as Record<string, unknown>).participantToken;
   const participantToken = extractToken(req, typeof rawBodyToken === "string" ? rawBodyToken : null);
 
   if (!displayName || typeof displayName !== "string" || displayName.trim().length === 0) {
     return apiError("INVALID_PAYLOAD", "İsim zorunludur.");
+  }
+
+  // Katılanın KENDİ doğum tarihi (isteğe bağlı; yorum kişiselleştirme): geçerli olmalı ve asgari yaş (13) sağlanmalı
+  const guestBirth = birthDate == null || birthDate === "" ? null : parseBirthDate(birthDate);
+  if (birthDate != null && birthDate !== "" && !guestBirth) {
+    return apiError("INVALID_PAYLOAD", "Geçersiz doğum tarihi (YYYY-AA-GG).");
+  }
+  if (guestBirth && ageOn(guestBirth) < MIN_APP_AGE) {
+    return apiError("AGE_RESTRICTED", `Game of Us'ı kullanmak için en az ${MIN_APP_AGE} yaşında olmalısın.`, 403);
   }
 
   // Mobil (giriş zorunlu): misafir de giriş yapmış olmalı; katılımcı kullanıcıya bağlanır (geçmiş, hesap silme). Web anonimdir.
@@ -40,7 +50,7 @@ export async function POST(
 
   const { data: room } = await supabase
     .from("rooms")
-    .select("id, status, join_locked, expires_at, game_mode, question_count, partner_gender")
+    .select("id, status, join_locked, expires_at, game_mode, question_count, category_id")
     .eq("room_code", roomCode)
     .maybeSingle();
 
@@ -76,9 +86,26 @@ export async function POST(
     return apiError("ROOM_FULL", "Bu odada iki kişi zaten var.");
   }
 
+  // Yaş koşullu kategori (Cesur 18+): katılan da yaşını kendi hesabından kanıtlamalı. Mobilde profildeki doğum tarihi okunur;
+  // web anonim olduğu için doğum tarihi yoktur → bu odaya web'den katılınamaz (mobil uygulamaya yönlendirilir).
+  if (room.category_id) {
+    const { data: cat } = await supabase.from("categories").select("min_age").eq("id", room.category_id).maybeSingle();
+    if (cat && cat.min_age > 0) {
+      if (!authUser) {
+        return apiError("AGE_VERIFICATION_REQUIRED", `Bu oyun ${cat.min_age}+ oyunculara özeldir ve yalnızca mobil uygulamada oynanır.`);
+      }
+      const { data: profile } = await supabase.from("users").select("birth_date").eq("id", authUser.id).maybeSingle();
+      const birth = parseBirthDate(profile?.birth_date ?? null);
+      if (!birth) return apiError("AGE_VERIFICATION_REQUIRED", "Bu oyun için doğum tarihini profilinde girmelisin.");
+      if (ageOn(birth) < cat.min_age) {
+        return apiError("AGE_RESTRICTED", `Bu oyun yalnızca ${cat.min_age}+ oyuncular içindir.`, 403);
+      }
+    }
+  }
+
   const rawToken = generateToken();
   const tokenHash = hashToken(rawToken);
-  const guestGender = parseGender(gender) ?? parseGender(room.partner_gender);
+  const guestGender = parseGender(gender);
 
   const { data: guest, error: guestErr } = await supabase
     .from("participants")
@@ -88,8 +115,10 @@ export async function POST(
       display_name: displayName.trim(),
       status: "joined",
       token_hash: tokenHash,
-      // Katılan kendi değerini gönderdiyse o, yoksa kurucunun partner için girdiği değer
+      // Cinsiyet opsiyoneldir ve yalnızca katılanın kendi beyanıdır (gerektiğinde istemci gönderir)
       ...(guestGender ? { gender: guestGender } : {}),
+      // Katılanın kendi doğum tarihi (isteğe bağlı; yalnızca bu odada, oda silinince gider)
+      ...(guestBirth && typeof birthDate === "string" ? { birth_date: birthDate } : {}),
       ...(authUser ? { user_id: authUser.id } : {}),
     })
     .select("id")

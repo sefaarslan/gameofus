@@ -9,11 +9,11 @@
 **Hedef cihaz:** Mobil öncelikli, masaüstü ve native mobile destekli
 **Teknik yaklaşım:** Link bazlı oda oluşturma, asenkron akış, soft realtime durum güncellemeleri
 
-Game of Us, iki kişinin — arkadaşlar, sevgililer ya da hayat arkadaşları — birbirini daha iyi tanıması için tasarlanmış kısa ve eğlenceli mini oyunlar sunan bir uygulamadır. Kullanıcılar bir oyun odası oluşturur ve oda kurarken aralarındaki bağı seçer (**Kanka / Sevgili / Hayat Arkadaşı**); linki karşı tarafa gönderir; her iki taraf da tek bir turda hem kendi cevabını verir hem de partnerinin cevabını tahmin eder. İki taraf da turunu tamamladığında sonuçlar açılır.
+Game of Us, iki kişinin — arkadaşlar, sevgililer ya da evli çiftler — birbirini daha iyi tanıması için tasarlanmış kısa ve eğlenceli mini oyunlar sunan bir uygulamadır. Kullanıcılar bir oyun odası oluşturur ve oda kurarken aralarındaki bağı seçer (**Kanka / Sevgili / Evli**); linki karşı tarafa gönderir; her iki taraf da tek bir turda hem kendi cevabını verir hem de partnerinin cevabını tahmin eder. İki taraf da turunu tamamladığında sonuçlar açılır.
 
 Oyun akışı, her soruda "cevapla + tahmin et" adımlarını tek ekranda birleştirir. Bu birleştirilmiş tur yaklaşımı, oda içinde ileri-geri geçişleri ve bekleme sürelerini azaltarak deneyimi belirgin biçimde kısaltır. Tahmin adımına eklenen güven seviyesi (tahmin / sanırım / eminim) ile oyun, basit bir soru-cevaptan küçük bir bahis-ve-keşif oyununa dönüşür.
 
-> **Terminoloji:** Bu dokümanda "partner", oyundaki *karşı oyuncu* anlamında genel bir terimdir. Arayüzde bu kelime odanın ilişki türüne göre uyarlanır (Kanka / Sevgili / Hayat Arkadaşı; EN: friend / partner; ES: amigo / pareja).
+> **Terminoloji:** Bu dokümanda "partner", oyundaki *karşı oyuncu* anlamında genel bir terimdir. Arayüzde bu kelime odanın ilişki türüne göre uyarlanır (Kanka / Sevgili / Evli; EN: friend / partner; ES: amigo / pareja).
 
 **AI yorumu (mobile, yakında):** Oyuncuların yapılandırılmış cevaplarından, ilişki türünü de dikkate alan sıcak ve yargılayıcı olmayan bir yorum üretilmesi planlanır. Soru bankası bu yüzden cevabı bilgilendirici olan sorular (tercih, ödünleşme, davranış) etrafında kurulmuştur. Özellik henüz yayında değildir; web'de yalnızca "mobil uygulamada, yakında" olarak anlatılır.
 
@@ -53,7 +53,7 @@ Vizyon cümlesi:
 
 - **Kanka** — yakın arkadaşlar (eğlence, mizah, paylaşılabilirlik; içerikte romantik çağrışım yoktur)
 - **Sevgili** — yeni tanışanlar, flört aşamasındakiler ve sevgililer
-- **Hayat Arkadaşı** — uzun süreli partnerler, birlikte yaşayanlar, evli çiftler
+- **Evli** — evli çiftler (uzun süreli, resmî birliktelik)
 
 ### İkincil hedef kitle
 
@@ -96,7 +96,7 @@ Game of Us şudur:
 Kullanıcıya verilen temel değerler:
 
 - App indirmeden linkle oynama (web)
-- Karşı tarafı tahmin etme eğlencesi (arkadaşını, sevgilini ya da hayat arkadaşını)
+- Karşı tarafı tahmin etme eğlencesi (arkadaşını, sevgilini ya da eşini)
 - Sonuçlardan konuşma başlatma
 - Yargılayıcı olmayan yumuşak sonuçlar
 - Ücretsiz hızlı deneme
@@ -110,8 +110,8 @@ Kullanıcıya verilen temel değerler:
 
 1. Landing page (hero, 4 adımlı "Nasıl çalışır" — 4. adım AI yorum, mobil uygulama teaser'ı, footer + Instagram)
 2. Oyun odası oluşturma (anonim, login gerekmez)
-3. **İlişki türü seçimi: Kanka / Sevgili / Hayat Arkadaşı** (zorunlu; metinler ve kategoriler buna göre uyarlanır)
-4. Karşı oyuncunun adını opsiyonel girme
+3. **İlişki türü seçimi: Kanka / Sevgili / Evli** (zorunlu; metinler ve kategoriler buna göre uyarlanır)
+4. Karşı oyuncu kendi adını davet linkinden girer (oda kurarken onun bilgisi alınmaz)
 5. Oyun modu seçimi — **dört mod: Secret Choice, Prediction, Orderline, Karma**
 6. Soru sayısı seçimi (5 / 10)
 7. Kategori seçimi (dropdown; varsayılan "Karışık Sürpriz"; ilişki türüne göre filtrelenir; premium kategoriler kilitli rozetle gösterilir — bkz. Bölüm 12.5)
@@ -267,14 +267,14 @@ Secret Choice, Prediction ve Orderline modlarının dengeli karışımıdır. MV
 Oda oluşturma **iki adımlı sihirbazdır** (web mobil/masaüstü ve mobil uygulama aynı yapıyı kullanır; adımlar arasında sunucuya gidilmez, tek `POST /api/rooms/create`):
 
 **Adım 1 — Kimler oynuyor?** (hangi mod seçilirse seçilsin aynıdır)
-3. İsmini girer ve (opsiyonel) cinsiyetini seçer: Kadın / Erkek / Diğer (varsayılan; Diğer = belirtilmedi, nötr karakter ve nötr dil).
-4. Karşı oyuncunun adını (opsiyonel; etiket ilişki türüne göre değişir) ve cinsiyetini girer.
-5. **Aralarındaki bağı seçer: Kanka / Sevgili / Hayat Arkadaşı** (zorunlu; ileri butonu seçilene kadar pasiftir). "Oyun modunu seç" ile 2. adıma geçer.
+3. **Aralarındaki bağı seçer: Kanka / Sevgili / Evli** (zorunlu).
+4. Kendi adını girer (zorunlu) ve (opsiyonel) doğum tarihini (GG.AA.YYYY) ve cinsiyetini seçer: Kadın / Erkek / Diğer (varsayılan; Diğer = belirtilmedi, nötr karakter ve nötr dil). **Karşı oyuncunun adı/cinsiyeti/doğum tarihi sorulmaz** — karşı taraf davet linkinden kendi adını (ve gerektiğinde cinsiyetini) kendisi girer.
+5. "Oyun modunu seç" ile 2. adıma geçer (ad ve bağ eksikse satır içi uyarı gösterilir).
 
 **Adım 2 — Ne oynuyoruz?**
-6. Oyun modunu seçer: tek listede beş mod, hepsi aynı kart diliyle: Secret Choice, Prediction, Orderline, Karma ve listenin **sonunda tam genişlikte Sahne** (backend hazır olana kadar pasif, "Yakında" rozetli; hazır olunca "Yeni" rozetli ve seçilebilir). Sahne seçilebilir olduğunda seçilince kategori ve soru sayısı gizlenir, alt kısım **bölüm seçimine** döner (ilişki türüne göre filtreli; bağ için bölüm yoksa "yakında" boş durumu; içerik hazır olana kadar bölüm kartları pasif ve oda kurma butonu pasif); klasik modlarda 7-8 gösterilir.
-7. Kategori seçer (ilişki türüne uygun kategoriler listelenir; varsayılan "Karışık Sürpriz"; premium kategoriler platforma göre farklı davranır — bkz. Bölüm 12.5).
-8. Soru sayısını seçer.
+6. Kategori seçer (yatay kaydırmalı kartlar; ilişki türüne uygun kategoriler; ilk kart "Karışık Sürpriz"; kilitli premium kategoriler platforma göre farklı davranır — bkz. Bölüm 12.5). Oyun modunu seçer: tek listede beş mod, hepsi aynı kart diliyle: Secret Choice, Prediction, Orderline, Karma ve listenin **sonunda tam genişlikte Sahne** (backend hazır olana kadar pasif, "Yakında" rozetli; hazır olunca "Yeni" rozetli ve seçilebilir). Sahne seçilebilir olduğunda seçilince kategori ve soru sayısı gizlenir, alt kısım **bölüm seçimine** döner (ilişki türüne göre filtreli; bağ için bölüm yoksa "yakında" boş durumu; içerik hazır olana kadar bölüm kartları pasif ve oda kurma butonu pasif); klasik modlarda 7-8 gösterilir.
+7. Soru sayısını seçer (5 hızlı ~5 dk "İDEAL" / 10 standart ~10 dk).
+8. Canlı özet kartı ("Oyun Paketi Hazır: kategori • soru sayısı • mod") görünür.
 9. "Oyun linki oluştur" butonuna tıklar. Geri düğmesi/tarayıcı geri tuşu 1. adıma döner, girilen bilgiler korunur. Sayfa yenilense veya kullanıcı başka sayfaya gidip dönse de sihirbaz kaldığı adımdan, girilen bilgilerle devam eder (taslak yalnızca tarayıcı oturumunda tutulur, oda kurulunca silinir).
 10. Sistem oda oluşturur: oda dili ve ilişki türü sabitlenir; sorular, ilişki türüne uygun ücretsiz kategorilerden seçilir (bkz. Bölüm 20).
 11. Kullanıcı link paylaşım ekranına yönlenir.
@@ -319,7 +319,7 @@ Oda oluşturulduğunda sistem:
 
 Partner linkten ilk kez girdiğinde:
 
-1. İsim girişi ekranı açılır.
+1. Katılma ekranı açılır: partner **kendi bilgisini kendisi girer** — ad (zorunlu), cinsiyet (Kadın / Erkek / Diğer) ve doğum tarihi (isteğe bağlı, GG.AA.YYYY; 13 yaş altı reddedilir). Oda kurandan farklı olarak bu bilgi oda kurulurken başkası tarafından girilmez.
 2. Odada guest yoksa yeni guest participant oluşturulur.
 3. Guest için güvenli bir `participant_token` üretilir.
 4. Token'ın ham değeri kullanıcının cihazında saklanır.
@@ -532,9 +532,9 @@ Kategori seçimi her iki platformda da vardır; davranış platforma göre farkl
 
 Web'e giren bilgi, kullanıcının premium *durumu* değil, kategorinin *meta verisi*dir (`is_premium` / `min_tier` kategori seviyesinde tanımlıdır, kullanıcı seviyesinde değil). Web hiçbir zaman "bu kullanıcı premium mu" sorusunu sormaz.
 
-**İlişki türü filtresi (hem web hem mobile):** Kategori listesi seçilen ilişki türüne göre filtrelenir (`categories.relationship_types`). Örnekler: *Kanka Testi* yalnızca Kanka'da, *Romantizm* yalnızca Sevgili'de, *Ev & Para* yalnızca Hayat Arkadaşı'nda görünür; *İletişim, Yaşam Tarzı, Değerler* üçünde de görünür. Sunucu, seçilen kategorinin türe uygunluğunu doğrular.
+**İlişki türü filtresi (hem web hem mobile):** Kategori listesi seçilen ilişki türüne göre filtrelenir (`categories.relationship_types`). Örnekler: *Kanka Testi* yalnızca Kanka'da, *Romantizm* yalnızca Sevgili'de, *Ev & Para* yalnızca Evli'nda görünür; *İletişim, Yaşam Tarzı, Değerler* üçünde de görünür. Sunucu, seçilen kategorinin türe uygunluğunu doğrular.
 
-**Cesur Sorular (premium, yalnızca Sevgili ve Hayat Arkadaşı):** Kanka'da hiç gösterilmez. Mobilde ek olarak (planlanan) her iki oyuncunun 18+ olması gerekir: oda kurulurken kurucunun ve karşı tarafın doğum tarihi alınır (`users.birth_date`, `rooms.partner_birth_date`); karar oda oluşturma anında tek ekranda verilir, karşı taraf katılırken ek yaş akışı yoktur. Web'de bu kategori kilitli olduğu için doğum tarihi **toplanmaz**. App Store: açık cinsel içerik yoktur ("cesur/romantik" çerçeve), yaş derecelendirmesi 17+ olarak ayarlanır.
+**Cesur Sorular (premium, yalnızca Sevgili ve Evli):** Kanka'da hiç gösterilmez. Mobilde ek olarak her iki oyuncunun 18+ olması gerekir: **kurucu oda kurarken** (`users.birth_date` ya da gövdedeki `birthDate`), **karşı oyuncu katılırken** kendi hesabındaki doğum tarihiyle (`POST /api/rooms/{roomCode}/join` → `AGE_VERIFICATION_REQUIRED` / `AGE_RESTRICTED`); kimse başkasının doğum tarihini girmez. Webde bu kategori kilitli olduğu için doğum tarihi 18+ koşulunda **kullanılmaz** (oyuncu isterse kendi tarihini yorum kişiselleştirme için isteğe bağlı girebilir) ve webden anonim katılan kişi 18+ odaya giremez ("mobil uygulamada oynanır"). App Store: açık cinsel içerik yoktur ("cesur/romantik" çerçeve), yaş derecelendirmesi 17+ olarak ayarlanır.
 
 ### 12.6 Henüz belirlenmemiş noktalar
 
@@ -588,18 +588,21 @@ CTA:
 
 İki adımlı sihirbaz; üstte ilerleme göstergesi ("Adım 1 / 2"), masaüstünde yan panelde adım listesi (Kimler oynuyor? → Ne oynuyoruz? → Linki paylaş, oynayın!).
 
-**Adım 1 — Kimler oynuyor?** İki kart ("Sen" ve karşı oyuncu; etiket ilişki türüne göre):
-- İsmin (zorunlu) + cinsiyet (Kadın / Erkek / Diğer; varsayılan Diğer = belirtilmedi (null))
-- Karşı oyuncunun adı (opsiyonel; Kanka adı / Sevgili adı / Hayat arkadaşı adı) + cinsiyeti (aynı seçenekler)
-- Cinsiyet notu: "Karakterlerinizi çizmek ve yorumları daha doğru yazmak için kullanılır. İstersen boş bırakabilirsin."
-- **İlişki türü** (3 kart: Kanka / Sevgili / Hayat Arkadaşı; zorunlu — seçilmeden ileri butonu pasif)
+Tasarım mobil uygulamayla aynıdır: numaralı bölüm başlıkları (1, 2, 3), seçili kartlar dolu kırmızı + köşe tik, adım rozeti ve yeşil/kırmızı ilerleme çubuğu.
 
-Buton: > Oyun modunu seç
+**Adım 1 — Kimler oynuyor?** (yalnızca oda kuranın bilgisi)
+- 1 · **Aranızdaki bağ** (3 kart: Kanka / Sevgili / Evli; zorunlu)
+- 2 · **Sen** kartı (zorunlu rozeti): ismin (zorunlu) + yan yana cinsiyet (segmentli: Kadın / Erkek / Diğer; varsayılan Diğer = belirtilmedi (null)) ve **Doğum Tarihi** (isteğe bağlı, GG.AA.YYYY maskeli; geçersiz ya da 13 yaş altı tarih satır içi uyarı verir). **Webde yalnızca ad ve bağ zorunludur**
+- Cinsiyet notu kutusu: "Karakterlerinizi çizmek ve yorumları daha doğru yazmak için kullanılır. İstersen boş bırakabilirsin."
+- Karşı oyuncunun bilgisi **sorulmaz**: kendi adını davet linkinden girer
+
+Buton: > Oyun modunu seç (ad/bağ eksikse satır içi uyarı)
 
 **Adım 2 — Ne oynuyoruz?**
-- Oyun modu: tek listede aynı kart diliyle beş mod (Secret Choice, Prediction, Orderline, Karma; varsayılan Karma; listenin sonunda **Sahne** — şimdilik pasif, "Yakında"). Modlar arasında başlık/stil ayrımı yoktur
-- Kategori seçimi (dropdown; varsayılan "Karışık Sürpriz"; ilişki türüne uygun kategoriler + kilitli premium kategoriler; kategoriler sayfa açılırken bir kez çekilip istemcide filtrelenir)
-- Soru sayısı
+- 1 · **Kategori**: yatay kayan kartlar (dokunmatikte kaydırma, masaüstünde yan ok düğmeleri; hiçbir ekranda alt alta sarmaz); ilk kart "Karışık Sürpriz" (varsayılan); ilişki türüne uygun kategoriler + kilitli premium kategoriler (kilit ikonlu); kategoriler sayfa açılırken bir kez çekilip istemcide filtrelenir
+- 2 · **Oyun modu**: tek listede aynı kart diliyle (Secret Choice "Popüler" rozetli, Prediction, Orderline, Karma; varsayılan Karma; listenin sonunda **Sahne** — şimdilik pasif, "Yakında"). Modlar arasında başlık/stil ayrımı yoktur
+- 3 · **Soru sayısı ve süre**: 5 soru (~5 dk, HIZLI, "İDEAL" rozetli) / 10 soru (~10 dk, STANDART)
+- Canlı özet kartı: "Oyun Paketi Hazır — kategori • soru sayısı • mod"
 - Sahne açıldığında seçiliyse kategori ve soru sayısı yerine **bölüm seçimi**: kartlarda ad, açıklama, sahne sayısı (coin bilgisi yalnızca mobilde); ilk bölüm varsayılan seçili gelecek. Şimdilik bölüm içeriği olmadığı için kartlar "Yakında" ve pasif
 
 Butonlar: geri (←) ve > Oyun linki oluştur
@@ -621,7 +624,7 @@ Secret Choice oyun ekranı tek soruda iki bölümlü birleştirilmiş tur yapıs
 - Progress bilgisi (soru n/N + çubuk)
 - Soru kartı: beyaz kart, mod rozeti ("SORU n/N · MOD") ve soru metni (web ve mobilde aynı)
 - Bölüm 1 — Kendi cevabın: cevap seçenekleri (gizli tutulur); başlık karşı oyuncunun adını kullanır ("Kendi cevabın — Deniz görmez")
-- Bölüm 2 — Karşı tarafı tahmin: aynı seçenekler, farklı vurgu rengi (başlık karşı oyuncunun adıyla: "Deniz ne cevap verir?"; ad henüz bilinmiyorsa ilişki türüne göre: "Kankan / Sevgilin / Hayat arkadaşın ne cevap verir?"). Kendi cevabı tamamlanınca bu bölüm ekranın altında kalıyorsa sayfa oraya yumuşakça kayar (soru başına bir kez)
+- Bölüm 2 — Karşı tarafı tahmin: aynı seçenekler, farklı vurgu rengi (başlık karşı oyuncunun adıyla: "Deniz ne cevap verir?"; ad henüz bilinmiyorsa ilişki türüne göre: "Kankan / Sevgilin / Eşin ne cevap verir?"). Kendi cevabı tamamlanınca bu bölüm ekranın altında kalıyorsa sayfa oraya yumuşakça kayar (soru başına bir kez)
 - Evet / Kararsız / Hayır renk dili: yeşil / turuncu / kırmızı; seçili durum renkli çerçeve + dolgu + tik, seçilmemişler ince çerçeveli (yalnızca renge bağlı kalmaz)
 - Güven seviyesi seçimi (tahmin / sanırım / eminim)
 - Mikro açıklama
@@ -895,8 +898,6 @@ Planlanan: `credit_transactions` (user_id, delta, reason, created_at) — coin h
 | status | text | Oda durumu |
 | game_mode | text | secret_choice / prediction / orderline / mixed |
 | relationship_type | text (nullable) | `friend` / `dating` / `partner` — oda kurulurken seçilen ilişki türü; oda kurulduktan sonra değişmez. Eski odalar ve henüz göndermeyen eski mobil build'ler için `null` (genel "partner" dili, tür filtresi uygulanmaz) |
-| partner_birth_date | date (planlanan, nullable) | Yalnızca mobil, yaş doğrulama için; yalnızca bu oda için |
-| partner_gender | text (nullable) | `female` / `male`; kurucunun partner için girdiği değer (opsiyonel); partner katılınca `participants.gender`'a kopyalanır; yalnızca bu oda için |
 | category_id | uuid | Seçilen kategori — `categories` tablosunda `locale = rooms.locale` olan satıra doğrudan referans (düz FK; dil zaten odaya sabit olduğu için çözümleme gerekmez) |
 | question_count | int | Seçilen soru sayısı |
 | owner_id | uuid | Odayı oluşturan participant |
@@ -923,6 +924,7 @@ unique(room_code)
 | display_name | text | Kullanıcı adı; kimlik doğrulama için tek başına kullanılmaz |
 | status | text | joined / playing / completed |
 | gender | text (nullable) | `female` / `male`; opsiyonel, null = belirtilmedi. Sahne modunda karakter çizimi ve ikili AI yorumunda dil bilgisi için; hesaba/profile yazılmaz, oda silinince gider, metriklere girmez |
+| birth_date | date (nullable) | Oyuncunun kendi isteğe bağlı doğum tarihi (yorum kişiselleştirme); oda silinince gider, hesap silmede null'lanır, metriklere girmez; asgari yaş 13 |
 | token_hash | text | Participant token'ın hashlenmiş değeri; ham token DB'de tutulmaz |
 | last_seen_at | timestamptz | Son aktivite zamanı |
 | completed_at | timestamptz | Oyunu tamamlama zamanı |
@@ -1237,8 +1239,9 @@ Anonim oyun oluşturma login gerektirmediği için kötüye kullanım riski vard
 - İleride veri minimizasyonu için belirli aralıklarla eski anonim odaların temizlenmesi eklenebilir.
 - Analytics tarafında soru/cevap içeriği değil, event seviyesinde davranış metrikleri tutulmalıdır.
 - **Geri bildirim (`feedback`):** yalnızca puan, AI ilgisi, kısa serbest yorum (≤ 500 karakter) ve oda meta verisi (dil, mod, ilişki türü, platform) tutulur; cevap/tahmin içeriği asla. Kimlik yalnızca `participant_id`'dir (anonim kalır). Yazma token doğrulayan sunucu endpoint'i üzerindendir, tablo ve metrik görünümleri `anon/authenticated` erişimine kapalıdır. Anket yalnızca sonuçlar hazır olduktan sonra kabul edilir.
-- **Cinsiyet** (opsiyonel; web ve mobil, oda oluştururken kurucu ve partner için): yalnızca `participants.gender` / `rooms.partner_gender`'da, oda silinince gider; hesap profiline, metrik görünümlerine, arşiv tablolarına ve loglara yazılmaz; hesap silmede başkalarının odalarındaki katılımdan da kaldırılır. İki oyuncunun cinsiyeti ve ilişki türü birlikte hassas olduğundan ayrıca sızdırılmaz. AI'a (yalnızca ikili AI yorum/sahne analizi) rıza metninde belirtilerek gider; prompt'ta cinsiyetin yalnızca dil bilgisi/doğal ifade için kullanılması, genelleme/klişe üretilmemesi zorunludur. Solo AI'a gitmez. Gizlilik politikasına ve mağaza veri beyanına eklenir.
-- **Partnerin doğum tarihi** (yalnızca mobil, planlanan) ve AI yorum için LLM'e gönderilen veriler gizlilik açısından özel değerlendirme gerektirir; web'de doğum tarihi toplanmaz (bkz. Bölüm 12.5).
+- **Her oyuncu yalnızca kendi bilgisini girer** (karşı oyuncunun adı/cinsiyeti/doğum tarihi oda kurarken alınmaz; `rooms.partner_*` sütunları kaldırıldı) — üçüncü kişi verisi toplanmaz, kişinin onayı kendi beyanıdır.
+- **Cinsiyet** (opsiyonel; web ve mobil, herkes kendisi için: kurucu oda kurarken, karşı oyuncu davetle katılırken): yalnızca `participants.gender`'da, oda silinince gider; hesap profiline, metrik görünümlerine, arşiv tablolarına ve loglara yazılmaz; hesap silmede başkalarının odalarındaki katılımdan da kaldırılır. İki oyuncunun cinsiyeti ve ilişki türü birlikte hassas olduğundan ayrıca sızdırılmaz. AI'a (yalnızca ikili AI yorum/sahne analizi) rıza metninde belirtilerek gider; prompt'ta cinsiyetin yalnızca dil bilgisi/doğal ifade için kullanılması, genelleme/klişe üretilmemesi zorunludur. Solo AI'a gitmez. Gizlilik politikasına ve mağaza veri beyanına eklenir.
+- **Doğum tarihi** (web ve mobil, isteğe bağlı; webde yalnızca ad ve bağ zorunludur; kurucu oda kurarken, karşı oyuncu davetle katılırken kendisi girer): kişinin **kendi** beyanı, `participants.birth_date`'te odayla birlikte tutulur (oda silinince gider; hesap silmede kaldırılır; profile/metriklere/loglara yazılmaz). Mobilde ayrıca profildeki tarih 18+ kategorilerde oda kurarken/katılırken kullanılır; başkası adına girilmez. Asgari yaş 13 (daha küçük tarih reddedilir, saklanmaz). AI yorum için LLM'e gönderilen veriler gizlilik açısından özel değerlendirme gerektirir ve rıza metninde belirtilir (bkz. Bölüm 12.5).
 
 ---
 
@@ -1300,7 +1303,7 @@ Yatırım kararı için iki katman kullanılır: **söylenen** (anket) ve **yap�
 - Prediction ve Orderline'da her soru tam **4 seçenek/kart** içerir; seçenekler birbirinden net ayrışan tavırlardır (AI'ın kişilik tonunu okuyabilmesi için, "iyi/daha iyi" hiyerarşisi yok).
 - Her soru, kullanıcıya görünmeyen bir **`insight_tag`** taşır (`planning_style`, `honesty_vs_tact`, `love_language`, `money_habit` …) — AI yorumu için tema.
 
-| Kategori (TR) | Slug | Kanka | Sevgili | Hayat Arkadaşı |
+| Kategori (TR) | Slug | Kanka | Sevgili | Evli |
 |---|---|:-:|:-:|:-:|
 | Kanka Testi | `friend_test` | ✓ | | |
 | Çılgın Senaryolar | `wild_scenarios` | ✓ | | |
@@ -1314,13 +1317,13 @@ Yatırım kararı için iki katman kullanılır: **söylenen** (anket) ve **yap�
 | Değerler | `values` | ✓ | ✓ | ✓ |
 | Cesur Sorular (premium) | `bold` | | ✓ | ✓ |
 
-Her ilişki türü 6 kategori görür (Sevgili ve Hayat Arkadaşı'nda biri premium olan Cesur Sorular'dır); ücretsiz havuz her modda en az 50 soru içerir (Kanka 60, Sevgili 50, Hayat Arkadaşı 50).
+Her ilişki türü 6 kategori görür (Sevgili ve Evli türlerinde biri premium olan Cesur Sorular'dır); ücretsiz havuz her modda en az 50 soru içerir (Kanka 60, Sevgili 50, Evli 50).
 
 ### İçerik kuralları
 
 - **Kanka'ya açık hiçbir kategoride hiçbir soru/seçenek romantik çağrışım taşımaz** ("partner", "sevgili", "aşk", "flört", "evlilik", "kıskançlık", "ilişki", ilk buluşma… ve EN/ES karşılıkları). Ortak kategoriler tür-bağımsız yazılır. Kural `scripts/check-questions.mjs` ile otomatik denetlenir.
-- **Cesur Sorular:** açık cinsel içerik yoktur; "cesur/romantik" çerçevede dürüstlük, kırılganlık, sınırlar, kıskançlık, sırlar. Yalnızca Sevgili ve Hayat Arkadaşı'nda ve premium.
-- **Hayat Arkadaşı:** evlilik/çocuk gibi hassas konular varsayılmaz.
+- **Cesur Sorular:** açık cinsel içerik yoktur; "cesur/romantik" çerçevede dürüstlük, kırılganlık, sınırlar, kıskançlık, sırlar. Yalnızca Sevgili ve Evli'nda ve premium.
+- **Evli:** evli bir çift olduğu varsayılabilir; çocuk sahibi olma gibi hassas konular varsayılmaz.
 - Sorular yargılayıcı olmaz; seçenekler "doğru/yanlış" değil "farklı yaklaşım" olarak yazılır.
 - Soruları **silme, pasife al**; metin düzeltmesi belirlenimci kimliklerle (UUID v5) migration ile yapılır.
 
@@ -1347,7 +1350,7 @@ Her ilişki türü 6 kategori görür (Sevgili ve Hayat Arkadaşı'nda biri prem
 - Üç dil (TR/EN/ES): arayüz ve soru bankası
 - Kategori seçimi + premium kategori kilidi (görsel) + mobile'a yönlendirme
 - **Prediction, Orderline ve Karma modları** (web'de canlı)
-- **İlişki türü (Kanka / Sevgili / Hayat Arkadaşı)**: oda alanı, kategori filtresi, tür duyarlı metinler
+- **İlişki türü (Kanka / Sevgili / Evli)**: oda alanı, kategori filtresi, tür duyarlı metinler
 - **Soru seti v2**: 11 kategori × 30 soru × 3 dil, `insight_tag`, romantik-çağrışım denetimi
 - **Geri bildirim** (sonuç ekranı anketi + çıkış istemi) ve metrik görünümleri
 - Landing yenilemesi (4 adım, AI/mobil teaser, footer + Instagram), `gameofus.app` alan adı, paylaşım önizlemesi (Open Graph)
@@ -1386,12 +1389,12 @@ Her ilişki türü 6 kategori görür (Sevgili ve Hayat Arkadaşı'nda biri prem
 | **Ödeme sağlayıcısı** | **Mobile App Store / Play Store IAP (RevenueCat); Lemon Squeezy kullanılmıyor** |
 | **Premium kapsamı** | **Yalnızca mobile; web hiçbir premium/login mantığı barındırmaz** |
 | Paket fiyatlarının yerel karşılıkları, reklam günlük limiti | Henüz belirlenmedi |
-| **İlişki türleri** | **Kanka (`friend`) / Sevgili (`dating`) / Hayat Arkadaşı (`partner`); oda kurulurken zorunlu, kurulduktan sonra değişmez; slug teknik, görünen isim çeviri. İngilizce: friend/partner, İspanyolca: amigo/pareja** |
+| **İlişki türleri** | **Kanka (`friend`) / Sevgili (`dating`) / Evli (`partner`); oda kurulurken zorunlu, kurulduktan sonra değişmez; slug teknik, görünen isim çeviri. İngilizce: friend/partner, İspanyolca: amigo/pareja** |
 | **Kanka içerik kuralı** | **Kanka'ya açık hiçbir kategoride romantik çağrışım yok (otomatik denetim); ortak kategoriler tür-bağımsız** |
 | **Kategori filtresi** | **`categories.relationship_types` ile; sunucu doğrular; "Karışık Sürpriz" yalnızca uygun, ücretsiz kategorilerden çeker** |
 | **Geri bildirim** | **Sonuç ekranında isteğe bağlı mini anket (puan, AI ilgisi, yorum) + oda başına bir kez yumuşak çıkış istemi; zorunlu değil. Davranış metrikleri (partner katılımı, tamamlama) asıl memnuniyet sinyalidir** |
 | **AI yorum** | **Mobil, coin ile (−100), `insight_tag` + yapılandırılmış cevaplardan; yayın öncesi rıza/gizlilik netleştirilir; web'de yalnızca "yakında" olarak anlatılır** |
-| **Yaş doğrulama** | **Yalnızca mobilde (Cesur Sorular için, Sevgili/Hayat Arkadaşı + her iki oyuncu 18+); web'de Cesur Sorular kilitli olduğu için doğum tarihi toplanmaz** |
+| **Yaş doğrulama** | **Yalnızca mobilde (Cesur Sorular için, Sevgili/Evli + her iki oyuncu 18+: kurucu kurarken, karşı oyuncu katılırken kendi hesabından); webde 18+ odalara girilemez. Doğum tarihi webde isteğe bağlıdır (yorum kişiselleştirme) ve asgari yaş 13 olarak kontrol edilir** |
 | **Domain** | **`gameofus.app` (satın alındı, canlı); Instagram `@gameofus.app`** |
 | **Solo oyun (Red Flag Mayın Tarlası)** | **Doğru cevap yok, yalnızca tolerans profili + Red sayısına göre sabit başlık/cümle (arketip yok); sabit setler (2 kategori × 3 açık set, 9'ar kart; 104-106 mobilde); ayrı model (`solo_*`); önce web (anonim, 1 oyun), sonra mobil (+20 coin, günde 3 ödüllü oyun, AI −100 coin); oyun girişinde kişisel veri sorulmaz** |
 | **Altyapı** | **Vercel fonksiyonları Supabase ile aynı bölgede (Frankfurt); Next.js sürümü sabit; fontlar/ikonlar self-host** |
@@ -1428,7 +1431,7 @@ MVP başarılı sayılacaktır eğer:
 
 ## 24. Özet
 
-Game of Us, iki kişinin — arkadaşlar, sevgililer ya da hayat arkadaşları — birbirini tahmin ederek ve cevapları birlikte açarak daha iyi tanımasını sağlayan link bazlı bir uygulamadır. Web'de stabil bir MVP olarak çalışır; mobile app, aynı oyun deneyimini native bir katmanla (push notification, geçmiş oyunlar, premium kategoriler) genişletir.
+Game of Us, iki kişinin — arkadaşlar, sevgililer ya da evli çiftler — birbirini tahmin ederek ve cevapları birlikte açarak daha iyi tanımasını sağlayan link bazlı bir uygulamadır. Web'de stabil bir MVP olarak çalışır; mobile app, aynı oyun deneyimini native bir katmanla (push notification, geçmiş oyunlar, premium kategoriler) genişletir.
 
 Web'de oyun tamamen anonimdir — link paylaşımı, iki kişilik oyun ve sonuç ekranı için kayıt gerekmez. Mobil uygulamada giriş (Google/Apple) zorunludur; satın alma ve coin yalnızca orada vardır: Lite/Premium paketleri kategorilere kalıcı erişim ve coin verir, coin oda kurmak ve AI yorumu açmak için harcanır.
 

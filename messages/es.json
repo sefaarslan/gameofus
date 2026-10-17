@@ -215,13 +215,13 @@
       "title": "¿Quiénes juegan?",
       "subtitle": "Primero conozcámonos, luego eliges el juego.",
       "next": "Elegir modo de juego",
-      "you": "Tú",
-      "partner": "{rel, select, friend {Tu amigo} other {Tu pareja}}"
+      "desc": "Preséntate y elige vuestro vínculo. La otra persona escribirá su propio nombre desde el enlace de invitación."
     },
     "step2": {
       "title": "¿A qué jugamos?",
       "subtitle": "Elige el juego y comparte el link con tu {rel, select, friend {amigo} other {pareja}}.",
-      "back": "Atrás"
+      "back": "Atrás",
+      "desc": "Elige el modo de juego y el ritmo."
     },
     "gender": {
       "label": "Género",
@@ -233,11 +233,6 @@
     "name": {
       "label": "Tu nombre",
       "placeholder": "Tu nombre"
-    },
-    "partner": {
-      "label": "Nombre de tu {rel, select, friend {amigo} other {pareja}}",
-      "optional": "Opcional",
-      "placeholder": "Nombre de tu {rel, select, friend {amigo} other {pareja}}"
     },
     "mode": {
       "label": "Modo de juego",
@@ -268,12 +263,19 @@
             "desc": "La cuenta, un mensaje de un ex, una bebida derramada…"
           }
         }
-      }
+      },
+      "hint": "¿Cómo se juega?",
+      "popular": "Popular"
     },
     "questions": {
-      "label": "Número de preguntas",
-      "fast": "Rápido — 5 preguntas",
-      "classic": "Clásico — 10 preguntas"
+      "label": "Número de Preguntas y Ritmo",
+      "badge": "Tiempo aprox.",
+      "word": "Preguntas",
+      "durationFast": "~5 min",
+      "durationStandard": "~10 min",
+      "quickLabel": "RÁPIDO",
+      "standardLabel": "ESTÁNDAR",
+      "ideal": "IDEAL"
     },
     "relationship": {
       "label": "¿Qué vínculo os une?",
@@ -287,13 +289,30 @@
         "desc": "Corazones a mil"
       },
       "partner": {
-        "name": "Media naranja",
+        "name": "Casados",
         "desc": "Juntos en el camino"
-      }
+      },
+      "title": "Vuestro vínculo",
+      "tone": "Define el tono del juego"
     },
     "category": {
       "label": "Categoría",
-      "all": "Sorpréndeme"
+      "all": "Sorpréndeme",
+      "badge": "Categoría Recomendada",
+      "surpriseDesc": "Equilibrado y Divertido",
+      "taglines": {
+        "friend_test": "Amistad y Risas",
+        "wild_scenarios": "Salvaje y Sorprendente",
+        "social_life": "Diversión y Compartir",
+        "first_date": "Primeras Impresiones",
+        "romance": "Amor y Pasión",
+        "future": "Sueños y Planes",
+        "home_money": "Orden y Equilibrio",
+        "communication": "Comprensión y Escucha",
+        "lifestyle": "Hábitos y Preferencias",
+        "values": "Principios y Prioridades",
+        "bold": "Valentía y Límites"
+      }
     },
     "premiumModal": {
       "title": "Esta categoría solo está disponible en la app móvil",
@@ -305,7 +324,27 @@
     "limitTitle": "Ya tienes un juego en curso",
     "limitDesc": "Con la versión gratuita puedes tener un juego a la vez. Descarga la app móvil de Game of Us para jugar más.",
     "limitGoBack": "Volver a mi juego",
-    "limitUpgrade": "Descargar la App"
+    "limitUpgrade": "Descargar la App",
+    "you": {
+      "title": "Tú",
+      "badge": "Obligatorio",
+      "subtitle": "Define tu nombre",
+      "hint": "La otra persona escribe su propio nombre desde el enlace de invitación"
+    },
+    "summary": {
+      "title": "Paquete de Juego Listo"
+    },
+    "errors": {
+      "nameRequired": "Por favor, escribe tu nombre",
+      "relationshipRequired": "Por favor, elige vuestro vínculo",
+      "birthDateInvalid": "Ingresa una fecha válida (DD.MM.AAAA)",
+      "birthDateTooYoung": "Debes tener al menos 13 años para usar Game of Us"
+    },
+    "birthDate": {
+      "label": "Fecha de Nacimiento",
+      "placeholder": "DD.MM.AAAA",
+      "optional": "opcional"
+    }
   },
   "share": {
     "title": "Tu link de invitación está listo",
@@ -330,12 +369,17 @@
   },
   "join": {
     "title": "Unirse al juego",
-    "subtitle": "Tu amigo/a te espera. Ingresa tu nombre y empieza a jugar.",
-    "name": { "label": "Tu nombre", "placeholder": "Tu nombre" },
+    "subtitle": "Te están esperando. Preséntate y empieza a jugar.",
+    "name": {
+      "label": "Tu nombre",
+      "placeholder": "Tu nombre"
+    },
     "submit": "Unirme",
     "joining": "Uniéndome...",
     "roomFull": "Esta sala ya tiene dos jugadores.",
-    "expired": "Esta sala ha expirado."
+    "expired": "Esta sala ha expirado.",
+    "ageMobileOnly": "Este juego es solo para mayores de 18 años y solo se juega en la app móvil.",
+    "hint": "Cada persona escribe sus propios datos."
   },
   "game": {
     "yourAnswer": "Tu respuesta",

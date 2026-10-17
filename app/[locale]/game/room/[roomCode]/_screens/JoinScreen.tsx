@@ -2,23 +2,48 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { GenderPicker } from "@/components/create/GenderPicker";
+import { ageFromIso, maskBirthDateInput, parseBirthDateInput } from "@/lib/date-input";
+import type { Gender } from "@/lib/gender";
 
 interface JoinScreenProps {
   roomCode: string;
   onJoined: (token: string) => void;
 }
 
+/**
+ * Davetle katılma: her oyuncu kendi bilgisini kendisi girer (oda kuran gibi): ad (zorunlu), cinsiyet ve doğum tarihi (isteğe bağlı).
+ */
 export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
   const t = useTranslations("join");
+  const tc = useTranslations("create");
   const tErr = useTranslations("error");
 
   const [displayName, setDisplayName] = useState("");
+  const [gender, setGender] = useState<Gender | null>(null);
+  const [birthDate, setBirthDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  function birthDateError(): string | null {
+    if (!birthDate.trim()) return null;
+    const iso = parseBirthDateInput(birthDate);
+    if (!iso) return tc("errors.birthDateInvalid");
+    if (ageFromIso(iso) < 13) return tc("errors.birthDateTooYoung");
+    return null;
+  }
+
   async function handleJoin(e: React.FormEvent) {
     e.preventDefault();
-    if (!displayName.trim()) return;
+    if (!displayName.trim()) {
+      setError(tc("errors.nameRequired"));
+      return;
+    }
+    const bdErr = birthDateError();
+    if (bdErr) {
+      setError(bdErr);
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -26,7 +51,11 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
       const res = await fetch(`/api/rooms/${roomCode}/join`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ displayName: displayName.trim() }),
+        body: JSON.stringify({
+          displayName: displayName.trim(),
+          gender,
+          ...(birthDate.trim() ? { birthDate: parseBirthDateInput(birthDate) } : {}),
+        }),
       });
       const data = await res.json();
 
@@ -34,6 +63,8 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
         const code = data.error?.code;
         if (code === "ROOM_FULL") setError(t("roomFull"));
         else if (code === "ROOM_EXPIRED") setError(t("expired"));
+        else if (code === "AGE_VERIFICATION_REQUIRED") setError(t("ageMobileOnly"));
+        else if (code === "AGE_RESTRICTED") setError(tc("errors.birthDateTooYoung"));
         else setError(tErr("generic"));
         return;
       }
@@ -56,38 +87,66 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
 
       <div className="w-full max-w-sm">
         {/* Illustration area */}
-        <div className="flex justify-center mb-8">
-          <div className="w-24 h-24 rounded-full bg-primary-container/20 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary icon-fill" style={{ fontSize: "48px" }}>celebration</span>
+        <div className="flex justify-center mb-6">
+          <div className="w-20 h-20 rounded-full bg-primary-container/20 flex items-center justify-center">
+            <span className="material-symbols-outlined text-primary icon-fill" style={{ fontSize: "40px" }}>celebration</span>
           </div>
         </div>
 
-        <div className="bg-surface-container-lowest rounded-[28px] p-8 shadow-soft-active border border-outline-variant/20">
-          <h1 className="text-headline-md text-on-background mb-1 text-center">{t("title")}</h1>
-          <p className="text-body-md text-on-surface-variant text-center mb-8">
-            {t("subtitle")}
-          </p>
+        <div className="bg-surface-container-lowest rounded-[28px] p-6 shadow-soft-active border border-outline-variant/20">
+          <h1 className="text-headline-sm text-on-background mb-1 text-center">{t("title")}</h1>
+          <p className="text-body-md text-on-surface-variant text-center mb-1">{t("subtitle")}</p>
+          <p className="text-xs text-on-surface-variant/70 text-center mb-6">{t("hint")}</p>
 
           <form onSubmit={handleJoin} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <label className="text-label-md text-on-surface-variant">{t("name.label")}</label>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="join-name" className="text-xs text-on-surface-variant">{t("name.label")}</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-xl">person</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">badge</span>
                 <input
+                  id="join-name"
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder={t("name.placeholder")}
                   maxLength={30}
-                  required
                   autoFocus
-                  className="w-full pl-11 pr-4 py-3.5 bg-background border-2 border-outline-variant/40 rounded-xl text-body-md text-on-surface placeholder-on-surface-variant/50 focus:outline-none focus:border-primary transition-colors"
+                  className="w-full pl-11 pr-4 py-3.5 bg-surface-container-lowest border border-outline-variant rounded-2xl text-body-md text-on-surface placeholder-on-surface-variant/50 shadow-soft-sm focus:outline-none focus:border-primary transition-colors"
                 />
               </div>
             </div>
 
+            <div className="flex gap-3">
+              <div className="flex-1 min-w-0">
+                <GenderPicker label={tc("gender.label")} value={gender} onChange={setGender} />
+              </div>
+              <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                <label htmlFor="join-birth" className="text-xs text-on-surface-variant flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm">calendar_month</span>
+                  <span className="truncate">{tc("birthDate.label")}</span>
+                </label>
+                <div className="flex items-center bg-surface-container rounded-xl px-3 min-h-[44px] focus-within:ring-2 focus-within:ring-primary/40">
+                  <input
+                    id="join-birth"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="bday"
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(maskBirthDateInput(e.target.value))}
+                    placeholder={tc("birthDate.placeholder")}
+                    maxLength={10}
+                    aria-describedby="join-birth-opt"
+                    className="w-full bg-transparent text-label-md text-on-surface placeholder-on-surface-variant/60 py-2.5 focus:outline-none"
+                  />
+                </div>
+                <span id="join-birth-opt" className="text-[11px] text-on-surface-variant/70">({tc("birthDate.optional")})</span>
+              </div>
+            </div>
+
+            <p className="text-xs text-on-surface-variant/70 -mt-1">{tc("gender.hint")}</p>
+
             {error && (
-              <div className="flex items-center gap-3 bg-error-container text-error rounded-xl px-4 py-3">
+              <div role="alert" className="flex items-center gap-3 bg-error-container text-error rounded-2xl px-4 py-3">
                 <span className="material-symbols-outlined text-xl">error</span>
                 <span className="text-body-md">{error}</span>
               </div>
@@ -95,8 +154,8 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
 
             <button
               type="submit"
-              disabled={loading || !displayName.trim()}
-              className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary text-body-md font-semibold py-4 rounded-full hover:bg-surface-tint disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-primary-glow mt-2"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary text-body-lg font-semibold py-4 rounded-full hover:bg-surface-tint disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-primary-glow mt-1"
             >
               {loading ? (
                 <span className="material-symbols-outlined animate-spin text-xl">refresh</span>

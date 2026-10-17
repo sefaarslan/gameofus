@@ -10,7 +10,7 @@ Game of Us'ı (gameofus.app ve mobil uygulama) kullanarak bu koşulları kabul e
 
 ## 2. Hizmetin tanımı
 
-Game of Us, iki kişinin birbirini daha iyi tanıması için tasarlanmış bir **eğlence** oyunudur (arkadaşlar, sevgililer, hayat arkadaşları). Tek kişilik "Red Flag Mayın Tarlası" oyunu da sunulur. Oyun sonuçları, "okuma skoru" ve "tolerans eşiği" dahil, **eğlence amaçlıdır**; psikolojik, ilişki veya tıbbi **danışmanlık/teşhis değildir** ve birini yargılamak için kullanılmamalıdır.
+Game of Us, iki kişinin birbirini daha iyi tanıması için tasarlanmış bir **eğlence** oyunudur (arkadaşlar, sevgililer, evli çiftler). Tek kişilik "Red Flag Mayın Tarlası" oyunu da sunulur. Oyun sonuçları, "okuma skoru" ve "tolerans eşiği" dahil, **eğlence amaçlıdır**; psikolojik, ilişki veya tıbbi **danışmanlık/teşhis değildir** ve birini yargılamak için kullanılmamalıdır.
 
 ## 3. Kullanım kuralları
 

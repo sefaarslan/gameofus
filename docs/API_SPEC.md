@@ -83,14 +83,13 @@ Oda ve owner participant oluşturur, soruları seçip `room_questions`'a yazar.
 ```json
 {
   "displayName": "Sefa",
-  "partnerName": "Esra",
   "gameMode": "mixed",
   "questionCount": 10,
   "locale": "tr",
   "relationshipType": "friend",
   "categoryId": "uuid",
   "birthDate": "1990-01-31",
-  "partnerBirthDate": "1992-05-05"
+  "gender": "female"
 }
 ```
 
@@ -106,13 +105,13 @@ Doğrulama:
 - **Paket kilidi (mobil):** kategorinin `min_tier`'ı `free` değilse yalnızca giriş yapmış ve tier'ı yeterli kullanıcı seçebilir;
   anonim web veya yetersiz tier → `403 TIER_REQUIRED`. Coin düşümünden **önce** kontrol edilir.
 - **Yaş koşulu:** `min_age > 0` olan kategoride (Cesur = 18) `relationshipType` zorunlu (kategori yalnızca `dating|partner`),
-  kurucu (`birthDate` gövdede ya da profilden `users.birth_date`) ve partner (`partnerBirthDate`) **ikisi de** asgari yaşta
-  olmalı: tarih eksikse `400 AGE_VERIFICATION_REQUIRED`, biri küçükse `403 AGE_RESTRICTED`. Tarihler `YYYY-AA-GG`; geçersiz/gelecek →
-  `INVALID_PAYLOAD`. Her durumda opsiyonel gönderilebilir: `partnerBirthDate` yalnızca bu odada (`rooms.partner_birth_date`) saklanır,
-  `birthDate` profile yazılır.
-- **Cinsiyet (opsiyonel):** `gender` (kurucu) ve `partnerGender` (partner için) `female` | `male`; boş/geçersiz = belirtilmedi (hata vermez).
-  Kurucununki `participants.gender`'a, partnerinki `rooms.partner_gender`'a yazılır (yalnızca bu oda için; profile yazılmaz). Katılımda
-  (`POST /api/rooms/{roomCode}/join`) gövdede `gender` gönderilirse o, yoksa `rooms.partner_gender` katılımcıya yazılır.
+  **kurucu** (`birthDate` gövdede ya da profilden `users.birth_date`) asgari yaşta olmalı: tarih eksikse `400 AGE_VERIFICATION_REQUIRED`,
+  küçükse `403 AGE_RESTRICTED`. Tarihler `YYYY-AA-GG`; geçersiz/gelecek → `INVALID_PAYLOAD`. `birthDate` (web ve mobil, opsiyonel) oyuncunun kendi doğum tarihidir: `participants.birth_date`'e yazılır (odayla birlikte silinir); mobilde ayrıca profile yazılır. **Asgari yaş 13**: daha küçük tarih `403 AGE_RESTRICTED` (oda açılmaz, tarih saklanmaz). **Karşı
+  oyuncunun yaşı katılırken** doğrulanır (bkz. `join`). Oda yalnızca kurucunun bilgisini alır: `partnerName`, `partnerGender`,
+  `partnerBirthDate` gönderilse bile **yok sayılır** (başkasının verisi toplanmaz; eski istemciler kırılmaz).
+- **Cinsiyet (opsiyonel):** `gender` (kurucunun kendisi) `female` | `male`; boş/geçersiz = belirtilmedi (hata vermez). `participants.gender`'a
+  yazılır (yalnızca bu oda için; profile yazılmaz). Karşı oyuncu katılırken (`POST /api/rooms/{roomCode}/join`) gövdede kendi `gender`'ını
+  gönderebilir (gerektiğinde: sahne/AI).
 
 **Soru seçimi:** Havuz = oda dili + `is_active` + ücretsiz + ilişki türüne uygun kategoriler. Seçilen kategori
 önceliklidir; yetmezse yalnızca aynı havuzdan tamamlanır, hâlâ yetmezse `tr` havuzu. Tüm havuz çekilip
@@ -122,8 +121,7 @@ rastgele seçilir. Karma: 10 soruda 4 Secret Choice / 3 Prediction / 3 Orderline
 {
   "roomCode": "X7K2P9QM",
   "roomUrl": "https://gameofus.app/game/room/X7K2P9QM",
-  "participant": { "id": "uuid", "role": "owner", "displayName": "Sefa",
-                   "partnerName": "Esra", "token": "raw-participant-token" }
+  "participant": { "id": "uuid", "role": "owner", "displayName": "Sefa", "token": "raw-participant-token" }
 }
 ```
 
@@ -140,7 +138,10 @@ Yanıt `201`. `roomUrl` `APP_BASE_URL` ortam değişkeninden üretilir; istemci 
 
 - Token geçerliyse mevcut participant aynı token ile döner (cihaz yeniden açılışı).
 - Aksi halde oda doluysa (`join_locked` ya da 2 participant) `ROOM_FULL`; değilse guest oluşturulur,
-  `join_locked = true` ve `status = guest_joined` yapılır.
+  `join_locked = true` ve `status = guest_joined` yapılır. Gövdede opsiyonel `gender` (`female|male`) ve `birthDate` (`YYYY-AA-GG`) katılanın **kendi** beyanıdır: `birthDate` `participants.birth_date`'e yazılır (odayla birlikte silinir); geçersiz → `400 INVALID_PAYLOAD`, **13 yaş altı → `403 AGE_RESTRICTED`** (katılımcı eklenmez).
+- **Yaş koşullu oda (18+ kategori, ör. Cesur):** katılanın yaşı kendi hesabından doğrulanır. Mobil (JWT): profildeki `users.birth_date`;
+  tarih yoksa `400 AGE_VERIFICATION_REQUIRED`, asgari yaşın altındaysa `403 AGE_RESTRICTED` (katılımcı eklenmez). Anonim web: doğum tarihi
+  olmadığı için `400 AGE_VERIFICATION_REQUIRED` ("yalnızca mobil uygulamada oynanır"). Mevcut token ile yeniden giriş bu kontrolden etkilenmez.
 
 ```json
 { "roomCode": "X7K2P9QM",

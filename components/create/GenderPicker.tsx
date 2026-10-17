@@ -3,13 +3,13 @@
 import { useTranslations } from "next-intl";
 import type { Gender } from "@/lib/gender";
 
-const OPTIONS: Array<{ value: Gender | null; key: "female" | "male" | "unspecified"; icon: string }> = [
-  { value: "female", key: "female", icon: "female" },
-  { value: "male", key: "male", icon: "male" },
-  { value: null, key: "unspecified", icon: "person" },
+const OPTIONS: Array<{ value: Gender | null; key: "female" | "male" | "unspecified" }> = [
+  { value: "female", key: "female" },
+  { value: "male", key: "male" },
+  { value: null, key: "unspecified" },
 ];
 
-/** Opsiyonel cinsiyet seçimi (karakter çizimi ve AI dili için). Varsayılan "Belirtmek istemiyorum" (null). */
+/** Opsiyonel cinsiyet seçimi (karakter çizimi ve AI dili için): mobildeki gibi segmentli kontrol. Varsayılan "Diğer" (null). */
 export function GenderPicker({
   label,
   value,
@@ -23,9 +23,12 @@ export function GenderPicker({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-xs text-on-surface-variant">{label}</span>
-      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={label}>
-        {OPTIONS.map(({ value: optionValue, key, icon }) => {
+      <span className="text-xs text-on-surface-variant flex items-center gap-1">
+        <span className="material-symbols-outlined text-sm">wc</span>
+        {label}
+      </span>
+      <div className="flex bg-surface-container rounded-xl p-1 min-h-[44px]" role="radiogroup" aria-label={label}>
+        {OPTIONS.map(({ value: optionValue, key }) => {
           const selected = value === optionValue;
           return (
             <button
@@ -34,13 +37,10 @@ export function GenderPicker({
               role="radio"
               aria-checked={selected}
               onClick={() => onChange(optionValue)}
-              className={`flex items-center gap-1.5 pl-3 pr-3.5 py-2 rounded-full border-2 text-xs font-medium transition-all ${
-                selected
-                  ? "border-primary bg-primary-container/10 text-primary"
-                  : "border-outline-variant/30 bg-surface-container-lowest text-on-surface-variant hover:border-outline"
+              className={`flex-1 flex items-center justify-center rounded-lg text-xs font-semibold transition-all ${
+                selected ? "bg-primary text-on-primary" : "text-on-surface-variant hover:bg-surface-container-high"
               }`}
             >
-              <span className="material-symbols-outlined text-base">{icon}</span>
               {t(key)}
             </button>
           );

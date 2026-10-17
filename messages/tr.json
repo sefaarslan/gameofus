@@ -149,7 +149,7 @@
     "how": {
       "title": "İki kişilik oyun nasıl çalışır?",
       "badge": "İki kişilik oyun",
-      "subtitle": "Arkadaşınla, sevgilinle ya da hayat arkadaşınla: birkaç basit adım",
+      "subtitle": "Arkadaşınla, sevgilinle ya da eşinle: birkaç basit adım",
       "step1": "Oda oluştur",
       "step2": "Linki paylaş",
       "step3": "Cevapları birlikte aç",
@@ -215,13 +215,13 @@
       "title": "Kimler oynuyor?",
       "subtitle": "Önce sizi tanıyalım, sonra oyunu seçeceksin.",
       "next": "Oyun modunu seç",
-      "you": "Sen",
-      "partner": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Hayat arkadaşın} other {Partnerin}}"
+      "desc": "Kendini tanıt ve aranızdaki bağı seç. Karşı taraf, davet linkinden kendi adını kendisi girecek."
     },
     "step2": {
       "title": "Ne oynuyoruz?",
-      "subtitle": "Oyunu seç ve linki {rel, select, friend {kankanla} dating {sevgilinle} partner {hayat arkadaşınla} other {partnerinle}} paylaş.",
-      "back": "Geri"
+      "subtitle": "Oyunu seç ve linki {rel, select, friend {kankanla} dating {sevgilinle} partner {eşinle} other {partnerinle}} paylaş.",
+      "back": "Geri",
+      "desc": "Oyun modunu ve soru temposunu belirleyin."
     },
     "gender": {
       "label": "Cinsiyet",
@@ -233,11 +233,6 @@
     "name": {
       "label": "İsmin",
       "placeholder": "Adın"
-    },
-    "partner": {
-      "label": "{rel, select, friend {Kanka} dating {Sevgili} partner {Hayat arkadaşı} other {Partner}} adı",
-      "optional": "Opsiyonel",
-      "placeholder": "{rel, select, friend {Kankanın} dating {Sevgilinin} partner {Hayat arkadaşının} other {Partnerinin}} adı"
     },
     "mode": {
       "label": "Oyun modu",
@@ -268,12 +263,19 @@
             "desc": "Hesap, eski sevgili mesajı, dökülen içecek…"
           }
         }
-      }
+      },
+      "hint": "Nasıl oynanacak?",
+      "popular": "Popüler"
     },
     "questions": {
-      "label": "Soru sayısı",
-      "fast": "Hızlı — 5 soru",
-      "classic": "Klasik — 10 soru"
+      "label": "Soru Sayısı ve Süre",
+      "badge": "Yaklaşık süre",
+      "word": "Soru",
+      "durationFast": "~5 dk",
+      "durationStandard": "~10 dk",
+      "quickLabel": "HIZLI",
+      "standardLabel": "STANDART",
+      "ideal": "İDEAL"
     },
     "relationship": {
       "label": "Aranızdaki bağ ne?",
@@ -287,13 +289,30 @@
         "desc": "Kalpler çarpıyor"
       },
       "partner": {
-        "name": "Hayat Arkadaşı",
+        "name": "Evli",
         "desc": "Birlikte yoldayız"
-      }
+      },
+      "title": "Aranızdaki Bağ",
+      "tone": "Oyun tonunu belirler"
     },
     "category": {
       "label": "Kategori",
-      "all": "Karışık Sürpriz"
+      "all": "Karışık Sürpriz",
+      "badge": "Önerilen Kategori",
+      "surpriseDesc": "Dengeli & Eğlenceli",
+      "taglines": {
+        "friend_test": "Dostluk & Kahkaha",
+        "wild_scenarios": "Çılgın & Sürpriz",
+        "social_life": "Eğlence & Paylaşım",
+        "first_date": "İlk İzlenim",
+        "romance": "Aşk & Tutku",
+        "future": "Hayaller & Planlar",
+        "home_money": "Düzen & Denge",
+        "communication": "Anlama & Dinleme",
+        "lifestyle": "Alışkanlıklar & Tercihler",
+        "values": "İlkeler & Öncelikler",
+        "bold": "Cesaret & Sınırlar"
+      }
     },
     "premiumModal": {
       "title": "Bu kategori sadece mobile app'te açılır",
@@ -305,42 +324,67 @@
     "limitTitle": "Zaten devam eden bir oyunun var",
     "limitDesc": "Ücretsiz sürümle aynı anda bir oyun yürütebilirsin. Daha fazla oyun için Game of Us mobil uygulamasını indir.",
     "limitGoBack": "Mevcut oyunuma dön",
-    "limitUpgrade": "Mobil Uygulamayı İndir"
+    "limitUpgrade": "Mobil Uygulamayı İndir",
+    "you": {
+      "title": "Sen",
+      "badge": "Zorunlu",
+      "subtitle": "Adını Tanımla",
+      "hint": "Karşı taraf, davet linkinden kendi adını girer"
+    },
+    "summary": {
+      "title": "Oyun Paketi Hazır"
+    },
+    "errors": {
+      "nameRequired": "Lütfen adını gir",
+      "relationshipRequired": "Lütfen aranızdaki bağı seç",
+      "birthDateInvalid": "Geçerli bir tarih gir (GG.AA.YYYY)",
+      "birthDateTooYoung": "Game of Us'ı kullanmak için en az 13 yaşında olmalısın"
+    },
+    "birthDate": {
+      "label": "Doğum Tarihi",
+      "placeholder": "GG.AA.YYYY",
+      "optional": "isteğe bağlı"
+    }
   },
   "share": {
     "title": "Davet linkin hazır",
-    "subtitle": "Linki {rel, select, friend {kankanla} dating {sevgilinle} partner {hayat arkadaşınla} other {partnerinle}} paylaş ve oynamaya başla.",
+    "subtitle": "Linki {rel, select, friend {kankanla} dating {sevgilinle} partner {eşinle} other {partnerinle}} paylaş ve oynamaya başla.",
     "link": "Davet linkin",
     "copy": "Linki kopyala",
     "copied": "Kopyalandı!",
     "whatsapp": "WhatsApp ile paylaş",
     "whatsappText": "Game of Us oynayalım!",
     "start": "Cevaplamaya başla",
-    "startWaiting": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Hayat arkadaşın} other {Partner}} bekleniyor...",
-    "waiting": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Hayat arkadaşın} other {Partner}} henüz katılmadı.",
-    "joined": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Hayat arkadaşın} other {Partner}} katıldı!",
-    "info": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Hayat arkadaşın} other {Partnerin}} linki açtığında ikiniz de cevap verip birbirinizi tahmin edeceksiniz. Ardından sonuçlar birlikte açılacak.",
+    "startWaiting": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Eşin} other {Partner}} bekleniyor...",
+    "waiting": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Eşin} other {Partner}} henüz katılmadı.",
+    "joined": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Eşin} other {Partner}} katıldı!",
+    "info": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Eşin} other {Partnerin}} linki açtığında ikiniz de cevap verip birbirinizi tahmin edeceksiniz. Ardından sonuçlar birlikte açılacak.",
     "roomStatus": "Oda Durumu",
     "you": "Sen",
     "inRoom": "Odadasın",
     "partnerWaiting": "Bekleniyor...",
     "partnerJoinedStatus": "Katıldı!",
-    "relaxMessage": "Sıcak bir çay al, {rel, select, friend {kankan} dating {sevgilin} partner {hayat arkadaşın} other {partnerin}} gelmek üzere.",
-    "partnerFallback": "{rel, select, friend {Kanka} dating {Sevgili} partner {Hayat arkadaşı} other {Partner}}"
+    "relaxMessage": "Sıcak bir çay al, {rel, select, friend {kankan} dating {sevgilin} partner {eşin} other {partnerin}} gelmek üzere.",
+    "partnerFallback": "{rel, select, friend {Kanka} dating {Sevgili} partner {Eş} other {Partner}}"
   },
   "join": {
     "title": "Oyuna katıl",
-    "subtitle": "Arkadaşın seni bekliyor. İsmini gir ve oynamaya başla.",
-    "name": { "label": "İsmin", "placeholder": "Adın" },
+    "subtitle": "Seni bekliyorlar. Kendini tanıt ve oynamaya başla.",
+    "name": {
+      "label": "İsmin",
+      "placeholder": "Adın"
+    },
     "submit": "Katıl",
     "joining": "Katılıyor...",
     "roomFull": "Bu odada iki kişi zaten var.",
-    "expired": "Bu odanın süresi dolmuş."
+    "expired": "Bu odanın süresi dolmuş.",
+    "ageMobileOnly": "Bu oyun 18+ oyunculara özeldir ve yalnızca mobil uygulamada oynanır.",
+    "hint": "Herkes kendi bilgisini kendisi girer."
   },
   "game": {
     "yourAnswer": "Kendi cevabın",
-    "yourAnswerNote": "{rel, select, friend {kankana} dating {sevgiline} partner {hayat arkadaşına} other {partnerine}} gösterilmez",
-    "partnerGuess": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Hayat arkadaşın} other {Partnerin}} ne cevap verir?",
+    "yourAnswerNote": "{rel, select, friend {kankana} dating {sevgiline} partner {eşine} other {partnerine}} gösterilmez",
+    "partnerGuess": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Eşin} other {Partnerin}} ne cevap verir?",
     "confidence": "Ne kadar eminsin?",
     "lock": "Tahmini kilitle",
     "locking": "Kaydediliyor...",
@@ -353,7 +397,7 @@
     "finish": "Bitir",
     "orderGuide": "Tercih ettiğin sırayla seç",
     "orderReset": "Sıfırla",
-    "partnerOrderGuide": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Hayat arkadaşın} other {Partnerin}} nasıl sıralar?",
+    "partnerOrderGuide": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Eşin} other {Partnerin}} nasıl sıralar?",
     "modeSecret": "Gizli Seçim",
     "modePrediction": "Tahmin",
     "modeOrderline": "Sıralama",
@@ -372,11 +416,11 @@
   },
   "waiting": {
     "title": "Sen tamamladın!",
-    "partner": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Hayat arkadaşın} other {Partnerin}} oyunu tamamlayınca sonuçlar açılacak.",
+    "partner": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Eşin} other {Partnerin}} oyunu tamamlayınca sonuçlar açılacak.",
     "resend": "Linki tekrar gönder",
     "or": "veya",
     "copyTitle": "Kopyala",
-    "waitingDots": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Hayat arkadaşın} other {Partner}} bekleniyor...",
+    "waitingDots": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Eşin} other {Partner}} bekleniyor...",
     "whatsappText": "Game of Us oynayalım!"
   },
   "results": {
@@ -389,9 +433,9 @@
     "near": "Yakın",
     "miss": "Iskala",
     "yourAnswer": "Cevabın",
-    "partnerAnswer": "{rel, select, friend {Kankanın} dating {Sevgilinin} partner {Hayat arkadaşının} other {Partnerinin}} cevabı",
+    "partnerAnswer": "{rel, select, friend {Kankanın} dating {Sevgilinin} partner {Eşinin} other {Partnerinin}} cevabı",
     "yourGuess": "Tahminin",
-    "partnerGuess": "{rel, select, friend {Kankanın} dating {Sevgilinin} partner {Hayat arkadaşının} other {Partnerinin}} tahmini",
+    "partnerGuess": "{rel, select, friend {Kankanın} dating {Sevgilinin} partner {Eşinin} other {Partnerinin}} tahmini",
     "goHome": "Ana Sayfa",
     "backHome": "Ana sayfaya dön",
     "correctCount": "Doğru Tahmin",
@@ -411,9 +455,9 @@
     "labelMiss": "Farklı Görüş",
     "answerOf": "cevabı",
     "guessOf": "tahmini",
-    "guessAboutPartner": "{rel, select, friend {kankası} dating {sevgilisi} partner {hayat arkadaşı} other {partneri}} hakkındaki tahmini",
+    "guessAboutPartner": "{rel, select, friend {kankası} dating {sevgilisi} partner {eşi} other {partneri}} hakkındaki tahmini",
     "partnerRealAnswer": "gerçek cevabı",
-    "partnerFallback": "{rel, select, friend {Kanka} dating {Sevgili} partner {Hayat arkadaşı} other {Partner}}"
+    "partnerFallback": "{rel, select, friend {Kanka} dating {Sevgili} partner {Eş} other {Partner}}"
   },
   "error": {
     "generic": "Bir şeyler ters gitti. Lütfen tekrar dene.",

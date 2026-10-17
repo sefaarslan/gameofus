@@ -1,7 +1,7 @@
 import type { SeedCategory } from "./types.ts";
 import { sc, pr, ol } from "./helpers.ts";
 
-// Birlikte Gelecek — yalnızca "partner" (Hayat Arkadaşı). Ortak plan, hayal ve hedefler.
+// Birlikte Gelecek — yalnızca "partner" (Evli). Ortak plan, hayal ve hedefler.
 export const future: SeedCategory = {
   slug: "future",
   names: { tr: "Birlikte Gelecek", en: "Future Together", es: "Futuro juntos" },

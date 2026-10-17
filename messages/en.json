@@ -215,13 +215,13 @@
       "title": "Who's playing?",
       "subtitle": "Let's meet you two first, then you'll pick the game.",
       "next": "Choose game mode",
-      "you": "You",
-      "partner": "{rel, select, friend {Your friend} other {Your partner}}"
+      "desc": "Introduce yourself and pick your bond. The other player will enter their own name from the invite link."
     },
     "step2": {
       "title": "What are we playing?",
       "subtitle": "Pick a game and share the link with your {rel, select, friend {friend} other {partner}}.",
-      "back": "Back"
+      "back": "Back",
+      "desc": "Choose the game mode and pace."
     },
     "gender": {
       "label": "Gender",
@@ -233,11 +233,6 @@
     "name": {
       "label": "Your name",
       "placeholder": "Your name"
-    },
-    "partner": {
-      "label": "{rel, select, friend {Friend} other {Partner}} name",
-      "optional": "Optional",
-      "placeholder": "Your {rel, select, friend {friend} other {partner}}'s name"
     },
     "mode": {
       "label": "Game mode",
@@ -268,12 +263,19 @@
             "desc": "The bill, a text from an ex, a spilled drink…"
           }
         }
-      }
+      },
+      "hint": "How to play?",
+      "popular": "Popular"
     },
     "questions": {
-      "label": "Number of questions",
-      "fast": "Quick — 5 questions",
-      "classic": "Classic — 10 questions"
+      "label": "Question Count & Pace",
+      "badge": "Approx. time",
+      "word": "Questions",
+      "durationFast": "~5 min",
+      "durationStandard": "~10 min",
+      "quickLabel": "QUICK",
+      "standardLabel": "STANDARD",
+      "ideal": "IDEAL"
     },
     "relationship": {
       "label": "What's your bond?",
@@ -287,13 +289,30 @@
         "desc": "Hearts racing"
       },
       "partner": {
-        "name": "Partner for Life",
+        "name": "Married",
         "desc": "On the road together"
-      }
+      },
+      "title": "Your Bond",
+      "tone": "Sets the game's tone"
     },
     "category": {
       "label": "Category",
-      "all": "Surprise Me"
+      "all": "Surprise Me",
+      "badge": "Recommended Category",
+      "surpriseDesc": "Balanced & Fun",
+      "taglines": {
+        "friend_test": "Friendship & Laughs",
+        "wild_scenarios": "Wild & Surprising",
+        "social_life": "Fun & Sharing",
+        "first_date": "First Impressions",
+        "romance": "Love & Passion",
+        "future": "Dreams & Plans",
+        "home_money": "Order & Balance",
+        "communication": "Understanding & Listening",
+        "lifestyle": "Habits & Preferences",
+        "values": "Principles & Priorities",
+        "bold": "Courage & Limits"
+      }
     },
     "premiumModal": {
       "title": "This category is only available in the mobile app",
@@ -305,7 +324,27 @@
     "limitTitle": "You already have a game in progress",
     "limitDesc": "With the free version you can run one game at a time. Download the Game of Us mobile app to play more.",
     "limitGoBack": "Back to my game",
-    "limitUpgrade": "Download the App"
+    "limitUpgrade": "Download the App",
+    "you": {
+      "title": "You",
+      "badge": "Required",
+      "subtitle": "Set your name",
+      "hint": "The other player enters their own name from the invite link"
+    },
+    "summary": {
+      "title": "Game Pack Ready"
+    },
+    "errors": {
+      "nameRequired": "Please enter your name",
+      "relationshipRequired": "Please pick your bond",
+      "birthDateInvalid": "Please enter a valid date (DD.MM.YYYY)",
+      "birthDateTooYoung": "You must be at least 13 to use Game of Us"
+    },
+    "birthDate": {
+      "label": "Birth Date",
+      "placeholder": "DD.MM.YYYY",
+      "optional": "optional"
+    }
   },
   "share": {
     "title": "Your invite link is ready",
@@ -330,12 +369,17 @@
   },
   "join": {
     "title": "Join the game",
-    "subtitle": "Your friend is waiting. Enter your name and start playing.",
-    "name": { "label": "Your name", "placeholder": "Your name" },
+    "subtitle": "They're waiting for you. Introduce yourself and start playing.",
+    "name": {
+      "label": "Your name",
+      "placeholder": "Your name"
+    },
     "submit": "Join",
     "joining": "Joining...",
     "roomFull": "This room already has two players.",
-    "expired": "This room has expired."
+    "expired": "This room has expired.",
+    "ageMobileOnly": "This game is for players 18+ and can only be played in the mobile app.",
+    "hint": "Everyone enters their own details."
   },
   "game": {
     "yourAnswer": "Your answer",

@@ -9,14 +9,14 @@ bir teknik karar varsa buradaki yaklaşım uygulanır.
 
 ## 1. Ürün Özeti
 
-**Game of Us**, iki kişinin (arkadaşlar, sevgililer ya da hayat arkadaşları) birbirini daha iyi
+**Game of Us**, iki kişinin (arkadaşlar, sevgililer ya da evli çiftler) birbirini daha iyi
 tanıması için tasarlanmış link bazlı bir oyundur; web'de (`https://gameofus.app`) ve mobil
 uygulamada (ayrı repo `gameofus-mobile`, aynı backend) oynanır. Oyuncular bir oda oluşturur, linki
 karşı tarafa gönderir; her iki taraf da tek bir turda hem kendi cevabını verir hem diğerinin
 cevabını tahmin eder. İki taraf da turunu tamamlayınca sonuçlar açılır.
 
 > **Terminoloji:** Bu dosyada "partner", oyundaki *karşı oyuncu* anlamındadır. Arayüzde bu kelime
-> odanın ilişki türüne göre uyarlanır (Kanka / Sevgili / Hayat Arkadaşı — bkz. aşağıdaki ilke).
+> odanın ilişki türüne göre uyarlanır (Kanka / Sevgili / Evli — bkz. aşağıdaki ilke).
 
 Temel oyun döngüsü: **cevapla → tahmin et → sonucu birlikte gör**.
 
@@ -34,7 +34,7 @@ daha iyi konuşmalar başlatmak ve birbirini tahmin etme deneyimini oyunlaştır
   (kullanıcının önceki tercihi), yoksa `Accept-Language`, desteklenmiyorsa `en` (next-intl middleware,
   `proxy.ts`). Tek doğruluk kaynağı middleware'dir; kök sayfada ayrı bir yönlendirme kodu yoktur.
 - **İlişki türü (oda oluştururken zorunlu):** `friend` (Kanka), `dating` (Sevgili), `partner`
-  (Hayat Arkadaşı). Slug'lar teknik değerdir (`rooms.relationship_type`); görünen isimler yalnızca
+  (Evli). Slug'lar teknik değerdir (`rooms.relationship_type`); görünen isimler yalnızca
   çeviri dosyalarındadır. Kategoriler `categories.relationship_types` ile türe göre filtrelenir ve
   sunucu, seçilen kategorinin türe uygunluğunu doğrular. Alan geriye dönük uyum için opsiyoneldir
   (eski mobil build'ler/odalar `null` gönderir → genel "partner" dili).
@@ -150,8 +150,8 @@ bkz. Bölüm 7 — Performans & Veri Akışı Kuralları.)
   Ekonomi: kayıt +500 (Auth trigger'ı) · reklam +100 (günde 5) · oda −250 · AI yorum −100 · solo +20 / solo AI −100.
   **Web bu bilgiyi hiçbir API isteğinde sormaz veya taşımaz** (web odaları anonim ve ücretsiz kalır).
   **Kategori erişimi yalnızca tier ile** (`categories.min_tier`, `lib/tier.ts`: `premium ≥ lite ≥ free`; per-kategori takip yok) ve
-  asgari yaşla (`categories.min_age`, Cesur=18: kurucu ve partner ikisi de; `lib/age.ts`). Her ikisi `POST /api/rooms/create`'te
-  coin düşümünden önce sunucuda doğrulanır (`TIER_REQUIRED` / `AGE_VERIFICATION_REQUIRED` / `AGE_RESTRICTED`); "Karışık Sürpriz"
+  asgari yaşla (`categories.min_age`, Cesur=18: kurucu **oda kurarken**, karşı oyuncu **katılırken** kendi hesabındaki doğum tarihiyle; `lib/age.ts`). Tier ve kurucu yaşı `POST /api/rooms/create`'te
+  coin düşümünden önce, karşı oyuncunun yaşı `POST /api/rooms/{roomCode}/join`'de sunucuda doğrulanır (`TIER_REQUIRED` / `AGE_VERIFICATION_REQUIRED` / `AGE_RESTRICTED`; webden anonim katılan 18+ odaya giremez → `AGE_VERIFICATION_REQUIRED`, "yalnızca mobilde"); "Karışık Sürpriz"
   havuzu her zaman yalnızca ücretsiz kategorilerden çeker (kilitli kategoriler yalnızca açıkça seçilince).
   **Mobilde misafir/anonim yoktur:** oda kuran da katılan da giriş yapmıştır (`platform: "mobile"` + Bearer JWT, yoksa 401);
   katılımcı `participants.user_id`'ye bağlanır (geçmiş ve hesap silme için). **Geçmiş:** `GET /api/users/history` (JWT; `created_at` son 90 gün; düz dizi) odaları listeler; `rooms/[roomCode]/results`, `state`, `submit-turn` ve `complete` token yoksa JWT ile de açılır (`lib/participant-auth.ts`: önce token, yoksa `participants.user_id` eşleşmesi; yazma uçlarında aynı hesap iki rolde ise JWT reddedilir; geçersiz JWT `401`, katılımcı değil `403 INVALID_TOKEN`; süresi dolmuş odada submit-turn/complete JWT ile de `ROOM_EXPIRED`) — böylece yarım kalan oyun başka cihazdan devam eder; süresi dolmuş oda sonucu yalnızca JWT ile okunur (saklama süresi boyunca), token ile `ROOM_EXPIRED`. **Hesap silme:** `DELETE /api/users/me`
@@ -337,9 +337,10 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   Süreler `lib/retention.ts` (Gizlilik Politikası ile uyumlu tut). `credit_transactions` hesap silinene kadar kalır (solo ödül
   idempotency'si buna dayanır), `purchases` yasal süre boyunca kullanıcıdan ayrılmış tutulur — ikisi bu işle silinmez. Silmeden önce kişisel olmayan günlük toplamlar `metrics_*_archive` tablolarına yazılır; `metrics_*` görünümleri
   canlı + arşivi birleştirir (metrik geçmişi kaybolmaz).
-- **Cinsiyet (opsiyonel, `participants.gender` / `rooms.partner_gender`):** yalnızca sahne modunda çöp adam karakterini çizmek ve
-  ikili (oda) AI yorumunda dil bilgisi/doğal ifade için alınır; kurucu partner için de girer, partner katılırken `participants.gender`'a
-  kopyalanır (katılan kendi değerini göndererek geçersiz kılabilir). **Hesap profiline yazılmaz, oda silinince gider**, metrik
+- **Her oyuncu yalnızca kendi bilgisini girer:** oda kurarken karşı oyuncunun adı/cinsiyeti/doğum tarihi **alınmaz** (üçüncü kişi verisi toplanmaz; `rooms.partner_*` sütunları kaldırıldı). Karşı oyuncu davet linkinden kendi adını girer.
+- **Doğum tarihi (opsiyonel, `participants.birth_date`):** oyuncunun **kendi** beyanı; oda kurarken ya da davetle katılırken, web ve mobilde isteğe bağlı (webde yalnızca ad ve bağ zorunludur; mobilde profil için zorunlu). Yorum kişiselleştirme içindir; oda silinince gider, hesap silmede anonimleştirilen katılımdan silinir, metriklere/loglara girmez. Asgari yaş 13: daha küçük bir tarih `403 AGE_RESTRICTED` ile reddedilir ve saklanmaz. Webde 18+ koşulu için kullanılmaz (18+ kategoriler yalnızca mobil).
+- **Cinsiyet (opsiyonel, `participants.gender`):** yalnızca sahne modunda çöp adam karakterini çizmek ve
+  ikili (oda) AI yorumunda dil bilgisi/doğal ifade için alınır; kurucu oda kurarken, karşı oyuncu davetle katılırken kendi cinsiyetini girer (katılma ekranı da ad + isteğe bağlı cinsiyet + isteğe bağlı doğum tarihi alır; `JoinScreen`). **Hesap profiline yazılmaz, oda silinince gider**, metrik
   görünümlerine/arşiv tablolarına/loglara **girmez** (iki oyuncunun cinsiyeti + ilişki türü birlikte hassastır); hesap silmede
   başkalarının odalarındaki katılımdan da silinir. AI'a yalnızca ikili AI'da ve rıza metninde belirtilerek gider; prompt'ta "cinsiyeti
   yalnızca dil bilgisi/doğal ifade için kullan, genelleme/klişe üretme" kuralı zorunludur. Solo AI'a cinsiyet **gitmez**.
@@ -351,8 +352,8 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   edilir.
 - **AI yorum (planlanan):** Cevaplar üçüncü taraf bir LLM'e (Groq) gönderileceği için, uygulamaya
   almadan önce gizlilik/rıza değerlendirmesi ve yalnızca yapılandırılmış cevapların (seçilen seçenek
-  metni, sıralama) gönderilmesi kuralı netleştirilmelidir. Doğum tarihi gibi ek kişisel veriler yalnızca
-  mobil tarafta ve gerekçesiyle toplanır.
+  metni, sıralama) gönderilmesi kuralı netleştirilmelidir. Doğum tarihi (isteğe bağlı, kişinin kendi beyanı)
+  yalnızca yorum kişiselleştirme/yaş koşulu gerekçesiyle ve rıza metninde belirtilerek AI'a gider.
 
 ### Abuse / rate limit (başlangıç limitleri)
 - Aynı IP/IP-hash için saatte max **10**, günde max **50** oda oluşturma.
@@ -393,16 +394,16 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
 - Skor hesaplama: her soru kendi modunun doğru/yakın/yanlış kuralına göre değerlenir.
 
 ### Oda oluşturma ve soru seçimi (`POST /api/rooms/create`)
-- Girdi: ad, (opsiyonel) partner adı, `gameMode`, `questionCount` (5/10), `locale`, `relationshipType`,
-  (opsiyonel) `categoryId`, (opsiyonel) `gender` / `partnerGender` (`female` | `male`; boş = belirtilmedi).
+- Girdi: ad, `gameMode`, `questionCount` (5/10), `locale`, `relationshipType`,
+  (opsiyonel) `categoryId`, (opsiyonel) `birthDate` (`YYYY-AA-GG`, kendi doğum tarihi; < 13 yaş `403 AGE_RESTRICTED`), (opsiyonel) `gender` (`female` | `male`; boş = belirtilmedi). **Yalnızca kurucunun bilgisi**: `partnerName`/`partnerGender`/`partnerBirthDate` gönderilse bile yok sayılır.
   **Oda oluşturma sayfası iki adımlı sihirbazdır (web + mobil görünüm; durum bileşende, sunucuya yalnızca son adımda tek istek):**
-  **Adım 1 "Kimler oynuyor?"** (ad + cinsiyet, partner adı (opsiyonel) + cinsiyet, ilişki türü; mod ne olursa olsun aynı) →
-  **Adım 2 "Ne oynuyoruz?"** (mod seçici → kategori → soru sayısı). Akış sırası: **ilişki türü → mod → kategori → soru sayısı**.
+  **Adım 1 "Kimler oynuyor?"** (ilişki türü + "Sen" kartı: ad (zorunlu), cinsiyet ve isteğe bağlı doğum tarihi (GG.AA.YYYY maskeli); webde yalnızca ad ve bağ zorunludur; mod ne olursa olsun aynı) →
+  **Adım 2 "Ne oynuyoruz?"** (kategori → oyun modu → soru sayısı + canlı özet). Tasarım **mobil uygulamadaki `create.tsx` ile aynıdır** (numaralı bölüm başlıkları, dolu kırmızı seçili kartlar, köşe seçim işareti, yatay kaydırmalı kategori kartları, "Popüler"/"İDEAL" rozetleri, özet kartı; parçalar `components/create/ui.tsx`). Sahne açıldığında mod bölümü kategori'nin üstüne alınmalı (Sahne seçilince kategori/soru sayısı kaybolacağı için).
   Geri tuşu 2. adımdan 1. adıma döner (`history.pushState({ createStep: 2 })`). **Taslak korunur:** sihirbaz durumu (adım, adlar, cinsiyetler, ilişki türü, mod, kategori, soru sayısı, bölüm) `sessionStorage` `gou_create_draft` anahtarında tutulur; sayfa yenilenince/başka sayfaya gidip dönünce kaldığı adımdan devam eder, oda kurulunca silinir, sekme kapanınca gider; sunucuya hiçbir şey gitmez (geri yüklenen değerler doğrulanır, listede olmayan kategori temizlenir). Mod seçicide **Sahne** (animasyonlu senaryo modu,
   planlı) diğer 4 modla **aynı kart diliyle, tek listede** durur (ayrı başlık/farklı stil yok; hepsi birer oyun modudur), listenin
   **sonunda** tam genişlikte; backend hazır olana kadar **pasiftir** ("Yakında" rozeti; `SCENE_MODE_ENABLED = false`, `lib/scene-chapters.ts`),
   hazır olunca bayrak true yapılır ("Yeni" rozeti, seçilebilir). Seçilebilir olduğunda Sahne seçilince kategori ve soru sayısı gizlenir (durumları korunur), yerine **bölüm seçimi** (`components/create/ChapterPicker.tsx`) gelir; bölüm içeriği/`chapters` API'si hazır olana kadar bölüm kartları "Yakında" ve pasiftir (geçici katalog: `lib/scene-chapters.ts`), oda oluşturma butonu Sahne seçiliyken pasif kalır ve istemci/sunucu `gameMode: "scene"` ile oda kurmaz. Bölümler ilişki türüne göre filtrelenir (bağ için bölüm yoksa boş durum); bölüm seçimi ilişki türü değişince sıfırlanır.
-- Kategori seçimi dropdown'dır; varsayılan seçenek "Karışık Sürpriz" (kategori yok). Kategoriler sayfa
+- Kategori seçimi **yatay kayan kartlardır** (`components/create/Carousel.tsx`: dokunmatikte kaydırma, masaüstünde yan ok düğmeleri; hiçbir ekranda alt alta sarmaz); ilk kart "Karışık Sürpriz" (kategori yok, varsayılan). Kategoriler sayfa
   açılırken bir kez çekilir, tür değişince istemcide filtrelenir; sunucu yine de uyumu doğrular
   (uyumsuzsa `INVALID_PAYLOAD`).
 - **Soru havuzu:** oda diline ait + aktif + **ücretsiz** + **ilişki türüne uygun** kategoriler.
@@ -411,8 +412,8 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
 - Tüm havuz çekilip **gerçekten rastgele** seçilir (sıralamasız `limit(n)` her zaman aynı ilk satırları
   döndürür; kullanma).
 - Kategoriler (v2): `friend_test`, `wild_scenarios`, `social_life` (yalnızca Kanka); `first_date`,
-  `romance` (yalnızca Sevgili); `future`, `home_money` (yalnızca Hayat Arkadaşı); `communication`,
-  `lifestyle`, `values` (üçü); `bold` (Sevgili + Hayat Arkadaşı, **premium**, 18+).
+  `romance` (yalnızca Sevgili); `future`, `home_money` (yalnızca Evli); `communication`,
+  `lifestyle`, `values` (üçü); `bold` (Sevgili + Evli, **premium**, 18+).
 
 ---
 

@@ -1,7 +1,7 @@
 import type { SeedCategory } from "./types.ts";
 import { sc, pr, ol } from "./helpers.ts";
 
-// Ev & Para — yalnızca "partner" (Hayat Arkadaşı). Ev düzeni, ortak harcama ve bütçe.
+// Ev & Para — yalnızca "partner" (Evli). Ev düzeni, ortak harcama ve bütçe.
 export const homeMoney: SeedCategory = {
   slug: "home_money",
   names: { tr: "Ev & Para", en: "Home & Money", es: "Casa y dinero" },

@@ -496,7 +496,7 @@
 
 ## Futuro juntos  `future`
 
-**Görünür:** Hayat Arkadaşı
+**Görünür:** Evli
 
 ### Evet / Kararsız / Hayır
 
@@ -619,7 +619,7 @@
 
 ## Casa y dinero  `home_money`
 
-**Görünür:** Hayat Arkadaşı
+**Görünür:** Evli
 
 ### Evet / Kararsız / Hayır
 
@@ -865,7 +865,7 @@
 
 ## Comunicación  `communication`
 
-**Görünür:** Kanka, Sevgili, Hayat Arkadaşı
+**Görünür:** Kanka, Sevgili, Evli
 
 ### Evet / Kararsız / Hayır
 
@@ -988,7 +988,7 @@
 
 ## Estilo de vida  `lifestyle`
 
-**Görünür:** Kanka, Sevgili, Hayat Arkadaşı
+**Görünür:** Kanka, Sevgili, Evli
 
 ### Evet / Kararsız / Hayır
 
@@ -1111,7 +1111,7 @@
 
 ## Valores  `values`
 
-**Görünür:** Kanka, Sevgili, Hayat Arkadaşı
+**Görünür:** Kanka, Sevgili, Evli
 
 ### Evet / Kararsız / Hayır
 
@@ -1234,7 +1234,7 @@
 
 ## Preguntas atrevidas  `bold`
 
-**Görünür:** Sevgili, Hayat Arkadaşı · **Premium (18+)**
+**Görünür:** Sevgili, Evli · **Premium (18+)**
 
 ### Evet / Kararsız / Hayır
 
