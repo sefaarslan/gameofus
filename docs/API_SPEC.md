@@ -197,7 +197,14 @@ Tek soruda cevap **ve** tahmini **tek istekte** kaydeder (kilitler).
 `answerValue` / `predictedValue` biçimi moda göre: `{value}` · `{option_id}` · `{order:[…]}`.
 `confidenceLevel`: `guess | think | sure` (geçersizse `guess`).
 
-Kurallar: token doğrulanır; soru bu odaya ait olmalı (`QUESTION_NOT_FOUND`); aynı soruya ikinci cevap
+**Kimlik:** katılımcı token'ı (`Authorization: Bearer <token>` ya da gövdede `participantToken`) **ya da (mobil) giriş yapmış kullanıcının
+Supabase JWT'si**: token yoksa `participants.user_id` JWT kullanıcısıyla eşleşen katılımcı o oyuncudur (başka cihazdan/yeniden kurulumdan sonra
+yarım kalan oyuna devam). Token öncelikli; web anonim akışı değişmez. Hatalar: geçersiz/süresi dolmuş JWT `401 UNAUTHORIZED`,
+geçerli JWT ama bu odanın katılımcısı değil `403 INVALID_TOKEN`, hiç kimlik yok `400 INVALID_TOKEN`, **oda süresi dolmuşsa JWT ile de
+`400 ROOM_EXPIRED`** (devam etmek yalnızca aktif odada). Aynı hesap odada iki rolde de varsa (kendi odasına kendi hesabıyla katılmak) JWT
+hangi oyuncu olduğunu belirleyemez → `403 INVALID_TOKEN` (token ile yazılır).
+
+Kurallar: kimlik doğrulanır; soru bu odaya ait olmalı (`QUESTION_NOT_FOUND`); aynı soruya ikinci cevap
 `ALREADY_SUBMITTED`; cevap ve tahmin birlikte yazılır; oyuncunun ilk gönderimi participant ve oda
 durumunu `playing` yapar. Bağımsız yazma/okuma adımları paralel çalışır.
 
@@ -214,7 +221,8 @@ yok sayar ve kilitleyince doğrudan sonraki soruya geçer (ara kart yok). Yanıt
 
 ## 8. `POST /api/rooms/[roomCode]/complete`
 
-Oyuncuyu `completed` yapar. **İlk bitiren:** `participants` ve `rooms.status` (`owner_completed`/
+Oyuncuyu `completed` yapar. Kimlik `submit-turn` ile aynıdır (katılımcı token'ı **ya da** mobil JWT; hata kodları ve süresi dolmuş oda davranışı aynı).
+**İlk bitiren:** `participants` ve `rooms.status` (`owner_completed`/
 `guest_completed`) paralel güncellenir. **İkinci bitiren:** sonuç aynı istekte server-side hesaplanır:
 `results` satırı yazılır, ardından `rooms.status = result_ready`. Duplicate sonuç oluşmaz
 (`unique(room_id)`); idempotenttir.

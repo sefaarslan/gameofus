@@ -14,8 +14,8 @@ export interface ParticipantAuthRow {
  * yeniden kurulumdan sonra token olmadan geçmişi açmak için). Token yolu öncelikli olduğu için normal oyun akışında
  * JWT doğrulaması (ek ağ turu) yapılmaz.
  *
- * Aynı kullanıcı aynı odada iki rolde de katılmışsa (kendi odasına kendi hesabıyla girmek) ilk eşleşen döner; token'ı olan
- * taraf token yoluyla her zaman doğru rolü bulur.
+ * Aynı kullanıcı aynı odada iki rolde de katılmışsa (kendi odasına kendi hesabıyla girmek): okuma uçlarında ilk eşleşen
+ * döner; yazma uçlarında `requireUnique` ile eşleşme sayılmaz (token'ı olan taraf token yoluyla her zaman doğru rolü bulur).
  */
 export type JwtStatus = "none" | "invalid" | "valid";
 
@@ -23,6 +23,7 @@ export async function findParticipant<T extends ParticipantAuthRow>(
   req: NextRequest,
   token: string | null,
   participants: T[],
+  options: { requireUnique?: boolean } = {},
 ): Promise<{ participant: T | null; viaUser: boolean; jwt: JwtStatus }> {
   if (token) {
     const match = participants.find((p) => verifyToken(token, p.token_hash));
@@ -31,7 +32,11 @@ export async function findParticipant<T extends ParticipantAuthRow>(
   if (bearerJwt(req)) {
     const user = await getAuthUser(req);
     if (!user) return { participant: null, viaUser: false, jwt: "invalid" };
-    const match = participants.find((p) => p.user_id === user.id);
+    const matches = participants.filter((p) => p.user_id === user.id);
+    // Yazma uçlarında (submit-turn/complete) aynı hesap odada iki rolde de varsa (kendi odasına kendi hesabıyla katılmak)
+    // JWT hangi oyuncu olduğunu belirleyemez: yanlış oyuncu adına yazmamak için eşleşme sayılmaz (token yolu yine çalışır).
+    if (options.requireUnique && matches.length > 1) return { participant: null, viaUser: false, jwt: "valid" };
+    const match = matches[0];
     return { participant: match ?? null, viaUser: !!match, jwt: "valid" };
   }
   return { participant: null, viaUser: false, jwt: "none" };

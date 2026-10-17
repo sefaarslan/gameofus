@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { verifyToken, extractToken } from "@/lib/token";
+import { extractToken } from "@/lib/token";
+import { bearerJwt } from "@/lib/auth";
+import { findParticipant } from "@/lib/participant-auth";
 import { isRoomExpired } from "@/lib/expire";
 import { corsOptions } from "@/lib/cors";
 
@@ -28,7 +30,8 @@ export async function POST(
 
   const rawBodyToken = (body as Record<string, unknown>).participantToken;
   const participantToken = extractToken(req, typeof rawBodyToken === "string" ? rawBodyToken : null);
-  if (!participantToken) {
+  // Kimlik: katılımcı token'ı ya da giriş yapmış (mobil) kullanıcının Supabase JWT'si (başka cihazdan devam etmek için)
+  if (!participantToken && bearerJwt(req) === null) {
     return apiError("INVALID_TOKEN", "Token gereklidir.");
   }
 
@@ -45,11 +48,12 @@ export async function POST(
 
   const { data: allParticipants } = await supabase
     .from("participants")
-    .select("id, role, status, token_hash, completed_at")
+    .select("id, role, status, token_hash, completed_at, user_id")
     .eq("room_id", room.id);
 
   const participants = allParticipants ?? [];
-  const me = participants.find((p) => verifyToken(participantToken, p.token_hash));
+  const { participant: me, jwt } = await findParticipant(req, participantToken, participants, { requireUnique: true });
+  if (!me && jwt === "invalid") return apiError("UNAUTHORIZED", "Oturum geçersiz, tekrar giriş yapın.", 401);
   if (!me) return apiError("INVALID_TOKEN", "Geçersiz token.", 403);
 
   if (me.status === "completed") {
