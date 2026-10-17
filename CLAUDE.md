@@ -154,7 +154,7 @@ bkz. Bölüm 7 — Performans & Veri Akışı Kuralları.)
   coin düşümünden önce sunucuda doğrulanır (`TIER_REQUIRED` / `AGE_VERIFICATION_REQUIRED` / `AGE_RESTRICTED`); "Karışık Sürpriz"
   havuzu her zaman yalnızca ücretsiz kategorilerden çeker (kilitli kategoriler yalnızca açıkça seçilince).
   **Mobilde misafir/anonim yoktur:** oda kuran da katılan da giriş yapmıştır (`platform: "mobile"` + Bearer JWT, yoksa 401);
-  katılımcı `participants.user_id`'ye bağlanır (geçmiş ve hesap silme için). **Hesap silme:** `DELETE /api/users/me`
+  katılımcı `participants.user_id`'ye bağlanır (geçmiş ve hesap silme için). **Geçmiş:** `GET /api/users/history` (JWT; son 90 gün) odaları listeler; `rooms/[roomCode]/results` ve `state` token yoksa JWT ile de açılır (`lib/participant-auth.ts`: önce token, yoksa `participants.user_id` eşleşmesi); süresi dolmuş oda sonucu yalnızca JWT ile okunur (saklama süresi boyunca), token ile `ROOM_EXPIRED`. **Hesap silme:** `DELETE /api/users/me`
   (`delete_user_account` RPC + Auth kaydı); kurulan odalar silinir, başkalarının odalarındaki katılım anonimleştirilir,
   satın alma kayıtları kullanıcıdan ayrılmış halde yasal süre tutulur.
 
@@ -180,22 +180,23 @@ Tek soru ekranında sıra:
 2. Aynı ekranda partnerinin cevabını **aynı format** ile tahmin eder.
 3. Tahmine güven seviyesi ekler.
 4. Tahmini kilitler.
-5. Partner zaten cevapladıysa **anlık mikro-reveal**; aksi halde "tahminin kaydedildi" bilgisi.
+5. Kilitleyince **doğrudan sonraki soruya geçilir (ara ekran/kart yok)**; son soruda sunucuya `complete` gider ve bekleme/sonuç ekranına geçilir. Kilitle düğmesinin altında küçük bir not durur: "Yanıtlar, tüm soruları cevapladıktan sonra en sonda görünecek." **Soru başına anlık sonuç (doğru/yakın/ıskaladı, puan) yoktur** — partner zaten cevaplamış olsa da; yanıtlar yalnızca iki taraf da bitirince sonuç ekranında açılır.
 
 ### Güven seviyesi
 - `guess` (tahmin) — çarpan ×1
 - `think` (sanırım) — çarpan ×2
 - `sure` (eminim) — çarpan ×3
 
-**Önemli:** Güven çarpanı yalnızca mikro-reveal/anlatım içindir; **okuma skoruna yansımaz**
+**Önemli:** Güven çarpanı yalnızca anlatım/sonuç yorumları içindir; **okuma skoruna yansımaz**
 (bkz. Bölüm 6).
 
-### Mikro-reveal kuralları
-- Yalnızca oyuncu kendi cevabını ve tahminini **kilitledikten sonra** hesaplanır.
-- Yalnızca partner o soruyu **zaten cevaplamışsa** gösterilir.
-- Sadece ilgili sorunun türetilmiş sonucunu gösterir (doğru / yakın / ıskaladı + puan).
-- Partnerin tüm cevaplarını veya oynanmamış sorulara ait bilgiyi **açığa çıkarmaz**.
-- Partner verisi yoksa akışı **bloke etmez** (fallback: "tahminin kaydedildi").
+### Anlık sonuç yok (mikro-reveal kaldırıldı)
+- Soru kilitlenince **hiçbir türetilmiş sonuç** (doğru / yakın / ıskaladı, puan) gösterilmez ve sunucu bunu **hesaplamaz/dönmez**:
+  `submit-turn` partnerin cevabını okumaz; yanıt yalnızca `{ saved: true, microReveal: { available: false, message } }`
+  (`microReveal` alanı eski istemcilerin yanıt şeklini bozmamak için kalır, her zaman `available:false`). Web ve mobil kilitleyince doğrudan sonraki soruya geçer
+  ve düğmenin altında "yanıtlar en sonda görünecek" notunu gösterir.
+- Gerekçe: iki oyuncu arasında eşitlik (ikinci oynayan avantajlı/farklı deneyim yaşamaz) ve partner verisinin sonuç öncesi hiçbir
+  biçimde sızmaması (türetilmiş sonuç bile partnerin cevabı hakkında ipucu verir).
 
 ### Room status değerleri
 `created`, `owner_playing`, `owner_completed`, `waiting_guest`, `guest_joined`,
@@ -473,7 +474,7 @@ Ayrıntılı durum için `docs/PRD.md` Bölüm 21 esas alınır. Özet:
 
 - **Web (tamamlandı, canlıda):** landing (4 adımlı "nasıl çalışır", mobil/AI teaser, footer), oda oluşturma
   (ilişki türü + kategori), 4 oyun modu (Secret Choice, Prediction, Orderline, Karma), birleştirilmiş tur,
-  mikro-reveal, soft realtime, server-side sonuç, sonuç ekranı + geri bildirim, 3 dil, premium kategori
+  soft realtime, server-side sonuç, sonuç ekranı + geri bildirim, 3 dil, premium kategori
   kilidi (mobile yönlendirme), soru seti v2, ilişki türüne duyarlı metinler, metrik görünümleri.
 - **Mobil (devam ediyor, ayrı repo):** giriş zorunlu (Google/Apple), coin + tier modeli, IAP, geçmiş,
   push, deep link, hesap silme, AI yorum. İş listesi: `gameofus-mobile/tasklist.md`.

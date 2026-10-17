@@ -42,6 +42,7 @@ POST /api/solo/red-flag/start
 POST /api/solo/[sessionId]/complete
 GET  /api/solo/red-flag/card?g=&l=&p=&q=&fmt=
 GET  /api/users/me                (mobil, Bearer JWT)
+GET  /api/users/history           (mobil, Bearer JWT; oda geçmişi, son 90 gün)
 GET  /api/users/solo-history      (mobil, Bearer JWT; + /[sessionId])
 POST /api/users/coins/spend       (mobil, Bearer JWT)
 POST /api/users/coins/earn        (mobil, Bearer JWT)
@@ -154,6 +155,10 @@ Yanıt `201`. `roomUrl` `APP_BASE_URL` ortam değişkeninden üretilir; istemci 
 Oda, katılımcılar ve **tüm soruları (seçenekleriyle) tek seferde** döner; oyun boyunca istemci bunu bellekte
 tutar. Token verilirse `participant` ve `progress` o oyuncuya göre dolar. Cevap/tahmin içermez.
 
+**Kimlik (mobil):** token yoksa `Authorization: Bearer <Supabase JWT>` ile de oyuncu belirlenir: `participants.user_id`
+giriş yapmış kullanıcıyla eşleşen katılımcı o kullanıcıdır (başka cihazda/yeniden kurulumda oyuna devam). Token yolu
+öncelikli (JWT doğrulaması yalnızca token yoksa yapılır). Oda hâlâ süre kontrolüne tabidir (`ROOM_EXPIRED`).
+
 ```json
 {
   "room": { "roomCode": "X7K2P9QM", "status": "guest_joined", "gameMode": "mixed",
@@ -194,19 +199,14 @@ Kurallar: token doğrulanır; soru bu odaya ait olmalı (`QUESTION_NOT_FOUND`); 
 `ALREADY_SUBMITTED`; cevap ve tahmin birlikte yazılır; oyuncunun ilk gönderimi participant ve oda
 durumunu `playing` yapar. Bağımsız yazma/okuma adımları paralel çalışır.
 
-Yanıt — partner o soruya zaten cevap verdiyse (ham cevap dönmez, yalnızca türetilmiş sonuç):
+Yanıt (her zaman aynı; **anlık sonuç yoktur** — sunucu partnerin cevabını okumaz, doğru/yakın/ıskaladı/puan dönmez):
 
 ```json
-{ "saved": true,
-  "microReveal": { "available": true, "result": "near", "label": "Yakın tahmin", "points": 2,
-                   "message": "Yakındın! …" } }
+{ "saved": true, "microReveal": { "available": false, "message": "Tahminin kaydedildi. Yanıtlar, tüm sorular bitince birlikte görünecek." } }
 ```
 
-`result`: `correct` (puan = çarpan × 2) · `near` (çarpan × 1) · `miss` (0). Partner henüz oynamadıysa:
-
-```json
-{ "saved": true, "microReveal": { "available": false, "message": "Tahminin kaydedildi. …" } }
-```
+`microReveal` alanı yalnızca eski istemcilerin yanıt şeklini bozmamak için kalır (her zaman `available: false`); yeni istemciler
+yok sayar ve kilitleyince doğrudan sonraki soruya geçer (ara kart yok). Yanıtlar iki taraf da bitirince `results`'ta açılır.
 
 ---
 
@@ -228,7 +228,10 @@ yapılır; başarısız olursa oda "hazır" görünmez.)
 
 ## 9. `GET /api/rooms/[roomCode]/results`
 
-Token zorunlu. Oda `result_ready`/`completed` değilse `RESULT_NOT_READY`.
+Kimlik zorunlu: katılımcı token'ı **ya da (mobil) giriş yapmış kullanıcının Supabase JWT'si** (`participants.user_id`
+eşleşmesi). Oda `result_ready`/`completed` değilse `RESULT_NOT_READY`. **Süresi dolmuş odalar yalnızca JWT ile açılır**
+(geçmiş: saklama süresi, `expires_at` + 90 gün boyunca); token ile süresi dolmuş odada `ROOM_EXPIRED`. Odada katılımcısı
+olmayan JWT → `403 INVALID_TOKEN`.
 
 ```json
 {
@@ -331,6 +334,10 @@ Ekonomi: kayıt +500 (Auth trigger'ı, otomatik) · reklam +100 (günde en fazla
 solo +20 (solo `complete` içinde, bkz. gelecek iş). **Miktarı istemci göndermez**, yalnızca `reason`.
 
 - `GET /api/users/me` → `{ id, coins, tier, birthDate }`
+- `GET /api/users/history` → `{ items: [{ roomCode, locale, relationshipType, gameMode, questionCount, status, role, partnerName, createdAt, expiresAt, expired, resultReady, readingScore, completedAt }] }`
+  (en yeni önce, en çok 100). Kullanıcının (`participants.user_id`) odaları; yalnızca `expires_at` son 90 gün içinde olanlar (saklama süresiyle aynı).
+  `partnerName`: karşı oyuncunun adı (hesabını sildiyse `null`); `readingScore`/`completedAt` sonuç hazırsa dolu. Sonuç ayrıntısı
+  için `GET /api/rooms/{roomCode}/results` aynı JWT ile açılır (süresi dolmuş odada da).
 - `PATCH /api/users/me` `{ "birthDate": "YYYY-AA-GG" }` → profil doğum tarihi (geçersiz `400`, 13 yaş altı `403 AGE_RESTRICTED`)
 - `DELETE /api/users/me` `{ "confirm": true }` → `{ deleted: true }` — **hesap silme** (App Store 5.1.1(v) / Google Play). Silinen: kurulan odalar
   (içeriğiyle), solo oyunlar, coin kayıtları, kullanıcı ve Auth kaydı. Başkalarının odalarındaki katılım anonimleştirilir

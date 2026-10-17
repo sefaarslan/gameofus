@@ -344,6 +344,7 @@
     "confidence": "Ne kadar eminsin?",
     "lock": "Tahmini kilitle",
     "locking": "Kaydediliyor...",
+    "answersAtEnd": "Yanıtlar, tüm soruları cevapladıktan sonra en sonda görünecek.",
     "progress": "Soru {current}/{total}",
     "finish": "Bitir",
     "orderGuide": "Tercih ettiğin sırayla seç",
@@ -364,20 +365,6 @@
     "guess": "Tahmin",
     "think": "Sanırım",
     "sure": "Eminim"
-  },
-  "reveal": {
-    "correct": "Doğru bildin!",
-    "near": "Yakındın!",
-    "miss": "Iskaladın!",
-    "correctTitle": "Doğru bildin!",
-    "nearTitle": "Yakın bildin!",
-    "missTitle": "Iskaladın",
-    "greatReading": "Harika bir okuma!",
-    "points": "+{points} puan",
-    "saved": "Tahminin kaydedildi. {rel, select, friend {Kankan} dating {Sevgilin} partner {Hayat arkadaşın} other {Partner}} oynayınca birlikte göreceksiniz.",
-    "savedSubtitle": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Hayat arkadaşın} other {Partner}} cevapladığında sonucu birlikte göreceksiniz.",
-    "next": "Sonraki soru",
-    "finish": "Sonuçlara git"
   },
   "waiting": {
     "title": "Sen tamamladın!",

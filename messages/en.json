@@ -344,6 +344,7 @@
     "confidence": "How sure are you?",
     "lock": "Lock guess",
     "locking": "Saving...",
+    "answersAtEnd": "Answers will appear at the very end, after you've answered all the questions.",
     "progress": "Question {current}/{total}",
     "finish": "Finish",
     "orderGuide": "Tap in the order you prefer",
@@ -364,20 +365,6 @@
     "guess": "Guess",
     "think": "I think so",
     "sure": "I'm sure"
-  },
-  "reveal": {
-    "correct": "You guessed right!",
-    "near": "You were close!",
-    "miss": "You missed it!",
-    "correctTitle": "You got it right!",
-    "nearTitle": "Close one!",
-    "missTitle": "Missed it",
-    "greatReading": "Great reading!",
-    "points": "+{points} pts",
-    "saved": "Your guess is saved. You'll see it together when your {rel, select, friend {friend} other {partner}} plays.",
-    "savedSubtitle": "You'll see the result together when your {rel, select, friend {friend} other {partner}} plays.",
-    "next": "Next question",
-    "finish": "See results"
   },
   "waiting": {
     "title": "You're done!",

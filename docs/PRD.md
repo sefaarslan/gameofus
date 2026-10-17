@@ -119,7 +119,7 @@ Kullanıcıya verilen temel değerler:
 9. Karşı tarafın linkten katılması (anonim guest token ile)
 10. Birleştirilmiş tur: her soruda kendi cevabını verme + karşı tarafı tahmin etme (tek ekran)
 11. Tahminlerde güven seviyesi seçimi (tahmin / sanırım / eminim)
-12. Anlık mikro-reveal
+12. Kilitleyince doğrudan sonraki soruya geçiş (ara ekran ve anlık sonuç yok; yanıtlar en sonda)
 13. Soft realtime durum ekranı
 14. Sonuç hesaplama ve sonuç ekranı
 15. **Geri bildirim:** sonuç ekranında isteğe bağlı mini anket + puansız çıkışta bir kez yumuşak istem (bkz. Bölüm 13.6, 19)
@@ -181,7 +181,7 @@ Tek soru ekranında sıra:
 2. Aynı ekranda partnerinin ne cevap verdiğini tahmin eder.
 3. Tahminine bir güven seviyesi ekler.
 4. Tahmini kilitler.
-5. Partner zaten cevapladıysa anlık mikro-reveal görünür; aksi halde "tahminin kaydedildi" bilgisi gösterilir.
+5. Doğrudan sonraki soruya geçilir (ara ekran yok); kilitle düğmesinin altında yanıtların tüm sorular bitince en sonda görüneceği belirtilir. Soru başına anlık sonuç (doğru/yakın/ıskaladı) gösterilmez.
 
 Oyuncu turunu tamamladığında bir sonraki soruya geçer. İki oyuncu da turunu bitirince oda `result_ready` durumuna geçer ve sonuçlar açılır.
 
@@ -195,16 +195,9 @@ Oyuncu her tahmin için bir güven seviyesi seçer:
 
 Güven seviyesi tahminin puan ağırlığını belirler. Emin olup tutturmak daha çok puan kazandırır; emin olup ıskalamak küçük bir risk taşır. Bu katman, basit evet/hayır mekaniğini küçük bir bahis oyununa çevirir ve sonuç ekranında "Sefa sana çok güvendi ve haklı çıktı" gibi konuşkan çıktılar üretir.
 
-#### Anlık mikro-reveal
+#### Anlık sonuç yok (mikro-reveal kaldırıldı)
 
-Her sorudan sonra, tüm sonucu sona saklamak yerine küçük bir geri bildirim verilebilir. Bu, akışı canlı tutar ve "bekleme uzun geliyor" hissini azaltır.
-
-Mikro-reveal yalnızca partner o soruyu zaten cevaplamışsa gösterilir:
-
-- Partner cevapladıysa: "doğru bildin / yakındın / ıskaladın" + kazanılan puan anlık gösterilir.
-- Partner henüz cevaplamadıysa: "Tahminin kaydedildi, partner oynayınca birlikte göreceksiniz" bilgisi gösterilir ve detaylı reveal toplu sonuç ekranına bırakılır.
-
-Bu davranış soft realtime mimarisiyle uyumludur: reveal için karşı tarafın verisi yoksa oyun akışı kesintiye uğramaz.
+Karar: soru kilitlenince hiçbir anlık sonuç (doğru bildin / yakındın / ıskaladın, puan) gösterilmez; **her iki oyuncu için de** ara ekran açılmadan doğrudan sonraki soruya geçilir; kilitle düğmesinin altındaki notta "Yanıtlar, tüm soruları cevapladıktan sonra en sonda görünecek" yazar. Gerekçe: ikinci oynayanın farklı deneyim yaşamaması (eşitlik), merakın ve sonuç ekranındaki sürprizin korunması, partner verisinin sonuç öncesi türetilmiş biçimde bile sızmaması. Sunucu partnerin cevabını `submit-turn` içinde okumaz ve sonuç dönmez. Web ve mobil aynıdır.
 
 ### 8.2 Prediction
 
@@ -291,7 +284,7 @@ Oda oluşturma **iki adımlı sihirbazdır** (web mobil/masaüstü ve mobil uygu
 1. Kullanıcı "Cevaplamaya Başla" butonuna tıklar.
 2. Soruları sırayla görür.
 3. Her soruda tek ekranda: önce kendi cevabını verir, sonra partnerinin cevabını tahmin eder ve tahminine güven seviyesi ekler.
-4. Tahmini kilitler. Partner zaten oynamışsa anlık mikro-reveal görür; oynamamışsa "tahminin kaydedildi" bilgisini görür.
+4. Tahmini kilitler ve doğrudan sonraki soruya geçer (ara ekran ve anlık sonuç yok; yanıtlar en sonda).
 5. Kendi cevapları gizli tutulur.
 6. Tüm sorular tamamlandığında status `owner_completed` olur.
 7. Kullanıcı bekleme ekranına yönlenir (partnerin turunu bekler).
@@ -363,7 +356,7 @@ Kullanıcı Supabase Auth ile (Google / Apple) giriş yapmıştır. Bu model **y
 
 1. Partner soruları sırayla görür.
 2. Her soruda tek ekranda: önce kendi cevabını verir, sonra ilk kullanıcının cevabını tahmin eder ve güven seviyesi ekler.
-3. İlk kullanıcı turunu zaten bitirdiği için, partner her soruda anlık mikro-reveal görebilir.
+3. İlk kullanıcı turunu bitirmiş olsa da partner de anlık sonuç görmez; kilitleyince doğrudan sonraki soruya geçer.
 4. Tüm sorular tamamlandığında status `guest_completed` olur.
 5. İki taraf da turunu tamamladığı için sonuç hesaplama tetiklenir.
 
@@ -396,7 +389,7 @@ Gerçek zamanlı olarak gösterilmeyecek şeyler:
 - Canlı soru geçişleri
 - Timer
 
-Mikro-reveal istisnası: Bir oyuncu tahminini kilitlediğinde, yalnızca partner o soruyu daha önce cevaplamışsa o tek sorunun sonucu (doğru/yakın/ıskaladın) anlık gösterilir. Bu, partnerin tüm cevaplarını canlı açmaz; sadece oyuncunun zaten tahmin ettiği soru için anlık geri bildirim verir.
+Anlık sonuç yoktur: bir oyuncu tahminini kilitlediğinde, partner o soruyu daha önce cevaplamış olsa bile hiçbir türetilmiş sonuç (doğru/yakın/ıskaladın) gösterilmez; yanıtlar iki taraf da bitirince sonuç ekranında açılır.
 
 Mobile'a özel: Soft realtime durum değişiklikleri (partner katıldı / tamamladı / sonuç hazır), mobile'da ayrıca **push notification** olarak tetiklenebilir.
 
@@ -631,15 +624,9 @@ Secret Choice oyun ekranı tek soruda iki bölümlü birleştirilmiş tur yapıs
 - Bölüm 2 — Karşı tarafı tahmin: aynı seçenekler, farklı vurgu rengi (başlık ilişki türüne göre: "Kankan / Sevgilin / Hayat arkadaşın ne cevap verir?")
 - Güven seviyesi seçimi (tahmin / sanırım / eminim)
 - Mikro açıklama
-- "Tahmini kilitle" butonu
+- "Tahmini kilitle" butonu ve altında küçük not: "Yanıtlar, tüm soruları cevapladıktan sonra en sonda görünecek."
 
-Tahmin kilitlendikten sonra mikro-reveal ekranı gösterilir:
-
-- Sonuç ikonu ve etiketi (doğru bildin / yakındın / ıskaladın)
-- Senin cevabın · partnerin cevabı
-- Kazanılan puan ve güven notu
-- Partner henüz oynamadıysa: "tahminin kaydedildi" fallback görünümü
-- Devam butonu
+Tahmin kilitlendikten sonra **ara ekran yoktur**: doğrudan sonraki soru açılır (son soruda bekleme/sonuç ekranına geçilir). Anlık sonuç, puan veya partnerin cevabı gösterilmez.
 
 ### 13.5 Waiting Screen (web + mobile)
 
@@ -701,8 +688,8 @@ Tahmin kilitlendikten sonra mikro-reveal ekranı gösterilir:
 
 İçerikler:
 
-- Oyun listesi (tarih, partner adı, okuma skoru)
-- Bir oyuna tıklayınca Detailed Results (13.7) açılır
+- Oyun listesi (tarih, partner adı, okuma skoru; `GET /api/users/history`, son 90 gün)
+- Bir oyuna tıklayınca Detailed Results (13.7) açılır (sonuç, hesabın JWT'siyle okunur; oda süresi dolmuş olsa da saklama süresi boyunca açılır, cihazdaki katılımcı token'ı gerekmez)
 - Yeni bir analiz/istatistik katmanı yoktur, var olan sonuç verisi gösterilir
 
 ### 13.12 Empty / Error States (web + mobile)
@@ -729,7 +716,7 @@ Durumlar:
 - Cevaplar reveal aşamasına kadar gizli kalmalı.
 - Her soru tek ekranda tamamlanmalı; cevap ve tahmin için oda içinde ileri-geri geçiş olmamalı.
 - Akış kısa hissettirmeli; oyuncu mümkün olduğunca az bekleme ve az tıklama ile oynamalı.
-- Anlık mikro-reveal mümkünse kullanılmalı, ancak partner verisi yoksa akışı bloke etmemeli.
+- Soru başına anlık sonuç gösterilmez; kilitleyince doğrudan sonraki soruya geçilir (ara ekran yok); akış partner verisinin durumundan bağımsızdır.
 - Güven seviyesi seçimi akışı uzatmamalı; tek dokunuşla seçilebilmeli.
 - Ton sıcak, yumuşak ve yargılayıcı olmayan bir dilde olmalı.
 - "Mükemmel eşleşme", "ilişkiniz kötü" gibi teşhis edici metinlerden kaçınılmalı.
@@ -791,7 +778,7 @@ Web ve mobile, **ayrı kod tabanları** olarak geliştirilir, **ortak Supabase b
 **Oda dili (oyun içeriği — oda bazlı, sabit):**
 
 - Bir oda kurulduğu anda, owner'ın **o anki arayüz dili** odaya sabitlenir (`rooms.locale`). Örneğin owner web'de sağ üstten İngilizce seçmişse ve "Oyun linki oluştur" derse, oda `locale = 'en'` olarak kurulur.
-- Guest linke girdiğinde, **kendi cihaz/tarayıcı dili ne olursa olsun**, girdiği odanın diline tabi olur — hem arayüz (buton, başlık, mikro-reveal metinleri) hem soru içeriği guest'e de odanın diliyle gösterilir.
+- Guest linke girdiğinde, **kendi cihaz/tarayıcı dili ne olursa olsun**, girdiği odanın diline tabi olur — hem arayüz (buton, başlık, not metinleri) hem soru içeriği guest'e de odanın diliyle gösterilir.
 - Bu kural sayesinde bir odadaki tüm soru ve cevap verisi **tek bir dile sabit** kalır; aynı anlamsal sorunun iki farklı dilde eşleştirilmesi gibi bir senaryo hiç oluşmaz (bkz. Bölüm 17 — veri modeli, `question_id` artık düz FK'dır).
 - Sonuç ekranı, geçmiş oyunlar gibi oda-sonrası görünümler de oda diliyle gösterilir.
 
@@ -1093,7 +1080,7 @@ Kural:
 | target_participant_id | uuid | Tahmin edilen kişi |
 | predicted_value | text/jsonb | Tahmin değeri |
 | confidence_level | text | Güven seviyesi: guess / think / sure |
-| confidence_multiplier | int | Güven çarpanı: 1 / 2 / 3 (mikro-reveal için kullanılır, sonuca yansımaz) |
+| confidence_multiplier | int | Güven çarpanı: 1 / 2 / 3 (yalnızca sonuç yorumları/anlatım için; okuma skoruna yansımaz) |
 | locked_at | timestamptz | Tahminin kilitlendiği zaman |
 | created_at | timestamptz | Oluşturulma zamanı |
 
@@ -1105,7 +1092,7 @@ unique(room_id, question_id, predictor_participant_id, target_participant_id)
 
 Kural:
 
-- Tahmin kilitlenmeden mikro-reveal hesaplanmaz.
+- Anlık sonuç hiç hesaplanmaz/dönmez; sonuçlar yalnızca iki taraf da bitirince açılır.
 - Tahmin kilitlendikten sonra değiştirilemez.
 - Partner cevabı tahmin kilitlenmeden hiçbir şekilde expose edilmez.
 
@@ -1208,9 +1195,8 @@ unique(provider_transaction_id)
 ### Cevap gizliliği ve reveal kuralları
 
 - Partnerin gerçek cevabı, tahmin kilitlenmeden önce hiçbir şekilde client'a dönmemelidir.
-- Mikro-reveal yalnızca oyuncu kendi cevabını ve tahminini kilitledikten sonra hesaplanabilir.
-- Mikro-reveal sadece ilgili soru için "doğru / yakın / ıskaladı" gibi türetilmiş sonucu gösterebilir.
-- Mikro-reveal, partnerin tüm cevaplarını veya henüz oynanmamış sorulara ait bilgileri açığa çıkarmaz.
+- Soru başına anlık sonuç (mikro-reveal) **yoktur**: `submit-turn` partnerin cevabını okumaz ve doğru/yakın/ıskaladı gibi türetilmiş sonuç bile dönmez.
+- Partnerin cevapları ve sonuçlar yalnızca iki taraf da bitirince (`result_ready`) sonuç endpoint'inde açılır.
 - Sonuç ekranı yalnızca oda `result_ready` durumuna geçtiğinde açılır.
 
 ### RLS ve veri erişim kuralları
@@ -1350,7 +1336,7 @@ Her ilişki türü 6 kategori görür (Sevgili ve Hayat Arkadaşı'nda biri prem
 ### Faz 1 — Web MVP (tamamlandı)
 
 - Landing, oda oluşturma, link paylaşımı, guest join (anonim participant token), token hash saklama
-- Birleştirilmiş tur, soft realtime status, mikro-reveal, server-side sonuç hesaplama, sonuç ekranı
+- Birleştirilmiş tur, soft realtime status, server-side sonuç hesaplama, sonuç ekranı
 - Temel RLS / server-side erişim kontrolleri, temel abuse/rate limit
 - Secret Choice modu
 

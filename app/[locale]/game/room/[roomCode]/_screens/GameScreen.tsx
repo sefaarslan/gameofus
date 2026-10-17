@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { relKey, type RelKey } from "@/lib/relationship";
+import { relKey } from "@/lib/relationship";
 
 type QuestionMode = "secret_choice" | "prediction" | "orderline";
 type ConfidenceLevel = "guess" | "think" | "sure";
 type ScChoice = "yes" | "unsure" | "no";
-type RevealResult = "correct" | "near" | "miss";
 
 interface Question {
   roundOrder: number;
@@ -15,14 +14,6 @@ interface Question {
   mode: QuestionMode;
   questionText: string;
   options: Array<{ id: string; optionText: string; sortOrder: number }> | null;
-}
-
-interface MicroReveal {
-  available: boolean;
-  result?: RevealResult;
-  label?: string;
-  points?: number;
-  message?: string;
 }
 
 interface GameScreenProps {
@@ -216,112 +207,6 @@ function OrderlineRanker({
   );
 }
 
-// ── Micro-reveal card ────────────────────────────────────────────
-function MicroRevealCard({
-  reveal,
-  isLast,
-  rel,
-  onNext,
-}: {
-  reveal: MicroReveal;
-  isLast: boolean;
-  rel: RelKey;
-  onNext: () => void;
-}) {
-  const tReveal = useTranslations("reveal");
-
-  if (!reveal.available) {
-    return (
-      <div className="w-full max-w-[400px] mx-auto bg-surface-container-lowest rounded-xl p-8 flex flex-col items-center text-center shadow-soft-active animate-pop-in">
-        <div className="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center mb-6">
-          <span className="material-symbols-outlined text-primary icon-fill" style={{ fontSize: "40px" }}>bookmark_added</span>
-        </div>
-        <h2 className="text-headline-lg-mobile text-on-background mb-2">{tReveal("saved", { rel })}</h2>
-        <p className="text-body-md text-on-surface-variant mb-8">{tReveal("savedSubtitle", { rel })}</p>
-        <button
-          onClick={onNext}
-          className="w-full bg-primary text-on-primary h-16 rounded-full flex items-center justify-center gap-3 shadow-primary-glow hover:bg-surface-tint transition-all active:scale-95 group text-body-lg font-semibold"
-        >
-          {isLast ? tReveal("finish") : tReveal("next")}
-          <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
-        </button>
-      </div>
-    );
-  }
-
-  const resultConfig = {
-    correct: {
-      iconBg: "bg-tertiary-fixed",
-      icon: "workspace_premium",
-      iconColor: "text-on-tertiary-fixed",
-      title: tReveal("correctTitle"),
-      titleColor: "text-primary",
-    },
-    near: {
-      iconBg: "bg-secondary-container",
-      icon: "adjust",
-      iconColor: "text-on-secondary-container",
-      title: tReveal("nearTitle"),
-      titleColor: "text-secondary-container",
-    },
-    miss: {
-      iconBg: "bg-error-container",
-      icon: "close",
-      iconColor: "text-error",
-      title: tReveal("missTitle"),
-      titleColor: "text-error",
-    },
-  };
-
-  const cfg = resultConfig[reveal.result ?? "miss"];
-
-  return (
-    <div className="w-full max-w-[400px] mx-auto bg-surface-container-lowest rounded-xl p-8 flex flex-col items-center text-center shadow-soft-active animate-pop-in relative overflow-hidden">
-      {/* Corner blobs */}
-      <div className="absolute -top-10 -left-10 w-32 h-32 bg-primary-container/20 rounded-full blur-3xl" />
-      <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-tertiary-fixed/20 rounded-full blur-3xl" />
-
-      <div className={`relative w-24 h-24 rounded-full ${cfg.iconBg} flex items-center justify-center mb-6 shadow-soft-card z-10`}>
-        <span className={`material-symbols-outlined icon-fill ${cfg.iconColor}`} style={{ fontSize: "48px" }}>{cfg.icon}</span>
-        {reveal.result === "correct" && (
-          <>
-            <span className="material-symbols-outlined absolute -top-2 -right-2 text-tertiary text-xl animate-pulse">auto_awesome</span>
-            <span className="material-symbols-outlined absolute bottom-2 -left-3 text-tertiary text-base animate-pulse">star</span>
-          </>
-        )}
-      </div>
-
-      <h2 className={`text-headline-lg-mobile mb-2 relative z-10 animate-float-up ${cfg.titleColor}`}>{cfg.title}</h2>
-      <p className="text-body-md text-on-surface-variant mb-6 relative z-10 animate-float-up">{reveal.message}</p>
-
-      {reveal.points !== undefined && reveal.points > 0 && (
-        <div className="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg p-5 flex flex-col items-center relative z-10 mb-6 animate-float-up">
-          <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-headline-xl text-tertiary drop-shadow-sm">{tReveal("points", { points: reveal.points })}</span>
-            {reveal.label && (
-              <span className="text-label-md text-on-surface-variant opacity-80">({reveal.label})</span>
-            )}
-          </div>
-          {reveal.result === "correct" && (
-            <div className="bg-tertiary-fixed text-on-tertiary-fixed text-label-md px-4 py-2 rounded-full inline-flex items-center gap-1.5 shadow-sm">
-              <span className="material-symbols-outlined text-lg icon-fill">bolt</span>
-              <span>{tReveal("greatReading")}</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      <button
-        onClick={onNext}
-        className="w-full bg-primary text-on-primary h-16 rounded-full flex items-center justify-center gap-3 shadow-primary-glow hover:bg-surface-tint transition-all active:scale-95 group text-body-lg font-semibold relative z-10"
-      >
-        {isLast ? tReveal("finish") : tReveal("next")}
-        <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
-      </button>
-    </div>
-  );
-}
-
 // ── Main GameScreen ───────────────────────────────────────────────
 export function GameScreen({
   roomCode,
@@ -341,7 +226,6 @@ export function GameScreen({
   const [myPrediction, setMyPrediction] = useState<ScChoice | string | string[] | null>(null);
   const [confidence, setConfidence] = useState<ConfidenceLevel>("guess");
   const [submitting, setSubmitting] = useState(false);
-  const [reveal, setReveal] = useState<MicroReveal | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const question = questions[currentIndex];
@@ -364,7 +248,7 @@ export function GameScreen({
       ? myPredictionOrder.length === (sortedOptions?.length ?? 0)
       : myPrediction !== null;
 
-  const canSubmit = myAnswerComplete && myPredictionComplete && !submitting && !reveal;
+  const canSubmit = myAnswerComplete && myPredictionComplete && !submitting;
 
   function buildValue(mode: QuestionMode, val: ScChoice | string | string[]) {
     if (mode === "secret_choice") return { value: val as ScChoice };
@@ -372,7 +256,29 @@ export function GameScreen({
     return { order: val as string[] };
   }
 
-  const handleSubmit = useCallback(async () => {
+  // Sonraki soruya (ya da son soruysa sonuca) geç: ara ekran yok, kilitlenen tur sessizce kaydedilir
+  async function advance() {
+    if (isLast) {
+      try {
+        await fetch(`/api/rooms/${roomCode}/complete`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ participantToken }),
+        });
+      } catch {
+        // proceed anyway
+      }
+      onComplete();
+      return;
+    }
+    setCurrentIndex((i) => i + 1);
+    setMyAnswer(null);
+    setMyPrediction(null);
+    setConfidence("guess");
+    setError(null);
+  }
+
+  async function handleSubmit() {
     if (!canSubmit || !question) return;
     setSubmitting(true);
     setError(null);
@@ -394,40 +300,18 @@ export function GameScreen({
         setError(data.error?.message ?? t("errorGeneric"));
         return;
       }
-      setReveal(data.microReveal);
+      await advance();
     } catch {
       setError(t("errorConnection"));
     } finally {
       setSubmitting(false);
     }
-  }, [canSubmit, question, roomCode, participantToken, myAnswer, myPrediction, confidence]);
+  }
 
-  // Soru/reveal değişince sayfa en üstten başlasın (mobilde önceki kaydırma konumu kalıp soruyu kesiyordu)
+  // Soru değişince sayfa en üstten başlasın (mobilde önceki kaydırma konumu kalıp soruyu kesiyordu)
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
-  }, [currentIndex, reveal]);
-
-  async function handleNext() {
-    if (isLast) {
-      try {
-        await fetch(`/api/rooms/${roomCode}/complete`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ participantToken }),
-        });
-      } catch {
-        // proceed anyway
-      }
-      onComplete();
-      return;
-    }
-    setCurrentIndex((i) => i + 1);
-    setMyAnswer(null);
-    setMyPrediction(null);
-    setConfidence("guess");
-    setReveal(null);
-    setError(null);
-  }
+  }, [currentIndex]);
 
   if (!question) return null;
 
@@ -464,147 +348,135 @@ export function GameScreen({
         </div>
       </div>
 
-      {/* Micro-reveal state — full overlay */}
-      {reveal && (
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
-          <div className="absolute -top-20 -left-20 w-[300px] h-[300px] bg-primary-container/30 rounded-full blur-[80px] opacity-60 pointer-events-none" />
-          <div className="absolute bottom-20 -right-20 w-[250px] h-[250px] bg-tertiary-fixed/40 rounded-full blur-[60px] opacity-40 pointer-events-none" />
-          <MicroRevealCard reveal={reveal} isLast={isLast} rel={rel} onNext={handleNext} />
+      <div className="flex-1 flex flex-col max-w-[720px] mx-auto w-full px-6 py-8 pb-32 gap-0">
+        {/* Question */}
+        <div className="text-center px-2 mb-8">
+          <h1 className="text-headline-lg-mobile md:text-headline-lg text-on-surface leading-snug">
+            {question.questionText}
+          </h1>
         </div>
-      )}
 
-      {!reveal && (
-        <div className="flex-1 flex flex-col max-w-[720px] mx-auto w-full px-6 py-8 pb-32 gap-0">
-          {/* Question */}
-          <div className="text-center px-2 mb-8">
-            <h1 className="text-headline-lg-mobile md:text-headline-lg text-on-surface leading-snug">
-              {question.questionText}
-            </h1>
+        {/* My answer section */}
+        <div className="glass-card rounded-[2rem] p-6 shadow-soft-card relative mb-0">
+          <div className="flex items-center gap-2 mb-5 text-primary">
+            <span className="material-symbols-outlined text-xl icon-fill">lock</span>
+            <h2 className="text-label-md uppercase tracking-wide">{t("yourAnswer")} — {t("yourAnswerNote", { rel })}</h2>
           </div>
 
-          {/* My answer section */}
-          <div className="glass-card rounded-[2rem] p-6 shadow-soft-card relative mb-0">
-            <div className="flex items-center gap-2 mb-5 text-primary">
-              <span className="material-symbols-outlined text-xl icon-fill">lock</span>
-              <h2 className="text-label-md uppercase tracking-wide">{t("yourAnswer")} — {t("yourAnswerNote", { rel })}</h2>
-            </div>
-
-            {question.mode === "secret_choice" && (
-              <SecretChoiceButtons
-                selected={myAnswer as ScChoice | null}
-                onSelect={(v) => setMyAnswer(v)}
-                variant="answer"
-              />
-            )}
-            {question.mode === "prediction" && sortedOptions && (
-              <PredictionButtons
-                options={sortedOptions}
-                selected={myAnswer as string | null}
-                onSelect={(id) => setMyAnswer(id)}
-                variant="answer"
-              />
-            )}
-            {question.mode === "orderline" && sortedOptions && (
-              <OrderlineRanker
-                options={sortedOptions}
-                order={myAnswerOrder}
-                onChange={(o) => setMyAnswer(o)}
-                guide={t("orderGuide")}
-                variant="answer"
-              />
-            )}
-          </div>
-
-          {/* Connector */}
-          <div className="flex justify-center my-0 relative z-10 py-1">
-            <div className="h-10 border-l-2 border-dashed border-outline-variant" />
-          </div>
-
-          {/* Partner prediction section */}
-          <div className="glass-card rounded-[2rem] p-6 shadow-soft-card">
-            <div className="flex items-center gap-2 mb-5 text-tertiary-container">
-              <span className="material-symbols-outlined text-xl icon-fill">psychology</span>
-              <h2 className="text-label-md uppercase tracking-wide">{t("partnerGuess", { rel })}</h2>
-            </div>
-
-            {question.mode === "secret_choice" && (
-              <SecretChoiceButtons
-                selected={myPrediction as ScChoice | null}
-                onSelect={(v) => setMyPrediction(v)}
-                variant="prediction"
-              />
-            )}
-            {question.mode === "prediction" && sortedOptions && (
-              <PredictionButtons
-                options={sortedOptions}
-                selected={myPrediction as string | null}
-                onSelect={(id) => setMyPrediction(id)}
-                variant="prediction"
-              />
-            )}
-            {question.mode === "orderline" && sortedOptions && (
-              <OrderlineRanker
-                options={sortedOptions}
-                order={myPredictionOrder}
-                onChange={(o) => setMyPrediction(o)}
-                guide={t("partnerOrderGuide", { rel })}
-                variant="prediction"
-              />
-            )}
-
-            {/* Confidence pills */}
-            <div className="mt-6 space-y-3">
-              <p className="text-label-md text-on-surface-variant text-center">{t("confidence")}</p>
-              <div className="grid grid-cols-3 gap-2 sm:flex sm:justify-center">
-                {confidenceLevels.map(({ level, icon }) => (
-                  <button
-                    key={level}
-                    type="button"
-                    onClick={() => setConfidence(level)}
-                    className={`flex items-center justify-center gap-1.5 min-w-0 px-2 sm:px-5 py-2 rounded-full text-label-md whitespace-nowrap transition-all ${
-                      confidence === level
-                        ? "border border-transparent bg-tertiary-container text-on-tertiary shadow-md"
-                        : "border border-outline-variant bg-surface text-on-surface-variant hover:bg-surface-container"
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-base">{icon}</span>
-                    {tConf(level)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Error */}
-          {error && (
-            <div className="flex items-center gap-3 bg-error-container text-error rounded-xl px-4 py-3 mt-4">
-              <span className="material-symbols-outlined text-xl">error</span>
-              <span className="text-body-md">{error}</span>
-            </div>
+          {question.mode === "secret_choice" && (
+            <SecretChoiceButtons
+              selected={myAnswer as ScChoice | null}
+              onSelect={(v) => setMyAnswer(v)}
+              variant="answer"
+            />
+          )}
+          {question.mode === "prediction" && sortedOptions && (
+            <PredictionButtons
+              options={sortedOptions}
+              selected={myAnswer as string | null}
+              onSelect={(id) => setMyAnswer(id)}
+              variant="answer"
+            />
+          )}
+          {question.mode === "orderline" && sortedOptions && (
+            <OrderlineRanker
+              options={sortedOptions}
+              order={myAnswerOrder}
+              onChange={(o) => setMyAnswer(o)}
+              guide={t("orderGuide")}
+              variant="answer"
+            />
           )}
         </div>
-      )}
 
-      {/* Sticky CTA */}
-      {!reveal && (
-        <div className="fixed bottom-0 left-0 w-full bg-gradient-to-t from-surface via-surface/95 to-transparent pt-12 pb-8 px-6 z-40 flex justify-center">
-          <div className="w-full max-w-[720px]">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              className="w-full bg-primary text-on-primary h-16 rounded-full flex items-center justify-center gap-2 shadow-primary-glow hover:bg-surface-tint disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 text-headline-md"
-            >
-              {submitting ? (
-                <span className="material-symbols-outlined animate-spin text-xl">refresh</span>
-              ) : (
-                <span className="material-symbols-outlined text-xl">lock_clock</span>
-              )}
-              {submitting ? t("locking") : t("lock")}
-            </button>
+        {/* Connector */}
+        <div className="flex justify-center my-0 relative z-10 py-1">
+          <div className="h-10 border-l-2 border-dashed border-outline-variant" />
+        </div>
+
+        {/* Partner prediction section */}
+        <div className="glass-card rounded-[2rem] p-6 shadow-soft-card">
+          <div className="flex items-center gap-2 mb-5 text-tertiary-container">
+            <span className="material-symbols-outlined text-xl icon-fill">psychology</span>
+            <h2 className="text-label-md uppercase tracking-wide">{t("partnerGuess", { rel })}</h2>
+          </div>
+
+          {question.mode === "secret_choice" && (
+            <SecretChoiceButtons
+              selected={myPrediction as ScChoice | null}
+              onSelect={(v) => setMyPrediction(v)}
+              variant="prediction"
+            />
+          )}
+          {question.mode === "prediction" && sortedOptions && (
+            <PredictionButtons
+              options={sortedOptions}
+              selected={myPrediction as string | null}
+              onSelect={(id) => setMyPrediction(id)}
+              variant="prediction"
+            />
+          )}
+          {question.mode === "orderline" && sortedOptions && (
+            <OrderlineRanker
+              options={sortedOptions}
+              order={myPredictionOrder}
+              onChange={(o) => setMyPrediction(o)}
+              guide={t("partnerOrderGuide", { rel })}
+              variant="prediction"
+            />
+          )}
+
+          {/* Confidence pills */}
+          <div className="mt-6 space-y-3">
+            <p className="text-label-md text-on-surface-variant text-center">{t("confidence")}</p>
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:justify-center">
+              {confidenceLevels.map(({ level, icon }) => (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() => setConfidence(level)}
+                  className={`flex items-center justify-center gap-1.5 min-w-0 px-2 sm:px-5 py-2 rounded-full text-label-md whitespace-nowrap transition-all ${
+                    confidence === level
+                      ? "border border-transparent bg-tertiary-container text-on-tertiary shadow-md"
+                      : "border border-outline-variant bg-surface text-on-surface-variant hover:bg-surface-container"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base">{icon}</span>
+                  {tConf(level)}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      )}
+
+        {/* Error */}
+        {error && (
+          <div className="flex items-center gap-3 bg-error-container text-error rounded-xl px-4 py-3 mt-4">
+            <span className="material-symbols-outlined text-xl">error</span>
+            <span className="text-body-md">{error}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Sticky CTA */}
+      <div className="fixed bottom-0 left-0 w-full bg-gradient-to-t from-surface via-surface/95 to-transparent pt-12 pb-8 px-6 z-40 flex justify-center">
+        <div className="w-full max-w-[720px]">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+            className="w-full bg-primary text-on-primary h-16 rounded-full flex items-center justify-center gap-2 shadow-primary-glow hover:bg-surface-tint disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 text-headline-md"
+          >
+            {submitting ? (
+              <span className="material-symbols-outlined animate-spin text-xl">refresh</span>
+            ) : (
+              <span className="material-symbols-outlined text-xl">lock_clock</span>
+            )}
+            {submitting ? t("locking") : t("lock")}
+          </button>
+          <p className="mt-2 text-center text-xs text-on-surface-variant/80">{t("answersAtEnd")}</p>
+        </div>
+      </div>
     </div>
   );
 }

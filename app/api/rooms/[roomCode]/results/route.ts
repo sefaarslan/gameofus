@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { verifyToken, extractToken } from "@/lib/token";
+import { extractToken } from "@/lib/token";
+import { bearerJwt } from "@/lib/auth";
+import { findParticipant } from "@/lib/participant-auth";
 import { isRoomExpired } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
 import { corsOptions } from "@/lib/cors";
@@ -28,7 +30,9 @@ export async function GET(
   const { roomCode } = await params;
   const token = extractToken(req, req.nextUrl.searchParams.get("participantToken"));
 
-  if (!token) return apiError("INVALID_TOKEN", "Token gereklidir.", 403);
+  // Kimlik: katılımcı token'ı ya da giriş yapmış (mobil) kullanıcının Supabase JWT'si (geçmiş sonuçlar için)
+  const hasJwt = bearerJwt(req) !== null;
+  if (!token && !hasJwt) return apiError("INVALID_TOKEN", "Token gereklidir.", 403);
 
   const supabase = createAdminClient();
 
@@ -39,7 +43,9 @@ export async function GET(
     .maybeSingle();
 
   if (!room) return apiError("ROOM_NOT_FOUND", "Oda bulunamadı.", 404);
-  if (isRoomExpired(room.expires_at)) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
+  // Süresi dolmuş oda yalnızca hesabıyla (JWT) giren oyuncuya açıktır (geçmiş, saklama süresi boyunca); token ile açılmaz
+  const expired = isRoomExpired(room.expires_at);
+  if (expired && !hasJwt) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
   if (room.status !== "result_ready" && room.status !== "completed") {
     return apiError("RESULT_NOT_READY", "Sonuçlar henüz hazır değil.");
   }
@@ -48,7 +54,7 @@ export async function GET(
   const [{ data: allParticipants }, { data: result }, { data: roomQuestions }] = await Promise.all([
     supabase
       .from("participants")
-      .select("id, role, display_name, token_hash")
+      .select("id, role, display_name, token_hash, user_id")
       .eq("room_id", room.id),
     supabase
       .from("results")
@@ -63,8 +69,9 @@ export async function GET(
   ]);
 
   const participants = allParticipants ?? [];
-  const me = participants.find((p) => verifyToken(token, p.token_hash));
+  const { participant: me, viaUser } = await findParticipant(req, token, participants);
   if (!me) return apiError("INVALID_TOKEN", "Geçersiz token.", 403);
+  if (expired && !viaUser) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
 
   const partner = participants.find((p) => p.id !== me.id);
 

@@ -344,6 +344,7 @@
     "confidence": "¿Qué tan seguro/a estás?",
     "lock": "Confirmar predicción",
     "locking": "Guardando...",
+    "answersAtEnd": "Las respuestas aparecerán al final, cuando hayas respondido todas las preguntas.",
     "progress": "Pregunta {current}/{total}",
     "finish": "Terminar",
     "orderGuide": "Toca en el orden que prefieras",
@@ -364,20 +365,6 @@
     "guess": "Adivino",
     "think": "Creo que sí",
     "sure": "Estoy seguro/a"
-  },
-  "reveal": {
-    "correct": "¡Adivinaste!",
-    "near": "¡Casi lo tienes!",
-    "miss": "¡Fallaste!",
-    "correctTitle": "¡Correcto!",
-    "nearTitle": "¡Cerca!",
-    "missTitle": "Fallaste",
-    "greatReading": "¡Excelente lectura!",
-    "points": "+{points} pts",
-    "saved": "Tu predicción fue guardada. Lo verán juntos cuando tu {rel, select, friend {amigo} other {pareja}} juegue.",
-    "savedSubtitle": "Verán el resultado juntos cuando tu {rel, select, friend {amigo} other {pareja}} juegue.",
-    "next": "Siguiente pregunta",
-    "finish": "Ver resultados"
   },
   "waiting": {
     "title": "¡Terminaste!",

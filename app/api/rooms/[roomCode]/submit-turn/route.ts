@@ -7,24 +7,11 @@ import { corsOptions } from "@/lib/cors";
 export function OPTIONS() {
   return corsOptions();
 }
-import { compareAnswers } from "@/lib/scoring";
 import { apiError, apiOk } from "@/lib/api";
 import type { Json } from "@/types/database.types";
 
 const CONFIDENCE_MULTIPLIERS = { guess: 1, think: 2, sure: 3 } as const;
 type ConfidenceLevel = keyof typeof CONFIDENCE_MULTIPLIERS;
-
-const REVEAL_MESSAGES = {
-  correct: "Doğru bildin! Partnerini çok iyi okuyorsun.",
-  near: "Yakındın! Birbirinize oldukça yakınsınız.",
-  miss: "Iskaladın! Bu soruyu birlikte konuşabilirsiniz.",
-} as const;
-
-const REVEAL_LABELS = {
-  correct: "Doğru tahmin",
-  near: "Yakın tahmin",
-  miss: "Iskaladı",
-} as const;
 
 export async function POST(
   req: NextRequest,
@@ -78,7 +65,7 @@ export async function POST(
       .eq("room_id", room.id),
     supabase
       .from("room_questions")
-      .select("question_id, questions(mode)")
+      .select("question_id")
       .eq("room_id", room.id)
       .eq("question_id", questionId)
       .maybeSingle(),
@@ -92,8 +79,6 @@ export async function POST(
   if (!partner) return apiError("ROOM_NOT_FOUND", "Partner henüz katılmadı.", 404);
 
   if (!rq) return apiError("QUESTION_NOT_FOUND", "Bu soru bu odaya ait değil.", 404);
-
-  const questionMode = (rq.questions as { mode: string } | null)?.mode ?? "secret_choice";
 
   // Duplicate submit kontrolü
   const { data: existingAnswer } = await supabase
@@ -110,15 +95,14 @@ export async function POST(
 
   const now = new Date().toISOString();
 
-  // Cevap + tahmin yazma, katılımcı/oda durum güncellemesi ve partner cevabı okuma —
-  // hiçbiri birbirine bağlı değil, hepsi paralel çalışır (sıralı 5-6 round-trip yerine 1)
+  // Cevap + tahmin yazma ve katılımcı/oda durum güncellemesi — birbirine bağlı değil, paralel çalışır.
+  // Partnerin cevabı burada OKUNMAZ ve doğru/yakın/ıskaladı gibi anlık sonuç dönülmez: sonuçlar yalnızca iki taraf da
+  // bitirince sonuç endpoint'inde açılır (reveal öncesi partner verisi hiçbir biçimde sızmaz).
   const newRoomStatus = me.role === "owner" ? "owner_playing" : "guest_playing";
   const [
     { error: answerErr },
     { error: predErr },
     ,
-    ,
-    { data: partnerAnswer },
   ] = await Promise.all([
     supabase.from("answers").insert({
       room_id: room.id,
@@ -143,43 +127,18 @@ export async function POST(
     me.status === "joined"
       ? supabase.from("rooms").update({ status: newRoomStatus }).eq("id", room.id)
       : Promise.resolve(null),
-    supabase
-      .from("answers")
-      .select("answer_value")
-      .eq("room_id", room.id)
-      .eq("question_id", questionId)
-      .eq("participant_id", partner.id)
-      .maybeSingle(),
   ]);
 
   if (answerErr || predErr) {
     return apiError("INTERNAL_ERROR", "Cevap kaydedilemedi.", 500);
   }
 
-  if (!partnerAnswer) {
-    return apiOk({
-      saved: true,
-      microReveal: {
-        available: false,
-        message: "Tahminin kaydedildi. Partner oynayınca birlikte göreceksiniz.",
-      },
-    });
-  }
-
-  // Partner cevabı var — karşılaştır (ham cevap dönme)
-  const mode = questionMode as "secret_choice" | "prediction" | "orderline";
-  const result = compareAnswers(mode, partnerAnswer.answer_value as Parameters<typeof compareAnswers>[1], predictedValue as Parameters<typeof compareAnswers>[2]);
-  const multiplier = CONFIDENCE_MULTIPLIERS[confidence];
-  const points = result === "correct" ? multiplier * 2 : result === "near" ? multiplier * 1 : 0;
-
+  // `microReveal` yalnızca eski istemcilerin yanıt şeklini bozmamak için kalır (her zaman available:false); yeni istemciler yok sayar.
   return apiOk({
     saved: true,
     microReveal: {
-      available: true,
-      result,
-      label: REVEAL_LABELS[result],
-      points,
-      message: REVEAL_MESSAGES[result],
+      available: false,
+      message: "Tahminin kaydedildi. Yanıtlar, tüm sorular bitince birlikte görünecek.",
     },
   });
 }

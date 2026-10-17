@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { verifyToken, extractToken } from "@/lib/token";
+import { extractToken } from "@/lib/token";
+import { findParticipant } from "@/lib/participant-auth";
 import { isRoomExpired } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
 import { corsOptions } from "@/lib/cors";
@@ -30,16 +31,13 @@ export async function GET(
   // Participants
   const { data: allParticipants } = await supabase
     .from("participants")
-    .select("id, role, display_name, status, token_hash, completed_at")
+    .select("id, role, display_name, status, token_hash, completed_at, user_id")
     .eq("room_id", room.id);
 
   const participants = allParticipants ?? [];
 
-  // Token ile mevcut participant'ı bul
-  let me = null;
-  if (token) {
-    me = participants.find((p) => verifyToken(token, p.token_hash)) ?? null;
-  }
+  // Token ile (yoksa giriş yapmış mobil kullanıcının JWT'siyle) mevcut participant'ı bul
+  const { participant: me } = await findParticipant(req, token, participants);
 
   // Questions (options dahil — tek seferde yüklenir)
   const { data: roomQuestions } = await supabase
