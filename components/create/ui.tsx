@@ -5,15 +5,17 @@ import type { ReactNode } from "react";
 
 export function NumberBadge({ n }: { n: number }) {
   return (
-    <span className="w-6 h-6 rounded-full bg-primary-container flex items-center justify-center text-xs font-bold text-primary shrink-0">
+    <span className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-xs font-bold text-on-primary shrink-0">
       {n}
     </span>
   );
 }
 
-export function Pill({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "primary" | "tertiary" }) {
+export function Pill({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "primary" | "tertiary" | "muted" }) {
   const cls =
-    tone === "primary"
+    tone === "muted"
+      ? "border border-outline-variant/60 text-on-surface-variant/70 font-medium"
+      : tone === "primary"
       ? "bg-primary-container text-primary"
       : tone === "tertiary"
       ? "bg-tertiary-container/60 text-[#6b5900]"
@@ -76,6 +78,7 @@ export function ChoiceCard({
   trailing,
   iconNode,
   wrapTitle,
+  iconFill,
 }: {
   selected: boolean;
   onClick: () => void;
@@ -95,6 +98,8 @@ export function ChoiceCard({
   iconNode?: ReactNode;
   /** Başlık sığmazsa kesmek yerine alt satıra insin (ör. uzun bir bağ adı) */
   wrapTitle?: boolean;
+  /** Material Symbols ikonunu dolu çiz */
+  iconFill?: boolean;
 }) {
   return (
     <button
@@ -111,7 +116,7 @@ export function ChoiceCard({
     >
       <span className="flex items-center justify-between mb-2 w-full">
         <span className={`w-9 h-9 rounded-xl flex items-center justify-center ${selected ? "bg-on-primary/15" : iconTint}`}>
-          {iconNode ?? <span className={`material-symbols-outlined text-lg ${selected ? "text-on-primary" : iconColor}`}>{icon}</span>}
+          {iconNode ?? <span className={`material-symbols-outlined ${iconFill ? "icon-fill text-[22px]" : "text-lg"} ${selected ? "text-on-primary" : iconColor}`}>{icon}</span>}
         </span>
         {trailing ?? (hideMarker ? null : <SelectionMarker selected={selected} />)}
       </span>

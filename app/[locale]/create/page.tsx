@@ -39,10 +39,11 @@ const MODES: Array<{ value: ClassicMode; icon: string; tint: string; color: stri
   { value: "mixed", icon: "casino", tint: "bg-error-container", color: "text-[#ae2f34]" },
 ];
 
+// Kanka: el sıkışma · Sevgili: elde kalp · Evli: yüzük/elmas (dolu stil)
 const RELATIONSHIP_ICONS: Record<RelationshipType, string> = {
-  friend: "mood",
-  dating: "favorite",
-  partner: "all_inclusive",
+  friend: "handshake",
+  dating: "volunteer_activism",
+  partner: "diamond",
 };
 
 const CATEGORY_ICONS: Record<string, string> = {
@@ -54,7 +55,7 @@ const CATEGORY_ICONS: Record<string, string> = {
   bold: "local_fire_department",
   friend_test: "mood",
   wild_scenarios: "rocket_launch",
-  romance: "volunteer_activism",
+  romance: "local_florist",
   future: "route",
   home_money: "home",
 };
@@ -477,6 +478,7 @@ export default function CreatePage() {
                           icon={RELATIONSHIP_ICONS[rt]}
                           title={t(`relationship.${rt}.name`)}
                           wrapTitle
+                          iconFill
                         />
                       ))}
                     </div>
@@ -487,7 +489,7 @@ export default function CreatePage() {
                     <div className="flex items-center gap-2 mb-3">
                       <NumberBadge n={2} />
                       <h2 className="flex-1 text-body-lg font-bold text-on-background">{t("you.title")}</h2>
-                      <Pill tone="primary">{t("you.badge")}</Pill>
+                      <Pill tone="muted">{t("you.badge")}</Pill>
                     </div>
                     <p className="text-label-md font-semibold text-on-surface mb-0.5">{t("you.subtitle")}</p>
                     <p className="text-xs text-on-surface-variant mb-3">{t("you.hint")}</p>
