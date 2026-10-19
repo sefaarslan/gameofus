@@ -390,7 +390,9 @@
     "roomFull": "Bu odada iki kişi zaten var.",
     "expired": "Bu odanın süresi dolmuş.",
     "ageMobileOnly": "Bu oyun 18+ oyunculara özeldir ve yalnızca mobil uygulamada oynanır.",
-    "hint": "Herkes kendi bilgisini kendisi girer."
+    "hint": "Herkes kendi bilgisini kendisi girer.",
+    "genderRequired": "Lütfen cinsiyetini seç",
+    "birthDateRequired": "Lütfen doğum tarihini gir (GG.AA.YYYY)"
   },
   "game": {
     "yourAnswer": "Kendi cevabın",

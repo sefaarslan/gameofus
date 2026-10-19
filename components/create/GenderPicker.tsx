@@ -9,14 +9,17 @@ const OPTIONS: Array<{ value: Gender | null; key: "female" | "male" | "unspecifi
   { value: null, key: "unspecified" },
 ];
 
-/** Opsiyonel cinsiyet seçimi (karakter çizimi ve AI dili için): mobildeki gibi segmentli kontrol. Varsayılan "Diğer" (null). */
+/**
+ * Cinsiyet seçimi (karakter çizimi ve AI dili için): mobildeki gibi segmentli kontrol. Varsayılan "Diğer" (null).
+ * `value === undefined` → henüz hiçbir şey seçilmedi (zorunlu doldurulan akışlar için).
+ */
 export function GenderPicker({
   label,
   value,
   onChange,
 }: {
   label: string;
-  value: Gender | null;
+  value: Gender | null | undefined;
   onChange: (value: Gender | null) => void;
 }) {
   const t = useTranslations("create.gender");
@@ -29,7 +32,7 @@ export function GenderPicker({
       </span>
       <div className="flex bg-surface-container rounded-xl p-1 min-h-[44px]" role="radiogroup" aria-label={label}>
         {OPTIONS.map(({ value: optionValue, key }) => {
-          const selected = value === optionValue;
+          const selected = value !== undefined && value === optionValue;
           return (
             <button
               key={key}

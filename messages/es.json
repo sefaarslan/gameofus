@@ -390,7 +390,9 @@
     "roomFull": "Esta sala ya tiene dos jugadores.",
     "expired": "Esta sala ha expirado.",
     "ageMobileOnly": "Este juego es solo para mayores de 18 años y solo se juega en la app móvil.",
-    "hint": "Cada persona escribe sus propios datos."
+    "hint": "Cada persona escribe sus propios datos.",
+    "genderRequired": "Elige tu género",
+    "birthDateRequired": "Introduce tu fecha de nacimiento (DD.MM.AAAA)"
   },
   "game": {
     "yourAnswer": "Tu respuesta",

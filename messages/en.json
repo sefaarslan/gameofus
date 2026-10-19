@@ -390,7 +390,9 @@
     "roomFull": "This room already has two players.",
     "expired": "This room has expired.",
     "ageMobileOnly": "This game is for players 18+ and can only be played in the mobile app.",
-    "hint": "Everyone enters their own details."
+    "hint": "Everyone enters their own details.",
+    "genderRequired": "Please choose your gender",
+    "birthDateRequired": "Please enter your date of birth (DD.MM.YYYY)"
   },
   "game": {
     "yourAnswer": "Your answer",

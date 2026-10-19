@@ -12,7 +12,7 @@ interface JoinScreenProps {
 }
 
 /**
- * Davetle katılma: her oyuncu kendi bilgisini kendisi girer (oda kuran gibi): ad (zorunlu), cinsiyet ve doğum tarihi (isteğe bağlı).
+ * Davetle katılma: her oyuncu kendi bilgisini kendisi girer (oda kuran gibi): ad, cinsiyet ve doğum tarihi (hepsi zorunlu; cinsiyet önceden seçili gelmez).
  */
 export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
   const t = useTranslations("join");
@@ -20,13 +20,13 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
   const tErr = useTranslations("error");
 
   const [displayName, setDisplayName] = useState("");
-  const [gender, setGender] = useState<Gender | null>(null);
+  const [gender, setGender] = useState<Gender | null | undefined>(undefined);
   const [birthDate, setBirthDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   function birthDateError(): string | null {
-    if (!birthDate.trim()) return null;
+    if (!birthDate.trim()) return t("birthDateRequired");
     const iso = parseBirthDateInput(birthDate);
     if (!iso) return tc("errors.birthDateInvalid");
     if (ageFromIso(iso) < 13) return tc("errors.birthDateTooYoung");
@@ -37,6 +37,10 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
     e.preventDefault();
     if (!displayName.trim()) {
       setError(tc("errors.nameRequired"));
+      return;
+    }
+    if (gender === undefined) {
+      setError(t("genderRequired"));
       return;
     }
     const bdErr = birthDateError();
@@ -54,7 +58,7 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
         body: JSON.stringify({
           displayName: displayName.trim(),
           gender,
-          ...(birthDate.trim() ? { birthDate: parseBirthDateInput(birthDate) } : {}),
+          birthDate: parseBirthDateInput(birthDate),
         }),
       });
       const data = await res.json();
@@ -135,11 +139,9 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
                     onChange={(e) => setBirthDate(maskBirthDateInput(e.target.value))}
                     placeholder={tc("birthDate.placeholder")}
                     maxLength={10}
-                    aria-describedby="join-birth-opt"
                     className="w-full bg-transparent text-label-md text-on-surface placeholder-on-surface-variant/60 py-2.5 focus:outline-none"
                   />
                 </div>
-                <span id="join-birth-opt" className="text-[11px] text-on-surface-variant/70">({tc("birthDate.optional")})</span>
               </div>
             </div>
 
