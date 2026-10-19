@@ -10,6 +10,8 @@ export function OPTIONS() {
   return corsOptions();
 }
 import { apiError, apiOk } from "@/lib/api";
+import { normalizeRoomCode } from "@/lib/room-code-utils";
+import { denyUnknownRoom, tokenDenied } from "@/lib/room-lookup";
 import type { Json } from "@/types/database.types";
 
 const CONFIDENCE_MULTIPLIERS = { guess: 1, think: 2, sure: 3 } as const;
@@ -19,7 +21,8 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ roomCode: string }> },
 ) {
-  const { roomCode } = await params;
+  // Kod büyük/küçük harf, tire ve boşluk fark etmez (K7M-2PQ = k7m2pq)
+  const roomCode = normalizeRoomCode((await params).roomCode);
 
   let body: unknown;
   try {
@@ -57,8 +60,8 @@ export async function POST(
     .eq("room_code", roomCode)
     .maybeSingle();
 
-  if (!room) return apiError("ROOM_NOT_FOUND", "Oda bulunamadı.", 404);
-  if (isRoomExpired(room.expires_at)) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
+  // Oda yok ile token yanlış AYNI yanıtı verir (oda varlığı sızmaz); süresi dolmuş bilgisi kimlik doğrulandıktan sonra söylenir
+  if (!room) return denyUnknownRoom(req, participantToken);
 
   // Token doğrulama + soru kontrolü — ikisi de yalnızca room.id'ye bağlı, paralel çalışır
   const [{ data: allParticipants }, { data: rq }] = await Promise.all([
@@ -78,7 +81,8 @@ export async function POST(
   const { participant: me, jwt } = await findParticipant(req, participantToken, participants, { requireUnique: true });
   // Geçersiz/süresi dolmuş JWT → 401 (istemci oturumu yenileyebilir); geçerli JWT ama bu odanın katılımcısı değil / geçersiz token → 403
   if (!me && jwt === "invalid") return apiError("UNAUTHORIZED", "Oturum geçersiz, tekrar giriş yapın.", 401);
-  if (!me) return apiError("INVALID_TOKEN", "Geçersiz token.", 403);
+  if (!me) return tokenDenied(req);
+  if (isRoomExpired(room.expires_at)) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
 
   const partner = participants.find((p) => p.id !== me.id);
   if (!partner) return apiError("ROOM_NOT_FOUND", "Partner henüz katılmadı.", 404);

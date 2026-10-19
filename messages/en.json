@@ -95,8 +95,7 @@
       "badge": "Solo game",
       "title": "No partner? Try it solo",
       "desc": "Red Flag Minefield: ready-made sets for friendships and romantic relationships, 9 face-down cards each. Flag every one, see your tolerance profile and share it on your story.",
-      "cta": "Try the Minefield",
-      "heroLink": "No partner? Try it solo →"
+      "cta": "Try the Minefield"
     },
     "promo": {
       "waitingTitle": "Minefield while you wait?",
@@ -202,6 +201,12 @@
       "correct": "Correct! 🎉",
       "points": "+3 pts",
       "partnerName": "Alex"
+    },
+    "joinByCode": {
+      "label": "Have an invite code?",
+      "placeholder": "e.g. K7M-2PQ",
+      "submit": "Join",
+      "invalid": "Enter a valid room code (6-8 letters/digits)"
     }
   },
   "create": {
@@ -365,7 +370,13 @@
     "partnerWaiting": "Waiting...",
     "partnerJoinedStatus": "Joined!",
     "relaxMessage": "Grab a cup of tea — your {rel, select, friend {friend} other {partner}} is on the way.",
-    "partnerFallback": "{rel, select, friend {Friend} other {Partner}}"
+    "partnerFallback": "{rel, select, friend {Friend} other {Partner}}",
+    "code": {
+      "label": "Room code",
+      "copy": "Copy code",
+      "copied": "Copied!",
+      "hint": "They can also enter the code instead of tapping the link: \"Join with code\" on gameofus.app or in the app."
+    }
   },
   "join": {
     "title": "Join the game",

@@ -95,8 +95,7 @@
       "badge": "Tek kişilik oyun",
       "title": "Partnerin yok mu? Tek başına dene",
       "desc": "Red Flag Mayın Tarlası: arkadaşlık ve gönül ilişkileri için hazır setler, her sette 9 kapalı kart. Her birine bir bayrak koy, tolerans profilini gör ve story’de paylaş.",
-      "cta": "Mayın Tarlası’nı dene",
-      "heroLink": "Partnerin yok mu? Tek başına dene →"
+      "cta": "Mayın Tarlası’nı dene"
     },
     "promo": {
       "waitingTitle": "Beklerken Mayın Tarlası?",
@@ -202,6 +201,12 @@
       "correct": "Doğru! 🎉",
       "points": "+3 puan",
       "partnerName": "Ayşe"
+    },
+    "joinByCode": {
+      "label": "Davet kodun mu var?",
+      "placeholder": "Örn: K7M-2PQ",
+      "submit": "Katıl",
+      "invalid": "Geçerli bir oda kodu gir (6-8 harf/rakam)"
     }
   },
   "create": {
@@ -365,7 +370,13 @@
     "partnerWaiting": "Bekleniyor...",
     "partnerJoinedStatus": "Katıldı!",
     "relaxMessage": "Sıcak bir çay al, {rel, select, friend {kankan} dating {sevgilin} partner {eşin} other {partnerin}} gelmek üzere.",
-    "partnerFallback": "{rel, select, friend {Kanka} dating {Sevgili} partner {Eş} other {Partner}}"
+    "partnerFallback": "{rel, select, friend {Kanka} dating {Sevgili} partner {Eş} other {Partner}}",
+    "code": {
+      "label": "Oda kodu",
+      "copy": "Kodu kopyala",
+      "copied": "Kopyalandı!",
+      "hint": "Linke dokunmak yerine kodu da girebilirler: gameofus.app'te ya da uygulamada \"Kodla katıl\"."
+    }
   },
   "join": {
     "title": "Oyuna katıl",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { decodeRoomCodeParam, normalizeRoomCode } from "@/lib/room-code-utils";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
@@ -79,7 +80,7 @@ function formatAnswer(
 
 export default function ResultsPage() {
   const params = useParams<{ roomCode: string }>();
-  const roomCode = params.roomCode;
+  const roomCode = normalizeRoomCode(decodeRoomCodeParam(params.roomCode));
   const t = useTranslations("results");
   const tOpt = useTranslations("option");
   const tErr = useTranslations("error");

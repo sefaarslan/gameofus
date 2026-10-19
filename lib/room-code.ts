@@ -1,15 +1,23 @@
 import crypto from "crypto";
+import { ROOM_CODE_CHARSET, ROOM_CODE_LENGTH } from "./room-code-utils.ts";
 
-// Kısa, ambiguous olmayan alfanümerik set (0, O, I, 1, l çıkarıldı)
-const CHARSET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-const CODE_LENGTH = 8;
+export { normalizeRoomCode } from "./room-code-utils.ts";
 
-/** Tahmin edilmesi güç 8 karakterli oda kodu üretir. */
+/**
+ * 6 karakterli oda kodu üretir (31^6 ≈ 887 milyon). Rastgelelikte modulo yanlılığı olmasın diye 248 ve üzeri baytlar atılır
+ * (256 mod 31 = 8). Kısa olduğu için kötüye kullanım sınırları (hız limiti, bulunamayan kod sayacı) zorunludur.
+ */
 export function generateRoomCode(): string {
-  const bytes = crypto.randomBytes(CODE_LENGTH);
-  return Array.from(bytes)
-    .map((b) => CHARSET[b % CHARSET.length])
-    .join("");
+  const limit = 256 - (256 % ROOM_CODE_CHARSET.length);
+  let out = "";
+  while (out.length < ROOM_CODE_LENGTH) {
+    for (const b of crypto.randomBytes(ROOM_CODE_LENGTH * 2)) {
+      if (b >= limit) continue;
+      out += ROOM_CODE_CHARSET[b % ROOM_CODE_CHARSET.length];
+      if (out.length === ROOM_CODE_LENGTH) break;
+    }
+  }
+  return out;
 }
 
 /**

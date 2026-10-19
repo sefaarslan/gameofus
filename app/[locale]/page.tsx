@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { JoinByCode } from "@/components/JoinByCode";
 import { Link } from "@/i18n/navigation";
 import { SiteFooter } from "@/components/SiteFooter";
 import { InstagramIcon } from "@/components/InstagramIcon";
@@ -216,9 +217,10 @@ export default function HomePage() {
             </a>
           </div>
 
-          <Link href="/solo/red-flag" className="self-center md:self-start text-label-md font-semibold text-primary hover:underline">
-            {tSolo("landing.heroLink")}
-          </Link>
+          {/* Kodla katıl: davet linkiyle aynı oda kodu */}
+          <div className="w-full flex justify-center md:justify-start mt-2">
+            <JoinByCode />
+          </div>
 
         </div>
 

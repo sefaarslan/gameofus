@@ -15,6 +15,8 @@ Next.js API route sözleşmeleri. **Gerçek davranışın kaynağı `app/api/**`
   `GET` isteklerinde `?participantToken=` fallback'i de kabul edilir (web istemcisi şu an bunu kullanır;
   hardening'de header'a taşınması hedeflenir). Token DB'de plaintext tutulmaz.
 - Expire olmuş odada yazma ve okuma reddedilir (`ROOM_EXPIRED`).
+- **Oda kodu (`roomCode`):** linkteki kod ile elle yazılan kod **aynı değerdir** (ayrı kısa kod/takma ad yok). Yeni odalar **6 karakter** (charset `ABCDEFGHJKMNPQRSTUVWXYZ23456789`: 0/1/I/L/O yok; ≈887 milyon olasılık, modulo yanlılığı olmayan üretim); eski odalar 8 karakterlidir ve geçerli kalır. `[roomCode]` alan **tüm uçlar** (join, state, submit-turn, complete, results; ayrıca `feedback` gövdesindeki `roomCode`) kodu **normalize eder**: harf boyutu, tire, boşluk ve diğer işaretler yok sayılır, büyük harfe çevrilir (`k7m-2pq`, `K7M 2PQ`, `K7M2PQ` → `K7M2PQ`; `lib/room-code-utils.ts` → `normalizeRoomCode`). Yanıtlardaki `roomCode` her zaman kanonik biçimdir. Ayrı bir "kodu çözümle" ucu yoktur: istemci kodu normalize edip doğrudan `join`'e gönderir.
+- **Kötüye kullanım sınırları (kod kısa olduğu için):** (1) `POST /rooms/{roomCode}/join` her deneme sayılır: **IP başına ve (giriş yapmışsa) kullanıcı başına dakikada 10**, aşılırsa `429 RATE_LIMITED`. (2) **Oda varlığı sızmaz.** Herkese açık uçlarda (`join`, `state`; link önizlemesi için oda zaten görünür) bulunamayan kod `404 ROOM_NOT_FOUND` ("Oda bulunamadı."). **Token gerektiren uçlarda (`results`, `submit-turn`, `complete`, `feedback`) "oda yok" ile "token yanlış" birebir aynı yanıtı verir: `403 INVALID_TOKEN` ("Geçersiz token.")**; oda durumları (`ROOM_EXPIRED`, `RESULT_NOT_READY`, `ALREADY_SUBMITTED`…) yalnızca kimlik doğrulandıktan **sonra** söylenir. (Geçersiz/süresi dolmuş JWT her durumda `401 UNAUTHORIZED`.) Başarısız denemeler (bulunamayan kod ya da yanlış token) aynı IP'den dakikada 10'u geçerse `429 RATE_LIMITED`; başarılı aramalar sayılmaz. (3) Oda dolunca `join_locked = true`; dolu odaya ikinci kişi `400 ROOM_FULL`. (4) Süresi dolan oda `400 ROOM_EXPIRED`.
 - Partnerin cevabı tahmin kilitlenmeden ve sonuçlar hazır olmadan **ham şekilde dönmez**.
 - Hata biçimi (HTTP 4xx/5xx):
 
@@ -22,7 +24,7 @@ Next.js API route sözleşmeleri. **Gerçek davranışın kaynağı `app/api/**`
 { "error": { "code": "ROOM_EXPIRED", "message": "Bu odanın süresi dolmuş." } }
 ```
 
-Hata kodları: `ROOM_NOT_FOUND` (404), `ROOM_EXPIRED`, `ROOM_FULL`, `INVALID_TOKEN` (403), `ALREADY_SUBMITTED`,
+Hata kodları: `ROOM_NOT_FOUND` (404), `ROOM_EXPIRED` (400), `ROOM_FULL` (400), `ROOM_WEB_ONLY` (403), `INVALID_TOKEN` (403), `ALREADY_SUBMITTED`,
 `QUESTION_NOT_FOUND` (404), `RESULT_NOT_READY`, `RATE_LIMITED` (429), `INVALID_PAYLOAD`, `INTERNAL_ERROR` (500).
 
 ---
@@ -137,6 +139,7 @@ Yanıt `201`. `roomUrl` `APP_BASE_URL` ortam değişkeninden üretilir; istemci 
 ```
 
 - Token geçerliyse mevcut participant aynı token ile döner (cihaz yeniden açılışı).
+- **Webden kurulan oda yalnızca web'e açıktır** (deneme amaçlı; kurucusu hesapsız, `rooms.user_id` boş): mobil kimlikle (`platform: "mobile"` + Bearer JWT) katılma `403 ROOM_WEB_ONLY` ("Bu oda web'de kurulmuş ve yalnızca web'den oynanabilir."). **Mobilden kurulan odaya hem mobil hem web katılabilir.** Hız limiti ve normalize için bkz. Bölüm 1.
 - Aksi halde oda doluysa (`join_locked` ya da 2 participant) `ROOM_FULL`; değilse guest oluşturulur,
   `join_locked = true` ve `status = guest_joined` yapılır. Gövdede opsiyonel `gender` (`female|male`) ve `birthDate` (`YYYY-AA-GG`) katılanın **kendi** beyanıdır: `birthDate` `participants.birth_date`'e yazılır (odayla birlikte silinir); geçersiz → `400 INVALID_PAYLOAD`, **13 yaş altı → `403 AGE_RESTRICTED`** (katılımcı eklenmez).
 - **Yaş koşullu oda (18+ kategori, ör. Cesur):** katılanın yaşı kendi hesabından doğrulanır. Mobil (JWT): profildeki `users.birth_date`;
@@ -155,6 +158,8 @@ Yanıt `201`. `roomUrl` `APP_BASE_URL` ortam değişkeninden üretilir; istemci 
 
 Oda, katılımcılar ve **tüm soruları (seçenekleriyle) tek seferde** döner; oyun boyunca istemci bunu bellekte
 tutar. Token verilirse `participant` ve `progress` o oyuncuya göre dolar. Cevap/tahmin içermez.
+
+**Katılımcı olmayan istek (token/JWT yok ya da eşleşmiyor — davet linkini açan, henüz katılmamış kişi) yalnızca asgari önizleme alır:** `room` (durum, mod, soru sayısı, dil, ilişki türü, bitiş), `participant: null`, `participants` yalnızca `{ role, status }` (**oyuncu adı yok**; dolu olup olmadığı anlaşılır), **`questions: []`**, `progress` sıfır. Oyuncu adları ve sorular yalnızca token/JWT ile doğrulanan katılımcıya döner (kod tahmin edilirse bilgi sızmaz). Katıldıktan sonra istemci token ile yeniden çağırıp tam veriyi alır.
 
 **Kimlik (mobil):** token yoksa `Authorization: Bearer <Supabase JWT>` ile de oyuncu belirlenir: `participants.user_id`
 giriş yapmış kullanıcıyla eşleşen katılımcı o kullanıcıdır (başka cihazda/yeniden kurulumda oyuna devam). Token yolu

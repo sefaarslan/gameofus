@@ -47,3 +47,35 @@ export async function checkRateLimit(
   }
   return true;
 }
+
+/**
+ * Kısa zaman penceresi sayacı (ör. dakikada N deneme). Sınır aşılmadıysa kaydı ekler ve true döner.
+ * `key` IP özeti ya da `u:<kullanıcı id>`; aynı tablo ve temizlik süresi (`rate_limits`) kullanılır.
+ */
+export async function checkRateLimitWindow(
+  key: string,
+  action: string,
+  limits: { limit: number; windowMs: number },
+): Promise<boolean> {
+  const supabase = createAdminClient();
+  const now = new Date();
+  const since = new Date(now.getTime() - limits.windowMs).toISOString();
+
+  const { count } = await supabase
+    .from("rate_limits")
+    .select("*", { count: "exact", head: true })
+    .eq("key", key)
+    .eq("action", action)
+    .gte("created_at", since);
+  if ((count ?? 0) >= limits.limit) return false;
+
+  const record = async () => {
+    await supabase.from("rate_limits").insert({ key, action, count: 1, window_start: now.toISOString() });
+  };
+  try {
+    after(record);
+  } catch {
+    await record();
+  }
+  return true;
+}

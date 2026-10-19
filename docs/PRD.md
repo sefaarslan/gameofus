@@ -242,7 +242,7 @@ Secret Choice, Prediction ve Orderline modlarının dengeli karışımıdır. MV
 - **Karne (ücretsiz):** sabit başlık + cümle, mini 3×3 ızgara + sayılar + tolerans çubuğu; **Story görseli** (1080×1920), **WhatsApp'ta paylaş** ve link önizlemesinde gönderenin karnesini gösteren paylaşım linki; **"Cevaplarına göz at"** kartı (9 kartın senaryosu ve seçilen bayrak, iki kişilik sonuçtaki "Detayları gör" gibi); geri bildirim kartı; sayfa sonunda "Ana sayfaya dön".
 - **Web:** anonim, **1 oyun** (tekrar için mobil uygulamaya yönlendirme), coin yok; "AI ile derinlemesine analiz" butonu **pasif** ("Mobil uygulamada").
 - **Mobil (planlı):** oyun başına **+20 coin** (oturum başına bir kez, sunucuda doğrulanır; günde en çok 3 ödüllü oyun), AI analizi **−100 coin** (Bölüm 12.3; 2 paragraf, mizahi/samimi, sınır ve tolerans eşiği odaklı, teşhis/"ayrıl-kal" tavsiyesi yok). Oyun girişinde isim/cinsiyet sorulmaz; AI için yalnızca (opsiyonel) ilk isim, senaryolar + bayraklar + tema etiketleri gider.
-- **Konumlandırma:** oda oluşturma akışında bir mod **değildir** (link/partner/oda yok). Girişler: landing hero bağlantısı ve bölümü, footer, iki kişilik bekleme ve sonuç ekranlarında kapatılabilir kart; mobilde ana sayfa kartı (+20 coin rozeti, "bugün x/3").
+- **Konumlandırma:** oda oluşturma akışında bir mod **değildir** (link/partner/oda yok). Girişler: landing bölümü (hero'da ayrı bağlantı yoktur), üst menüdeki "Solo" bağlantısı, footer, iki kişilik bekleme ve sonuç ekranlarında kapatılabilir kart; mobilde ana sayfa kartı (+20 coin rozeti, "bugün x/3").
 - **Sonraki sürümler:** kalabalık yüzdeleri, "arkadaşına gönder, aynı 9 kartı o da oynasın ve karşılaştırın" köprüsü (solo → iki kişilik ana döngü), yeni solo oyunlar (`solo_*` tabloları `game` alanıyla genişlemeye hazır).
 
 ### 8.6 Sahne — animasyonlu senaryo modu (planlı)
@@ -298,6 +298,8 @@ Her iki taraf da aynı public oda linkini kullanır:
 ```
 
 Public link yalnızca `room_code` içerir. Owner veya guest kimliği URL üzerinden açıkça taşınmaz.
+
+**Kodla katılma:** linke ek olarak aynı oda kodu elle de girilebilir (web ana sayfasında "Kodla katıl", mobil uygulamada kodla katıl). Linkteki kod ile yazılan kod **aynı değerdir** (ayrı alan yok). Yeni odalarda kod **6 karakter** (K7M-2PQ biçiminde gruplu gösterilir; 0/1/I/L/O yok), eski 8 karakterli kodlar geçerli kalır. Büyük/küçük harf, tire ve boşluk fark etmez. Kod kısa olduğu için katılma denemesi ve bulunamayan kod sayısı hız limitine bağlıdır (dakikada 10). Oda varlığı sızmaz: token gerektiren uçlarda "oda yok" ile "token yanlış" aynı yanıtı verir ve katılımcı olmayan kişi `state`'ten yalnızca asgari önizleme alır (oyuncu adı/soru yok). **Politika:** mobilden kurulan odaya partner hem mobilden hem webden katılabilir; webden kurulan oda yalnızca deneme amaçlıdır ve yalnızca webden oynanır (mobil kimlikle katılma `ROOM_WEB_ONLY`).
 
 Bu link hem web tarayıcısından hem mobile app'ten (deep link / universal link ile) açılabilir. App yüklüyse mobile app'te açılır, yüklü değilse web'e düşer.
 
@@ -562,7 +564,7 @@ Amaç: Kullanıcının ürünü 10 saniyede anlamasını sağlamak.
 
 İçerikler:
 
-- Hero başlık, alt açıklama, Oyun Başlat CTA ("+10k çift oynuyor" gibi doğrulanamayan sosyal kanıt **kullanılmaz**)
+- Hero başlık, alt açıklama, Oyun Başlat CTA ("+10k çift oynuyor" gibi doğrulanamayan sosyal kanıt **kullanılmaz**) ve altında **"Kodla katıl"** kutusu (oda kodunu yazıp mevcut oda sayfasına gider)
 - Nasıl Çalışır bölümü — **4 adım**: Oda oluştur → Linki paylaş → Cevapları birlikte aç → **AI sizi yorumlasın** (4. adım "Mobil uygulamada" rozetiyle)
 - Oyun modları bölümü
 - Sonuç önizlemesi
@@ -613,6 +615,7 @@ Butonlar: geri (←) ve > Oyun linki oluştur
 
 - Davet linki
 - Linki kopyala
+- **Oda kodu**: büyük ve gruplu (6 karakter K7M-2PQ; eski 8 karakter 4+4) + kopyala düğmesi (linkle aynı değer)
 - WhatsApp ile paylaş
 - Oda durumu
 - Cevaplamaya başla butonu
@@ -894,7 +897,7 @@ Planlanan: `credit_transactions` (user_id, delta, reason, created_at) — coin h
 | Alan | Tip | Açıklama |
 |---|---|---|
 | id | uuid | Oda ID |
-| room_code | text | Paylaşılabilir kısa kod; tahmin edilmesi zor olmalıdır |
+| room_code | text | Paylaşılabilir kısa kod (yeni odalar 6, eski odalar 8 karakter; büyük harf/rakam, 0/1/I/L/O yok); linkteki kodla elle yazılan kod aynı değerdir; brute force'a karşı hız limiti uygulanır |
 | status | text | Oda durumu |
 | game_mode | text | secret_choice / prediction / orderline / mixed |
 | relationship_type | text (nullable) | `friend` / `dating` / `partner` — oda kurulurken seçilen ilişki türü; oda kurulduktan sonra değişmez. Eski odalar ve henüz göndermeyen eski mobil build'ler için `null` (genel "partner" dili, tür filtresi uygulanmaz) |

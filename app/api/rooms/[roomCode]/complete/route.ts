@@ -11,6 +11,8 @@ export function OPTIONS() {
 }
 import { compareAnswers, calculateReadingScore } from "@/lib/scoring";
 import { apiError, apiOk } from "@/lib/api";
+import { normalizeRoomCode } from "@/lib/room-code-utils";
+import { denyUnknownRoom, tokenDenied } from "@/lib/room-lookup";
 import type { Json } from "@/types/database.types";
 
 type PredictionResult = "correct" | "near" | "miss";
@@ -19,7 +21,8 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ roomCode: string }> },
 ) {
-  const { roomCode } = await params;
+  // Kod büyük/küçük harf, tire ve boşluk fark etmez (K7M-2PQ = k7m2pq)
+  const roomCode = normalizeRoomCode((await params).roomCode);
 
   let body: unknown;
   try {
@@ -43,8 +46,8 @@ export async function POST(
     .eq("room_code", roomCode)
     .maybeSingle();
 
-  if (!room) return apiError("ROOM_NOT_FOUND", "Oda bulunamadı.", 404);
-  if (isRoomExpired(room.expires_at)) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
+  // Oda yok ile token yanlış AYNI yanıtı verir (oda varlığı sızmaz); süresi dolmuş bilgisi kimlik doğrulandıktan sonra söylenir
+  if (!room) return denyUnknownRoom(req, participantToken);
 
   const { data: allParticipants } = await supabase
     .from("participants")
@@ -54,7 +57,8 @@ export async function POST(
   const participants = allParticipants ?? [];
   const { participant: me, jwt } = await findParticipant(req, participantToken, participants, { requireUnique: true });
   if (!me && jwt === "invalid") return apiError("UNAUTHORIZED", "Oturum geçersiz, tekrar giriş yapın.", 401);
-  if (!me) return apiError("INVALID_TOKEN", "Geçersiz token.", 403);
+  if (!me) return tokenDenied(req);
+  if (isRoomExpired(room.expires_at)) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
 
   if (me.status === "completed") {
     return apiOk({ completed: true, resultReady: room.status === "result_ready" });

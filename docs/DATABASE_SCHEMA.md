@@ -82,7 +82,7 @@ solo oturum ve geri bildirimlerini siler, `users` satırını (coin hareketleriy
 | Alan | Tip | Not |
 |---|---|---|
 | id | uuid | PK |
-| room_code | text | unique, tahmin edilemez |
+| room_code | text | unique; yeni odalar 6, eski odalar 8 karakter (büyük harf/rakam, 0/1/I/L/O yok); linkle elle yazılan kod aynı değer; uzunluğa bağlı kısıt yok |
 | status | room_status | |
 | game_mode | game_mode | secret_choice / prediction / orderline / mixed |
 | question_count | int | 5 veya 10 |

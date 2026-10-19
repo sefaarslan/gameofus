@@ -5,6 +5,8 @@ import { findParticipant } from "@/lib/participant-auth";
 import { bearerJwt } from "@/lib/auth";
 import { isRoomExpired } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
+import { normalizeRoomCode } from "@/lib/room-code-utils";
+import { roomNotFound } from "@/lib/room-lookup";
 import { corsOptions } from "@/lib/cors";
 
 export function OPTIONS() {
@@ -15,7 +17,8 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ roomCode: string }> },
 ) {
-  const { roomCode } = await params;
+  // Kod büyük/küçük harf, tire ve boşluk fark etmez (K7M-2PQ = k7m2pq)
+  const roomCode = normalizeRoomCode((await params).roomCode);
   const token = extractToken(req, req.nextUrl.searchParams.get("participantToken"));
 
   const supabase = createAdminClient();
@@ -26,7 +29,7 @@ export async function GET(
     .eq("room_code", roomCode)
     .maybeSingle();
 
-  if (!room) return apiError("ROOM_NOT_FOUND", "Oda bulunamadı.", 404);
+  if (!room) return roomNotFound(req);
   if (isRoomExpired(room.expires_at)) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
 
   // Participants
@@ -45,6 +48,26 @@ export async function GET(
     return jwt === "invalid"
       ? apiError("UNAUTHORIZED", "Oturum geçersiz, tekrar giriş yapın.", 401)
       : apiError("INVALID_TOKEN", "Bu odanın katılımcısı değilsiniz.", 403);
+  }
+
+  // Katılımcı OLMAYAN (kodu/linki bilen ama henüz katılmamış ya da yabancı) istek yalnızca asgari önizleme alır: oda durumu ve
+  // dolu olup olmadığı. Oyuncu adları, sorular ve cevaplar yalnızca token/JWT ile doğrulanan katılımcıya döner (kod tahmin saldırısında bilgi sızmaz).
+  if (!me) {
+    return apiOk({
+      room: {
+        roomCode: room.room_code,
+        status: room.status,
+        gameMode: room.game_mode,
+        questionCount: room.question_count,
+        expiresAt: room.expires_at,
+        locale: room.locale ?? "tr",
+        relationshipType: room.relationship_type ?? null,
+      },
+      participant: null,
+      participants: participants.map((p) => ({ role: p.role, status: p.status })),
+      questions: [],
+      progress: { answeredCount: 0, totalCount: room.question_count },
+    });
   }
 
   // Questions (options dahil — tek seferde yüklenir)

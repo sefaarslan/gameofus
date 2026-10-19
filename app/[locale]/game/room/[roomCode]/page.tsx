@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { decodeRoomCodeParam, normalizeRoomCode } from "@/lib/room-code-utils";
 import { JoinScreen } from "./_screens/JoinScreen";
 import { ShareScreen } from "./_screens/ShareScreen";
 import { GameScreen } from "./_screens/GameScreen";
@@ -70,7 +71,9 @@ function pickScreen(data: RoomStateData, token: string | null): Screen {
 
 export default function RoomPage() {
   const params = useParams<{ roomCode: string; locale: string }>();
-  const roomCode = params.roomCode;
+  // URL'deki kod hangi biçimde gelirse gelsin (k7m-2pq, K7M 2PQ…) kanonik biçime çevrilir; farklıysa adres düzeltilir
+  const rawCode = decodeRoomCodeParam(params.roomCode);
+  const roomCode = normalizeRoomCode(rawCode);
   const urlLocale = params.locale;
   const tErr = useTranslations("error");
   const router = useRouter();
@@ -113,6 +116,10 @@ export default function RoomPage() {
 
   // Initial load + locale redirect
   useEffect(() => {
+    if (roomCode && roomCode !== rawCode) {
+      window.location.replace(`/${urlLocale}/game/room/${roomCode}`);
+      return;
+    }
     const storedToken = localStorage.getItem(`gou_token_${roomCode}`);
     setToken(storedToken);
 
@@ -129,7 +136,7 @@ export default function RoomPage() {
       const nextScreen = pickScreen(data, storedToken);
       setScreen(nextScreen);
     });
-  }, [roomCode, fetchState, urlLocale]);
+  }, [roomCode, rawCode, fetchState, urlLocale]);
 
   // Polling for share and waiting screens
   useEffect(() => {

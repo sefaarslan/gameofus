@@ -5,6 +5,8 @@ import { bearerJwt } from "@/lib/auth";
 import { findParticipant } from "@/lib/participant-auth";
 import { isRoomExpired } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
+import { normalizeRoomCode } from "@/lib/room-code-utils";
+import { denyUnknownRoom, tokenDenied } from "@/lib/room-lookup";
 import { corsOptions } from "@/lib/cors";
 
 export function OPTIONS() {
@@ -27,7 +29,8 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ roomCode: string }> },
 ) {
-  const { roomCode } = await params;
+  // Kod büyük/küçük harf, tire ve boşluk fark etmez (K7M-2PQ = k7m2pq)
+  const roomCode = normalizeRoomCode((await params).roomCode);
   const token = extractToken(req, req.nextUrl.searchParams.get("participantToken"));
 
   // Kimlik: katılımcı token'ı ya da giriş yapmış (mobil) kullanıcının Supabase JWT'si (geçmiş sonuçlar için)
@@ -42,13 +45,9 @@ export async function GET(
     .eq("room_code", roomCode)
     .maybeSingle();
 
-  if (!room) return apiError("ROOM_NOT_FOUND", "Oda bulunamadı.", 404);
-  // Süresi dolmuş oda yalnızca hesabıyla (JWT) giren oyuncuya açıktır (geçmiş, saklama süresi boyunca); token ile açılmaz
+  // Oda yok ile token yanlış AYNI yanıtı verir (oda varlığı sızmaz); oda durumları (süresi dolmuş, hazır değil) kimlik doğrulandıktan sonra söylenir
+  if (!room) return denyUnknownRoom(req, token);
   const expired = isRoomExpired(room.expires_at);
-  if (expired && !hasJwt) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
-  if (room.status !== "result_ready" && room.status !== "completed") {
-    return apiError("RESULT_NOT_READY", "Sonuçlar henüz hazır değil.");
-  }
 
   // Üçü de yalnızca room.id'ye bağlı — paralel okunur (sıralı 3 round-trip yerine 1)
   const [{ data: allParticipants }, { data: result }, { data: roomQuestions }] = await Promise.all([
@@ -72,8 +71,12 @@ export async function GET(
   const { participant: me, viaUser, jwt } = await findParticipant(req, token, participants);
   // Geçersiz/süresi dolmuş JWT → 401 (istemci oturumu yenileyebilir); geçerli JWT ama odada katılımcı değil / geçersiz token → 403
   if (!me && jwt === "invalid") return apiError("UNAUTHORIZED", "Oturum geçersiz, tekrar giriş yapın.", 401);
-  if (!me) return apiError("INVALID_TOKEN", "Geçersiz token.", 403);
+  if (!me) return tokenDenied(req);
+  // Süresi dolmuş oda yalnızca hesabıyla (JWT) giren oyuncuya açıktır (geçmiş, saklama süresi boyunca); token ile açılmaz
   if (expired && !viaUser) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
+  if (room.status !== "result_ready" && room.status !== "completed") {
+    return apiError("RESULT_NOT_READY", "Sonuçlar henüz hazır değil.");
+  }
 
   const partner = participants.find((p) => p.id !== me.id);
 

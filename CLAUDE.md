@@ -159,9 +159,10 @@ bkz. Bölüm 7 — Performans & Veri Akışı Kuralları.)
   satın alma kayıtları kullanıcıdan ayrılmış halde yasal süre tutulur.
 
 ### Public link yapısı
-- Public link yalnızca `room_code` içerir: `/game/room/{room_code}`
+- Public link yalnızca `room_code` içerir: `/game/room/{room_code}`. **Linkteki kod ile elle yazılan kod AYNI değerdir** (ayrı kısa kod/alias yok): yeni odalar **6 karakter** (`lib/room-code-utils.ts`, 0/1/I/L/O yok), eski 8 karakterli odalar geçerli kalır. Kod her yerde `normalizeRoomCode` ile kanonikleştirilir (harf boyutu/tire/boşluk fark etmez; tüm `[roomCode]` uçları ve oda sayfaları). Ana sayfada **"Kodla katıl"** kutusu (`components/JoinByCode.tsx`), paylaşım ekranında kod büyük ve gruplu (K7M-2PQ) gösterilir (`components/RoomCodeBox.tsx`).
 - Owner/guest kimliği URL üzerinden açıkça taşınmaz.
-- `room_code` kısa olabilir ama brute force'a açık olmamalı (tahmin edilemez olmalı).
+- `room_code` kısa olabilir ama brute force'a açık olmamalı: kod 6 karaktere indiği için **katılma denemesi sınırı** (IP ve kullanıcı başına dakikada 10, `429 RATE_LIMITED`) ve **bulunamayan kod sayacı** (aynı IP'den dakikada 10'dan fazla bulunamayan kod → 429; herkese açık uçlarda (`join`, `state`) bulunamayan kod `404 ROOM_NOT_FOUND`; **token gerektiren uçlarda (`results`, `submit-turn`, `complete`, `feedback`) "oda yok" ile "token yanlış" aynı `403 INVALID_TOKEN` yanıtını verir** ve oda durumları (süresi dolmuş, sonuç hazır değil…) **kimlik doğrulandıktan sonra** söylenir; başarısız denemeler sayılır, `lib/room-lookup.ts`) zorunludur. **`state` katılımcı olmayana yalnızca asgari önizleme verir** (oyuncu adı ve soru yok). Yeni bir `[roomCode]` ucu eklersen kodu normalize et; herkese açıksa `roomNotFound(req)`, token gerektiriyorsa `denyUnknownRoom(req, token)` / `tokenDenied(req)` kullan ve durum bilgisini kimlikten sonra ver.
+- **Webden kurulan oda yalnızca web'e açıktır** (deneme amaçlı; `rooms.user_id` boş): mobil kimlikle katılma `403 ROOM_WEB_ONLY`. Mobilden kurulan odaya hem mobil hem web katılır.
 
 ---
 
@@ -357,6 +358,7 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
 
 ### Abuse / rate limit (başlangıç limitleri)
 - Aynı IP/IP-hash için saatte max **10**, günde max **50** oda oluşturma.
+- Katılma denemesi: IP başına ve kullanıcı başına dakikada **10**; bulunamayan oda kodu: IP başına dakikada **10** (`rate_limits`, `action` = `join_attempt` / `room_miss`).
 - Aynı oda için max **2** participant; oda dolunca `join_locked = true`.
 
 ---
@@ -463,7 +465,7 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
 - Paylaşım: `GET /api/solo/red-flag/card?g=<9 harf G/Y/R>&l=<dil>[&p=<set>][&q=<G|Y|R><senaryo id>,…][&fmt=og]` (`next/og`, 1080×1920;
   küçük ızgara + her bayraktan bir soru/cevap kartı (`q`, metin DB'den); `fmt=og` yatay 1200×630 link önizlemesi). Paylaşım linki `…/solo/red-flag?s=<kod>&p=<set>` — önizleme gönderenin karnesini gösterir (kişisel
   veri yok). Satori `React.Fragment` desteklemez (görselde `<g>`/`<div>` kullan); fontlar `public/fonts/*.woff`.
-- Giriş noktaları: landing hero bağlantısı + bölüm (`#tek-basina`), footer, iki kişilik **bekleme** ve **sonuç**
+- Giriş noktaları: landing bölümü (`#tek-basina`), üst menüdeki "Solo" bağlantısı, footer, iki kişilik **bekleme** ve **sonuç**
   ekranlarında kapatılabilir `SoloPromoCard`. Oda oluşturma akışına **eklenmez** (oda modu değildir).
 - Erişilebilirlik: bayraklar renk + ikon + etiket; açık kart `dialog` (Escape, odak); `prefers-reduced-motion` saygı.
 
@@ -498,6 +500,7 @@ Ayrıntılı durum için `docs/PRD.md` Bölüm 21 esas alınır. Özet:
 | `scripts/build-questions-migration.mjs` | Seed → `supabase/migrations/*_questions_v2_*.sql` (belirlenimci UUID v5 kimlikler) |
 | `scripts/export-questions-md.mjs` | İnceleme belgeleri: `docs/questions-v2-{tr,en,es}.md` |
 | `scripts/build-icon-font.mjs` (`npm run icons`) | Kullanılan ikonlardan font alt kümesi |
+| `scripts/test-room-code.mjs`, `scripts/test-room-code-api.mjs` | Oda kodu testleri: birim (normalize/biçim/üretim; `node scripts/test-room-code.mjs`) ve entegrasyon (sunucu + `.env` ile: kanonikleştirme, tek tip `ROOM_NOT_FOUND`, hız limitleri, `ROOM_WEB_ONLY`, `ROOM_FULL`, `ROOM_EXPIRED`; `BASE=http://localhost:3001 node scripts/test-room-code-api.mjs`) |
 | `seeds/solo/`, `scripts/check-solo.mjs`, `scripts/build-solo-migration.mjs`, `scripts/export-solo-md.mjs` | Solo oyun senaryoları, denetimi, migration üretimi, `docs/solo-red-flag-{tr,en,es}.md` dökümü |
 
 İş akışı: seed'i düzenle → `node scripts/check-questions.mjs` → `node scripts/build-questions-migration.mjs`

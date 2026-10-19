@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { relKey } from "@/lib/relationship";
+import { RoomCodeBox } from "@/components/RoomCodeBox";
 
 interface ShareScreenProps {
   roomCode: string;
@@ -100,6 +101,9 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
             </div>
           </div>
 
+          {/* Oda kodu (linkle aynı değer) */}
+          <RoomCodeBox roomCode={roomCode} compact />
+
           {/* WhatsApp */}
           <button
             onClick={handleWhatsApp}
@@ -179,6 +183,9 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
                 </button>
               </div>
             </div>
+
+            {/* Oda kodu (linkle aynı değer) */}
+            <RoomCodeBox roomCode={roomCode} />
 
             {/* WhatsApp */}
             <button

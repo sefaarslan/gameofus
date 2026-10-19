@@ -3,6 +3,9 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { generateToken, hashToken, verifyToken, extractToken } from "@/lib/token";
 import { isRoomExpired } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
+import { normalizeRoomCode } from "@/lib/room-code-utils";
+import { roomNotFound } from "@/lib/room-lookup";
+import { checkRateLimitWindow, ipHashFor } from "@/lib/rate-limit";
 import { corsOptions } from "@/lib/cors";
 import { getAuthUser } from "@/lib/auth";
 import { parseGender } from "@/lib/gender";
@@ -12,11 +15,15 @@ export function OPTIONS() {
   return corsOptions();
 }
 
+/** Katılma denemesi sınırı: IP başına ve (giriş yapmışsa) kullanıcı başına dakikada 10 deneme. Kod 6 karaktere indiği için tahmini yavaşlatır. */
+const JOIN_ATTEMPT_LIMIT = { limit: 10, windowMs: 60_000 };
+
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ roomCode: string }> },
 ) {
-  const { roomCode } = await params;
+  // Kod büyük/küçük harf, tire ve boşluk fark etmez (K7M-2PQ = k7m2pq)
+  const roomCode = normalizeRoomCode((await params).roomCode);
 
   let body: unknown;
   try {
@@ -46,16 +53,31 @@ export async function POST(
   const authUser = await getAuthUser(req);
   if (platform === "mobile" && !authUser) return apiError("UNAUTHORIZED", "Giriş gereklidir.", 401);
 
+  // Hız limiti: her deneme sayılır (başarılı ya da değil); aşılırsa 429 RATE_LIMITED
+  const [ipAllowed, userAllowed] = await Promise.all([
+    checkRateLimitWindow(ipHashFor(req), "join_attempt", JOIN_ATTEMPT_LIMIT),
+    authUser ? checkRateLimitWindow(`u:${authUser.id}`, "join_attempt", JOIN_ATTEMPT_LIMIT) : Promise.resolve(true),
+  ]);
+  if (!ipAllowed || !userAllowed) {
+    return apiError("RATE_LIMITED", "Çok fazla katılma denemesi. Biraz sonra tekrar dene.", 429);
+  }
+
   const supabase = createAdminClient();
 
   const { data: room } = await supabase
     .from("rooms")
-    .select("id, status, join_locked, expires_at, game_mode, question_count, category_id")
+    .select("id, status, join_locked, expires_at, game_mode, question_count, category_id, user_id")
     .eq("room_code", roomCode)
     .maybeSingle();
 
-  if (!room) return apiError("ROOM_NOT_FOUND", "Oda bulunamadı.", 404);
+  if (!room) return roomNotFound(req);
   if (isRoomExpired(room.expires_at)) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
+
+  // Webden kurulan oda (kurucusu hesapsız: `rooms.user_id` boş) yalnızca deneme amaçlıdır ve yalnızca webden oynanır:
+  // mobil kimlikle (platform "mobile" + JWT) katılma reddedilir. Mobilden kurulan odaya hem mobil hem web katılabilir.
+  if (platform === "mobile" && authUser && !room.user_id) {
+    return apiError("ROOM_WEB_ONLY", "Bu oda web'de kurulmuş ve yalnızca web'den oynanabilir.", 403);
+  }
 
   const { data: existingParticipants } = await supabase
     .from("participants")

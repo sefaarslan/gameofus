@@ -5,6 +5,7 @@ export type ApiErrorCode =
   | "ROOM_NOT_FOUND"
   | "ROOM_EXPIRED"
   | "ROOM_FULL"
+  | "ROOM_WEB_ONLY"
   | "INVALID_TOKEN"
   | "ALREADY_SUBMITTED"
   | "QUESTION_NOT_FOUND"

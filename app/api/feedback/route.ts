@@ -4,6 +4,8 @@ import { verifyToken, extractToken } from "@/lib/token";
 import { isRoomExpired } from "@/lib/expire";
 import { corsOptions } from "@/lib/cors";
 import { apiError, apiOk } from "@/lib/api";
+import { normalizeRoomCode } from "@/lib/room-code-utils";
+import { denyUnknownRoom, tokenDenied } from "@/lib/room-lookup";
 
 export function OPTIONS() {
   return corsOptions();
@@ -82,15 +84,11 @@ export async function POST(req: NextRequest) {
   const { data: room } = await supabase
     .from("rooms")
     .select("id, status, expires_at, locale, game_mode, relationship_type")
-    .eq("room_code", roomCode as string)
+    .eq("room_code", normalizeRoomCode(roomCode))
     .maybeSingle();
 
-  if (!room) return apiError("ROOM_NOT_FOUND", "Oda bulunamadı.", 404);
-  if (isRoomExpired(room.expires_at)) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
-  // Anket yalnızca sonuç görüldükten sonra anlamlı
-  if (room.status !== "result_ready" && room.status !== "completed") {
-    return apiError("RESULT_NOT_READY", "Sonuçlar henüz hazır değil.");
-  }
+  // Oda yok ile token yanlış AYNI yanıtı verir (oda varlığı sızmaz); oda durumları kimlik doğrulandıktan sonra söylenir
+  if (!room) return denyUnknownRoom(req, token);
 
   const { data: participants } = await supabase
     .from("participants")
@@ -98,7 +96,12 @@ export async function POST(req: NextRequest) {
     .eq("room_id", room.id);
 
   const me = (participants ?? []).find((p) => verifyToken(token, p.token_hash));
-  if (!me) return apiError("INVALID_TOKEN", "Geçersiz token.", 403);
+  if (!me) return tokenDenied(req);
+  if (isRoomExpired(room.expires_at)) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
+  // Anket yalnızca sonuç görüldükten sonra anlamlı
+  if (room.status !== "result_ready" && room.status !== "completed") {
+    return apiError("RESULT_NOT_READY", "Sonuçlar henüz hazır değil.");
+  }
 
   // Yalnızca gönderilen alanlar yazılır; önceki değerler (ör. puan) korunur
   const { error } = await supabase.from("feedback").upsert(

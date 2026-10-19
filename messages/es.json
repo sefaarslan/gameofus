@@ -95,8 +95,7 @@
       "badge": "Juego en solitario",
       "title": "¿Sin pareja? Pruébalo tú solo",
       "desc": "Campo Minado de Red Flags: sets listos para amistades y relaciones sentimentales, con 9 cartas boca abajo cada uno. Marca cada una, descubre tu perfil de tolerancia y compártelo en tus stories.",
-      "cta": "Probar el Campo Minado",
-      "heroLink": "¿Sin pareja? Pruébalo tú solo →"
+      "cta": "Probar el Campo Minado"
     },
     "promo": {
       "waitingTitle": "¿Campo Minado mientras esperas?",
@@ -202,6 +201,12 @@
       "correct": "¡Correcto! 🎉",
       "points": "+3 pts",
       "partnerName": "Alex"
+    },
+    "joinByCode": {
+      "label": "¿Tienes un código de invitación?",
+      "placeholder": "Ej.: K7M-2PQ",
+      "submit": "Unirme",
+      "invalid": "Escribe un código de sala válido (6-8 letras/números)"
     }
   },
   "create": {
@@ -365,7 +370,13 @@
     "partnerWaiting": "Esperando...",
     "partnerJoinedStatus": "¡Se unió!",
     "relaxMessage": "Tómate un té — tu {rel, select, friend {amigo} other {pareja}} está en camino.",
-    "partnerFallback": "{rel, select, friend {Amigo} other {Pareja}}"
+    "partnerFallback": "{rel, select, friend {Amigo} other {Pareja}}",
+    "code": {
+      "label": "Código de sala",
+      "copy": "Copiar código",
+      "copied": "¡Copiado!",
+      "hint": "También pueden escribir el código en lugar de tocar el enlace: \"Unirse con código\" en gameofus.app o en la app."
+    }
   },
   "join": {
     "title": "Unirse al juego",
