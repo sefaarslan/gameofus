@@ -376,7 +376,9 @@
       "label": "Room code",
       "copy": "Copy code",
       "copied": "Copied!",
-      "hint": "They can also enter the code instead of tapping the link: \"Join with code\" on gameofus.app or in the app."
+      "or": "or",
+      "instruction": "Your {rel, select, friend {friend} other {partner}} should go to <b>gameofus.app</b> and enter this code under “Invite code”",
+      "hint": "This code works on the web."
     }
   },
   "join": {

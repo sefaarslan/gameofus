@@ -376,7 +376,9 @@
       "label": "Oda kodu",
       "copy": "Kodu kopyala",
       "copied": "Kopyalandı!",
-      "hint": "Linke dokunmak yerine kodu da girebilirler: gameofus.app'te ya da uygulamada \"Kodla katıl\"."
+      "or": "veya",
+      "instruction": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Eşin} other {Partnerin}} <b>gameofus.app</b> adresine girmeli ve “Davet kodu” kısmına bu kodu yazmalı",
+      "hint": "Bu kod web’de çalışır."
     }
   },
   "join": {

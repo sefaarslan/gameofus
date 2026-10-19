@@ -376,7 +376,9 @@
       "label": "Código de sala",
       "copy": "Copiar código",
       "copied": "¡Copiado!",
-      "hint": "También pueden escribir el código en lugar de tocar el enlace: \"Unirse con código\" en gameofus.app o en la app."
+      "or": "o",
+      "instruction": "Tu {rel, select, friend {amigo} other {pareja}} debe entrar en <b>gameofus.app</b> e introducir este código en “Código de invitación”",
+      "hint": "Este código funciona en la web."
     }
   },
   "join": {

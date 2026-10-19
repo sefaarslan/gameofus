@@ -615,7 +615,7 @@ Butonlar: geri (←) ve > Oyun linki oluştur
 
 - Davet linki
 - Linki kopyala
-- **Oda kodu**: büyük ve gruplu (6 karakter K7M-2PQ; eski 8 karakter 4+4) + kopyala düğmesi (linkle aynı değer)
+- **Oda kodu** (davet linkinin ÜSTÜNDE, altında "veya" ayracıyla davet linki; Netflix TV girişi gibi): "{Kankan/Sevgilin/Eşin} gameofus.app adresine girmeli ve “Davet kodu” kısmına bu kodu yazmalı" (`rel` kalıbıyla) + büyük ve gruplu kod (6 karakter K7M-2PQ; eski 8 karakter 4+4) + kopyala düğmesi (linkle aynı değer) + "Bu kod web’de çalışır" notu (webden kurulan oda mobil kimlikle açılmaz)
 - WhatsApp ile paylaş
 - Oda durumu
 - Cevaplamaya başla butonu

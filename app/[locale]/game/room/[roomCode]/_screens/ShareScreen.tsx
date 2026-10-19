@@ -21,6 +21,17 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
+/** Kod ile link arasındaki "veya" ayracı. */
+function OrDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3" aria-hidden="true">
+      <span className="flex-1 h-px bg-outline-variant/40" />
+      <span className="text-xs text-on-surface-variant uppercase tracking-wider">{label}</span>
+      <span className="flex-1 h-px bg-outline-variant/40" />
+    </div>
+  );
+}
+
 export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, relationshipType, myName, onStartPlaying }: ShareScreenProps) {
   const t = useTranslations("share");
   const rel = relKey(relationshipType);
@@ -84,6 +95,11 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
 
           <hr className="border-outline-variant/30" />
 
+          {/* Oda kodu (linkle aynı değer) */}
+          <RoomCodeBox roomCode={roomCode} rel={rel} compact />
+
+          <OrDivider label={t("code.or")} />
+
           {/* Link section */}
           <div className="flex flex-col gap-3">
             <label className="text-label-md text-on-surface">{t("link")}</label>
@@ -100,9 +116,6 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
               </button>
             </div>
           </div>
-
-          {/* Oda kodu (linkle aynı değer) */}
-          <RoomCodeBox roomCode={roomCode} compact />
 
           {/* WhatsApp */}
           <button
@@ -164,6 +177,11 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
           </div>
 
           <div className="flex flex-col gap-6">
+            {/* Oda kodu (linkle aynı değer) */}
+            <RoomCodeBox roomCode={roomCode} rel={rel} />
+
+            <OrDivider label={t("code.or")} />
+
             {/* Link */}
             <div>
               <label className="text-label-md text-on-surface-variant mb-2 block">{t("link")}</label>
@@ -183,9 +201,6 @@ export function ShareScreen({ roomCode, roomLocale, partnerJoined, partnerName, 
                 </button>
               </div>
             </div>
-
-            {/* Oda kodu (linkle aynı değer) */}
-            <RoomCodeBox roomCode={roomCode} />
 
             {/* WhatsApp */}
             <button
