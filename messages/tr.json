@@ -230,10 +230,11 @@
     },
     "gender": {
       "label": "Cinsiyet",
-      "hint": "Karakterlerinizi çizmek ve yorumları daha doğru yazmak için kullanılır. Dilersen Diğer'i seçip geçebilirsin.",
+      "hint": "Karakterlerinizi çizmek ve yorumları daha doğru yazmak için kullanılır. Belirtmek istemezsen — seçebilirsin.",
       "female": "Kadın",
       "male": "Erkek",
-      "unspecified": "Diğer"
+      "unspecified": "—",
+      "unspecifiedAria": "Belirtmek istemiyorum"
     },
     "name": {
       "label": "İsmin",

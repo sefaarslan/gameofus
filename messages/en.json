@@ -230,10 +230,11 @@
     },
     "gender": {
       "label": "Gender",
-      "hint": "Used to draw your characters and to write more fitting comments. You can just pick Other.",
+      "hint": "Used to draw your characters and to write more fitting comments. If you'd rather not say, pick —.",
       "female": "Female",
       "male": "Male",
-      "unspecified": "Other"
+      "unspecified": "—",
+      "unspecifiedAria": "Prefer not to say"
     },
     "name": {
       "label": "Your name",

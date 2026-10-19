@@ -120,32 +120,30 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
               </div>
             </div>
 
-            <div className="flex gap-3">
-              <div className="flex-1 min-w-0">
-                <GenderPicker label={tc("gender.label")} value={gender} onChange={setGender} />
-              </div>
-              <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                <label htmlFor="join-birth" className="text-xs text-on-surface-variant flex items-center gap-1">
-                  <span className="material-symbols-outlined text-sm">calendar_month</span>
-                  <span className="truncate">{tc("birthDate.label")}</span>
-                </label>
-                <div className="flex items-center bg-surface-container rounded-xl px-3 min-h-[44px] focus-within:ring-2 focus-within:ring-primary/40">
-                  <input
-                    id="join-birth"
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="bday"
-                    value={birthDate}
-                    onChange={(e) => setBirthDate(maskBirthDateInput(e.target.value))}
-                    placeholder={tc("birthDate.placeholder")}
-                    maxLength={10}
-                    className="w-full bg-transparent text-label-md text-on-surface placeholder-on-surface-variant/60 py-2.5 focus:outline-none"
-                  />
-                </div>
-              </div>
+            <div className="flex flex-col gap-1.5">
+              <GenderPicker label={tc("gender.label")} value={gender} onChange={setGender} />
+              <p className="text-xs text-on-surface-variant/70">{tc("gender.hint")}</p>
             </div>
 
-            <p className="text-xs text-on-surface-variant/70 -mt-1">{tc("gender.hint")}</p>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="join-birth" className="text-xs text-on-surface-variant flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm">calendar_month</span>
+                <span className="truncate">{tc("birthDate.label")}</span>
+              </label>
+              <div className="flex items-center bg-surface-container rounded-xl px-3 min-h-[44px] focus-within:ring-2 focus-within:ring-primary/40">
+                <input
+                  id="join-birth"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="bday"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(maskBirthDateInput(e.target.value))}
+                  placeholder={tc("birthDate.placeholder")}
+                  maxLength={10}
+                  className="w-full bg-transparent text-label-md text-on-surface placeholder-on-surface-variant/60 py-2.5 focus:outline-none"
+                />
+              </div>
+            </div>
 
             {error && (
               <div role="alert" className="flex items-center gap-3 bg-error-container text-error rounded-2xl px-4 py-3">

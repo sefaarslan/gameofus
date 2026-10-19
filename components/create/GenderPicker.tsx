@@ -10,7 +10,7 @@ const OPTIONS: Array<{ value: Gender | null; key: "female" | "male" | "unspecifi
 ];
 
 /**
- * Cinsiyet seçimi (karakter çizimi ve AI dili için): mobildeki gibi segmentli kontrol. Varsayılan "Diğer" (null).
+ * Cinsiyet seçimi (karakter çizimi ve AI dili için): mobildeki gibi segmentli kontrol. Varsayılan "—" / belirtmek istemiyorum (null).
  * `value === undefined` → henüz hiçbir şey seçilmedi (zorunlu doldurulan akışlar için).
  */
 export function GenderPicker({
@@ -39,6 +39,7 @@ export function GenderPicker({
               type="button"
               role="radio"
               aria-checked={selected}
+              {...(optionValue === null ? { "aria-label": t("unspecifiedAria"), title: t("unspecifiedAria") } : {})}
               onClick={() => onChange(optionValue)}
               className={`flex-1 flex items-center justify-center rounded-lg text-xs font-semibold transition-all ${
                 selected ? "bg-primary text-on-primary" : "text-on-surface-variant hover:bg-surface-container-high"
