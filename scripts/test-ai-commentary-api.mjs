@@ -173,6 +173,17 @@ try {
   await G(code5, B);
   ok((await coins(A)) === 1000, "coin düşülmemiş takılmış kayıt: iade YOK");
 
+  // ── Süresi dolmuş (ama saklanan) odada satın alma serbest ───────────────────
+  const g8 = await playRoom(A, B); const code8 = g8.code;
+  await setCoins(A, 1000);
+  await db.from("rooms").update({ expires_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() }).eq("room_code", code8);
+  r = await P(code8, A, "fake:ok");
+  ok(r.status === 200 && r.json?.applied === true && r.json.balance === 900, "süresi dolmuş odada satın alma: 200 (ROOM_EXPIRED yok)");
+  r = await G(code8, B);
+  ok(r.status === 200 && r.json?.status === "ready", "süresi dolmuş odada partner GET ile okur");
+  r = await P("ZZZZZ3", A, "fake:ok");
+  ok(r.status === 403 && r.json?.error?.code === "INVALID_TOKEN", "silinmiş/olmayan oda: POST hâlâ 403 INVALID_TOKEN");
+
   // ── Web partner yorumu hiçbir yoldan göremez ────────────────────────────────
   const g6 = await playRoom(A, { web: true }); const code6 = g6.code;
   await setCoins(A, 1000);

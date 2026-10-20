@@ -3,7 +3,6 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { COIN_PRICES, CoinError, applyCoins } from "@/lib/coins";
 import { CORS_HEADERS, corsOptions } from "@/lib/cors";
 import { apiError, apiOk } from "@/lib/api";
-import { isRoomExpired } from "@/lib/expire";
 import { normalizeRoomCode } from "@/lib/room-code-utils";
 import { checkRateLimitWindow } from "@/lib/rate-limit";
 import { authAiUser, resolveAiParticipant } from "@/lib/ai/access";
@@ -87,8 +86,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
     return apiError("AI_CONSENT_REQUIRED", "AI yorum için önce onay vermelisin.", 403);
   }
 
-  // 2) Oda durumu
-  if (isRoomExpired(room.expires_at)) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
+  // 2) Oda durumu. `expires_at` geçmiş olsa bile satın alma serbesttir: oyun süresi dolsa da sonuç saklama süresi (90 gün) boyunca
+  //    okunabilir; oda silindiyse zaten bulunamaz (INVALID_TOKEN). Burada yalnızca sonucun hazır olması aranır.
   if (room.status !== "result_ready" && room.status !== "completed") {
     return apiError("RESULT_NOT_READY", "Sonuçlar henüz hazır değil.", 409);
   }

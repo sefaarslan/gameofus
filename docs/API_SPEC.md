@@ -386,10 +386,10 @@ JWT → `401 UNAUTHORIZED`; geçerli JWT ama bu odanın katılımcısı değil, 
   Sunucu sürümü yalnızca saklar (`users.ai_consent_at/version`); metin mobilde. Rıza yoksa POST `403 AI_CONSENT_REQUIRED`.
 - `GET /api/rooms/[roomCode]/ai-commentary` → 200 `{ status: "none"|"generating"|"ready"|"failed", purchasedByMe, content?, createdAt? }`.
   Odanın her katılımcısına ücretsiz (satın alan da, partner de). `none` hata değildir. `content` yalnızca `ready`. Süresi dolmuş oda da
-  saklama süresi içinde JWT ile okunabilir.
+  saklama süresi içinde JWT ile okunabilir (POST için de aynısı geçerli).
 - `POST /api/rooms/[roomCode]/ai-commentary` (gövde yok), sıra:
   1. Kimlik → hız sınırı (kullanıcı başına dakikada 5, günde 20; `429 RATE_LIMITED`) → katılımcı → rıza.
-  2. Oda süresi dolmuşsa `400 ROOM_EXPIRED`; sonuç hazır değilse `409 RESULT_NOT_READY`.
+  2. Sonuç hazır değilse (`result_ready`/`completed` değil) `409 RESULT_NOT_READY`. **`expires_at` geçmiş odada da satın alma mümkündür** (`ROOM_EXPIRED` yoktur): sonuç, odanın saklama süresi (90 gün) boyunca açılabilir; oda silinmişse (saklama süresi geçmişse) oda bulunamaz ve diğer kimlik hatalarıyla aynı `403 INVALID_TOKEN` döner.
   3. Zaten `ready` kayıt varsa `200 { status:"ready", content, applied:false }` (**coin düşmez**; ikinci kişi okur). `generating` varsa `202 { status:"generating" }`.
   4. Sağlayıcı kapasitesi yoksa `503 AI_UNAVAILABLE` (**coin düşmeden**, `refunded:false`).
   5. Yarış-güvenli `generating` satırı açılır (odada aynı anda tek aktif kayıt), sonra coin düşer: `reason:"ai_commentary"`, `refId:"<oda kodu>:<attempt>"`,

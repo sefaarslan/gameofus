@@ -359,6 +359,7 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   `generate` — doğrula + bir kez düzelt; `run` — ana→yedek; `capacity` — günlük kota koruması; `config` — `AI_PRIMARY`/`AI_FALLBACK`). Uçlar: bkz. `docs/API_SPEC.md` §10c.
   **Burç:** doğum tarihinden KODDA hesaplanır (`lib/ai/zodiac.ts`), modele yalnızca burç adı gider ve yalnızca sessiz arka plan olarak kullanılır; yorumda burç/astroloji sözcüğü
   geçerse çıktı reddedilir (`schema.ts` → `qualityIssues`). **[YAPILACAK] rıza metni ve gizlilik politikası burç/yaş aralığı/cinsiyet/sağlayıcıyı kapsayacak şekilde güncellenecek** (bkz. `docs/PRD.md` Bölüm 12.3 sonrası "Açık konular").
+  **Süre:** `expires_at` geçmiş odada da (sonuç hazırsa) yorum satın alınır ve okunur; `ROOM_EXPIRED` yoktur, sınır odanın saklama süresidir (oda silinince `403 INVALID_TOKEN`).
   **Kural:** coin düşmeden önce kapasite/veri kontrol edilir; üretim başarısızsa coin iade edilir (iade yalnızca düşüm gerçekten yapıldıysa); `refId = <oda kodu>:<attempt>`.
   Prompt değiştirirken `PROMPT_VERSION`'ı artır; model değiştirmeden önce `scripts/ai-playground.mjs` ile uydurma odalarla (3 dil) karşılaştır. Gerçek kullanıcı verisini
   ücretsiz OpenRouter (`:free`) modellerine ASLA gönderme. Testler: `node --no-warnings scripts/test-ai.mjs` (birim) ve
