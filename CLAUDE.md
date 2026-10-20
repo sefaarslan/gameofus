@@ -343,7 +343,7 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
 - **Cinsiyet (opsiyonel, `participants.gender`):** yalnızca sahne modunda çöp adam karakterini çizmek ve
   ikili (oda) AI yorumunda dil bilgisi/doğal ifade için alınır; kurucu oda kurarken, karşı oyuncu davetle katılırken kendi cinsiyetini girer (katılma ekranı da ad + isteğe bağlı cinsiyet + isteğe bağlı doğum tarihi alır; `JoinScreen`). **Hesap profiline yazılmaz, oda silinince gider**, metrik
   görünümlerine/arşiv tablolarına/loglara **girmez** (iki oyuncunun cinsiyeti + ilişki türü birlikte hassastır); hesap silmede
-  başkalarının odalarındaki katılımdan da silinir. AI'a yalnızca ikili AI'da ve rıza metninde belirtilerek gider; prompt'ta "cinsiyeti
+  başkalarının odalarındaki katılımdan da silinir. AI'a yalnızca ikili AI'da, yalnızca İspanyolca odalarda ve rıza metninde belirtilerek gider; prompt'ta "cinsiyeti
   yalnızca dil bilgisi/doğal ifade için kullan, genelleme/klişe üretme" kuralı zorunludur. Solo AI'a cinsiyet **gitmez**.
 - Analytics event'lerinde **bireysel cevap içeriği tutulmaz**, yalnızca davranış metrikleri. Aynı kural
   `feedback` tablosu için de geçerlidir: puan, AI ilgisi, kısa yorum (≤ 500 karakter) ve oda meta verisi
@@ -351,10 +351,18 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
 - `feedback` yazımı yalnızca token doğrulayan `POST /api/feedback` üzerinden yapılır; RLS açık ve hiç
   policy yoktur (client doğrudan okuyamaz/yazamaz). Anket yalnızca sonuçlar hazır olduktan sonra kabul
   edilir.
-- **AI yorum (planlanan):** Cevaplar üçüncü taraf bir LLM'e (Groq) gönderileceği için, uygulamaya
-  almadan önce gizlilik/rıza değerlendirmesi ve yalnızca yapılandırılmış cevapların (seçilen seçenek
-  metni, sıralama) gönderilmesi kuralı netleştirilmelidir. Doğum tarihi (isteğe bağlı, kişinin kendi beyanı)
-  yalnızca yorum kişiselleştirme/yaş koşulu gerekçesiyle ve rıza metninde belirtilerek AI'a gider.
+- **AI yorum (mobil, canlı):** cevaplar üçüncü taraf bir LLM'e (Groq; yedek yapılandırılırsa OpenRouter) gittiği için yalnızca YAPILANDIRILMIŞ oyun verisi gönderilir:
+  oyuncu adları (≤30 karakter, tek satır, **veri** olarak), kodda çözülmüş olgu kartları (soru/seçenek metniyle cevap ve tahminler), ilişki türü, oda dili,
+  **yaş aralığı** (ham doğum tarihi ASLA) ve cinsiyet yalnızca İspanyolca odalarda (dil bilgisi uyumu için). Kimlik/token/e-posta gitmez; loglara kişisel veri girmez
+  (yalnızca hata türü ve süre). Rıza `users.ai_consent_at/version` (metin mobilde). **Web'de hiçbir yerde yok**; yalnızca JWT (token'lı istek `403 AI_MOBILE_ONLY`).
+  Kod: `lib/ai/` (`provider` — Groq/OpenRouter aynı OpenAI uyumlu istemci; `digest` — kodda sinyal/olgu hesabı; `prompt` — sürümlü prompt; `schema` — Zod doğrulama;
+  `generate` — doğrula + bir kez düzelt; `run` — ana→yedek; `capacity` — günlük kota koruması; `config` — `AI_PRIMARY`/`AI_FALLBACK`). Uçlar: bkz. `docs/API_SPEC.md` §10c.
+  **Burç:** doğum tarihinden KODDA hesaplanır (`lib/ai/zodiac.ts`), modele yalnızca burç adı gider ve yalnızca sessiz arka plan olarak kullanılır; yorumda burç/astroloji sözcüğü
+  geçerse çıktı reddedilir (`schema.ts` → `qualityIssues`). **[YAPILACAK] rıza metni ve gizlilik politikası burç/yaş aralığı/cinsiyet/sağlayıcıyı kapsayacak şekilde güncellenecek** (bkz. `docs/PRD.md` Bölüm 12.3 sonrası "Açık konular").
+  **Kural:** coin düşmeden önce kapasite/veri kontrol edilir; üretim başarısızsa coin iade edilir (iade yalnızca düşüm gerçekten yapıldıysa); `refId = <oda kodu>:<attempt>`.
+  Prompt değiştirirken `PROMPT_VERSION`'ı artır; model değiştirmeden önce `scripts/ai-playground.mjs` ile uydurma odalarla (3 dil) karşılaştır. Gerçek kullanıcı verisini
+  ücretsiz OpenRouter (`:free`) modellerine ASLA gönderme. Testler: `node --no-warnings scripts/test-ai.mjs` (birim) ve
+  `AI_ALLOW_TEST_OVERRIDE=1 npx next dev -p 3001` + `BASE=http://localhost:3001 node --no-warnings scripts/test-ai-commentary-api.mjs` (entegrasyon; gerçek modele gitmez).
 
 ### Abuse / rate limit (başlangıç limitleri)
 - Aynı IP/IP-hash için saatte max **10**, günde max **50** oda oluşturma.
@@ -481,8 +489,7 @@ Ayrıntılı durum için `docs/PRD.md` Bölüm 21 esas alınır. Özet:
   kilidi (mobile yönlendirme), soru seti v2, ilişki türüne duyarlı metinler, metrik görünümleri.
 - **Mobil (devam ediyor, ayrı repo):** giriş zorunlu (Google/Apple), coin + tier modeli, IAP, geçmiş,
   push, deep link, hesap silme, AI yorum. İş listesi: `gameofus-mobile/tasklist.md`.
-- **Sıradaki web işleri:** coin/tier için `users/*` ve `iap/verify` endpoint'leri, AI yorum endpoint'i
-  (`GET /api/rooms/[roomCode]/ai-commentary`, `results.ai_commentary`), hesap silme, doğum tarihi/yaş
+- **Sıradaki web işleri:** `iap/verify` endpoint'i, doğum tarihi/yaş
   doğrulama (yalnızca mobil gerektirdiğinde), universal link dosyaları (`apple-app-site-association`,
   `assetlinks.json`), sonuç paylaşım kartları.
 - **Sonraya:** PWA install prompt, admin panel, eski anonim oda temizleme job'u, HttpOnly cookie hardening.

@@ -51,8 +51,7 @@ POST /api/users/coins/earn        (mobil, Bearer JWT)
 ```
 
 Ayrı bir `calculate-results` endpoint'i **yoktur**: sonuç, ikinci oyuncu `complete` çağırdığında aynı
-istek içinde hesaplanır. Planlanan (mobil için): `POST /api/iap/verify`, `GET /api/rooms/[roomCode]/ai-commentary`,
-`DELETE /api/users/me`. Lemon Squeezy webhook'u **kullanılmaz**.
+istek içinde hesaplanır. Planlanan (mobil için): `POST /api/iap/verify`. Lemon Squeezy webhook'u **kullanılmaz**.
 
 ---
 
@@ -349,7 +348,7 @@ Geçersiz/eksik JWT → `401 UNAUTHORIZED`. Coin yazımı yalnızca sunucuda, at
 Ekonomi: kayıt +500 (Auth trigger'ı, otomatik) · reklam +100 (günde en fazla 5) · oda −250 · AI yorum −100 · solo AI −100 ·
 solo +20 (solo `complete` içinde, bkz. gelecek iş). **Miktarı istemci göndermez**, yalnızca `reason`.
 
-- `GET /api/users/me` → `{ id, coins, tier, birthDate }`
+- `GET /api/users/me` → `{ id, coins, tier, birthDate, aiConsent }` (`aiConsent`: `{ version, at }` ya da rıza yoksa `null`)
 - `GET /api/users/history` → **düz dizi** (sarmalayıcı yok), en yeni önce (`created_at` azalan), en çok 100:
   `[{ roomCode, locale, relationshipType, status, role, partnerName, readingScore, completedAt, createdAt, gameMode, questionCount, expiresAt, expired, resultReady }]`.
   Kullanıcının (`participants.user_id`) tüm odaları; yalnızca `created_at` son 90 gün içinde olanlar. `status` ham `rooms.status`
@@ -370,6 +369,47 @@ solo +20 (solo `complete` içinde, bkz. gelecek iş). **Miktarı istemci gönder
 - `POST /api/rooms/create` (mobil): `platform: "mobile"` + Bearer JWT zorunlu (`401`); oda −250 coin düşülür
   (`402 INSUFFICIENT_COINS`), oda başarısız olursa iade edilir, `rooms.user_id` bağlanır. `platform` göndermeyen anonim
   web istekleri ücretsizdir ve değişmez.
+
+## 10c. AI yorum (ikili sonuç) — YALNIZCA MOBİL
+
+Web'de hiçbir yerde yoktur: web arayüzünde buton/kart/ipucu yok; `state`, `results`, `history` yanıtlarında AI ile ilgili alan yok.
+Hesapsız (katılımcı token'lı) web oyuncusu yorumu hiçbir yoldan göremez (partneri mobildeyse ondan rica eder; ürün tarafında bir şey yapılmaz).
+Model/sağlayıcı ortam değişkenlerinde (kodda değil): `AI_PRIMARY` (varsayılan `groq:openai/gpt-oss-120b`), `AI_FALLBACK` (isteğe bağlı,
+ör. `openrouter:google/gemini-2.5-flash-lite` ya da `groq:qwen/qwen3.8-27b`), `GROQ_API_KEY`, `OPENROUTER_API_KEY`,
+`AI_DAILY_LIMIT_GROQ` (ücretsiz katman koruması için günlük yumuşak sınır, varsayılan 60). Kod: `lib/ai/`.
+
+**Kimlik (GET ve POST):** yalnızca geçerli Supabase JWT. Katılımcı token'lı ya da kimliksiz istek → `403 AI_MOBILE_ONLY`; geçersiz/süresi dolmuş
+JWT → `401 UNAUTHORIZED`; geçerli JWT ama bu odanın katılımcısı değil, oda yok ya da aynı hesap iki rolde → hepsi aynı `403 INVALID_TOKEN`
+(oda varlığı sızmaz).
+
+- `POST /api/users/ai-consent` `{ "version": "<rıza metni sürümü>" }` (1-32 karakter: harf, rakam, `.` `_` `-`) → `{ ok: true }`.
+  Sunucu sürümü yalnızca saklar (`users.ai_consent_at/version`); metin mobilde. Rıza yoksa POST `403 AI_CONSENT_REQUIRED`.
+- `GET /api/rooms/[roomCode]/ai-commentary` → 200 `{ status: "none"|"generating"|"ready"|"failed", purchasedByMe, content?, createdAt? }`.
+  Odanın her katılımcısına ücretsiz (satın alan da, partner de). `none` hata değildir. `content` yalnızca `ready`. Süresi dolmuş oda da
+  saklama süresi içinde JWT ile okunabilir.
+- `POST /api/rooms/[roomCode]/ai-commentary` (gövde yok), sıra:
+  1. Kimlik → hız sınırı (kullanıcı başına dakikada 5, günde 20; `429 RATE_LIMITED`) → katılımcı → rıza.
+  2. Oda süresi dolmuşsa `400 ROOM_EXPIRED`; sonuç hazır değilse `409 RESULT_NOT_READY`.
+  3. Zaten `ready` kayıt varsa `200 { status:"ready", content, applied:false }` (**coin düşmez**; ikinci kişi okur). `generating` varsa `202 { status:"generating" }`.
+  4. Sağlayıcı kapasitesi yoksa `503 AI_UNAVAILABLE` (**coin düşmeden**, `refunded:false`).
+  5. Yarış-güvenli `generating` satırı açılır (odada aynı anda tek aktif kayıt), sonra coin düşer: `reason:"ai_commentary"`, `refId:"<oda kodu>:<attempt>"`,
+     100 coin; yetersizse satır silinir, `402 INSUFFICIENT_COINS`.
+  6. Ana modelle üretilir (~20 sn zaman aşımı; geçersiz çıktıda bir kez düzeltme turu); olmazsa yedek model. Başarılı: `200 { status:"ready", content, balance, applied:true, purchasedByMe:true }`.
+  7. Başarısız: satır `failed`, coin iadesi (`reason:"ai_commentary_refund"`, aynı `refId`; iade yalnızca düşüm gerçekten yapıldıysa), `503 AI_UNAVAILABLE` + `refunded:true`.
+     Yeniden denemede `attempt` artar (yeni coin referansı).
+  8. 2 dakikadan uzun `generating` kalan (sunucu çökmesi) kayıtlar GET/POST sırasında `failed` sayılır ve iade edilir (tembel temizlik).
+- `GET /api/users/ai-reports` (JWT) → **düz dizi**, yeniden eskiye, en çok 100: `[{ roomCode, partnerName, relationshipType, headline, createdAt }]`;
+  yalnızca kullanıcının SATIN ALDIĞI `ready` yorumlar (partnerin aldıkları çıkmaz). JWT'siz `401`.
+
+`content` biçimi (oda dilinde, `rooms.locale`): `{ headline: string, summary: string, strengths: string[3], blindSpots: string[2..3], conversationStarters: string[3] }`.
+Sunucu Zod ile doğrular; yüzde, soru numarası ve JSON kırıntısı gibi içerik kuralları da denetlenir.
+
+**Modele giden veri:** oyuncu adları (≤30 karakter, tek satır, veri olarak), kodda çözülmüş "olgu kartları" (cevaplar/tahminler soru ve seçenek METNİYLE,
+benzerlik, "eminim ama ıskaladı" anları), ilişki türü, oda dili, yaş aralığı (ham doğum tarihi **asla**) ve cinsiyet yalnızca İspanyolca odalarda
+(dil bilgisi için). Kimlik, token, e-posta gönderilmez. Loglara yalnızca hata türü ve süre girer.
+
+**Veri saklama:** yorum odaya bağlıdır (oda 90 gün sonra silinince gider); satın alan hesabını silerse onun satın aldığı yorumlar da silinir.
+`ai_usage_daily`: sağlayıcı başına günlük istek/token toplamı (kişisel veri yok).
 
 ---
 

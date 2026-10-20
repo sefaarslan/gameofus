@@ -16,12 +16,19 @@ export async function GET(req: NextRequest) {
 
   const { data } = await createAdminClient()
     .from("users")
-    .select("room_credits, tier, birth_date")
+    .select("room_credits, tier, birth_date, ai_consent_at, ai_consent_version")
     .eq("id", user.id)
     .maybeSingle();
   if (!data) return apiError("INTERNAL_ERROR", "Kullanıcı kaydı bulunamadı.", 500);
 
-  return apiOk({ id: user.id, coins: data.room_credits, tier: data.tier, birthDate: data.birth_date });
+  return apiOk({
+    id: user.id,
+    coins: data.room_credits,
+    tier: data.tier,
+    birthDate: data.birth_date,
+    // AI yorum rızası (yoksa null); mobil metin sürümü değiştiğinde yeniden rıza ister
+    aiConsent: data.ai_consent_at ? { version: data.ai_consent_version, at: data.ai_consent_at } : null,
+  });
 }
 
 /**

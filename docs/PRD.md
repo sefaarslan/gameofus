@@ -507,12 +507,15 @@ Kurallar:
 - App Store 3.1.1: fiyat/faturalama net gösterilir; Terms of Use ve Privacy Policy bağlantıları bulunur.
 - Satın alma yalnızca sunucu doğrulamasıyla (`/api/iap/verify`) geçerli olur: `users` üzerinde coin artışı + `tier = GREATEST(mevcut, yeni)`; tüm hareketler `credit_transactions` audit tablosuna yazılır.
 
-### 12.3 AI yorum (mobile, planlanan)
+### 12.3 AI yorum (mobile; backend canlı)
 
-- Sonuç ekranında "100 coin ile aç" butonu (herkes için aynı). Coin yetersizse paket ekranına yönlendirilir.
-- Sunucu `GET /api/rooms/[roomCode]/ai-commentary`: önce coin düşer, sonra LLM çağrısı yapılır; sonuç `results.ai_commentary`'e **cache'lenir** (aynı oda için tekrar ücret/maliyet yok).
-- Girdi: oda ilişki türü, yapılandırılmış cevaplar (seçilen seçenek metni, sıralamalar) ve soruların `insight_tag`'leri. Serbest metin yoktur. İlişki türüne göre ton ayarlanır; ton sıcak ve yargılayıcı olmayan kalır, "uyum puanı/eşleşme" dili kullanılmaz.
-- Gizlilik: cevaplar üçüncü taraf LLM'e gittiği için yayına almadan önce rıza/gizlilik metni netleştirilir (bkz. Bölüm 18).
+- **Yalnızca mobil.** Web arayüzünde hiçbir yerde yoktur (buton, kart, ipucu ya da "mobilde aç" duyurusu eklenmez); hesapsız web oyuncusu yorumu göremez.
+- Sonuç ekranında "100 coin ile aç" butonu (herkes için aynı). Coin yetersizse paket ekranına yönlendirilir. **Yorumu odadaki iki kişiden biri açar; açılınca partner de ücretsiz okur** (ikinci kişi satın alamaz, okur).
+- Rıza: kullanıcı AI yorum için bir kez onay verir (`POST /api/users/ai-consent`); metin mobilde, sürüm sunucuda saklanır.
+- Sunucu (`POST /api/rooms/[roomCode]/ai-commentary`): önce coin düşer, sonra LLM çağrısı yapılır; başarısızlıkta coin iade edilir. Yorum `ai_commentaries` tablosunda saklanır (oda başına tek aktif kayıt; aynı oda için tekrar ücret/maliyet yok).
+- Girdi: oda ilişki türü, oda dili, kodda hesaplanmış olgu kartları (soru/seçenek metniyle cevaplar ve tahminler; benzerlik; "eminim ama ıskaladı" anları), yaş aralığı ve (yalnızca İspanyolca için) cinsiyet. Serbest metin yoktur; doğum tarihi, kimlik, e-posta gönderilmez. Ton: sıcak, yargılamayan, spesifik; "uyum puanı/eşleşme" dili yok; `friend` odasında romantik çağrışım yok.
+- Sağlayıcı: Groq `openai/gpt-oss-120b` (ana), yedek ortam değişkeniyle seçilir (`lib/ai/config.ts`). Model değişimi kod değil yapılandırma işidir. Yorum başına maliyet ≈ $0.0007.
+- Gizlilik: cevaplar üçüncü taraf LLM'e (Groq; yedek OpenRouter kullanılırsa onun sağlayıcısı) gittiği için rıza metni ve gizlilik politikası bu işleyicileri belirtmelidir (bkz. Bölüm 18).
 
 ### 12.4 Satın alma akışı (mobile)
 
@@ -542,7 +545,7 @@ Web'e giren bilgi, kullanıcının premium *durumu* değil, kategorinin *meta ve
 
 - Paket fiyatlarının yerel para birimi karşılıkları (TL/EUR vb.) ve nihai tutarlar.
 - Reklam izleme için günlük üst sınır olup olmayacağı.
-- AI yorum için LLM sağlayıcısı/modeli, maliyet tavanı ve rıza metni.
+- **[YAPILACAK — yayından önce] AI yorum rıza metni ve gizlilik politikası güncellemesi** (`docs/legal/privacy-policy-tr.md`, `docs/legal/terms-tr.md` ve mobil rıza ekranı). Metinde şunlar açıkça yazılmalı: (1) cevaplar ve tahminler üçüncü taraf LLM sağlayıcısına gider (Groq; yedek yapılandırılırsa OpenRouter ve onun model sağlayıcısı) ve saklama/eğitim politikaları; (2) modele giden veriler: oyuncu adları, soru/seçenek metniyle cevaplar ve tahminler, ilişki türü, oda dili, **yaş aralığı**, **cinsiyet (yalnızca İspanyolca dil bilgisi için)** ve **burç (doğum tarihinden türetilir; yorumu kişiselleştirmek için arka planda kullanılır, yorumda anılmaz)**; (3) gönderilmeyenler: doğum tarihi, e-posta, kimlikler; (4) AI yorumun eğlence amaçlı olduğu, tıbbi/psikolojik tavsiye olmadığı; (5) partnerin yorumu satın alan kişi aracılığıyla okuyabildiği (iki oyuncuya da görünür); (6) rıza sürümü `users.ai_consent_version` ile tutulur, metin değişince yeniden rıza istenir.
 - Doğum tarihinin saklama süresi (oda ile birlikte silinmesi önerilir; oda 24 saatte expire olur).
 
 ### 12.7 Oda expire mantığı

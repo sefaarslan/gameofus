@@ -745,6 +745,8 @@ export type Database = {
           room_credits: number
           tier: string
           birth_date: string | null
+          ai_consent_at: string | null
+          ai_consent_version: string | null
         }
         Insert: {
           created_at?: string
@@ -754,6 +756,8 @@ export type Database = {
           room_credits?: number
           tier?: string
           birth_date?: string | null
+          ai_consent_at?: string | null
+          ai_consent_version?: string | null
         }
         Update: {
           created_at?: string
@@ -763,7 +767,69 @@ export type Database = {
           room_credits?: number
           tier?: string
           birth_date?: string | null
+          ai_consent_at?: string | null
+          ai_consent_version?: string | null
         }
+        Relationships: []
+      }
+      ai_commentaries: {
+        Row: {
+          attempt: number
+          completion_tokens: number | null
+          consent_version: string
+          content: Json | null
+          created_at: string
+          error_kind: string | null
+          id: string
+          locale: string
+          model: string | null
+          prompt_tokens: number | null
+          prompt_version: string | null
+          purchased_by: string
+          room_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempt: number
+          completion_tokens?: number | null
+          consent_version: string
+          content?: Json | null
+          created_at?: string
+          error_kind?: string | null
+          id?: string
+          locale: string
+          model?: string | null
+          prompt_tokens?: number | null
+          prompt_version?: string | null
+          purchased_by: string
+          room_id: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          attempt?: number
+          completion_tokens?: number | null
+          consent_version?: string
+          content?: Json | null
+          created_at?: string
+          error_kind?: string | null
+          id?: string
+          locale?: string
+          model?: string | null
+          prompt_tokens?: number | null
+          prompt_version?: string | null
+          purchased_by?: string
+          room_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ai_usage_daily: {
+        Row: { day: string; failures: number; provider: string; requests: number; tokens: number }
+        Insert: { day: string; failures?: number; provider: string; requests?: number; tokens?: number }
+        Update: { day?: string; failures?: number; provider?: string; requests?: number; tokens?: number }
         Relationships: []
       }
       purchases: {
@@ -821,6 +887,14 @@ export type Database = {
       }
       delete_user_account: {
         Args: { p_user: string }
+        Returns: undefined
+      }
+      ai_commentary_begin: {
+        Args: { p_consent: string; p_locale: string; p_room: string; p_user: string }
+        Returns: { attempt: number; id: string }[]
+      }
+      ai_usage_add: {
+        Args: { p_failures: number; p_provider: string; p_requests: number; p_tokens: number }
         Returns: undefined
       }
       apply_coins: {
