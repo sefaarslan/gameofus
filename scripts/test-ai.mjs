@@ -5,6 +5,8 @@ import { generateCommentary, InvalidCommentaryError } from "../lib/ai/generate.t
 import { AiProviderError, chat } from "../lib/ai/provider.ts";
 import { parseSpec } from "../lib/ai/config.ts";
 import { zodiacSignFor } from "../lib/ai/zodiac.ts";
+import { isSensitiveTag, themeOf } from "../lib/ai/themes.ts";
+import { toneFor } from "../lib/ai/prompt.ts";
 import { buildMessages, promptPayload } from "../lib/ai/prompt.ts";
 
 let fails = 0;
@@ -63,7 +65,32 @@ ok(/first choices differ/.test(sentences), "farklı sıralama: ilk tercihler kar
 ok(!/answered "/.test(sentences), "sıralama olgularında 'answered' (cevapladı) ifadesi yok");
 ok(/would put "Sessizlik" first when ranking the options, but (Elif|Deniz) actually put "Kahvaltı" first/.test(sentences), "emin-ıska (sıralama): yalnızca beklenen ve gerçek ilk tercih");
 d = buildDigest(room());
-ok(d.facts.some((f) => f.mode === "secret_choice" && /answered "/.test(f.sentence)), "evet/hayır sorusunda 'answered' kalıyor");
+ok(d.facts.some((f) => f.mode === "secret_choice" && /answered (Yes|No|Not sure)\b/.test(f.sentence)), "evet/hayır sorusunda tırnaksız İngilizce kelime (Yes/No/Not sure)");
+ok(!d.facts.some((f) => f.mode === "secret_choice" && /"(yes|no|unsure)"/.test(f.sentence)), "ham 'unsure' değeri tırnak içinde modele gitmez");
+
+// ── Temalar, örüntüler, hassasiyet, ton kadranı ──────────────────────────────
+ok(themeOf("conflict_cooling") === "communication and conflict style" && themeOf("budget_tension") === "home life and money", "etiket → tema");
+ok(themeOf("bilinmeyen_etiket") === "general topics", "bilinmeyen etiket → general topics");
+ok(isSensitiveTag("conflict_style") && isSensitiveTag("money_disagreement") && isSensitiveTag("jealousy_reaction"), "çatışma/para gerilimi/kıskançlık hassas");
+ok(!isSensitiveTag("evening_style") && !isSensitiveTag("zombie_leader"), "gündelik etiketler hassas değil");
+const t = (tag, over = {}) => q({ tag, ...over });
+d = buildDigest(room({ questions: [t("conflict_style"), t("conflict_cooling"), t("evening_style", { answerB: { value: "yes" } })] }));
+ok(d.facts.filter((f) => f.theme === "communication and conflict style").every((f) => f.sensitive === true), "hassas olgular işaretlenir (sensitive: true)");
+ok(!d.facts.some((f) => f.sensitive && ["answered_alike", "answered_similarly", "both_read_each_other_correctly"].includes(f.kind)), "hassas konularda kutlama olguları (aynı cevap / ikisi de doğru) HİÇ gönderilmez");
+ok(d.facts.some((f) => f.sensitive && (f.kind === "answered_differently" || f.kind === "sure_but_missed")), "hassas konuda yalnızca farklı cevap ve ıska olguları gider");
+ok(!d.facts.some((f) => f.theme === "daily rhythm and habits" && f.sensitive), "gündelik olgu hassas işaretlenmez");
+ok(!d.patterns.some((p) => /communication and conflict style/.test(p) && /every single time|read each other right/.test(p)), "hassas temada olumlu örüntü (hep aynı / hep doğru) üretilmez");
+d = buildDigest(room({ questions: [t("tradition", { answerB: { value: "yes" } }), t("rules_following", { answerB: { value: "yes" } }), t("evening_style")] }));
+ok(d.patterns.some((p) => /values and principles/.test(p) && /every single time|differed|read each other/.test(p)), "değerler temasında örüntü üretilir");
+d = buildDigest(room());
+ok(/friends: banter/.test(toneFor({ ...d, relationshipType: "friend" })) && /dating: warm, cute/.test(toneFor({ ...d, relationshipType: "dating" })) && /life partners/.test(toneFor({ ...d, relationshipType: "partner" })), "ton: ilişki türüne göre");
+ok(/many misses/.test(toneFor({ ...d, summary: { ...d.summary, readingScore: { a: 30, b: 40 } } })), "ton: çok ıska → ekstra hafif ve güven verici");
+ok(/very well/.test(toneFor({ ...d, summary: { ...d.summary, readingScore: { a: 90, b: 85 } } })), "ton: yüksek skor → kutlama");
+ok(/noticeably better/.test(toneFor({ ...d, summary: { ...d.summary, readingScore: { a: 90, b: 50 } } })), "ton: büyük fark → utandırma yok");
+const vv = { headline: "h", summary: "s", strengths: ["a", "b", "c"], blindSpots: ["a", "b"], conversationStarters: ["a", "b", "c"], awards: [{ title: "t", text: "x" }, { title: "t", text: "x" }, { title: "t", text: "x" }] };
+ok(qualityIssues({ ...vv, summary: "Siz uyumsuz bir çiftsiniz" }, [], "tr").length === 1, "ilişki hükmü ('uyumsuz') yakalanır");
+ok(qualityIssues({ ...vv, summary: "Belki bir terapiste gidin" }, [], "tr").length === 1, "terapi dili yakalanır");
+ok(qualityIssues({ ...vv, summary: "Kahve sohbeti sizi rahatlatıyor" }, [], "tr").length === 0, "normal metin temiz kalır");
 
 // ── Şema ve kalite kuralları ────────────────────────────────────────────────
 const valid = { headline: "h", summary: "s", strengths: ["a", "b", "c"], blindSpots: ["a", "b"], conversationStarters: ["a", "b", "c"], awards: [{ title: "t", text: "x" }, { title: "t", text: "x" }, { title: "t", text: "x" }] };

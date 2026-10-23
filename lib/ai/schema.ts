@@ -68,6 +68,9 @@ const ASTROLOGY = new RegExp(
 /** Boş "ahlak dersi" kalıpları: yorumun genel ve politik kalmasının tipik işaretleri (tr/en/es). */
 const CLICHES = /ortak zemin|iletişim(?:iniz)?i güçlendir|bağınızı güçlendir|common ground|strengthens? your bond|communication is key|terreno común|fortalece(?:n)? (?:su|el) v[ií]nculo/iu;
 
+/** İlişki hükmü ve teşhis/terapi dili: ürün ilkesi gereği yorumda yok (tr/en/es). */
+const VERDICTS = /uyumsuz|toksik|ayrılık|terapi|terapist|psikolog|incompatib|toxic|breakup|break up|therap|incompatible|tóxic[oa]|incompatib|terapia|psicólog/iu;
+
 /** Şemanın yakalayamadığı içerik kuralları (yüzde yok, soru numarası yok, tag/JSON sızıntısı yok, burç/astroloji yok). */
 export function qualityIssues(c: Commentary, playerNames: string[] = [], locale: "tr" | "en" | "es" = "en"): string[] {
   let all = [c.headline, c.summary, ...c.strengths, ...c.blindSpots, ...c.conversationStarters, ...c.awards.flatMap((a) => [a.title, a.text])].join("\n");
@@ -84,6 +87,7 @@ export function qualityIssues(c: Commentary, playerNames: string[] = [], locale:
   if (locale !== "en" && (all.match(/\b(?:was|were|would|actually|answered|that|the|and|but|both|very|fairly|sure)\b/gi) ?? []).length >= 4) {
     issues.push(`The text must be written ONLY in ${locale === "tr" ? "Turkish" : "Spanish"}; do not copy the English fact sentences.`);
   }
+  if (VERDICTS.test(all)) issues.push("Do not give verdicts about the relationship or use diagnosis/therapy language.");
   if (CLICHES.test(all)) issues.push("Avoid empty filler phrases such as 'common ground' or 'strengthens your bond'; use concrete details instead.");
   if (ASTROLOGY.test(all)) issues.push("Do not mention zodiac, signs, horoscopes or astrology in any way.");
   return issues;

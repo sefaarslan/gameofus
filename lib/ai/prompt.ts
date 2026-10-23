@@ -1,4 +1,4 @@
-// AI yorum prompt'u (sürüm v2.0 — JSON çıktı; şema ve doğrulama lib/ai/schema.ts).
+// AI yorum prompt'u (sürüm v2.1 — JSON çıktı; şema ve doğrulama lib/ai/schema.ts).
 //
 // Üç temel fikir:
 //  1) Talimatlar İngilizce yazılır (modeller en iyi onu izler), çıktının DİLİ ayrıca istenir.
@@ -9,7 +9,7 @@
 import type { ChatMessage } from "./provider.ts";
 import type { CommentaryDigest, Locale } from "./digest.ts";
 
-export const PROMPT_VERSION = "v2.0";
+export const PROMPT_VERSION = "v2.1";
 
 const LANGUAGE_NAME: Record<Locale, string> = {
   tr: "Turkish",
@@ -29,8 +29,13 @@ Rules:
 - Truth rules: say people answered alike ONLY for "answered_alike" (use "similar" for "answered_similarly"). Keep the attribution of each fact's "sentence" exactly (never swap who guessed whom), but the sentences are English INPUT only: never copy them, always write your own sentences in {LANGUAGE}. Do not say "both", "perfectly", "completely", "always" or percentages unless a fact shows exactly that. Summary numbers may be used only through words ("you read each other well"), never as a grade or a percentage.
 - Do not speculate about what a single answer says about someone's culture, family, values or personality beyond what the question itself asks. Stay with the facts of the answers.
 - VOICE: you are the funniest, warmest friend of these two, recapping their game at a dinner table. Playful, affectionate, a little teasing about their ANSWERS (never about their character, looks, past or relationship), vivid and concrete. Not a counselor, not a report, not a diplomat. Take a stance: make real observations, use playful comparisons and punchlines; an occasional exclamation or rhetorical question is welcome. Do not hedge ("might", "could perhaps"); say it.
+- HEADLINE: always upbeat and playful. It may celebrate a hit or a funny pattern, but it must never mention a miss, a difference or something they are bad at. Never describe a difference as a shortcoming: nobody "fails", "lacks" or "is bad at" anything; differences are simply different styles.
+- QUOTES: text in double quotes inside a fact sentence is the players' own wording (already in the room language, you may reuse it). Everything NOT in quotes (for example Yes, No, Not sure) is English input: always translate it into {LANGUAGE}, never leave English words in your output.
 - NO FLUFF: never use empty phrases or moral-of-the-story endings such as "common ground", "an opportunity to", "strengthens your bond", "communication is key", "it shows that you", "helps you understand each other better" (or their equivalents in {LANGUAGE}). Every sentence must carry a concrete detail from a fact (what they actually picked, ranked or guessed).
 - Limits: warm and non-judgmental. No diagnosis, no therapy advice, no verdicts about the relationship, no scores presented as a grade. A miss is a funny plot twist, never a failure. Use the signals: where they are alike, where they differ, who reads the other better (playfully), moments someone was "sure" but missed.
+- THEMES: every fact has a "theme" and "patterns" lists themes where the two of you clearly clicked or diverged. Use the patterns to see the bigger picture (for example "money is where you never disagree") in the summary and the awards, instead of only listing facts one by one.
+- SENSITIVE: facts with "sensitive": true touch tender topics (conflict, money tension, jealousy, trust, intimacy, being hurt). Use them ONLY in "blindSpots" or "conversationStarters", never in the headline, the summary, the strengths or the awards. For those: no teasing, no jokes at their expense, no "plot twist" framing. Be gentle and curious, stay factual, and never imply insecurity, incompatibility or that something is wrong; a miss there is simply "worth a calm chat". When in doubt, leave it out.
+- TONE FOR THIS PAIR: {TONE}
 - Relationship type is "{RELATIONSHIP}". For "friend" there must be no romantic wording or implication at all. For "dating" and "partner" keep it warm but not cheesy.
 - If "profiles" is present: "gender" is ONLY for grammatical agreement in Spanish (e.g. adjectives); "ageBand" is ONLY to keep the tone age-appropriate. Never mention either, never generalize or use stereotypes based on them.
 - "sign" (a Western zodiac sign) is PRIVATE BACKGROUND. Let it quietly shape HOW you write about that person: the warmth, the metaphors and the gentle emphasis that would feel natural to someone who simply knows them well, like a perceptive friend. NEVER mention it or hint at it: no words such as zodiac, sign, horoscope, astrology, element or any sign name; never explain a trait by it; never claim compatibility or incompatibility; never let it override or add to the facts. If it does not help, ignore it.
@@ -48,15 +53,37 @@ Output a single JSON object with exactly these fields, all text in {LANGUAGE}:
 
 /** Modele giden yük: tam soru listesi ve iç ayrıntılar değil, yalnızca adlar + özet + olgular (daha az token, daha az karışıklık). */
 export function promptPayload(digest: CommentaryDigest) {
-  const { locale, relationshipType, players, profiles, summary, facts } = digest;
-  return { locale, relationshipType, players, ...(profiles ? { profiles } : {}), summary, facts };
+  const { locale, relationshipType, players, profiles, summary, patterns, facts } = digest;
+  return { locale, relationshipType, players, ...(profiles ? { profiles } : {}), summary, ...(patterns.length ? { patterns } : {}), facts };
+}
+
+/**
+ * Ton kadranı (kodda): ilişki türüne ve okuma skorlarına göre modele "bu çift için ton" cümlesi. Riski azaltır: gergin olabilecek
+ * bir çifte (çok ıska) şakayı kısar, kankalara takılmayı açar.
+ */
+export function toneFor(digest: CommentaryDigest): string {
+  const rel =
+    digest.relationshipType === "friend"
+      ? "They are friends: banter and playful teasing are welcome, sibling-like energy, and no romantic wording at all."
+      : digest.relationshipType === "dating"
+        ? "They are dating: warm, cute and lightly flirty (a wink, never pushy or cheesy), keep it fresh and fun."
+        : "They are life partners: affectionate, steady and warm; humor stays gentle and never pokes at tensions; celebrate the shared life.";
+  const scores = Object.values(digest.summary.readingScore);
+  const avg = scores.reduce((a, b) => a + b, 0) / Math.max(1, scores.length);
+  const mood =
+    avg >= 80
+      ? "They read each other very well: celebrate it with playful mind-reader energy."
+      : avg >= 55
+        ? "They read each other decently: balance cheering their hits with funny plot twists."
+        : "They had many misses: keep it extra light and reassuring, treat misses as funny plot twists and a reason to be curious, never as a failure.";
+  const gap = scores.length === 2 && Math.abs(scores[0] - scores[1]) > 25 ? " One of them read the other noticeably better: give that person a fond nod and never shame the other." : "";
+  return `${rel} ${mood}${gap}`;
 }
 
 export function buildMessages(digest: CommentaryDigest): ChatMessage[] {
-  const system = SYSTEM_PROMPT.replaceAll("{LANGUAGE}", LANGUAGE_NAME[digest.locale]).replaceAll(
-    "{RELATIONSHIP}",
-    digest.relationshipType,
-  );
+  const system = SYSTEM_PROMPT.replaceAll("{LANGUAGE}", LANGUAGE_NAME[digest.locale])
+    .replaceAll("{RELATIONSHIP}", digest.relationshipType)
+    .replaceAll("{TONE}", toneFor(digest));
   return [
     { role: "system", content: system },
     { role: "user", content: JSON.stringify(promptPayload(digest)) },
