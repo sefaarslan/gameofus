@@ -142,6 +142,13 @@ ok(r.meta.attempts === 1 && r.content.strengths.length === 3, "geçerli çıktı
 r = await generateCommentary(digest, { ...base, model: "repairable" });
 ok(r.meta.attempts === 2, "bozuk çıktı bir kez düzeltilip kabul edilir (deneme: 2)");
 ok(r.meta.totalTokens === 2800, "token toplamı iki denemeyi kapsar");
+r = await generateCommentary(digest, { ...base, model: "rate_limit_once" });
+ok(r.meta.attempts === 1 && r.content.strengths.length === 3, "kısa 429 (50 ms): bir kez bekleyip yeniden dener, kullanıcı hata görmez");
+ok(await rejects(() => generateCommentary(digest, { ...base, model: "rate_limit" }), (e) => e instanceof AiProviderError && e.kind === "rate_limited"), "uzun 429 (1 sn bile olsa tekrar tekrar bekleme yok): ikinci 429 hata olarak çıkar");
+r = await generateCommentary(digest, { ...base, model: "rate_limit_twice" });
+ok(r.content.strengths.length === 3, "iki ardışık kısa 429: iki kez bekleyip yeniden dener, üçüncüde başarılı");
+const t0 = Date.now();
+ok(await rejects(() => generateCommentary(digest, { ...base, model: "rate_limit_long" }), (e) => e instanceof AiProviderError && e.kind === "rate_limited") && Date.now() - t0 < 1000, "çok uzun 429 (40 sn): beklenmez, hemen hata (üst katman yedek/iade kararı verir)");
 ok(await rejects(() => generateCommentary(digest, { ...base, model: "invalid" }), (e) => e instanceof InvalidCommentaryError), "hep bozuksa InvalidCommentaryError");
 ok(await rejects(() => generateCommentary(digest, { ...base, model: "rate_limit" }), (e) => e instanceof AiProviderError && e.kind === "rate_limited"), "429 → AiProviderError(rate_limited) (yedek karar katmanında)");
 ok(await rejects(() => generateCommentary(digest, { ...base, model: "timeout" }), (e) => e instanceof AiProviderError && e.kind === "timeout"), "zaman aşımı → AiProviderError(timeout)");

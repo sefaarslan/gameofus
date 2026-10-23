@@ -1,5 +1,5 @@
 // Test sağlayıcısı: gerçek bir modele gitmeden belirlenimci davranış üretir (birim ve entegrasyon testleri için).
-// Model adı davranışı seçer: "ok" | "repairable" | "invalid" | "rate_limit" | "timeout" | "slow" | "down".
+// Model adı davranışı seçer: "ok" | "repairable" | "invalid" | "rate_limit" | "rate_limit_once" | "rate_limit_twice" | "rate_limit_long" | "timeout" | "slow" | "down".
 // Güvenlik: üretimde (NODE_ENV=production) çalışmaz; yanlışlıkla `fake:ok` yapılandırılırsa istek reddedilir.
 
 import { AiProviderError } from "./provider.ts";
@@ -18,12 +18,19 @@ const VALID = {
   ],
 };
 
+/** "rate_limit_once": tek sayaç; çift çağrılar (0., 2., …) kısa bir 429 verir, tek çağrılar başarılı olur (bekle-yeniden-dene testi için). */
+let onceCounter = 0;
+let twiceCounter = 0;
+
 export async function fakeChat(options: ChatOptions): Promise<ChatResult> {
   if (process.env.NODE_ENV === "production") throw new AiProviderError("not_configured", "Test sağlayıcısı üretimde kapalıdır.");
   const mode = options.model;
   const repairing = options.messages.length > 2; // generate.ts düzeltme turunda mesaj ekler
 
   if (mode === "rate_limit") throw new AiProviderError("rate_limited", "Hız sınırı (test)", { status: 429, retryAfterMs: 1000 });
+  if (mode === "rate_limit_long") throw new AiProviderError("rate_limited", "Hız sınırı (test, uzun)", { status: 429, retryAfterMs: 40_000 });
+  if (mode === "rate_limit_twice" && twiceCounter++ % 3 < 2) throw new AiProviderError("rate_limited", "Hız sınırı (test, iki kez)", { status: 429, retryAfterMs: 30 });
+  if (mode === "rate_limit_once" && onceCounter++ % 2 === 0) throw new AiProviderError("rate_limited", "Hız sınırı (test, kısa)", { status: 429, retryAfterMs: 50 });
   if (mode === "timeout") throw new AiProviderError("timeout", "Zaman aşımı (test)");
   if (mode === "down") throw new AiProviderError("upstream", "Sağlayıcı hatası (test)", { status: 503 });
   if (mode === "slow") await new Promise((r) => setTimeout(r, 1500));

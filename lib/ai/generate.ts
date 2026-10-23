@@ -3,7 +3,7 @@
 // Sağlayıcı hataları (429, zaman aşımı, yetki…) burada YAKALANMAZ: üst katman (endpoint) bunlara göre yedek sağlayıcıya
 // geçer ya da coin'i iade eder. Burada yalnızca "model cevap verdi ama kullanılamaz" durumu ele alınır.
 
-import { chat } from "./provider.ts";
+import { AiProviderError, chat } from "./provider.ts";
 import type { ChatMessage, ChatOptions, ChatResult, ProviderName } from "./provider.ts";
 import { buildMessages, PROMPT_VERSION } from "./prompt.ts";
 import type { CommentaryDigest } from "./digest.ts";
@@ -35,6 +35,34 @@ export interface GenerateResult {
     completionTokens: number;
     totalTokens: number;
   };
+}
+
+/**
+ * Hız sınırında (429) sağlayıcının önerdiği bekleme bu süreden kısaysa (en fazla iki kez, toplam bekleme bütçesi içinde) bekleyip aynı modeli yeniden dener.
+ * Süre bütçesi (fonksiyon sınırı 60 sn): 429 (~0.3 sn) + bekleme (≤ 25 sn) + ikinci deneme (≤ 12 sn) + olası yedek model (≤ 15 sn) < 60 sn.
+ */
+const MAX_RATE_LIMIT_WAIT_MS = 25_000;
+const RETRY_TIMEOUT_MS = 12_000;
+
+/**
+ * Ücretsiz katmanda dakikalık token sınırı dar: iki yorum aynı dakikaya denk gelirse ikincisi 429 alır ve genelde ~10 sn sonra
+ * geçer. Kullanıcıyı hataya düşürmek (ve coin iadesi yapmak) yerine kısa bir kez bekleyip yeniden deneriz. Uzun beklemeler
+ * (> 25 sn) denenmez: üst katman yedek modele geçer ya da iade eder.
+ */
+async function chatWithBackoff(options: ChatOptions): Promise<ChatResult> {
+  let waited = 0;
+  for (let call = 0; ; call++) {
+    try {
+      // İlk çağrı normal zaman aşımıyla; bekleme sonrası denemeler kısaltılmış zaman aşımıyla (toplam süre bütçesi için)
+      return await chat(call === 0 ? options : { ...options, timeoutMs: Math.min(options.timeoutMs ?? RETRY_TIMEOUT_MS, RETRY_TIMEOUT_MS) });
+    } catch (err) {
+      const wait = err instanceof AiProviderError && err.kind === "rate_limited" ? err.retryAfterMs : undefined;
+      // En fazla iki bekleme, toplam bekleme bütçesi aşılırsa hata üst katmana (yedek model / iade) bırakılır
+      if (wait === undefined || call >= 2 || waited + wait + 250 > MAX_RATE_LIMIT_WAIT_MS) throw err;
+      waited += wait + 250;
+      await new Promise((resolve) => setTimeout(resolve, wait + 250));
+    }
+  }
 }
 
 /** Model yanıt verdi ama (yeniden denemelerden sonra bile) kullanılabilir bir yorum çıkmadı. */
@@ -82,11 +110,11 @@ export async function generateCommentary(digest: CommentaryDigest, options: Gene
   let lastIssues: string[] = [];
 
   for (let attempt = 1; attempt <= maxRepairs + 1; attempt++) {
-    const res: ChatResult = await chat({
+    const res: ChatResult = await chatWithBackoff({
       provider: options.provider,
       model: options.model,
       messages,
-      maxTokens: options.maxTokens ?? 2600,
+      maxTokens: options.maxTokens ?? 2000, // Groq dakikalık limitte girdi + bu değeri "istenen" sayar: gereğinden yüksek tutma
       temperature: 0.8,
       reasoningEffort: options.reasoningEffort,
       timeoutMs: options.timeoutMs ?? 20_000,
