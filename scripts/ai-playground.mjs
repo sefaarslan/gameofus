@@ -40,7 +40,7 @@ try {
   const res = await generateCommentary(room, {
     provider,
     model,
-    maxTokens: Number(args["max-tokens"] ?? 1800),
+    maxTokens: Number(args["max-tokens"] ?? 2600),
     reasoningEffort: args.effort ?? (model.includes("gpt-oss") ? "low" : undefined),
     strictSchema: Boolean(args.strict) || (provider === "groq" && model.includes("gpt-oss")),
     // Ücretsiz OpenRouter uçları isteği kaydedebilir → burada YALNIZCA uydurma veri olduğu için izin veriyoruz.
@@ -49,7 +49,7 @@ try {
   });
   const c = res.content;
   const bullets = (list) => list.map((x) => `  • ${x}`).join("\n");
-  console.log(`\n${c.headline}\n\n${c.summary}\n\nBirlikte iyi olduğunuz yönler:\n${bullets(c.strengths)}\n\nMerak edilebilecekler:\n${bullets(c.blindSpots)}\n\nKonuşma başlatıcılar:\n${bullets(c.conversationStarters)}\n`);
+  console.log(`\n${c.headline}\n\n${c.summary}\n\nBirlikte iyi olduğunuz yönler:\n${bullets(c.strengths)}\n\nMerak edilebilecekler:\n${bullets(c.blindSpots)}\n\nKonuşma başlatıcılar:\n${bullets(c.conversationStarters)}\n\nÖdüller:\n${c.awards.map((a) => `  ★ ${a.title} — ${a.text}`).join("\n")}\n`);
   const m = res.meta;
   console.log("── ÖLÇÜLER ──");
   console.log(`süre: ${(m.latencyMs / 1000).toFixed(1)} sn | deneme: ${m.attempts} | model: ${m.model} | prompt: ${m.promptVersion}`);

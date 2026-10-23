@@ -361,6 +361,7 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   geçerse çıktı reddedilir (`schema.ts` → `qualityIssues`). **[YAPILACAK] rıza metni ve gizlilik politikası burç/yaş aralığı/cinsiyet/sağlayıcıyı kapsayacak şekilde güncellenecek** (bkz. `docs/PRD.md` Bölüm 12.3 sonrası "Açık konular").
   **Süre:** `expires_at` geçmiş odada da (sonuç hazırsa) yorum satın alınır ve okunur; `ROOM_EXPIRED` yoktur, sınır odanın saklama süresidir (oda silinince `403 INVALID_TOKEN`).
   **Kural:** coin düşmeden önce kapasite/veri kontrol edilir; üretim başarısızsa coin iade edilir (iade yalnızca düşüm gerçekten yapıldıysa); `refId = <oda kodu>:<attempt>`.
+  **Ses ve içerik (v2.0):** yorum eğlenceli, somut ve cesur olmalı (diplomatik/genel geçer değil); klişe kalıplar (`ortak zemin`, `bağınızı güçlendirir`…) `qualityIssues` ile reddedilir; çıktıda `awards` (3-4 ödül kartı) vardır. Sıralama sorularında olgular "X sıraladı (1 = en önemli)" diye anlatılır, kısa ve ilk tercih odaklıdır.
   Prompt değiştirirken `PROMPT_VERSION`'ı artır; model değiştirmeden önce `scripts/ai-playground.mjs` ile uydurma odalarla (3 dil) karşılaştır. Gerçek kullanıcı verisini
   ücretsiz OpenRouter (`:free`) modellerine ASLA gönderme. Testler: `node --no-warnings scripts/test-ai.mjs` (birim) ve
   `AI_ALLOW_TEST_OVERRIDE=1 npx next dev -p 3001` + `BASE=http://localhost:3001 node --no-warnings scripts/test-ai-commentary-api.mjs` (entegrasyon; gerçek modele gitmez).

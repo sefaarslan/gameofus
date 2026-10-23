@@ -401,7 +401,9 @@ JWT → `401 UNAUTHORIZED`; geçerli JWT ama bu odanın katılımcısı değil, 
 - `GET /api/users/ai-reports` (JWT) → **düz dizi**, yeniden eskiye, en çok 100: `[{ roomCode, partnerName, relationshipType, headline, createdAt }]`;
   yalnızca kullanıcının SATIN ALDIĞI `ready` yorumlar (partnerin aldıkları çıkmaz). JWT'siz `401`.
 
-`content` biçimi (oda dilinde, `rooms.locale`): `{ headline: string, summary: string, strengths: string[3], blindSpots: string[2..3], conversationStarters: string[3] }`.
+`content` biçimi (oda dilinde, `rooms.locale`): `{ headline: string, summary: string, strengths: string[3], blindSpots: string[2..3], conversationStarters: string[3], awards: { title: string, text: string }[3..4] }`.
+`awards` (prompt v2.0, 2026-10-23) eğlenceli "ödül" kartlarıdır (`title` ≤ 60 karakter, çoğu zaman baştaki bir emojiyle; `text` tek cümle). **Eski kayıtlarda `awards` yoktur**: istemci alanın eksikliğini tolere etmeli (yoksa bölümü gizle). Ton v2.0'dan itibaren daha eğlenceli ve somuttur; uzunluk sınırları: headline ≤ 180, summary ≤ 1400, strengths/blindSpots ≤ 420/460, conversationStarters ≤ 300 karakter.
+Sıralama (orderline) sorularında olgular "cevap" değil "sıralama" olarak anlatılır (1 = en önemli).
 Sunucu Zod ile doğrular; yüzde, soru numarası ve JSON kırıntısı gibi içerik kuralları da denetlenir.
 
 **Modele giden veri:** oyuncu adları (≤30 karakter, tek satır, veri olarak), kodda çözülmüş "olgu kartları" (cevaplar/tahminler soru ve seçenek METNİYLE,

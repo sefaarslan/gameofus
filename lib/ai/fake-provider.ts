@@ -11,6 +11,11 @@ const VALID = {
   strengths: ["Ortak tercihleriniz sohbeti kolaylaştırıyor.", "Birbirinizin cevaplarını dikkatle okuyorsunuz.", "Farklılıkları konuşmaya açıksınız."],
   blindSpots: ["Bazı tahminlerde beklentiler biraz farklı çıktı.", "Sıralama sorularında öncelikler ayrışıyor."],
   conversationStarters: ["Hangi konuda en çok aynı düşünüyorsunuz?", "Sizi en çok şaşırtan cevap hangisiydi?", "Bir sonraki sefer neyi farklı tahmin ederdiniz?"],
+  awards: [
+    { title: "🏆 Aynı Dalga Ödülü", text: "Birçok soruda aynı yöne baktınız." },
+    { title: "🎭 Sürpriz Ödülü", text: "Birkaç tahmin tam ters çıktı." },
+    { title: "🔍 Dedektif Ödülü", text: "Bazı cevapları gözünüz kapalı bildiniz." },
+  ],
 };
 
 export async function fakeChat(options: ChatOptions): Promise<ChatResult> {

@@ -12,11 +12,13 @@ const text = (max: number) => z.string().trim().min(1).max(max);
 
 export const commentarySchema = z
   .object({
-    headline: text(140),
-    summary: text(900),
-    strengths: z.array(text(260)).length(3),
-    blindSpots: z.array(text(300)).min(2).max(3),
-    conversationStarters: z.array(text(220)).length(3),
+    headline: text(180),
+    summary: text(1400),
+    strengths: z.array(text(420)).length(3),
+    blindSpots: z.array(text(460)).min(2).max(3),
+    conversationStarters: z.array(text(300)).length(3),
+    /** Eğlenceli "ödül" kartları (v2.0'da eklendi; eski kayıtlarda yoktur, istemci alanın eksikliğini tolere etmeli) */
+    awards: z.array(z.object({ title: text(60), text: text(300) }).strict()).min(3).max(4),
   })
   .strict();
 
@@ -33,8 +35,17 @@ export const COMMENTARY_JSON_SCHEMA = {
       strengths: { type: "array", items: { type: "string" } },
       blindSpots: { type: "array", items: { type: "string" } },
       conversationStarters: { type: "array", items: { type: "string" } },
+      awards: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: { title: { type: "string" }, text: { type: "string" } },
+          required: ["title", "text"],
+          additionalProperties: false,
+        },
+      },
     },
-    required: ["headline", "summary", "strengths", "blindSpots", "conversationStarters"],
+    required: ["headline", "summary", "strengths", "blindSpots", "conversationStarters", "awards"],
     additionalProperties: false,
   },
 } as const;
@@ -54,9 +65,12 @@ const ASTROLOGY = new RegExp(
   "iu",
 );
 
+/** Boş "ahlak dersi" kalıpları: yorumun genel ve politik kalmasının tipik işaretleri (tr/en/es). */
+const CLICHES = /ortak zemin|iletişim(?:iniz)?i güçlendir|bağınızı güçlendir|common ground|strengthens? your bond|communication is key|terreno común|fortalece(?:n)? (?:su|el) v[ií]nculo/iu;
+
 /** Şemanın yakalayamadığı içerik kuralları (yüzde yok, soru numarası yok, tag/JSON sızıntısı yok, burç/astroloji yok). */
 export function qualityIssues(c: Commentary, playerNames: string[] = [], locale: "tr" | "en" | "es" = "en"): string[] {
-  let all = [c.headline, c.summary, ...c.strengths, ...c.blindSpots, ...c.conversationStarters].join("\n");
+  let all = [c.headline, c.summary, ...c.strengths, ...c.blindSpots, ...c.conversationStarters, ...c.awards.flatMap((a) => [a.title, a.text])].join("\n");
   // Oyuncu adları kullanıcı metnidir ve kurallarla çakışabilir (ör. "Burcu" adı "burç" desenine uyar): denetimden önce çıkarılır.
   for (const name of playerNames) {
     const n = name.trim();
@@ -70,6 +84,7 @@ export function qualityIssues(c: Commentary, playerNames: string[] = [], locale:
   if (locale !== "en" && (all.match(/\b(?:was|were|would|actually|answered|that|the|and|but|both|very|fairly|sure)\b/gi) ?? []).length >= 4) {
     issues.push(`The text must be written ONLY in ${locale === "tr" ? "Turkish" : "Spanish"}; do not copy the English fact sentences.`);
   }
+  if (CLICHES.test(all)) issues.push("Avoid empty filler phrases such as 'common ground' or 'strengthens your bond'; use concrete details instead.");
   if (ASTROLOGY.test(all)) issues.push("Do not mention zodiac, signs, horoscopes or astrology in any way.");
   return issues;
 }

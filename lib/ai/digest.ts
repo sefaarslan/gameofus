@@ -105,6 +105,8 @@ export type FactKind =
 
 export interface Fact {
   kind: FactKind;
+  /** Sorunun türü: secret_choice (evet/kararsız/hayır), prediction (seçenek seçme), orderline (seçenekleri SIRALAMA) */
+  mode: Mode;
   question: string;
   /**
    * Olgunun açık, kendi içinde tam İngilizce cümlesi (kim kimi/neyi nasıl yaptı). Model, "by/about" gibi alanları
@@ -227,52 +229,86 @@ export function buildDigest(room: RawRoom): CommentaryDigest {
   }
   confidentMisses.sort((a, b) => CONFIDENCE_RANK[a.confidence] - CONFIDENCE_RANK[b.confidence] || a.n - b.n);
 
-  const byN = new Map(questions.map((x) => [x.n, x]));
-  const show = (v: Readable) => (Array.isArray(v) ? v.join(" > ") : v);
   const SURE: Record<Confidence, string> = { sure: "very sure", think: "fairly sure", guess: "just guessing" };
+
+  // Mod farkındalıklı ifade. Sıralama sorusunda oyuncular soruya CEVAP VERMEZ, seçenekleri SIRALAR (1 = en önemli);
+  // olgu cümlesi bunu açıkça söylemezse model sıralamayı "soruya verilen cevap" gibi yorumluyordu.
+  const list = (v: Readable) => (Array.isArray(v) ? v.map((t, i) => `${i + 1}) ${t}`).join(", ") : v);
+  const top = (v: Readable) => (Array.isArray(v) ? v[0] : v);
+  const said = (m: Mode, v: Readable) =>
+    m === "orderline" ? `ranked the options like this (1 = most important): ${list(v)}` : m === "prediction" ? `picked "${v}"` : `answered "${v}"`;
+  const wouldSay = (m: Mode, v: Readable) =>
+    m === "orderline" ? `would rank the options like this (1 = most important): ${list(v)}` : m === "prediction" ? `would pick "${v}"` : `would answer "${v}"`;
+  const topNote = (m: Mode, a: Readable, b: Readable) =>
+    m !== "orderline"
+      ? ""
+      : top(a) === top(b)
+        ? ` They agree on the first choice ("${top(a)}").`
+        : ` Their first choices differ: ${nameA} put "${top(a)}" first, ${nameB} put "${top(b)}" first.`;
+
+  const byN = new Map(questions.map((x) => [x.n, x]));
   const facts: Fact[] = [];
-  const shared = nums(questions.filter((x) => x.relation === "same"), 3);
+  const shared = nums(questions.filter((x) => x.relation === "same"), 4);
   const different = nums(questions.filter((x) => x.relation === "different"), 3);
-  const similar = nums(questions.filter((x) => x.relation === "close"), 2);
+  const similar = nums(questions.filter((x) => x.relation === "close"), 3);
   const bothCorrect = nums(
     questions.filter((x) => x.guesses[0].result === "correct" && x.guesses[1].result === "correct"),
     2,
   );
   for (const n of shared) {
     const x = byN.get(n)!;
-    facts.push({ kind: "answered_alike", question: x.question, sentence: `${nameA} and ${nameB} both answered: "${show(x.answers[nameA])}".` });
+    const a = x.answers[nameA];
+    facts.push({
+      kind: "answered_alike",
+      mode: x.mode,
+      question: x.question,
+      sentence:
+        x.mode === "orderline"
+          ? `${nameA} and ${nameB} ranked the options in exactly the same order (1 = most important): ${list(a)}.`
+          : `${nameA} and ${nameB} both ${x.mode === "prediction" ? "picked" : "answered"} "${a}".`,
+    });
   }
   for (const n of similar) {
     const x = byN.get(n)!;
+    const [a, b] = [x.answers[nameA], x.answers[nameB]];
     facts.push({
       kind: "answered_similarly",
+      mode: x.mode,
       question: x.question,
-      sentence: `${nameA} answered "${show(x.answers[nameA])}" and ${nameB} answered "${show(x.answers[nameB])}" (close, not identical).`,
+      sentence:
+        x.mode === "orderline"
+          ? `${nameA} ${said(x.mode, a)}. ${nameB} ${said(x.mode, b)}. Nearly the same ranking: only two neighbouring options are swapped.${topNote(x.mode, a, b)}`
+          : `${nameA} ${said(x.mode, a)} and ${nameB} ${said(x.mode, b)} (close, not identical).`,
     });
   }
   for (const n of different) {
     const x = byN.get(n)!;
+    const [a, b] = [x.answers[nameA], x.answers[nameB]];
     facts.push({
       kind: "answered_differently",
+      mode: x.mode,
       question: x.question,
-      sentence: `${nameA} answered "${show(x.answers[nameA])}" while ${nameB} answered "${show(x.answers[nameB])}".`,
+      sentence: `${nameA} ${said(x.mode, a)}${x.mode === "orderline" ? "." : " while"} ${nameB} ${said(x.mode, b)}.${topNote(x.mode, a, b)}`.replace(".  ", ". "),
     });
   }
   for (const m of confidentMisses.slice(0, 3)) {
     const x = byN.get(m.n)!;
     const g = x.guesses.find((y) => y.by === m.by)!;
-    facts.push({
-      kind: "sure_but_missed",
-      question: x.question,
-      sentence: `${g.by} was ${SURE[g.confidence]} that ${g.about} would answer "${show(g.guess)}", but ${g.about} actually answered "${show(x.answers[g.about])}". (This is about ${g.by} misreading ${g.about}.)`,
-    });
+    const actual = x.answers[g.about];
+    // Sıralamada uzun listeler modeli karıştırıyordu: yalnızca ilk tercih karşılaştırılır (kısa ve net).
+    const sentence =
+      x.mode === "orderline"
+        ? `${g.by} was ${SURE[g.confidence]} that ${g.about} would put "${top(g.guess)}" first when ranking the options, but ${g.about} actually put "${top(actual)}" first. (This is about ${g.by} misreading ${g.about}'s priorities.)`
+        : `${g.by} was ${SURE[g.confidence]} that ${g.about} ${wouldSay(x.mode, g.guess)}, but ${g.about} actually ${said(x.mode, actual)}. (This is about ${g.by} misreading ${g.about}.)`;
+    facts.push({ kind: "sure_but_missed", mode: x.mode, question: x.question, sentence });
   }
   for (const n of bothCorrect) {
     const x = byN.get(n)!;
     facts.push({
       kind: "both_read_each_other_correctly",
+      mode: x.mode,
       question: x.question,
-      sentence: `${nameA} and ${nameB} each guessed the other's answer correctly (${nameA}: "${show(x.answers[nameA])}", ${nameB}: "${show(x.answers[nameB])}").`,
+      sentence: `${nameA} and ${nameB} each predicted the other's ${x.mode === "orderline" ? "ranking" : "answer"} correctly (${nameA} ${said(x.mode, x.answers[nameA])}; ${nameB} ${said(x.mode, x.answers[nameB])}).`,
     });
   }
 
