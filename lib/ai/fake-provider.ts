@@ -1,5 +1,5 @@
 // Test sağlayıcısı: gerçek bir modele gitmeden belirlenimci davranış üretir (birim ve entegrasyon testleri için).
-// Model adı davranışı seçer: "ok" | "repairable" | "invalid" | "rate_limit" | "rate_limit_once" | "rate_limit_twice" | "rate_limit_long" | "timeout" | "slow" | "down".
+// Model adı davranışı seçer: "ok" | "repairable" | "invalid" | "rate_limit" | "rate_limit_once" | "rate_limit_twice" | "rate_limit_long" | "cliche" | "percent" | "timeout" | "slow" | "down".
 // Güvenlik: üretimde (NODE_ENV=production) çalışmaz; yanlışlıkla `fake:ok` yapılandırılırsa istek reddedilir.
 
 import { AiProviderError } from "./provider.ts";
@@ -36,7 +36,14 @@ export async function fakeChat(options: ChatOptions): Promise<ChatResult> {
   if (mode === "slow") await new Promise((r) => setTimeout(r, 1500));
 
   const invalid = mode === "invalid" || (mode === "repairable" && !repairing);
-  const text = invalid ? '{"headline": "eksik alanlar"}' : JSON.stringify(VALID);
+  // "cliche": yumuşak üslup sorunu (hep klişe kullanır); "percent": sert sorun (hep yüzde kullanır)
+  const body =
+    mode === "cliche"
+      ? { ...VALID, strengths: ["Ortak zemin bulmanız harika.", ...VALID.strengths.slice(1)] }
+      : mode === "percent"
+        ? { ...VALID, summary: "Yüzde 70 uyumlusunuz, yani %70." }
+        : VALID;
+  const text = invalid ? '{"headline": "eksik alanlar"}' : JSON.stringify(body);
   return {
     text,
     model: `fake:${mode}`,

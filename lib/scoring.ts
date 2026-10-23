@@ -34,7 +34,7 @@ function comparePrediction(
 // Orderline (kart sıralama — Kendall tau mesafesi ≤ 1 → near)
 // ---------------------------------------------------------------------------
 
-function kendallTauDistance(order1: string[], order2: string[]): number {
+export function kendallTauDistance(order1: string[], order2: string[]): number {
   const posMap = new Map<string, number>(order2.map((id, i) => [id, i]));
   const translated = order1.map((id) => posMap.get(id) ?? -1);
   let inversions = 0;

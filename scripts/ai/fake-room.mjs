@@ -8,6 +8,7 @@ import { join, resolve } from "node:path";
 const DIR = resolve("seeds/v2");
 const NAMES = { tr: ["Deniz", "Elif"], en: ["Alex", "Sam"], es: ["Carmen", "Diego"] };
 const MODE_COUNTS = { secret_choice: 4, prediction: 3, orderline: 3 }; // "Karma" 10 soru: 4 / 3 / 3
+const MODE_ORDER = ["secret_choice", "prediction", "orderline"];
 
 // mulberry32: küçük, tohumlu rastgele sayı üreteci
 function rng(seed) {
@@ -33,7 +34,39 @@ async function loadCategories() {
 
 const SIGNS = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
 
-export async function buildFakeRoom({ lang = "tr", relationshipType = "friend", seed = 1, signs = true } = {}) {
+// Senaryolar: gerçek bir sorunlu odayı (skor 45) ve yüksek skorlu bir odayı (85) kontrollü yeniden üretir.
+//  rel: iki oyuncunun KENDİ cevapları (same | opposite | close) · a / b: A'nın B'yi, B'nin A'yı tahmin sonucu (correct | near | miss)
+//  Sıra: 4 evet/hayır, 3 seçenek, 3 sıralama sorusu.
+const PLANS = {
+  // 20 tahmin: 7 doğru, 2 yakın, 11 yanlış → Okuma Skoru 45; 3 zıt cevap (0, 4, 7), 2+ "aynı cevap yanlış tahmin" (1, 5, 6)
+  low: [
+    { rel: "opposite", a: "miss", b: "miss" },
+    { rel: "same", a: "miss", b: "miss" },
+    { rel: "same", a: "correct", b: "near" },
+    { rel: "same", a: "correct", b: "correct" },
+    { rel: "opposite", a: "miss", b: "miss" },
+    { rel: "same", a: "miss", b: "miss" },
+    { rel: "same", a: "correct", b: "miss" },
+    { rel: "opposite", a: "miss", b: "miss" },
+    { rel: "same", a: "correct", b: "near" },
+    { rel: "same", a: "correct", b: "correct" },
+  ],
+  // 20 tahmin: 15 doğru, 2 yakın, 3 yanlış → Okuma Skoru 85
+  high: [
+    { rel: "same", a: "correct", b: "correct" },
+    { rel: "same", a: "correct", b: "correct" },
+    { rel: "same", a: "correct", b: "near" },
+    { rel: "opposite", a: "near", b: "correct" },
+    { rel: "same", a: "correct", b: "correct" },
+    { rel: "same", a: "correct", b: "correct" },
+    { rel: "opposite", a: "miss", b: "correct" },
+    { rel: "same", a: "correct", b: "correct" },
+    { rel: "close", a: "correct", b: "correct" },
+    { rel: "opposite", a: "miss", b: "miss" },
+  ],
+};
+
+export async function buildFakeRoom({ lang = "tr", relationshipType = "friend", seed = 1, signs = true, scenario = "random" } = {}) {
   const rand = rng(seed);
   const pick = (arr) => arr[Math.floor(rand() * arr.length)];
   const shuffle = (arr) => {
@@ -54,13 +87,50 @@ export async function buildFakeRoom({ lang = "tr", relationshipType = "friend", 
   for (const [mode, n] of Object.entries(MODE_COUNTS)) {
     chosen.push(...shuffle(pool.filter((q) => q.mode === mode)).slice(0, n));
   }
-  const questions = shuffle(chosen);
+  // Senaryolarda sıra sabittir (plan indeksine göre): önce evet/hayır, sonra seçenek, sonra sıralama
+  const questions = scenario === "random" ? shuffle(chosen) : [...chosen].sort((x, y) => MODE_ORDER.indexOf(x.mode) - MODE_ORDER.indexOf(y.mode));
+  const plan = PLANS[scenario];
 
   const SC = ["yes", "unsure", "no"];
   const CONF = ["guess", "guess", "think", "think", "sure"]; // "eminim" biraz daha nadir
   const [nameA, nameB] = NAMES[lang];
 
-  const rawQuestions = questions.map((q) => {
+  // Plana göre: cevap çifti (ilişki) ve her iki tahminin istenen sonucu (correct | near | miss) üretilir.
+  const swapFirstTwo = (order) => [order[1], order[0], ...order.slice(2)];
+  const planned = (q, loc, options, ids, step) => {
+    const mode = q.mode;
+    const flip = rand() < 0.5; // hangi oyuncunun "evet/ilk seçenek" olduğu çeşitlensin
+    let a, b;
+    if (mode === "secret_choice") {
+      a = { value: flip ? "yes" : "no" };
+      b = step.rel === "opposite" ? { value: flip ? "no" : "yes" } : { value: a.value };
+    } else if (mode === "prediction") {
+      a = { option_id: ids[0] };
+      b = step.rel === "opposite" ? { option_id: ids[2] } : { option_id: ids[0] };
+    } else {
+      a = { order: [...ids] };
+      b = step.rel === "opposite" ? { order: [...ids].reverse() } : step.rel === "close" ? { order: swapFirstTwo([...ids]) } : { order: [...ids] };
+    }
+    // Gerçek cevaba göre istenen sonuçta bir tahmin üretir
+    const guessWith = (actual, result) => {
+      if (result === "correct") return JSON.parse(JSON.stringify(actual));
+      if (mode === "secret_choice") return { value: result === "near" ? "unsure" : actual.value === "yes" ? "no" : "yes" };
+      if (mode === "prediction") return { option_id: actual.option_id === ids[1] ? ids[3] : ids[1] }; // her zaman farklı bir seçenek
+      return { order: result === "near" ? swapFirstTwo(actual.order) : [...actual.order].reverse() };
+    };
+    return {
+      mode,
+      tag: q.tag,
+      text: loc.text,
+      options,
+      answerA: a,
+      answerB: b,
+      guessAboutB: { value: guessWith(b, step.a), confidence: pick(CONF) },
+      guessAboutA: { value: guessWith(a, step.b), confidence: pick(CONF) },
+    };
+  };
+
+  const rawQuestions = questions.map((q, qi) => {
     const loc = q[lang];
     const options = loc.options ? loc.options.map((text, i) => ({ id: String(i), text })) : null;
     const ids = options ? options.map((o) => o.id) : [];
@@ -79,6 +149,8 @@ export async function buildFakeRoom({ lang = "tr", relationshipType = "friend", 
         [o[i], o[i + 1]] = [o[i + 1], o[i]]; // yan yana takas → "yakın"
       }
     }
+    if (plan) return planned(q, loc, options, ids, plan[qi]);
+
     // Tahminler: ~%60 gerçek cevaba eşit, aksi halde rastgele
     const guessFor = (real) => (rand() < 0.6 ? JSON.parse(JSON.stringify(real)) : randomAnswer());
     return {

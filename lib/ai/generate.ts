@@ -7,7 +7,7 @@ import { AiProviderError, chat } from "./provider.ts";
 import type { ChatMessage, ChatOptions, ChatResult, ProviderName } from "./provider.ts";
 import { buildMessages, PROMPT_VERSION } from "./prompt.ts";
 import type { CommentaryDigest } from "./digest.ts";
-import { COMMENTARY_JSON_SCHEMA, commentarySchema, qualityIssues } from "./schema.ts";
+import { COMMENTARY_JSON_SCHEMA, commentarySchema, isSoftIssue, qualityIssues } from "./schema.ts";
 import type { Commentary } from "./schema.ts";
 
 export interface GenerateOptions {
@@ -88,7 +88,7 @@ function parseJson(text: string): unknown {
   }
 }
 
-function validate(text: string, playerNames: string[], locale: "tr" | "en" | "es"): { ok: true; content: Commentary } | { ok: false; issues: string[] } {
+function validate(text: string, digest: CommentaryDigest): { ok: true; content: Commentary } | { ok: false; issues: string[]; content?: Commentary } {
   let json: unknown;
   try {
     json = parseJson(text);
@@ -99,8 +99,8 @@ function validate(text: string, playerNames: string[], locale: "tr" | "en" | "es
   if (!parsed.success) {
     return { ok: false, issues: parsed.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`) };
   }
-  const issues = qualityIssues(parsed.data, playerNames, locale);
-  return issues.length ? { ok: false, issues } : { ok: true, content: parsed.data };
+  const issues = qualityIssues(parsed.data, [...digest.players], digest.locale, { band: digest.summary.scoreBand, quotable: digest.quotable });
+  return issues.length ? { ok: false, issues, content: parsed.data } : { ok: true, content: parsed.data };
 }
 
 export async function generateCommentary(digest: CommentaryDigest, options: GenerateOptions): Promise<GenerateResult> {
@@ -127,7 +127,7 @@ export async function generateCommentary(digest: CommentaryDigest, options: Gene
     totals.totalTokens += res.usage.totalTokens;
 
     // Çıktı yarıda kesildiyse (token sınırı) JSON bozuk olur; doğrulama bunu zaten yakalar.
-    const checked = validate(res.text, digest.players, digest.locale);
+    const checked = validate(res.text, digest);
     if (checked.ok) {
       return {
         content: checked.content,
@@ -141,6 +141,10 @@ export async function generateCommentary(digest: CommentaryDigest, options: Gene
       };
     }
     lastIssues = checked.issues;
+    // Son denemede yalnızca "yumuşak" üslup sorunları kaldıysa içerik kabul edilir (sert sorunlarda asla)
+    if (attempt === maxRepairs + 1 && checked.content && checked.issues.every(isSoftIssue)) {
+      return { content: checked.content, meta: { provider: options.provider, model: res.model, promptVersion: PROMPT_VERSION, attempts: attempt, ...totals } };
+    }
     // Düzeltme turu: modele kendi çıktısını ve neyin yanlış olduğunu göster, yalnızca düzeltilmiş JSON iste.
     messages.push(
       { role: "assistant", content: res.text },

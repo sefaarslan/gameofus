@@ -7,6 +7,7 @@
 //     kurallarınız denetlenir. Model değiştirilince bile çıktı sözleşmesi bozulmaz.
 
 import { z } from "zod";
+import type { ScoreBand } from "./digest.ts";
 
 const text = (max: number) => z.string().trim().min(1).max(max);
 
@@ -68,12 +69,63 @@ const ASTROLOGY = new RegExp(
 /** Boş "ahlak dersi" kalıpları: yorumun genel ve politik kalmasının tipik işaretleri (tr/en/es). */
 const CLICHES = /ortak zemin|iletişim(?:iniz)?i güçlendir|bağınızı güçlendir|common ground|strengthens? your bond|communication is key|terreno común|fortalece(?:n)? (?:su|el) v[ií]nculo/iu;
 
+/**
+ * Uydurma "gizli anlaşma / ortak strateji" dili: iki oyuncu aynı cevabı verdi diye bilinçli bir uyum, plan ya da strateji iddia edilemez
+ * (gerçek bir odada "ortak gizli anlaşma" çıktı). Yumuşak sorun: bir düzeltme turu sonra yine de kalırsa içerik kabul edilir.
+ */
+const INVENTED = /gizli (?:anlaşma|ortaklık|strateji|ekip|işbirliği)|ortak strateji|ortak oyun planı|shared strategy|secret(?:ly)? (?:pact|deal|agreement|strategy|team|alliance)|hidden (?:pact|agreement|alliance)|(?:perfect|total|complete) sync|same playbook|estrategia (?:compartida|secreta)|pacto secreto|acuerdo secreto|sincron[íi]a perfecta|equipo secreto/iu;
+
 /** İlişki hükmü ve teşhis/terapi dili: ürün ilkesi gereği yorumda yok (tr/en/es). */
 const VERDICTS = /uyumsuz|toksik|ayrılık|terapi|terapist|psikolog|incompatib|toxic|breakup|break up|therap|incompatible|tóxic[oa]|incompatib|terapia|psicólog/iu;
 
-/** Şemanın yakalayamadığı içerik kuralları (yüzde yok, soru numarası yok, tag/JSON sızıntısı yok, burç/astroloji yok). */
-export function qualityIssues(c: Commentary, playerNames: string[] = [], locale: "tr" | "en" | "es" = "en"): string[] {
-  let all = [c.headline, c.summary, ...c.strengths, ...c.blindSpots, ...c.conversationStarters, ...c.awards.flatMap((a) => [a.title, a.text])].join("\n");
+/**
+ * Düşük skor bandında başlık/özette YASAK dil: "aynı dalgada", "tam uyum", "birkaç komik yanılgı" (gerçek bir odada skor 45 iken çıktı bunu
+ * söylüyordu). Prompt kuralı tek başına yetmediği için kodda da reddedilir.
+ */
+const LOW_BAND_BANNED = new RegExp(
+  [
+    "aynı dalga", "tam uyum", "mükemmel uyum", "senkron", "bir kitap gibi", "avucunuzun içi", "birbirinizi (?:çok )?iyi (?:okuyor|tanıyor)",
+    "birkaç\\s+(?:komik\\s+)?(?:yanılgı|yanlış|ters köşe)",
+    "same wavelength", "in sync", "perfect(?:ly)? (?:harmony|match|sync)", "know each other (?:inside out|perfectly|so well)", "a few (?:funny )?(?:mix-?ups|misses|slips)",
+    "misma onda", "sincroniz", "armon[íi]a perfecta", "se conocen (?:perfectamente|a la perfecci[oó]n|muy bien)", "(?:unos|algunos) (?:pocos )?(?:errores|fallos|desaciertos)(?: graciosos)?",
+  ].join("|"),
+  "iu",
+);
+
+/** Tırnak içindeki metni karşılaştırmak için sadeleştirir: küçük harf, noktalama ve fazla boşluk yok. */
+const normalizeQuote = (t: string) => t.toLowerCase().replace(/[.,;:!?…"“”«»'’‘`]/g, "").replace(/\s+/g, " ").trim();
+
+/** Çıktıdaki çift tırnaklı parçalar. */
+function quotedSegments(text: string): string[] {
+  return [...text.matchAll(/[“"«]([^”"»\n]{4,160})[”"»]/gu)].map((m) => m[1]);
+}
+
+/**
+ * "Yumuşak" sorunlar: üslup/biçim kuralları (klişe, bozuk alıntı, hitap, İngilizce ödül başlığı). Düzeltme turundan sonra HÂLÂ yalnızca bunlar
+ * kalıyorsa yorum reddedilmez (kullanıcı parasını iade edip yorumsuz bırakmak, "ortak zemin" gibi bir kalıp yüzünden fazla pahalı);
+ * "sert" sorunlar (yüzde, burç, hüküm, düşük skor dili, dil sızıntısı, JSON kırıntısı) her zaman reddedilir.
+ */
+export function isSoftIssue(issue: string): boolean {
+  return /^(Avoid empty filler|Avoid invented secrets|The quoted text|Never refer to the pair|Award titles must be)/.test(issue);
+}
+
+export interface QualityContext {
+  /** Skor bandı: "low" ise "aynı dalgada/tam uyum" dili reddedilir */
+  band?: ScoreBand;
+  /** Tırnak içinde alıntılanabilecek metinler (oyuncuların cevap/seçenek metinleri); uzun alıntılar bunlardan birinde AYNEN geçmeli */
+  quotable?: string[];
+}
+
+/** Şemanın yakalayamadığı içerik kuralları (yüzde yok, soru numarası yok, tag/JSON sızıntısı yok, burç/astroloji yok, alıntı/hitap/ton). */
+export function qualityIssues(
+  c: Commentary,
+  playerNames: string[] = [],
+  locale: "tr" | "en" | "es" = "en",
+  ctx: QualityContext = {},
+): string[] {
+  const texts = [c.headline, c.summary, ...c.strengths, ...c.blindSpots, ...c.conversationStarters, ...c.awards.flatMap((a) => [a.title, a.text])];
+  const original = texts.join("\n");
+  let all = original;
   // Oyuncu adları kullanıcı metnidir ve kurallarla çakışabilir (ör. "Burcu" adı "burç" desenine uyar): denetimden önce çıkarılır.
   for (const name of playerNames) {
     const n = name.trim();
@@ -88,7 +140,39 @@ export function qualityIssues(c: Commentary, playerNames: string[] = [], locale:
     issues.push(`The text must be written ONLY in ${locale === "tr" ? "Turkish" : "Spanish"}; do not copy the English fact sentences.`);
   }
   if (VERDICTS.test(all)) issues.push("Do not give verdicts about the relationship or use diagnosis/therapy language.");
+  if (INVENTED.test(all)) issues.push("Avoid invented secrets: never present a shared answer as a secret pact, a shared strategy or perfect sync; they did not know it.");
   if (CLICHES.test(all)) issues.push("Avoid empty filler phrases such as 'common ground' or 'strengthens your bond'; use concrete details instead.");
   if (ASTROLOGY.test(all)) issues.push("Do not mention zodiac, signs, horoscopes or astrology in any way.");
+
+  // Ödül başlıkları oda dilinde olmalı: "awardBases" İngilizce notlardır; model etiketi ("Plot-twist Award") kopyalamasın.
+  if (locale !== "en" && c.awards.some((x) => /\b(?:award|plot.?twist|more.?alike|pattern|sharp.?eyed|boldest|finishers?)\b/i.test(x.title))) {
+    issues.push(`Award titles must be written in ${locale === "tr" ? "Turkish" : "Spanish"}; do not copy the English award notes.`);
+  }
+
+  // Hitap tutarlılığı: çift üçüncü kişi olarak anılmaz ("Deniz ve Elif ..."); çift her zaman "siz"dir.
+  if (playerNames.length === 2 && playerNames[0].trim() && playerNames[1].trim()) {
+    const esc = (t: string) => t.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const [a, b] = [esc(playerNames[0]), esc(playerNames[1])];
+    if (new RegExp(`${a}\\s*(?:ve|ile|and|y|e|&)\\s+${b}|${b}\\s*(?:ve|ile|and|y|e|&)\\s+${a}`, "u").test(original)) {
+      issues.push(`Never refer to the pair in the third person ("${playerNames[0]} and ${playerNames[1]}"); address them as "you". Use a name only as the subject when contrasting what each one answered.`);
+    }
+  }
+
+  // Düşük skor bandı: başlık ve özette "aynı dalgada / tam uyum / birkaç komik yanılgı" yok.
+  if (ctx.band === "low" && LOW_BAND_BANNED.test(`${c.headline}\n${c.summary}`)) {
+    issues.push("The score band is LOW: the headline and summary must not say or imply 'same wavelength', 'in sync' or 'perfect harmony', and must not shrink the many misses to 'a few funny mix-ups'. Be honest and warm: they have a lot to discover about each other.");
+  }
+
+  // Alıntı denetimi: tırnak içindeki uzun parçalar bir seçenek/cevap metninde AYNEN geçmeli (ör. "biliyordum" yerine "biliyorum" yazılmamalı).
+  if (ctx.quotable && ctx.quotable.length > 0) {
+    const allowed = ctx.quotable.map(normalizeQuote);
+    for (const seg of texts.flatMap(quotedSegments)) {
+      const n = normalizeQuote(seg);
+      if (n.length >= 14 && n.split(" ").length >= 3 && !allowed.some((q) => q.includes(n))) {
+        issues.push(`The quoted text "${seg}" is not an exact option text. Copy option texts exactly as written, or paraphrase WITHOUT quotation marks.`);
+        break;
+      }
+    }
+  }
   return issues;
 }

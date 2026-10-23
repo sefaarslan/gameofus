@@ -1,7 +1,7 @@
 // AI yorum oyun alanı: UYDURMA bir odayı modele gönderir, çıktıyı ve kullanımı gösterir.
 //   node --no-warnings --env-file=.env scripts/ai-playground.mjs [--provider groq|openrouter] [--model <ad>]
 //        [--lang tr|en|es] [--type friend|dating|partner] [--seed 1] [--effort low|medium|high]
-//        [--max-tokens 1800] [--show-prompt] [--strict] [--no-signs] [--name-a <ad>]  (--no-signs: burçsuz karşılaştırma; --strict: sağlayıcıda şemaya zorla; --name-a: prompt enjeksiyonu denemesi için)
+//        [--max-tokens 1800] [--show-prompt] [--strict] [--no-signs] [--scenario low|high|random] [--name-a <ad>]  (--no-signs: burçsuz karşılaştırma; --strict: sağlayıcıda şemaya zorla; --name-a: prompt enjeksiyonu denemesi için)
 // Gerçek kullanıcı verisi KULLANMAZ; veritabanına bağlanmaz.
 import { AiProviderError } from "../lib/ai/provider.ts";
 import { generateCommentary, InvalidCommentaryError } from "../lib/ai/generate.ts";
@@ -20,7 +20,7 @@ const lang = args.lang ?? "tr";
 const relationshipType = args.type ?? "friend";
 const seed = Number(args.seed ?? 1);
 
-const raw = await buildFakeRoom({ lang, relationshipType, seed, signs: !args["no-signs"] });
+const raw = await buildFakeRoom({ lang, relationshipType, seed, signs: !args["no-signs"], scenario: args.scenario ?? "random" });
 if (typeof args["name-a"] === "string") raw.nameA = args["name-a"];
 const room = buildDigest(raw);
 const messages = buildMessages(room);
