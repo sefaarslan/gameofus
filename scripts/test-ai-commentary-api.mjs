@@ -195,8 +195,8 @@ try {
   ok(r.status === 403 && r.json?.error?.code === "AI_MOBILE_ONLY", "web partner POST → 403 AI_MOBILE_ONLY");
   const res = await call("GET", `/api/rooms/${code6}/results`, { token: g6.guestAuth.token });
   const st = await call("GET", `/api/rooms/${code6}/state`, { token: g6.guestAuth.token });
-  ok(res.status === 200 && !/commentary|\bai[A-Z_ ]|headline/i.test(JSON.stringify(res.json)), "web results yanıtında AI alanı yok");
-  ok(st.status === 200 && !/commentary|\bai[A-Z_ ]|headline/i.test(JSON.stringify(st.json)), "web state yanıtında AI alanı yok");
+  ok(res.status === 200 && !/"(?:aiCommentary|ai_commentary|aiConsent|commentary|headline|awards)"/.test(JSON.stringify(res.json)), "web results yanıtında AI alanı yok");
+  ok(st.status === 200 && !/"(?:aiCommentary|ai_commentary|aiConsent|commentary|headline|awards)"/.test(JSON.stringify(st.json)), "web state yanıtında AI alanı yok");
   const hist = await call("GET", "/api/users/history", { jwt: A.jwt });
   ok(Array.isArray(hist.json) && !/commentary|headline/i.test(JSON.stringify(hist.json)), "geçmiş yanıtında AI alanı yok");
 
