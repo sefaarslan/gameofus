@@ -116,18 +116,24 @@ export interface QualityContext {
   quotable?: string[];
 }
 
-/** Şemanın yakalayamadığı içerik kuralları (yüzde yok, soru numarası yok, tag/JSON sızıntısı yok, burç/astroloji yok, alıntı/hitap/ton). */
-export function qualityIssues(
-  c: Commentary,
-  playerNames: string[] = [],
-  locale: "tr" | "en" | "es" = "en",
-  ctx: QualityContext = {},
-): string[] {
-  const texts = [c.headline, c.summary, ...c.strengths, ...c.blindSpots, ...c.conversationStarters, ...c.awards.flatMap((a) => [a.title, a.text])];
-  const original = texts.join("\n");
-  let all = original;
-  // Oyuncu adları kullanıcı metnidir ve kurallarla çakışabilir (ör. "Burcu" adı "burç" desenine uyar): denetimden önce çıkarılır.
-  for (const name of playerNames) {
+export interface CommonIssueOptions {
+  /** Oyuncu/kullanıcı adları: kurallarla çakışabilir ("Burcu" ↔ "burç"), denetimden önce metinden çıkarılır */
+  names?: string[];
+  /** Tırnak içinde alıntılanabilecek metinler; uzun alıntılar bunlardan birinde AYNEN geçmeli */
+  quotable?: string[];
+  /** İlişki hükmü / teşhis-terapi dili denetlensin mi (solo analiz kendi daha dar listesini kullanabilir) */
+  verdicts?: boolean;
+  /** İki kişilik "gizli anlaşma" dili denetlensin mi (solo'da anlamsız) */
+  invented?: boolean;
+}
+
+/**
+ * Oda yorumu ve solo analiz için ORTAK içerik kuralları: yüzde yok, soru numarası yok, JSON kırıntısı yok, dil sızıntısı yok,
+ * klişe yok, burç/astroloji yok, uzun alıntılar birebir. Özelliğe özel kurallar (skor bandı, hitap, ödül başlığı…) çağıran tarafta eklenir.
+ */
+export function commonTextIssues(texts: string[], locale: "tr" | "en" | "es", opts: CommonIssueOptions = {}): string[] {
+  let all = texts.join("\n");
+  for (const name of opts.names ?? []) {
     const n = name.trim();
     if (n) all = all.replace(new RegExp(n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gu"), " ");
   }
@@ -139,10 +145,35 @@ export function qualityIssues(
   if (locale !== "en" && (all.match(/\b(?:was|were|would|actually|answered|that|the|and|but|both|very|fairly|sure)\b/gi) ?? []).length >= 4) {
     issues.push(`The text must be written ONLY in ${locale === "tr" ? "Turkish" : "Spanish"}; do not copy the English fact sentences.`);
   }
-  if (VERDICTS.test(all)) issues.push("Do not give verdicts about the relationship or use diagnosis/therapy language.");
-  if (INVENTED.test(all)) issues.push("Avoid invented secrets: never present a shared answer as a secret pact, a shared strategy or perfect sync; they did not know it.");
+  if (opts.verdicts !== false && VERDICTS.test(all)) issues.push("Do not give verdicts about the relationship or use diagnosis/therapy language.");
+  if (opts.invented !== false && INVENTED.test(all)) issues.push("Avoid invented secrets: never present a shared answer as a secret pact, a shared strategy or perfect sync; they did not know it.");
   if (CLICHES.test(all)) issues.push("Avoid empty filler phrases such as 'common ground' or 'strengthens your bond'; use concrete details instead.");
   if (ASTROLOGY.test(all)) issues.push("Do not mention zodiac, signs, horoscopes or astrology in any way.");
+
+  // Alıntı denetimi: tırnak içindeki uzun parçalar bir seçenek/cevap/senaryo metninde AYNEN geçmeli (ör. "biliyordum" yerine "biliyorum" yazılmamalı).
+  if (opts.quotable && opts.quotable.length > 0) {
+    const allowed = opts.quotable.map(normalizeQuote);
+    for (const seg of texts.flatMap(quotedSegments)) {
+      const n = normalizeQuote(seg);
+      if (n.length >= 14 && n.split(" ").length >= 3 && !allowed.some((q) => q.includes(n))) {
+        issues.push(`The quoted text "${seg}" is not an exact option text. Copy option texts exactly as written, or paraphrase WITHOUT quotation marks.`);
+        break;
+      }
+    }
+  }
+  return issues;
+}
+
+/** Şemanın yakalayamadığı içerik kuralları (oda yorumu): ortak kurallar + hitap, ödül başlığı dili, skor bandı dili. */
+export function qualityIssues(
+  c: Commentary,
+  playerNames: string[] = [],
+  locale: "tr" | "en" | "es" = "en",
+  ctx: QualityContext = {},
+): string[] {
+  const texts = [c.headline, c.summary, ...c.strengths, ...c.blindSpots, ...c.conversationStarters, ...c.awards.flatMap((a) => [a.title, a.text])];
+  const original = texts.join("\n");
+  const issues = commonTextIssues(texts, locale, { names: playerNames, quotable: ctx.quotable });
 
   // Ödül başlıkları oda dilinde olmalı: "awardBases" İngilizce notlardır; model etiketi ("Plot-twist Award") kopyalamasın.
   if (locale !== "en" && c.awards.some((x) => /\b(?:award|plot.?twist|more.?alike|pattern|sharp.?eyed|boldest|finishers?)\b/i.test(x.title))) {
@@ -161,18 +192,6 @@ export function qualityIssues(
   // Düşük skor bandı: başlık ve özette "aynı dalgada / tam uyum / birkaç komik yanılgı" yok.
   if (ctx.band === "low" && LOW_BAND_BANNED.test(`${c.headline}\n${c.summary}`)) {
     issues.push("The score band is LOW: the headline and summary must not say or imply 'same wavelength', 'in sync' or 'perfect harmony', and must not shrink the many misses to 'a few funny mix-ups'. Be honest and warm: they have a lot to discover about each other.");
-  }
-
-  // Alıntı denetimi: tırnak içindeki uzun parçalar bir seçenek/cevap metninde AYNEN geçmeli (ör. "biliyordum" yerine "biliyorum" yazılmamalı).
-  if (ctx.quotable && ctx.quotable.length > 0) {
-    const allowed = ctx.quotable.map(normalizeQuote);
-    for (const seg of texts.flatMap(quotedSegments)) {
-      const n = normalizeQuote(seg);
-      if (n.length >= 14 && n.split(" ").length >= 3 && !allowed.some((q) => q.includes(n))) {
-        issues.push(`The quoted text "${seg}" is not an exact option text. Copy option texts exactly as written, or paraphrase WITHOUT quotation marks.`);
-        break;
-      }
-    }
   }
   return issues;
 }

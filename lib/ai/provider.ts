@@ -27,6 +27,8 @@ export interface ChatOptions {
   /** Yanıtı bu JSON şemasına uydurmaya zorla (strict; destekleyen modellerde). Doğrulama yine ayrıca yapılmalıdır. */
   jsonSchema?: { name: string; schema: unknown };
   timeoutMs?: number;
+  /** Yalnızca test sağlayıcısı (`fake`): bu özelliğin GEÇERLİ örnek çıktısı; gerçek sağlayıcılar yok sayar. */
+  fakeValid?: unknown;
   /**
    * Yalnızca OpenRouter: sağlayıcının istemi kaydedip eğitimde kullanmasına izin ver.
    * VARSAYILAN "deny". Sadece uydurma verilerle denerken (ör. ücretsiz `:free` modeller) "allow" yapılır.

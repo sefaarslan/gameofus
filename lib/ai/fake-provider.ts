@@ -37,12 +37,15 @@ export async function fakeChat(options: ChatOptions): Promise<ChatResult> {
 
   const invalid = mode === "invalid" || (mode === "repairable" && !repairing);
   // "cliche": yumuşak üslup sorunu (hep klişe kullanır); "percent": sert sorun (hep yüzde kullanır)
+  const valid = (options.fakeValid ?? VALID) as Record<string, unknown>;
   const body =
     mode === "cliche"
-      ? { ...VALID, strengths: ["Ortak zemin bulmanız harika.", ...VALID.strengths.slice(1)] }
+      ? "strengths" in valid
+        ? { ...valid, strengths: ["Ortak zemin bulmanız harika.", ...(valid.strengths as string[]).slice(1)] }
+        : { ...valid, summary: "Ortak zemin bulmanız harika." } // solo şekli: summary yumuşak sorunu taşır
       : mode === "percent"
-        ? { ...VALID, summary: "Yüzde 70 uyumlusunuz, yani %70." }
-        : VALID;
+        ? { ...valid, summary: "Yüzde 70 uyumlusunuz, yani %70." }
+        : valid;
   const text = invalid ? '{"headline": "eksik alanlar"}' : JSON.stringify(body);
   return {
     text,

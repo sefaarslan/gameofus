@@ -30,7 +30,14 @@ export async function anyCapacity(specs: ModelSpec[]): Promise<boolean> {
   return false;
 }
 
-export async function generateWithFallback(digest: CommentaryDigest, specs: ModelSpec[]): Promise<GenerateResult> {
+/**
+ * Yedekli üretim (oyundan bağımsız): önce ana model, olmazsa (hız sınırı, zaman aşımı, sağlayıcı hatası, geçersiz çıktı) yedek model.
+ * `generate`, belirli bir model tanımıyla çalışan üretim fonksiyonudur (oda yorumu ya da solo analiz).
+ */
+export async function runWithFallback<R extends { meta: { totalTokens: number } }>(
+  specs: ModelSpec[],
+  generate: (spec: ModelSpec) => Promise<R>,
+): Promise<R> {
   const reasons: string[] = [];
   for (const spec of specs) {
     if (!(await hasCapacity(spec))) {
@@ -38,7 +45,7 @@ export async function generateWithFallback(digest: CommentaryDigest, specs: Mode
       continue;
     }
     try {
-      const result = await generateCommentary(digest, spec);
+      const result = await generate(spec);
       await recordUsage(spec.provider, result.meta.totalTokens, false);
       return result;
     } catch (err) {
@@ -47,4 +54,8 @@ export async function generateWithFallback(digest: CommentaryDigest, specs: Mode
     }
   }
   throw new AiUnavailableError(reasons);
+}
+
+export async function generateWithFallback(digest: CommentaryDigest, specs: ModelSpec[]): Promise<GenerateResult> {
+  return runWithFallback(specs, (spec) => generateCommentary(digest, spec));
 }

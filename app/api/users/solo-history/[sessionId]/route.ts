@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { corsOptions } from "@/lib/cors";
 import { apiError, apiOk } from "@/lib/api";
 import { computeProfile, encodeGrid, isFlag, type Flag } from "@/lib/solo";
+import { soloAiStatuses } from "@/lib/ai/solo/store";
 
 export function OPTIONS() {
   return corsOptions();
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ sess
   const supabase = createAdminClient();
   const { data: s } = await supabase
     .from("solo_sessions")
-    .select("id, pack_key, locale, scenario_ids, answers, coins_awarded, completed_at, status, user_id")
+    .select("id, game, pack_key, locale, scenario_ids, answers, coins_awarded, completed_at, status, user_id")
     .eq("id", sessionId)
     .maybeSingle();
   // Başkasının oturumu "yok" gibi davranır
@@ -34,9 +35,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ sess
   const { data: rows } = await supabase.from("solo_scenarios").select("id, scenario_text").in("id", s.scenario_ids);
   const text = new Map((rows ?? []).map((r) => [r.id, r.scenario_text]));
   const profile = computeProfile(flags as Flag[]);
+  const aiStatus = (await soloAiStatuses([s.id])).get(s.id) ?? "none";
 
   return apiOk({
     sessionId: s.id,
+    gameType: s.game,
+    aiStatus,
     pack: s.pack_key,
     locale: s.locale,
     completedAt: s.completed_at,

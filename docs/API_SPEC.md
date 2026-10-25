@@ -42,6 +42,8 @@ GET  /api/rooms/[roomCode]/results
 POST /api/feedback
 POST /api/solo/red-flag/start
 POST /api/solo/[sessionId]/complete
+GET  /api/solo/[sessionId]/ai-analysis   (mobil, Bearer JWT; AI analiz durumu, ücretsiz)
+POST /api/solo/[sessionId]/ai-analysis   (mobil, Bearer JWT; 100 coin, satın al + üret)
 GET  /api/solo/red-flag/card?g=&l=&p=&q=&fmt=
 GET  /api/users/me                (mobil, Bearer JWT)
 GET  /api/users/history           (mobil, Bearer JWT; oda geçmişi, son 90 gün; düz dizi)
@@ -324,7 +326,8 @@ ek coin yok). Web (anonim) yanıtında `reward` alanı yoktur.
 ### `GET /api/users/solo-history` ve `GET /api/users/solo-history/[sessionId]` (mobil)
 
 `Authorization: Bearer <Supabase JWT>`. Liste: kullanıcının tamamlanmış solo oyunları (en yeni önce, en fazla 100):
-`{ items: [{ sessionId, pack, locale, completedAt, coinsEarned, grid, counts, tolerance }] }`. Ayrıntı: aynı alanlar +
+`{ items: [{ sessionId, gameType, aiStatus, pack, locale, completedAt, coinsEarned, grid, counts, tolerance }] }`. `gameType` oyun türü
+(`solo_sessions.game`, şimdilik hep `"red_flag"`), `aiStatus` AI analiz durumu (`none | generating | ready | failed`; liste için tek sorguyla hesaplanır, N tane GET gerekmez). Ayrıntı: aynı alanlar +
 `cards: [{ id, text, flag }]` (kart sırasıyla metin ve seçilen bayrak). Başkasının/web oturumu `404 SESSION_NOT_FOUND`.
 
 ### `GET /api/solo/red-flag/card`
@@ -398,8 +401,10 @@ JWT → `401 UNAUTHORIZED`; geçerli JWT ama bu odanın katılımcısı değil, 
   7. Başarısız: satır `failed`, coin iadesi (`reason:"ai_commentary_refund"`, aynı `refId`; iade yalnızca düşüm gerçekten yapıldıysa), `503 AI_UNAVAILABLE` + `refunded:true`.
      Yeniden denemede `attempt` artar (yeni coin referansı).
   8. 2 dakikadan uzun `generating` kalan (sunucu çökmesi) kayıtlar GET/POST sırasında `failed` sayılır ve iade edilir (tembel temizlik).
-- `GET /api/users/ai-reports` (JWT) → **düz dizi**, yeniden eskiye, en çok 100: `[{ roomCode, partnerName, relationshipType, headline, createdAt }]`;
-  yalnızca kullanıcının SATIN ALDIĞI `ready` yorumlar (partnerin aldıkları çıkmaz). JWT'siz `401`.
+- `GET /api/users/ai-reports` (JWT) → **düz dizi**, yeniden eskiye (iki tür birlikte), en çok 100. Her satırda `type` vardır:
+  `{ type:"room", roomCode, partnerName, relationshipType, headline, createdAt }` (oda yorumu) ve
+  `{ type:"solo", sessionId, gameType, pack, headline, createdAt }` (solo analiz, bkz. §10d). Yalnızca kullanıcının SATIN ALDIĞI `ready`
+  kayıtlar (partnerin aldıkları çıkmaz). `type` alanı geriye dönük uyumludur (eski istemci yok sayar; oda satırları aynı alanları taşır). JWT'siz `401`.
 
 `content` biçimi (oda dilinde, `rooms.locale`): `{ headline: string, summary: string, strengths: string[3], blindSpots: string[2..3], conversationStarters: string[3], awards: { title: string, text: string }[3..4] }`.
 `awards` (prompt v2.0, 2026-10-23) eğlenceli "ödül" kartlarıdır (`title` ≤ 60 karakter, çoğu zaman baştaki bir emojiyle; `text` tek cümle). **Eski kayıtlarda `awards` yoktur**: istemci alanın eksikliğini tolere etmeli (yoksa bölümü gizle). Ton v2.0'dan itibaren daha eğlenceli ve somuttur; uzunluk sınırları: headline ≤ 180, summary ≤ 1400, strengths/blindSpots ≤ 420/460, conversationStarters ≤ 300 karakter.
@@ -412,6 +417,48 @@ benzerlik, "eminim ama ıskaladı" anları), ilişki türü, oda dili, yaş aral
 
 **Veri saklama:** yorum odaya bağlıdır (oda 90 gün sonra silinince gider); satın alan hesabını silerse onun satın aldığı yorumlar da silinir.
 `ai_usage_daily`: sağlayıcı başına günlük istek/token toplamı (kişisel veri yok).
+
+---
+
+## 10d. Solo oyunlar için AI analizi — YALNIZCA MOBİL
+
+Oda yorumuyla (§10c) aynı ilkeler ve durum makinesi; **oyundan bağımsız** tasarım. Oturum kimliği tek alandır (`sessionId`); oyun türü sunucuda
+oturumdan (`solo_sessions.game`) okunur, istemci göndermez. Şimdilik tek adaptör: `red_flag`. Yeni solo oyun = yeni **oyun adaptörü**
+(`lib/ai/solo/<oyun>.ts`) + `lib/ai/solo/registry.ts`'e tek satır; route, tablo (`ai_solo_analyses`), coin/iade akışı, rıza, hata kodları ve mobil
+bileşenler DEĞİŞMEZ. Kod: `lib/ai/solo/` (`types`, `registry`, `red-flag`, `envelope`, `prompt`, `generate`, `store`), çekirdek `lib/ai/structured.ts`.
+
+**Kimlik (GET ve POST):** yalnızca geçerli Supabase JWT. Oturum token'ı ile gelen / kimliksiz istek → `403 AI_MOBILE_ONLY`; geçersiz JWT → `401 UNAUTHORIZED`.
+Oturum yok, başkasının oturumu ya da anonim web oturumu (`user_id` boş) → hepsi AYNI `404 SESSION_NOT_FOUND` (varlık sızmaz). Oyun türü kayıtlı değilse
+`400 INVALID_PAYLOAD` (500 değil).
+
+- `GET /api/solo/{sessionId}/ai-analysis` → 200 `{ status: "none"|"generating"|"ready"|"failed", purchasedByMe, gameType, content?, createdAt? }`.
+  `none` hata değildir. `content` yalnızca `ready`. Takılmış (2 dk) `generating` kayıtlar okuma sırasında `failed` sayılır ve iade edilir.
+- `POST /api/solo/{sessionId}/ai-analysis` (gövde yok), sıra: kimlik → hız sınırı (kullanıcı başına dakikada 5, günde 20; `429 RATE_LIMITED`) → oturum sahipliği
+  → rıza (`403 AI_CONSENT_REQUIRED`; aynı `ai-v1`) → oturum tamamlanmamışsa `409 RESULT_NOT_READY` → zaten `ready` ise `200 { status:"ready", gameType, content,
+  applied:false }` (coin düşmez), `generating` ise `202 { status:"generating", gameType }` → kapasite yoksa `503 AI_UNAVAILABLE` (coin düşmeden, `refunded:false`)
+  → yarış-güvenli tek aktif kayıt → coin düş (`reason:"solo_ai"`, 100 coin; `refId = "<sessionId>:<attempt>"`: yeniden denemede `attempt` artar, bedava deneme olmaz;
+  yetersizse `402 INSUFFICIENT_COINS`, kayıt silinir) → ana model, olmazsa yedek model → başarı: `200 { status:"ready", gameType, content, balance, applied:true, purchasedByMe:true }`;
+  başarısızlık: satır `failed`, coin iadesi (`reason:"solo_ai_refund"`, aynı `refId`; yalnızca düşüm yapıldıysa) ve `503 AI_UNAVAILABLE` + `refunded:true` + `gameType`.
+- `GET /api/users/solo-history` (+ detay): her öğede `gameType` ve `aiStatus`. `GET /api/users/ai-reports`: `type:"solo"` satırları (bkz. §10c).
+
+**İçerik zarfı (oyundan bağımsız; `content`):**
+```json
+{ "gameType": "red_flag", "headline": "…", "summary": "…",
+  "sections": [ { "id": "green_zone", "kind": "bullets", "title": "Rahat bölgen", "items": ["…"] },
+                { "id": "self_questions", "kind": "questions", "title": "Kendine sor", "items": ["…", "…"] } ] }
+```
+- `kind`: `text` (`text` alanı), `bullets` (`items[]`), `questions` (`items[]`). **İstemci bilinmeyen `kind`/`id`'yi yok sayar**; sıra sunucudan gelir.
+- `title` sunucuda oturum diline göre (tr/en/es) verilir, mobil yazı eklemez. Boş bölümler zarfa girmez (ör. kırmızı kart yoksa `red_lines` gelmez).
+- `items` en çok 4 (şemada zorlanır). **AI çıktısında sayı, yüzde, emoji ya da ızgara yoktur**: 3×3 ızgara, bayrak oranları, tolerans çubuğu oyunun kendi sonuç
+  verisinden (`complete` / `solo-history`) çizilir.
+- Red Flag bölümleri: `green_zone` (bullets), `red_lines` (bullets), `gray_areas` (bullets), `self_questions` (questions, 2-4).
+
+**Modele giden veri (Red Flag):** set kategorisi (arkadaşlık/sevgili), 9 kartın senaryo metni (herkese açık içerik) + tema + seçilen bayrak, kodda hesaplanmış sayılar
+(Green/Yellow/Red adedi, tolerans, profil türü). Ad, cinsiyet, doğum tarihi, e-posta, kimlikler GİTMEZ; solo AI'a cinsiyet gitmez (CLAUDE.md §9). Prompt sürümü
+`solo-v1.0` (`ai_solo_analyses.prompt_version`).
+
+**Saklama:** analiz oturuma bağlıdır; oturum silinince (90 günlük temizlik, hesap silme) ve satın alan kullanıcı silinince analiz de silinir (cascade).
+Migration: `20260617000000_ai_solo_analysis.sql`.
 
 ---
 

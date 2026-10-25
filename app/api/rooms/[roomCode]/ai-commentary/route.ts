@@ -1,13 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { COIN_PRICES, CoinError, applyCoins } from "@/lib/coins";
-import { CORS_HEADERS, corsOptions } from "@/lib/cors";
+import { corsOptions } from "@/lib/cors";
 import { apiError, apiOk } from "@/lib/api";
 import { normalizeRoomCode } from "@/lib/room-code-utils";
 import { checkRateLimitWindow } from "@/lib/rate-limit";
 import { authAiUser, resolveAiParticipant } from "@/lib/ai/access";
-import { aiConfig, parseSpec } from "@/lib/ai/config";
-import type { ModelSpec } from "@/lib/ai/config";
+import { modelSpecs, unavailable } from "@/lib/ai/http";
 import { buildDigest } from "@/lib/ai/digest";
 import { coinRef, currentCommentary, reapStale, refundIfCharged } from "@/lib/ai/commentary-store";
 import { loadRawRoom } from "@/lib/ai/room-data";
@@ -24,23 +23,6 @@ export function OPTIONS() {
 /** POST hız sınırı: kullanıcı başına dakikada 5, günde 20 */
 const POST_LIMIT_MIN = { limit: 5, windowMs: 60_000 };
 const POST_LIMIT_DAY = { limit: 20, windowMs: 24 * 60 * 60 * 1000 };
-
-/** Kullanılacak modeller (ortam değişkenleri). Yalnızca geliştirmede, açıkça izin verilirse başlıkla geçersiz kılınabilir (testler). */
-function modelSpecs(req: NextRequest): ModelSpec[] {
-  if (process.env.NODE_ENV !== "production" && process.env.AI_ALLOW_TEST_OVERRIDE === "1") {
-    const override = req.headers.get("x-ai-test-specs");
-    if (override) return override.split(",").map((s) => parseSpec(s.trim(), "primary")!);
-  }
-  const cfg = aiConfig();
-  return cfg.fallback ? [cfg.primary, cfg.fallback] : [cfg.primary];
-}
-
-function unavailable(refunded: boolean) {
-  return NextResponse.json(
-    { error: { code: "AI_UNAVAILABLE", message: "Şu an yorum üretilemiyor. Lütfen biraz sonra tekrar dene." }, refunded },
-    { status: 503, headers: CORS_HEADERS },
-  );
-}
 
 /**
  * GET: odanın AI yorum durumu. Odanın HER katılımcısına (satın alan da, partner de) ücretsiz. Yalnızca JWT (mobil).

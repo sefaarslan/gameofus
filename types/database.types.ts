@@ -826,6 +826,63 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_solo_analyses: {
+        Row: {
+          attempt: number
+          completion_tokens: number | null
+          consent_version: string
+          content: Json | null
+          created_at: string
+          error_kind: string | null
+          game: string
+          id: string
+          locale: string
+          model: string | null
+          prompt_tokens: number | null
+          prompt_version: string | null
+          purchased_by: string
+          session_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempt: number
+          completion_tokens?: number | null
+          consent_version: string
+          content?: Json | null
+          created_at?: string
+          error_kind?: string | null
+          game: string
+          id?: string
+          locale: string
+          model?: string | null
+          prompt_tokens?: number | null
+          prompt_version?: string | null
+          purchased_by: string
+          session_id: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          attempt?: number
+          completion_tokens?: number | null
+          consent_version?: string
+          content?: Json | null
+          created_at?: string
+          error_kind?: string | null
+          game?: string
+          id?: string
+          locale?: string
+          model?: string | null
+          prompt_tokens?: number | null
+          prompt_version?: string | null
+          purchased_by?: string
+          session_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ai_usage_daily: {
         Row: { day: string; failures: number; provider: string; requests: number; tokens: number }
         Insert: { day: string; failures?: number; provider: string; requests?: number; tokens?: number }
@@ -891,6 +948,10 @@ export type Database = {
       }
       ai_commentary_begin: {
         Args: { p_consent: string; p_locale: string; p_room: string; p_user: string }
+        Returns: { attempt: number; id: string }[]
+      }
+      ai_solo_begin: {
+        Args: { p_consent: string; p_game: string; p_locale: string; p_session: string; p_user: string }
         Returns: { attempt: number; id: string }[]
       }
       ai_usage_add: {
