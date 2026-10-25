@@ -37,6 +37,8 @@ const mkUser = async (tag) => {
   const u = { id: data.user.id, jwt: s.session.access_token };
   users.push(u); return u;
 };
+// JSONB anahtar sırasını değiştirir: içerik karşılaştırması anahtar sırasından bağımsız yapılır
+const stable = (v) => JSON.stringify(v, (_, x) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([p], [q]) => p.localeCompare(q))) : x));
 const coins = async (u) => (await db.from("users").select("room_credits").eq("id", u.id).single()).data.room_credits;
 const setCoins = (u, n) => db.from("users").update({ room_credits: n }).eq("id", u.id);
 const consent = (u) => call("POST", "/api/users/ai-consent", { jwt: u.jwt, body: { version: "test-v1" } });
@@ -112,7 +114,7 @@ try {
   const rows1 = await rowsOf(s1.id);
   ok(rows1.length === 1 && rows1[0].status === "ready" && rows1[0].game === "red_flag" && rows1[0].prompt_version === "solo-v1.0" && rows1[0].consent_version === "test-v1", "kayıt: ready, game, prompt_version solo-v1.0, rıza sürümü");
   r = await P(s1.id, A, "fake:ok");
-  ok(r.status === 200 && r.json?.applied === false && r.json.status === "ready" && JSON.stringify(r.json.content) === JSON.stringify(content) && (await coins(A)) === 900, "ikinci POST: coin düşmez, aynı içerik (applied:false)");
+  ok(r.status === 200 && r.json?.applied === false && r.json.status === "ready" && stable(r.json.content) === stable(content) && (await coins(A)) === 900, "ikinci POST: coin düşmez, aynı içerik (applied:false)");
   r = await G(s1.id, A);
   ok(r.status === 200 && r.json?.status === "ready" && r.json.purchasedByMe === true && !!r.json.content && !!r.json.createdAt, "GET: ready + içerik + createdAt");
 
