@@ -11,6 +11,8 @@ export type ApiErrorCode =
   | "QUESTION_NOT_FOUND"
   | "SESSION_NOT_FOUND"
   | "PACK_UNAVAILABLE"
+  | "DAILY_MOBILE_ONLY"
+  | "ALREADY_PLAYED_TODAY"
   | "UNAUTHORIZED"
   | "INSUFFICIENT_COINS"
   | "AD_LIMIT_REACHED"
@@ -25,8 +27,8 @@ export type ApiErrorCode =
   | "INVALID_PAYLOAD"
   | "INTERNAL_ERROR";
 
-export function apiError(code: ApiErrorCode, message: string, status = 400) {
-  return NextResponse.json({ error: { code, message } }, { status, headers: CORS_HEADERS });
+export function apiError(code: ApiErrorCode, message: string, status = 400, extra: Record<string, unknown> = {}) {
+  return NextResponse.json({ error: { code, message, ...extra } }, { status, headers: CORS_HEADERS });
 }
 
 export function apiOk<T>(data: T, status = 200) {

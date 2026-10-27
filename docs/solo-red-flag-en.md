@@ -1,6 +1,6 @@
 # Red Flag Mayın Tarlası — Setler (EN)
 
-54 aktif senaryo, 6 set × 9 kart. Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır. Yüzdeler yalnızca aynı set içinde karşılaştırılabilir. 104-106 setleri mobilde açılacaktır (henüz içerik yok).
+126 aktif senaryo, 14 set × 9 kart (kategori başına 7). Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır. Yüzdeler yalnızca aynı set içinde karşılaştırılabilir. 101 webde ve mobilde, 102-107 yalnızca mobilde (günlük set havuzu) oynanır.
 
 ## Arkadaşlık · 101  `friend-101`
 
@@ -38,6 +38,54 @@
 8. Your friend cancels plans at the last minute again and again, saying “I have no energy.”  _(Para & Yaşam Tarzı · gri)_
 9. When you get closer to someone else, your friend sulks, saying “You don't like me anymore.”  _(Kıskançlık / Sahiplenme · endişe verici)_
 
+## Arkadaşlık · 104  `friend-104`
+
+1. When someone asks your friend about something private you told them, they say “That's yours to share, not mine” and change the subject.  _(Güven · sağlıklı)_
+2. Your friend expects you to tell them in advance about plans with your other friends, and sulks if you don't.  _(Kıskançlık / Sahiplenme · endişe verici)_
+3. Your friend disagrees with you, yet says “Let me try to see it your way” and hears you out completely.  _(Saygı · sağlıklı)_
+4. When your group chips in for a shared gift, your friend always pays their share on the last day, but they do pay.  _(Para & Yaşam Tarzı · gri)_
+5. You said “Not tonight,” but your friend shows up at your door and says “Just one minute” while stepping inside.  _(Sınırlar · endişe verici)_
+6. Your friend takes all the credit in front of the group for something you made together and never mentions you.  _(Güven · endişe verici)_
+7. Realizing they misread you, your friend asks “I think I misunderstood, could you explain again?”  _(İletişim · sağlıklı)_
+8. You start a new hobby; your friend shows interest but keeps teasing “Are you always there now?”  _(Kıskançlık / Sahiplenme · gri)_
+9. Your friend always introduces you to new people as “our klutz”; you laugh along, but you don't really like it.  _(Saygı · gri)_
+
+## Arkadaşlık · 105  `friend-105`
+
+1. When a rumor about you goes around, your friend says “I know them, that's not true” and stands up for you.  _(Saygı · sağlıklı)_
+2. When you ask what's wrong, your friend says “I'll tell you later,” and a few days later they really do.  _(İletişim · gri)_
+3. Seeing you grow close to someone new, your friend says “Anyone who makes you happy is good news to me.”  _(Kıskançlık / Sahiplenme · sağlıklı)_
+4. While you're out of the room, your friend opens your phone, reads your messages, and says “Friends have no secrets.”  _(Sınırlar · endişe verici)_
+5. On group trips your friend always pushes for the cheapest option, and quietly sits it out if it doesn't fit their budget.  _(Para & Yaşam Tarzı · gri)_
+6. Your friend brings up a topic you'd rather not discuss, saying “You'd feel better if you talked,” and tries again a few times.  _(Sınırlar · gri)_
+7. Instead of telling you directly, your friend passes on a complaint about you through other friends.  _(İletişim · endişe verici)_
+8. Realizing they can't keep a promise, your friend tells you ahead of time and suggests an alternative.  _(Güven · sağlıklı)_
+9. When you ask about money they borrowed, your friend says “I already paid you back, don't you remember?” though they didn't.  _(Para & Yaşam Tarzı · endişe verici)_
+
+## Arkadaşlık · 106  `friend-106`
+
+1. Your friend keeps your secrets well, but almost never tells you what's going on in their own life.  _(Güven · gri)_
+2. Your friend drops by without notice quite often; sometimes it's a nice surprise, sometimes it's tiring.  _(Sınırlar · gri)_
+3. While you're talking, your friend rolls their eyes and sighs loudly enough for everyone to hear.  _(Saygı · endişe verici)_
+4. Your friend “forgets” their wallet so that you end up paying, and it happens at nearly every meetup.  _(Para & Yaşam Tarzı · endişe verici)_
+5. When you mention spending lots of time with another friend, yours says “Nice, tell me what you did.”  _(Kıskançlık / Sahiplenme · sağlıklı)_
+6. In the middle of a disagreement, your friend changes the subject and acts as if nothing happened.  _(İletişim · endişe verici)_
+7. Before posting a photo of you on social media, your friend asks “Is it okay if I share this?”  _(Sınırlar · sağlıklı)_
+8. Instead of talking about feelings, your friend would rather send a funny sticker and move on.  _(İletişim · gri)_
+9. When you say money is tight, your friend doesn't judge and says “Let's figure something out together.”  _(Para & Yaşam Tarzı · sağlıklı)_
+
+## Arkadaşlık · 107  `friend-107`
+
+1. Your friend usually keeps their promises, but often forgets the small details.  _(Güven · gri)_
+2. After breaking something they borrowed from you, your friend tells you right away and replaces it.  _(Para & Yaşam Tarzı · sağlıklı)_
+3. In front of everyone, your friend brushes off something you did with “I could do that as a kid.”  _(Saygı · endişe verici)_
+4. When you're chatting with someone else, your friend walks over, interrupts, and steers you away.  _(Kıskançlık / Sahiplenme · endişe verici)_
+5. Realizing they hurt you, your friend brings it up themselves and asks “How can I make it right?”  _(İletişim · sağlıklı)_
+6. Your friend often cuts in while you're talking, saying it's only because they get excited.  _(Saygı · gri)_
+7. Your friend gives you one excuse and others a different one; when you point it out, they say “You must have misheard.”  _(Güven · endişe verici)_
+8. When asking about something personal, your friend adds “No worries if you'd rather not say.”  _(Sınırlar · sağlıklı)_
+9. Hearing you started a project with someone else, your friend mildly complains “You didn't even ask me.”  _(Kıskançlık / Sahiplenme · gri)_
+
 ## Sevgili · 101  `romantic-101`
 
 1. During an argument, your partner says “I'm getting too worked up, can we cool off for half an hour and talk?”  _(İletişim · sağlıklı)_
@@ -73,6 +121,54 @@
 7. Your partner texts their ex once a week and tells you about it openly.  _(Güven · gri)_
 8. On your birthday, your partner buys an expensive gift that stretches your budget, saying “You deserve it.”  _(Para & Yaşam Tarzı · gri)_
 9. When you ask who they're with late at night, your partner pauses, says “A friend,” and changes the subject.  _(Güven · endişe verici)_
+
+## Sevgili · 104  `romantic-104`
+
+1. Your partner wants to spend most of their savings on an expensive phone and tells you before deciding.  _(Para & Yaşam Tarzı · gri)_
+2. Your partner wants you to share your location all the time, and when you turn it off says “So you're hiding something.”  _(Sınırlar · endişe verici)_
+3. When upset, your partner says “I'm a bit swamped right now, but I want to tell you. Can we talk tonight?”  _(İletişim · sağlıklı)_
+4. Your partner jokes about you in front of friends; most are sweet, but now and then they go a bit too far.  _(Saygı · gri)_
+5. Each time you ask where your partner was, they give a different story.  _(Güven · endişe verici)_
+6. Whenever you try to talk about a problem in the relationship, your partner shuts it down with “Here you go again.”  _(İletişim · endişe verici)_
+7. Your partner notices the effort you put into something and says “I know how hard you worked on this.”  _(Saygı · sağlıklı)_
+8. Your partner puts together a simple budget for shared costs, shares every number openly, and asks for your input.  _(Para & Yaşam Tarzı · sağlıklı)_
+9. Curious about your dinner with colleagues, your partner asks “Who was there?” and drops it once you answer.  _(Kıskançlık / Sahiplenme · gri)_
+
+## Sevgili · 105  `romantic-105`
+
+1. When something bothers your partner, they explain it calmly: “This happened, and it made me feel this way.”  _(İletişim · sağlıklı)_
+2. Your partner tries to cut down your time with old friends, saying “They're not good for you.”  _(Kıskançlık / Sahiplenme · endişe verici)_
+3. Before a big purchase, your partner asks “Shall we look together and see if it fits the budget?”  _(Para & Yaşam Tarzı · sağlıklı)_
+4. Even when your partner disagrees with your decision, they say “Your call, I've got your back.”  _(Saygı · sağlıklı)_
+5. Your partner likes a call every evening; if you skip it they don't complain, but their mood dips a little.  _(Sınırlar · gri)_
+6. When you ask about past relationships, your partner gives short answers and says “That's all for now.”  _(Güven · gri)_
+7. To make you cancel something important to you, your partner says “If you loved me, you'd stay.”  _(Sınırlar · endişe verici)_
+8. In the middle of an argument, your partner says “You wouldn't understand anyway” and turns to their phone.  _(İletişim · endişe verici)_
+9. Your partner insists on paying every bill and won't let you split it, which makes you a little uneasy.  _(Para & Yaşam Tarzı · gri)_
+
+## Sevgili · 106  `romantic-106`
+
+1. Your partner calls your project “just a hobby,” yet in the end says they support you.  _(Saygı · gri)_
+2. Your partner asks about your income in detail but never shares theirs, saying “That's private.”  _(Para & Yaşam Tarzı · endişe verici)_
+3. Your partner never checks your phone and says “Tell me whatever you want to share.”  _(Sınırlar · sağlıklı)_
+4. Your partner finds it hard to talk about feelings, so they leave you small notes instead.  _(İletişim · gri)_
+5. Learning you still talk to an ex, your partner stays calm but keeps turning it over for a few days.  _(Kıskançlık / Sahiplenme · gri)_
+6. Your partner comes to you on their own to confess a mistake they found hard to admit.  _(Güven · sağlıklı)_
+7. In front of others, your partner says “You're doing it wrong” and makes you redo something right there.  _(Saygı · endişe verici)_
+8. Hearing you're meeting an old friend, your partner says “Say hi from me” and doesn't make a thing of it.  _(Kıskançlık / Sahiplenme · sağlıklı)_
+9. During an argument, your partner uses against you something you confided in them.  _(Güven · endişe verici)_
+
+## Sevgili · 107  `romantic-107`
+
+1. Seeing you shine in a crowd, your partner doesn't get jealous and happily tells others how proud they are.  _(Kıskançlık / Sahiplenme · sağlıklı)_
+2. Your partner keeps even small promises on time without needing a reminder.  _(Güven · sağlıklı)_
+3. After an argument, your partner would rather cook your favorite meal than talk it through.  _(İletişim · gri)_
+4. Seeing a photo of you with a friend, your partner says “I don't want you seeing them.”  _(Kıskançlık / Sahiplenme · endişe verici)_
+5. Your partner loves doing everything together, while you sometimes want time alone and find it hard to say so.  _(Sınırlar · gri)_
+6. Your partner mocks one of your interests as “childish” and keeps making jokes about it.  _(Saygı · endişe verici)_
+7. Before introducing you to their family, your partner asks “Do you feel ready?”  _(Sınırlar · sağlıklı)_
+8. Your partner doesn't tell you the whole truth about something, saying it's to avoid upsetting you.  _(Güven · gri)_
+9. Your partner hasn't put in their agreed share of the shared budget for three months and says “Later” when asked.  _(Para & Yaşam Tarzı · endişe verici)_
 
 ## Emekli (pasif) senaryolar
 

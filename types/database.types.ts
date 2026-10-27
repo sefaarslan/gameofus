@@ -289,6 +289,7 @@ export type Database = {
           pack_key: string | null
           platform: string
           scenario_ids: string[]
+          set_date: string | null
           status: string
           token_hash: string
           user_id: string | null
@@ -305,6 +306,7 @@ export type Database = {
           pack_key?: string | null
           platform?: string
           scenario_ids: string[]
+          set_date?: string | null
           status?: string
           token_hash: string
           user_id?: string | null
@@ -321,9 +323,31 @@ export type Database = {
           pack_key?: string | null
           platform?: string
           scenario_ids?: string[]
+          set_date?: string | null
           status?: string
           token_hash?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      solo_daily_sets: {
+        Row: {
+          category: string
+          created_at: string
+          pack_key: string
+          set_date: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          pack_key: string
+          set_date: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          pack_key?: string
+          set_date?: string
         }
         Relationships: []
       }

@@ -147,7 +147,7 @@ bkz. Bölüm 7 — Performans & Veri Akışı Kuralları.)
   tüm coin hareketleri `credit_transactions`'ta tutulur. **Coin yalnızca sunucuda** `apply_coins` (SQL, atomik + idempotent,
   yalnızca service role) ile değişir; istemci miktar göndermez, yalnızca `reason`/`refId` bildirir. Kimlik doğrulama
   `lib/auth.ts` (`getAuthUser`: Bearer Supabase JWT); katılımcı token'ı (64 hex) ile karışmaz. Fiyatlar/ödüller `lib/coins.ts`.
-  Ekonomi: kayıt +500 (Auth trigger'ı) · reklam +100 (günde 5) · oda −250 · AI yorum −100 · solo +20 / solo AI −100.
+  Ekonomi: kayıt +500 (Auth trigger'ı) · reklam +100 (günde 5) · oda −250 · AI yorum −100 · solo günlük set +50 / solo AI −100.
   **Web bu bilgiyi hiçbir API isteğinde sormaz veya taşımaz** (web odaları anonim ve ücretsiz kalır).
   **Kategori erişimi yalnızca tier ile** (`categories.min_tier`, `lib/tier.ts`: `premium ≥ lite ≥ free`; per-kategori takip yok) ve
   asgari yaşla (`categories.min_age`, Cesur=18: kurucu **oda kurarken**, karşı oyuncu **katılırken** kendi hesabındaki doğum tarihiyle; `lib/age.ts`). Tier ve kurucu yaşı `POST /api/rooms/create`'te
@@ -440,12 +440,15 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   yargılamaz/teşhis koymaz. Share kartı, link önizlemesi ve WhatsApp metni de aynı başlığı kullanır.
 - **Setler (deste):** Oyun rastgele değil, **sabit setlerle** oynanır; böylece aynı setteki toleranslar karşılaştırılabilir.
   Her set 9 sabit kart (sabit sıra), 6 temanın tamamını kapsar, ton (sağlıklı/gri/endişe verici) dengelidir. İki kategori:
-  **Arkadaşlık** (`friend-101…106`) ve **Sevgili** (`romantic-101…106`). **Webde yalnızca
-  101-103 açık**; 104-106 "mobilde açılacak" (içerik yok, seçilemez). Set listesi/uygunluk: `lib/solo.ts` (`PACKS`,
+  **Arkadaşlık** (`friend-101…107`) ve **Sevgili** (`romantic-101…107`). **Webde her kategoride
+  yalnızca 101** (`WEB_PACK_NUMBERS = [101]`); 102-107 yalnızca mobilde (günlük set havuzu; web `start` çağrısı `403 PACK_UNAVAILABLE`). Set listesi/uygunluk: `lib/solo.ts` (`PACKS`,
   `WEB_PACK_NUMBERS`). Arkadaşlık setlerinde romantik çağrışım yoktur (check-solo denetler). Yeni set eklerken
-  `seeds/solo/red-flag-packs.ts` içine slotları (pack/pos/tone) yaz, gerekirse senaryo ekle, `check-solo` →
-  `build-solo-packs-migration.mjs` ve (webde açacaksan) `WEB_PACK_NUMBERS`.
-- İçerik: `seeds/solo/red-flag.ts` (+ `red-flag-packs.ts`) — 65 senaryo, **54 aktif** (6 set × 9), 11 emekli (pasif, silinmez;
+  senaryoları `seeds/solo/red-flag-sets2.ts` biçiminde (`add(pack, pos, tema, ton, tr, en, es)`; `n` tema başına otomatik, mevcut sırayı değiştirme) ekle,
+  `lib/solo.ts` `PACK_NUMBERS`'a numarayı ekle, `check-solo` → yeni bir ekleme migration'ı üret (`build-solo-sets2-migration.mjs` örnek) ve (webde açacaksan) `WEB_PACK_NUMBERS`.
+  Günlük set havuzu veritabanında 9 aktif senaryosu olan setlerden okunduğu için başka kod değişikliği gerekmez.
+  **Denge kuralı (check-solo zorlar):** her sette 6 tema + 3 ekstra, ton 3 sağlıklı / 3 gri / 3 endişe verici, üst üste 3 aynı ton ve ardışık aynı tema yok, ilk kart endişe verici değil;
+  104-107'de kategori başına her tema 6 kez (2H/2G/2C).
+- İçerik: `seeds/solo/red-flag.ts` (+ `red-flag-packs.ts`, `red-flag-sets2.ts`) — 137 senaryo, **126 aktif** (14 set × 9: kategori başına 7), 11 emekli (pasif, silinmez;
   geçmiş oturumlar kimliklerine başvurabilir). 6 tema: `boundaries`, `trust`, `communication`, `jealousy`,
   `money_lifestyle`, `respect`. TR/EN/ES, **ikinci tekil kişi** ("Sevgilin…", "your partner…", "tu pareja…") ile
   cinsiyetsiz yazılır. Denetim: `node scripts/check-solo.mjs`.
@@ -456,12 +459,18 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   otomatik gönderilmez, kullanıcı **"Tamamlandı"** butonuna basınca tek `complete` isteğiyle DB'ye yazılır.
   API: `POST /api/solo/red-flag/start` (gövdede `pack` zorunlu), `POST /api/solo/[sessionId]/complete`.
 - **Web:** anonim (token), **her sette 1 oyun** (`localStorage` `gou_solo_redflag_packs`, set anahtarına göre); oynanmış sete
-  tekrar girince kayıtlı karne gösterilir. Giriş ekranında tüm setler tek açılır listede ("Kategori - 101"). Yarım kalan oyun
+  tekrar girince kayıtlı karne gösterilir. Giriş ekranında yan yana iki kategori kartı (Sevgili solda, Arkadaşlık sağda; her biri sabit 101 seti, tek seçim, açılır liste yoktur). Yarım kalan oyun
   `gou_solo_redflag_pending_packs` ile saklanır (sayfa yenilenince aynı oturum/cevaplar devam eder, bitince silinir); bu istemci tarafı bir UX katmanıdır, çerez/depolama temizlenirse yeniden oynanabilir; AI düğmesi pasif ("Mobil uygulamada"). Coin yoktur.
-- **Mobil:** giriş zorunlu (`platform: "mobile"` + Bearer JWT, yoksa 401); oturum `user_id`'ye bağlanır. **Coin ödülü +20,
-  her set için kullanıcı başına YALNIZCA BİR KEZ** (aynı seti tekrar oynamak ödülsüz; idempotency ref = set anahtarı) ve
-  **günde en fazla 3 ödüllü oyun**; hepsi sunucuda `complete` içinde verilir (istemci "bitirdim" diyemez). Yanıtta
-  `reward: { earned, balance?, reason? }` (`already_rewarded` / `daily_limit`). Geçmiş: `GET /api/users/solo-history` (+ `/[sessionId]`). AI analizi 100 coin (önce düş, LLM hatasında iade, oturum başına cache): `GET/POST /api/solo/{sessionId}/ai-analysis` (bkz. §9 "Solo AI analiz" ve `docs/API_SPEC.md` §10d).
+- **Mobil:** giriş zorunlu (`platform: "mobile"` + Bearer JWT, yoksa 401); oturum `user_id`'ye bağlanır. **Günlük set (yalnızca mobil):** serbest set
+  seçimi yok; `start` `{ category, timezone }` ile çağrılır, sunucu o günün setini seçer (`lib/solo-daily.ts` saf mantık: set günü = kullanıcının
+  `timezone`'daki yerel takvim günü, gece yarısı değişir; `lib/solo-daily-server.ts`: havuz = 9 aktif senaryosu olan setler, `pickDailyPack` = `gün mod N`,
+  dünün setiyse bir sonrakine kayar, seçim `solo_daily_sets`'e yazılıp sabitlenir; yeni set içeriği eklemek kod değişikliği gerektirmez). Aynı gün aynı
+  kategori yalnızca bir kez tamamlanır (`409 ALREADY_PLAYED_TODAY`, kısmi benzersiz indeks). `GET /api/solo/red-flag/today` bugünün durumunu verir.
+  **Web günlük kipe girmez** (`403 DAILY_MOBILE_ONLY`); web serbest `pack` kipinde, eskisi gibi. **Coin ödülü +50, set günü başına YALNIZCA BİR KEZ**
+  (ref `daily:<set_date>`; iki kategoriyi de oynayan ikinci oyunda coin yok), serbest `pack` kipinde ödül yok; sunucuda `complete` içinde verilir
+  (istemci "bitirdim" diyemez). `DAILY_ANCHOR_DATE` (`lib/solo-daily.ts`) set numarasının (#1) başladığı gündür: çıkış tarihine göre ayarla.
+  Yanıtta `reward: { earned, balance?, reason? }` (`already_rewarded`). Test: `node --no-warnings scripts/test-solo-daily.mjs` (birim) ve
+  `BASE=http://localhost:3001 node --no-warnings scripts/test-solo-daily-api.mjs` (entegrasyon). Geçmiş: `GET /api/users/solo-history` (+ `/[sessionId]`). AI analizi 100 coin (önce düş, LLM hatasında iade, oturum başına cache): `GET/POST /api/solo/{sessionId}/ai-analysis` (bkz. §9 "Solo AI analiz" ve `docs/API_SPEC.md` §10d).
   AI'a yalnızca ilk isim (opsiyonel), 9 senaryo metni + bayrak + `insight_tag` ve dil gider; cinsiyet/e-posta
   gitmez ve oyun girişinde **hiçbir şey sorulmaz**.
 - **Karne ekranı:** Red sayısına göre sabit başlık + cümle, mini ızgara, **Story görseli**, **WhatsApp'ta paylaş**
@@ -514,7 +523,7 @@ Ayrıntılı durum için `docs/PRD.md` Bölüm 21 esas alınır. Özet:
 | `scripts/build-icon-font.mjs` (`npm run icons`) | Kullanılan ikonlardan font alt kümesi |
 | `scripts/build-ai-tag-map.mjs` | Soru etiketi → tema eşlemesi (`lib/ai/tag-themes.ts`, AI yorum için; soru/etiket eklenince yeniden çalıştır) |
 | `scripts/test-room-code.mjs`, `scripts/test-room-code-api.mjs` | Oda kodu testleri: birim (normalize/biçim/üretim; `node scripts/test-room-code.mjs`) ve entegrasyon (sunucu + `.env` ile: kanonikleştirme, tek tip `ROOM_NOT_FOUND`, hız limitleri, `ROOM_WEB_ONLY`, `ROOM_FULL`, `ROOM_EXPIRED`; `BASE=http://localhost:3001 node scripts/test-room-code-api.mjs`) |
-| `seeds/solo/`, `scripts/check-solo.mjs`, `scripts/build-solo-migration.mjs`, `scripts/export-solo-md.mjs` | Solo oyun senaryoları, denetimi, migration üretimi, `docs/solo-red-flag-{tr,en,es}.md` dökümü |
+| `seeds/solo/`, `scripts/check-solo.mjs`, `scripts/build-solo-migration.mjs`, `scripts/build-solo-sets2-migration.mjs`, `scripts/export-solo-md.mjs` | Solo oyun senaryoları, denetimi, migration üretimi, `docs/solo-red-flag-{tr,en,es}.md` dökümü |
 
 İş akışı: seed'i düzenle → `node scripts/check-questions.mjs` → `node scripts/build-questions-migration.mjs`
 → migration'ları sırayla çalıştır. Üretilen migration dosyalarını **elle düzenleme**.

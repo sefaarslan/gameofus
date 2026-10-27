@@ -16,8 +16,8 @@
     "preparing": "Getting your cards ready…",
     "submitting": "Preparing your scorecard…",
     "packs": {
-      "title": "Pick a set",
-      "desc": "Every set has 9 fixed cards. Results from the same set can be compared with each other.",
+      "title": "Pick a category",
+      "desc": "Each category has 9 fixed cards. Results from the same category can be compared with each other.",
       "categories": {
         "friend": "Friendship",
         "romantic": "Romantic"
@@ -25,9 +25,9 @@
       "play": "Play",
       "resume": "Continue",
       "view": "See scorecard",
-      "soon": "Mobile only",
       "label": "{category} · {n}",
-      "otherSets": "Other sets"
+      "cards": "{n} cards",
+      "otherSets": "Other category"
     },
     "cardClosed": "Card {n}, closed",
     "cardDone": "Card {n}, {flag} chosen",

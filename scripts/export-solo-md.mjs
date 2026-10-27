@@ -8,9 +8,9 @@ const NAMES = { boundaries: "Sınırlar", trust: "Güven", communication: "İlet
 const CATS = { friend: "Arkadaşlık", romantic: "Sevgili" };
 const TONE = { H: "sağlıklı", G: "gri", C: "endişe verici" };
 const active = list.filter((s) => !s.inactive);
-let out = `# Red Flag Mayın Tarlası — Setler (${lang.toUpperCase()})\n\n${active.length} aktif senaryo, 6 set × 9 kart. Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır. Yüzdeler yalnızca aynı set içinde karşılaştırılabilir. 104-106 setleri mobilde açılacaktır (henüz içerik yok).\n\n`;
+let out = `# Red Flag Mayın Tarlası — Setler (${lang.toUpperCase()})\n\n${active.length} aktif senaryo, 14 set × 9 kart (kategori başına 7). Doğru cevap yoktur; skor yalnızca Green/Yellow/Red dağılımıdır. Yüzdeler yalnızca aynı set içinde karşılaştırılabilir. 101 webde ve mobilde, 102-107 yalnızca mobilde (günlük set havuzu) oynanır.\n\n`;
 for (const cat of Object.keys(CATS)) {
-  for (const no of [101, 102, 103]) {
+  for (const no of [101, 102, 103, 104, 105, 106, 107]) {
     const key = `${cat}-${no}`;
     out += `## ${CATS[cat]} · ${no}  \`${key}\`\n\n`;
     list.filter((s) => s.pack === key).sort((a, b) => a.pos - b.pos).forEach((s) => (out += `${s.pos}. ${s[lang]}  _(${NAMES[s.tag]} · ${TONE[s.tone]})_\n`));

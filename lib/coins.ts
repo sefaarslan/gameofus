@@ -11,13 +11,11 @@ export type SpendReason = keyof typeof COIN_PRICES;
 export const COIN_REWARDS = {
   signup_bonus: 500,
   ad_reward: 100,
-  solo_reward: 20,
+  solo_reward: 50,
 } as const;
 export type EarnReason = "ad_reward";
 
-/** Solo oyun ödülü: aynı kullanıcı için her set yalnızca BİR kez ödül verir (tekrar oynama ödülsüz); günde en fazla 3 ödüllü oyun */
-export const SOLO_REWARD_DAILY_LIMIT = 3;
-
+/** Günlük solo set ödülü (+50): set günü başına YALNIZCA BİR kez (ref = `daily:<set_date>`); iki kategoriyi de oynayan ikinci oyunda coin almaz. */
 /** Reklam ödülü günlük üst sınırı (AdMob sunucu doğrulaması gelene kadar kötüye kullanımı sınırlar) */
 export const AD_REWARD_DAILY_LIMIT = 5;
 

@@ -1,5 +1,6 @@
 import type { RedFlagScenario, RedFlagTag } from "./types.ts";
 import { packSlots, retiredKeys } from "./red-flag-packs.ts";
+import { setsBatch2 } from "./red-flag-sets2.ts";
 
 // Red Flag Mayın Tarlası — 60 senaryo (6 tema × 10), TR/EN/ES.
 // Yazım kuralları:
@@ -286,8 +287,12 @@ const baseScenarios: RedFlagScenario[] = [
 ];
 
 /** Sete yerleştirme (pack/pos) ve pasif işaretleri seed'e uygulanmış nihai liste */
-export const redFlagScenarios: RedFlagScenario[] = baseScenarios.map((sc) => {
-  const key = `${sc.tag}:${sc.n}`;
-  const slot = packSlots[key];
-  return { ...sc, ...(slot ? { pack: slot.pack, pos: slot.pos, tone: slot.tone } : {}), ...(retiredKeys.includes(key) ? { inactive: true } : {}) };
-});
+export const redFlagScenarios: RedFlagScenario[] = [
+  ...baseScenarios.map((sc) => {
+    const key = `${sc.tag}:${sc.n}`;
+    const slot = packSlots[key];
+    return { ...sc, ...(slot ? { pack: slot.pack, pos: slot.pos, tone: slot.tone } : {}), ...(retiredKeys.includes(key) ? { inactive: true } : {}) };
+  }),
+  // friend-104…107 / romantic-104…107 (pack/pos/tone kendi dosyasında)
+  ...setsBatch2,
+];

@@ -16,8 +16,8 @@
     "preparing": "Preparando las cartas…",
     "submitting": "Preparando tu resultado…",
     "packs": {
-      "title": "Elige un set",
-      "desc": "Cada set tiene 9 cartas fijas. Los resultados del mismo set se pueden comparar entre sí.",
+      "title": "Elige una categoría",
+      "desc": "Cada categoría tiene 9 cartas fijas. Los resultados de la misma categoría se pueden comparar entre sí.",
       "categories": {
         "friend": "Amistad",
         "romantic": "Pareja"
@@ -25,9 +25,9 @@
       "play": "Jugar",
       "resume": "Continuar",
       "view": "Ver resultado",
-      "soon": "Solo móvil",
       "label": "{category} · {n}",
-      "otherSets": "Otros sets"
+      "cards": "{n} cartas",
+      "otherSets": "Otra categoría"
     },
     "cardClosed": "Carta {n}, cerrada",
     "cardDone": "Carta {n}, elegiste {flag}",

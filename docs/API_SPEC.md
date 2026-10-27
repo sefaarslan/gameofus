@@ -284,11 +284,11 @@ mobilde aynı endpoint'ler `platform: "mobile"` ile kullanılır (coin/AI ilerid
 { "locale": "tr", "platform": "web" | "mobile", "pack": "friend-101" }
 ```
 
-- `pack` zorunlu: `friend-101…106`, `romantic-101…106`; geçersizse `INVALID_PAYLOAD`. Webde yalnızca 101-103 açık;
+- **İki kip.** `pack` (serbest set seçimi; web ve geriye dönük uyum) **ya da** `category` + `timezone` (günlük set; aşağıya bakın). `pack` kipinde `pack` zorunlu: `friend-101…107`, `romantic-101…107`; geçersizse `INVALID_PAYLOAD`. Webde her kategoride yalnızca 101 açık;
   diğerleri `403 PACK_UNAVAILABLE` ("mobilde açılacak").
 - IP hash'e göre saatte 30 / günde 100 başlatma sınırı (`RATE_LIMITED`). `locale` geçersizse `en`.
 - `platform: "mobile"` ise geçerli Supabase JWT (`Authorization: Bearer`) zorunlu (`401`); oturum `user_id`'ye bağlanır, mobilde tüm setler
-  oynanabilir. İçeriği olmayan set (ör. 104-106) → `404 PACK_UNAVAILABLE`.
+  oynanabilir. İçeriği olmayan set (ör. 108+) → `404 PACK_UNAVAILABLE`.
 - Sunucu, setin 9 kartını sabit sırayla (`pack_position`) döndürür (rastgelelik yok), oturumu (`pack_key`) ve anonim token'ı oluşturur. Kart geçişleri istemcide
   yapılır; cevaplar bu endpoint'e değil `complete`'e gider.
 
@@ -298,6 +298,29 @@ mobilde aynı endpoint'ler `platform: "mobile"` ile kullanılır (coin/AI ilerid
 ```
 
 Yanıt `201`. `scenarios` kart sırasıdır.
+
+**Günlük set kipi (yalnızca mobil):** gövde `{ "platform": "mobile", "locale": "tr", "category": "friend" | "romantic", "timezone": "Europe/Istanbul" }`
+(`pack` GÖNDERİLMEZ). Set gün başına sunucuda seçilir; **set günü = kullanıcının `timezone`'daki yerel takvim günü** (gece yarısı değişir;
+`timezone` IANA, yoksa/geçersizse `Europe/Istanbul`). Aynı kategori ve aynı gün için herkes aynı seti alır; dünün seti bugün çıkmaz
+(`solo_daily_sets` günün seçimini sabitler, havuz = veritabanında 9 aktif senaryosu olan setler, yeni set eklemek kod değişikliği gerektirmez).
+Yanıta `category`, `setDate` (`YYYY-MM-DD`), `setNumber` (paylaşım kartındaki "#42"; `DAILY_ANCHOR_DATE`'ten bu yana gün + 1) ve `nextSetAt`
+(sonraki yerel gece yarısı, UTC ISO) eklenir. Hatalar: web ile günlük kip `403 DAILY_MOBILE_ONLY`; kimliksiz `401`; geçersiz `category`
+`400 INVALID_PAYLOAD`; o gün o kategoriyi **zaten tamamlamışsa** `409 ALREADY_PLAYED_TODAY` (`error.sessionId` = tamamlanan oturum; sonuç
+`solo-history/{sessionId}`); havuz boşsa `404 PACK_UNAVAILABLE`. Tamamlamadan tekrar başlatmak serbesttir (yarım kalan oturum).
+
+### `GET /api/solo/red-flag/today` (mobil)
+
+`Authorization: Bearer <Supabase JWT>` (yoksa `401`), `?timezone=Europe/Istanbul`. Kartlar dönmez; yalnızca bugünün durumu:
+
+```json
+{ "setDate": "2026-11-03", "setNumber": 3, "nextSetAt": "2026-11-03T21:00:00.000Z", "rewardAvailable": true,
+  "categories": [
+    { "category": "friend", "pack": "friend-102", "packNumber": 102, "played": false },
+    { "category": "romantic", "pack": "romantic-101", "packNumber": 101, "played": true, "sessionId": "uuid",
+      "completedAt": "…", "grid": "GRGYGYRYR", "counts": { "green": 3, "yellow": 3, "red": 3 }, "tolerance": 50, "coinsEarned": 50 } ] }
+```
+
+`rewardAvailable`: o set gününün +50 ödülü henüz alınmadı (herhangi bir kategoriyi tamamlamak verir). Sayaç `nextSetAt`'e geri sayar.
 
 ### `POST /api/solo/[sessionId]/complete`
 
@@ -319,15 +342,16 @@ Yanıt `201`. `scenarios` kart sırasıdır.
 döndürmez: istemci ve paylaşım görseli, Red sayısına göre sabit metni (`solo.verdicts.<red>`) kendi dilinde seçer.
 
 **Mobil (kullanıcıya bağlı oturum) yanıtına `reward` eklenir:** `{ "earned": 20, "balance": 520 }` veya ödül yoksa
-`{ "earned": 0, "reason": "already_rewarded" | "daily_limit" }`. Kural: **+20 coin, her set için kullanıcı başına yalnızca bir
-kez** (aynı seti tekrar oynamak ödülsüz), **günde en fazla 3 ödüllü oyun**; idempotent (aynı oturum tekrar `complete` edilirse
-ek coin yok). Web (anonim) yanıtında `reward` alanı yoktur.
+`{ "earned": 0, "reason": "already_rewarded" }`. Kural: **+50 coin, set günü başına kullanıcı başına yalnızca bir kez** — yalnızca
+**günlük set kipinde** (iki kategoriyi de oynayan ikinci oyunda coin yok; ref `daily:<set_date>`); idempotent (aynı oturum tekrar `complete`
+edilirse ek coin yok). Serbest `pack` kipinde (günlük olmayan mobil oturum) ve web'de `reward` alanı yoktur. Günlük oyunda aynı günün aynı seti
+başka bir oturumda zaten tamamlanmışsa `409 ALREADY_PLAYED_TODAY`.
 
 ### `GET /api/users/solo-history` ve `GET /api/users/solo-history/[sessionId]` (mobil)
 
 `Authorization: Bearer <Supabase JWT>`. Liste: kullanıcının tamamlanmış solo oyunları (en yeni önce, en fazla 100):
-`{ items: [{ sessionId, gameType, aiStatus, pack, locale, completedAt, coinsEarned, grid, counts, tolerance }] }`. `gameType` oyun türü
-(`solo_sessions.game`, şimdilik hep `"red_flag"`), `aiStatus` AI analiz durumu (`none | generating | ready | failed`; liste için tek sorguyla hesaplanır, N tane GET gerekmez). Ayrıntı: aynı alanlar +
+`{ items: [{ sessionId, gameType, aiStatus, pack, setDate, setNumber, locale, completedAt, coinsEarned, grid, counts, tolerance }] }`. `gameType` oyun türü
+(`solo_sessions.game`, şimdilik hep `"red_flag"`), `aiStatus` AI analiz durumu (`none | generating | ready | failed`; liste için tek sorguyla hesaplanır, N tane GET gerekmez). `setDate`/`setNumber` günlük oyunda dolu, serbest oyunda `null`. Ayrıntı: aynı alanlar +
 `cards: [{ id, text, flag }]` (kart sırasıyla metin ve seçilen bayrak). Başkasının/web oturumu `404 SESSION_NOT_FOUND`.
 
 ### `GET /api/solo/red-flag/card`
@@ -349,7 +373,7 @@ yok sayılır). Uzun süreli cache; cevap verisi içermez, yalnızca oyuncunun p
 Kimlik: `Authorization: Bearer <Supabase JWT>` (Google/Apple girişi). Web anonimdir ve bunları **hiç çağırmaz**.
 Geçersiz/eksik JWT → `401 UNAUTHORIZED`. Coin yazımı yalnızca sunucuda, atomik ve idempotent (`apply_coins`, SQL).
 Ekonomi: kayıt +500 (Auth trigger'ı, otomatik) · reklam +100 (günde en fazla 5) · oda −250 · AI yorum −100 · solo AI −100 ·
-solo +20 (solo `complete` içinde, bkz. gelecek iş). **Miktarı istemci göndermez**, yalnızca `reason`.
+solo günlük set +50 (solo `complete` içinde, bkz. §10b). **Miktarı istemci göndermez**, yalnızca `reason`.
 
 - `GET /api/users/me` → `{ id, coins, tier, birthDate, aiConsent }` (`aiConsent`: `{ version, at }` ya da rıza yoksa `null`)
 - `GET /api/users/history` → **düz dizi** (sarmalayıcı yok), en yeni önce (`created_at` azalan), en çok 100:

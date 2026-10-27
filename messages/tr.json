@@ -16,8 +16,8 @@
     "preparing": "Kartlar hazırlanıyor…",
     "submitting": "Karnen hazırlanıyor…",
     "packs": {
-      "title": "Bir set seç",
-      "desc": "Her sette 9 sabit kart var. Aynı setteki sonuçlar birbiriyle kıyaslanabilir.",
+      "title": "Bir kategori seç",
+      "desc": "Her kategoride 9 sabit kart var. Aynı kategorideki sonuçlar birbiriyle kıyaslanabilir.",
       "categories": {
         "friend": "Arkadaşlık",
         "romantic": "Sevgili"
@@ -25,9 +25,9 @@
       "play": "Oyna",
       "resume": "Devam et",
       "view": "Karneni gör",
-      "soon": "Mobile özel",
       "label": "{category} · {n}",
-      "otherSets": "Diğer setler"
+      "cards": "{n} kart",
+      "otherSets": "Diğer kategori"
     },
     "cardClosed": "{n}. kart, kapalı",
     "cardDone": "{n}. kart, {flag} seçildi",

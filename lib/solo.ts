@@ -56,9 +56,9 @@ export function gridToEmojiText(flags: Flag[]): string {
 export const PACK_CATEGORIES = ["friend", "romantic"] as const;
 export type PackCategory = (typeof PACK_CATEGORIES)[number];
 
-export const PACK_NUMBERS = [101, 102, 103, 104, 105, 106] as const;
-/** Webde oynanabilen setler; diğerleri "mobilde açılacak" (içerik eklenince buraya alınır / mobil açar) */
-export const WEB_PACK_NUMBERS: readonly number[] = [101, 102, 103];
+export const PACK_NUMBERS = [101, 102, 103, 104, 105, 106, 107] as const;
+/** Webde oynanabilen setler: her kategoride yalnızca 101 (sabit). Diğerleri mobilde (günlük set havuzu). */
+export const WEB_PACK_NUMBERS: readonly number[] = [101];
 
 export interface PackInfo {
   key: string;

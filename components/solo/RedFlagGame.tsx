@@ -21,7 +21,6 @@ import { FlagGlyph } from "./FlagGlyph";
 import { FeedbackCard } from "@/components/FeedbackCard";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { FlagMark, SoloLogo } from "./SoloLogo";
-import { PackDropdown, type PackOption } from "./PackDropdown";
 
 // Web: her sette 1 oyun. Karneler ve yarım kalan oyunlar set anahtarına göre saklanır.
 // (Eski tek-oyun kaydı `gou_solo_redflag` rastgele kartlıydı; setler gelince yok sayılır.)
@@ -260,20 +259,11 @@ export function RedFlagGame() {
   if (phase === "intro" || phase === "loading" || phase === "startError") {
     const loading = phase === "loading";
     // Varsayılan seçim: oynanmamış ilk açık set (hepsi oynandıysa ilk açık set)
-    const webPacks = PACKS.filter((pk) => pk.webAvailable);
+    // Webde her kategori için tek sabit set (101): yan yana iki kart, Sevgili solda
+    const webPacks = PACKS.filter((pk) => pk.webAvailable).sort((a, b) => (a.category === b.category ? 0 : a.category === "romantic" ? -1 : 1));
     const selectedPack = webPacks.find((pk) => pk.key === selectedKey) ?? webPacks.find((pk) => !savedMap[pk.key]) ?? webPacks[0] ?? null;
     const selectedSaved = selectedPack ? savedMap[selectedPack.key] : undefined;
     const selectedPending = selectedPack ? !selectedSaved && !!pendingMap[selectedPack.key] : false;
-    // Tüm setler düz listede (başlıksız): "Kategori - 101"; kapalı olanlar seçilemez
-    const packOptions: PackOption[] = PACKS.map((pk) => {
-      const done = savedMap[pk.key];
-      return {
-        key: pk.key,
-        label: `${t(`packs.categories.${pk.category}`)} - ${pk.number}`,
-        disabled: !pk.webAvailable,
-        hint: !pk.webAvailable ? t("packs.soon") : done ? `%${done.result.tolerance}` : pendingMap[pk.key] ? t("packs.resume") : undefined,
-      };
-    });
     return (
       <div className="min-h-[calc(100vh-73px)] bg-background flex justify-center px-6 py-10 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-72 h-72 bg-tertiary-container/20 rounded-full blur-3xl -z-10 pointer-events-none" />
@@ -310,15 +300,46 @@ export function RedFlagGame() {
               {t("error.start")}
             </p>
           )}
-          {/* Tüm setler tek açılır listede: kategoriye göre gruplu; 104-106 "mobilde açılacak" ve seçilemez */}
+          {/* Kategori kartları: yan yana, tek seçim (her kategoride sabit set) */}
           <div className="w-full flex flex-col gap-3 text-left">
-            <PackDropdown
-              options={packOptions}
-              value={selectedPack?.key ?? ""}
-              onChange={setSelectedKey}
-              disabled={loading}
-              ariaLabel={t("packs.title")}
-            />
+            <div role="radiogroup" aria-label={t("packs.title")} className="grid grid-cols-2 gap-3">
+              {webPacks.map((pk) => {
+                const selected = selectedPack?.key === pk.key;
+                const done = savedMap[pk.key];
+                const status = done ? t("packs.view") : pendingMap[pk.key] ? t("packs.resume") : t("packs.cards", { n: RED_FLAG_CARD_COUNT });
+                return (
+                  <button
+                    key={pk.key}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    disabled={loading}
+                    onClick={() => setSelectedKey(pk.key)}
+                    className={`relative flex flex-col items-center gap-2 px-3 py-5 rounded-2xl border-2 text-center transition-all active:scale-[0.98] disabled:opacity-60 ${
+                      selected
+                        ? "border-primary bg-primary-container/30 shadow-soft-active"
+                        : "border-outline-variant/30 bg-surface-container-lowest shadow-soft-card hover:bg-surface-container"
+                    }`}
+                  >
+                    {selected && (
+                      <span className="material-symbols-outlined absolute top-2 right-2 text-xl leading-none text-primary" aria-hidden="true">
+                        check_circle
+                      </span>
+                    )}
+                    <span
+                      className={`material-symbols-outlined text-4xl leading-none ${selected ? "text-primary" : "text-on-surface-variant"}`}
+                      aria-hidden="true"
+                    >
+                      {pk.category === "romantic" ? "favorite" : "group"}
+                    </span>
+                    <span className="text-body-lg font-semibold text-on-background">{t(`packs.categories.${pk.category}`)}</span>
+                    <span className="text-xs font-semibold text-on-surface-variant">
+                      {done ? `${status} · %${done.result.tolerance}` : status}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
 
             <button
               type="button"

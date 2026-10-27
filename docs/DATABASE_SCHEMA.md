@@ -218,13 +218,17 @@ Ayrı model; `questions` ile karıştırılmaz. RLS açık, policy yok (erişim 
 
 `solo_scenarios`: `id`, `game` (default `red_flag`), `scenario_key` (`tema:sıra`), `translation_group_id`, `locale`,
 `scenario_text`, `insight_tag` (`boundaries | trust | communication | jealousy | money_lifestyle | respect`),
-`is_active`, `created_at`. `unique(game, scenario_key, locale)`. `pack_key` (ör. `friend-101`, `romantic-103`) + `pack_position` (1-9): senaryonun hangi sette/kaçıncı sırada olduğu; `unique(game, pack_key, pack_position, locale)` (pack_key doluysa). Aktif set: 54 senaryo × 3 dil = 162 aktif satır, 6 set × 9 kart (65 senaryodan 11'i emekli/pasif; migration'lar `20260607000000`, `20260608000000`)
+`is_active`, `created_at`. `unique(game, scenario_key, locale)`. `pack_key` (ör. `friend-101`, `romantic-103`) + `pack_position` (1-9): senaryonun hangi sette/kaçıncı sırada olduğu; `unique(game, pack_key, pack_position, locale)` (pack_key doluysa). Aktif set: 126 senaryo × 3 dil = 378 aktif satır, 14 set × 9 kart (137 senaryodan 11'i emekli/pasif; migration'lar `20260607000000`, `20260608000000`, `20260619000000_solo_sets_104_107.sql`)
 (belirlenimci UUID v5; migration `20260605000000_solo_red_flag.sql`, `scripts/build-solo-migration.mjs` üretir).
 
 `solo_sessions`: `id`, `game`, `locale`, `pack_key` (oynanan set), `platform` (`web | mobile`), `user_id` (web'de null), `token_hash`,
 `scenario_ids uuid[]` (kart sırası), `answers jsonb` (`{scenarioId: "green"|"yellow"|"red"}`), `status`
 (`started | completed`), `coins_awarded int` (mobil; oturum başına bir kez), `ai_analysis text` (planlı),
-`created_at`, `completed_at`.
+`created_at`, `completed_at`, `set_date date` (günlük set kipinde set günü; serbest kipte null). Kısmi benzersiz indeks
+`(user_id, pack_key, set_date)` `status='completed'` iken: bir kullanıcı bir günün aynı setini yalnızca bir kez tamamlar.
+
+`solo_daily_sets`: `(category, set_date)` birincil anahtar, `pack_key`, `created_at`. Günün seti ilk istekte sunucuca yazılır ve sabit kalır
+(`lib/solo-daily-server.ts`); RLS açık, policy yok. Migration `20260618000000_solo_daily.sql`.
 
 ### `purchases` — mobil IAP (Lemon Squeezy / `payments` kullanılmaz)
 

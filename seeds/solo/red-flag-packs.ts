@@ -2,7 +2,7 @@
 // Her set 9 kart: 6 temanın tamamını kapsar, ton (sağlıklı/gri/endişe verici) dengelidir. Yalnızca aynı set içindeki
 // tolerans yüzdeleri karşılaştırılabilir.
 //  - friend-10x  : "Arkadaşlık"   - romantic-10x : "Sevgili"
-//  - 101-103 webde oynanır; 104-106 ileride (mobilde açılacak) doldurulur.
+//  - 101-103 webde oynanır; 104-107 (red-flag-sets2.ts) yalnızca mobilde açılır.
 //  - tone: H = sağlıklı, G = gri, C = endişe verici (yalnızca yazım/inceleme notu; DB'ye yazılmaz).
 export interface PackSlot { pack: string; pos: number; tone: "H" | "G" | "C" }
 

@@ -4,7 +4,7 @@ import { verifyToken, extractToken } from "@/lib/token";
 import { corsOptions } from "@/lib/cors";
 import { apiError, apiOk } from "@/lib/api";
 import { computeProfile, encodeGrid, isFlag, type Flag } from "@/lib/solo";
-import { COIN_REWARDS, SOLO_REWARD_DAILY_LIMIT, applyCoins } from "@/lib/coins";
+import { COIN_REWARDS, applyCoins } from "@/lib/coins";
 
 export function OPTIONS() {
   return corsOptions();
@@ -22,41 +22,22 @@ interface Reward {
   earned: number;
   /** Güncel bakiye (ödül sorgusu başarılıysa) */
   balance?: number;
-  /** earned = 0 ise neden: aynı set daha önce ödüllendirilmiş / günlük sınır */
-  reason?: "already_rewarded" | "daily_limit";
+  /** earned = 0 ise neden: o set gününün ödülü zaten alınmış (ör. aynı gün diğer kategori) */
+  reason?: "already_rewarded";
 }
 
 /**
- * Mobil (kullanıcıya bağlı) oturumda coin ödülü: aynı kullanıcı için her set yalnızca BİR kez (+20),
- * günde en fazla 3 ödüllü oyun. İdempotent (ref = set anahtarı); tekrar oynama ödülsüzdür.
+ * Günlük set ödülü (mobil, kullanıcıya bağlı oturum): set günü başına YALNIZCA BİR kez (+50). İdempotent
+ * (ref = `daily:<set_date>`), yani iki kategoriyi de oynayan ikinci oyunda coin almaz. Serbest kipte (`set_date` boş) ödül yoktur.
  */
 async function rewardSession(
   supabase: ReturnType<typeof createAdminClient>,
-  session: { id: string; user_id: string | null; pack_key: string | null; coins_awarded: number },
+  session: { id: string; user_id: string | null; set_date: string | null; coins_awarded: number },
 ): Promise<Reward | undefined> {
-  if (!session.user_id || !session.pack_key) return undefined;
+  if (!session.user_id || !session.set_date) return undefined;
   if (session.coins_awarded > 0) return { earned: session.coins_awarded };
-
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { count } = await supabase
-    .from("credit_transactions")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", session.user_id)
-    .eq("reason", "solo_reward")
-    .gte("created_at", since);
-  // Günlük sınır yalnızca yeni (henüz ödüllenmemiş) set için sorulur; set zaten ödüllendiyse aşağıda applied=false döner
   try {
-    const { data: prior } = await supabase
-      .from("credit_transactions")
-      .select("id")
-      .eq("user_id", session.user_id)
-      .eq("reason", "solo_reward")
-      .eq("ref_id", session.pack_key)
-      .maybeSingle();
-    if (prior) return { earned: 0, reason: "already_rewarded" };
-    if ((count ?? 0) >= SOLO_REWARD_DAILY_LIMIT) return { earned: 0, reason: "daily_limit" };
-
-    const { balance, applied } = await applyCoins(session.user_id, COIN_REWARDS.solo_reward, "solo_reward", session.pack_key);
+    const { balance, applied } = await applyCoins(session.user_id, COIN_REWARDS.solo_reward, "solo_reward", `daily:${session.set_date}`);
     if (!applied) return { earned: 0, balance, reason: "already_rewarded" };
     await supabase.from("solo_sessions").update({ coins_awarded: COIN_REWARDS.solo_reward }).eq("id", session.id);
     return { earned: COIN_REWARDS.solo_reward, balance };
@@ -90,7 +71,7 @@ export async function POST(
   const supabase = createAdminClient();
   const { data: session } = await supabase
     .from("solo_sessions")
-    .select("id, token_hash, scenario_ids, answers, status, user_id, pack_key, coins_awarded")
+    .select("id, token_hash, scenario_ids, answers, status, user_id, set_date, coins_awarded")
     .eq("id", sessionId)
     .maybeSingle();
 
@@ -125,6 +106,8 @@ export async function POST(
     .update({ answers: clean, status: "completed", completed_at: new Date().toISOString() })
     .eq("id", session.id)
     .eq("status", "started");
+  // Aynı günün aynı seti başka bir oturumda zaten tamamlanmış (benzersiz indeks)
+  if (error?.code === "23505") return apiError("ALREADY_PLAYED_TODAY", "Bugünün setini zaten tamamladın.", 409);
   if (error) return apiError("INTERNAL_ERROR", "Sonuç kaydedilemedi.", 500);
 
   return respond(flags as Flag[], await rewardSession(supabase, { ...session, coins_awarded: 0 }));
