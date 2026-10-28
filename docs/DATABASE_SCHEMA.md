@@ -114,6 +114,7 @@ Index: `unique(room_code)`, `status`, `expires_at`, `user_id`, `category_id`.
 | birth_date | date null | Oyuncunun kendi isteğe bağlı doğum tarihi (yorum kişiselleştirme; web ve mobil); profile yazılmaz, oda silinince gider, hesap silmede null'lanır |
 | user_id | uuid null | `users.id`; mobil (giriş yapmış) oyuncular için; web'de null. Hesap silmede null'lanır ve ad kaldırılır |
 | last_seen_at, completed_at | timestamptz null | |
+| hidden_at | timestamptz null | Mobil "Oyunlarım" listesinden kaldırıldı (yumuşak silme; yalnızca bu oyuncunun satırı). `history` listesi `hidden_at is null` süzer |
 | created_at | timestamptz | |
 
 Constraint: `unique(room_id, role)`, `unique(room_id, token_hash)`.
@@ -224,7 +225,7 @@ Ayrı model; `questions` ile karıştırılmaz. RLS açık, policy yok (erişim 
 `solo_sessions`: `id`, `game`, `locale`, `pack_key` (oynanan set), `platform` (`web | mobile`), `user_id` (web'de null), `token_hash`,
 `scenario_ids uuid[]` (kart sırası), `answers jsonb` (`{scenarioId: "green"|"yellow"|"red"}`), `status`
 (`started | completed`), `coins_awarded int` (mobil; oturum başına bir kez), `ai_analysis text` (planlı),
-`created_at`, `completed_at`, `set_date date` (günlük set kipinde set günü; serbest kipte null). Kısmi benzersiz indeks
+`created_at`, `completed_at`, `set_date date` (günlük set kipinde set günü; serbest kipte null), `hidden_at timestamptz` (mobil "Oyunlarım"dan kaldırıldı; yumuşak silme, günlük set kuralı ve coin kaydı etkilenmez). Kısmi benzersiz indeks
 `(user_id, pack_key, set_date)` `status='completed'` iken: bir kullanıcı bir günün aynı setini yalnızca bir kez tamamlar.
 
 `solo_daily_sets`: `(category, set_date)` birincil anahtar, `pack_key`, `created_at`. Günün seti ilk istekte sunucuca yazılır ve sabit kalır
@@ -274,3 +275,9 @@ bağlı 90 gün) ve eski `rate_limits` satırlarını önce arşivleyip siler; `
 - `answers` ve `predictions` kayıtları kilitlendikten sonra güncellenmez.
 - Duplicate submit'te aynı kayıt ikinci kez yazılmaz.
 - Eski anonim oda temizleme job'u ileri bir fazdadır.
+
+### Geçmiş listelerinden kaldırma (`hidden_at`)
+
+`participants`, `solo_sessions`, `ai_commentaries` ve `ai_solo_analyses` tablolarında `hidden_at timestamptz null` (null = listede). Mobil "Oyunlarım"/"Analizlerim"
+listelerinden kaldırılan kayıtlar silinmez, yalnızca bu sütun dolar; liste uçları `hidden_at is null` süzer. Saklama temizliği ve hesap silme etkilenmez.
+Migration `20260620000000_history_hide.sql`.

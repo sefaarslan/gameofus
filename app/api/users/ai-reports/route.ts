@@ -12,6 +12,7 @@ export function OPTIONS() {
  * Mobil: kullanıcının SATIN ALDIĞI AI yorum/analizlerin listesi (yeniden eskiye, düz dizi, en çok 100). İki tür:
  *  - `type: "room"`: iki kişilik oda yorumu `{ roomCode, partnerName, relationshipType, headline, createdAt }`
  *  - `type: "solo"`: solo oyun analizi `{ sessionId, gameType, pack, headline, createdAt }`
+ * Listeden kaldırılanlar (`DELETE /api/users/ai-reports/{room|solo}/{id}`) çıkmaz; analiz silinmez.
  * Partnerin satın aldığı oda yorumları burada çıkmaz (onlara oda sonuç ekranından ulaşılır). Saklama süresi (90 gün) dolan
  * odaların/oturumların analizleri zaten silinmiştir.
  */
@@ -26,6 +27,7 @@ export async function GET(req: NextRequest) {
       .select("room_id, content, created_at")
       .eq("purchased_by", user.id)
       .eq("status", "ready")
+      .is("hidden_at", null)
       .order("created_at", { ascending: false })
       .limit(100),
     supabase
@@ -33,6 +35,7 @@ export async function GET(req: NextRequest) {
       .select("session_id, game, content, created_at")
       .eq("purchased_by", user.id)
       .eq("status", "ready")
+      .is("hidden_at", null)
       .order("created_at", { ascending: false })
       .limit(100),
   ]);

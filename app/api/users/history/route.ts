@@ -13,6 +13,7 @@ export function OPTIONS() {
  * Mobil: kullanıcının oda geçmişi (en yeni önce). Bearer Supabase JWT.
  * Kapsam: `participants.user_id = kullanıcı` olan odalar (kurucu ya da katılımcı olarak); yalnızca `created_at` son 90 gün
  * içinde olanlar (saklama temizliği odayı expires_at + userHistoryDays sonra siler, yani liste her zaman silinmemiş veridir).
+ * Listeden kaldırılanlar (`DELETE /api/users/history/{roomCode}`, `participants.hidden_at`) çıkmaz; veri silinmez.
  * Yanıt düz dizidir (sarmalayıcı yok). Sonuç ayrıntısı için
  * `GET /api/rooms/{roomCode}/results` aynı JWT ile açılır (süresi dolmuş odada da, bu pencerede).
  */
@@ -26,7 +27,8 @@ export async function GET(req: NextRequest) {
   const { data: mine } = await supabase
     .from("participants")
     .select("id, room_id, role")
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .is("hidden_at", null);
   const myRows = mine ?? [];
   if (myRows.length === 0) return apiOk([]);
 

@@ -11,7 +11,7 @@ export function OPTIONS() {
   return corsOptions();
 }
 
-/** Mobil: kullanıcının tamamlanmış solo oyunları (en yeni önce). Bearer Supabase JWT. */
+/** Mobil: kullanıcının tamamlanmış solo oyunları (en yeni önce; listeden kaldırılanlar çıkmaz). Bearer Supabase JWT. */
 export async function GET(req: NextRequest) {
   const user = await getAuthUser(req);
   if (!user) return apiError("UNAUTHORIZED", "Giriş gereklidir.", 401);
@@ -21,6 +21,7 @@ export async function GET(req: NextRequest) {
     .select("id, game, pack_key, locale, scenario_ids, answers, coins_awarded, completed_at, set_date")
     .eq("user_id", user.id)
     .eq("status", "completed")
+    .is("hidden_at", null)
     .order("completed_at", { ascending: false })
     .limit(100);
 

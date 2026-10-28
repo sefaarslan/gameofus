@@ -283,6 +283,7 @@ export type Database = {
           coins_awarded: number
           completed_at: string | null
           created_at: string
+          hidden_at: string | null
           game: string
           id: string
           locale: string
@@ -300,6 +301,7 @@ export type Database = {
           coins_awarded?: number
           completed_at?: string | null
           created_at?: string
+          hidden_at?: string | null
           game?: string
           id?: string
           locale: string
@@ -317,6 +319,7 @@ export type Database = {
           coins_awarded?: number
           completed_at?: string | null
           created_at?: string
+          hidden_at?: string | null
           game?: string
           id?: string
           locale?: string
@@ -356,6 +359,7 @@ export type Database = {
           completed_at: string | null
           birth_date: string | null
           created_at: string
+          hidden_at: string | null
           display_name: string | null
           gender: string | null
           id: string
@@ -370,6 +374,7 @@ export type Database = {
           birth_date?: string | null
           completed_at?: string | null
           created_at?: string
+          hidden_at?: string | null
           display_name?: string | null
           gender?: string | null
           id?: string
@@ -384,6 +389,7 @@ export type Database = {
           birth_date?: string | null
           completed_at?: string | null
           created_at?: string
+          hidden_at?: string | null
           display_name?: string | null
           gender?: string | null
           id?: string
@@ -803,6 +809,7 @@ export type Database = {
           consent_version: string
           content: Json | null
           created_at: string
+          hidden_at: string | null
           error_kind: string | null
           id: string
           locale: string
@@ -820,6 +827,7 @@ export type Database = {
           consent_version: string
           content?: Json | null
           created_at?: string
+          hidden_at?: string | null
           error_kind?: string | null
           id?: string
           locale: string
@@ -837,6 +845,7 @@ export type Database = {
           consent_version?: string
           content?: Json | null
           created_at?: string
+          hidden_at?: string | null
           error_kind?: string | null
           id?: string
           locale?: string
@@ -857,6 +866,7 @@ export type Database = {
           consent_version: string
           content: Json | null
           created_at: string
+          hidden_at: string | null
           error_kind: string | null
           game: string
           id: string
@@ -875,6 +885,7 @@ export type Database = {
           consent_version: string
           content?: Json | null
           created_at?: string
+          hidden_at?: string | null
           error_kind?: string | null
           game: string
           id?: string
@@ -893,6 +904,7 @@ export type Database = {
           consent_version?: string
           content?: Json | null
           created_at?: string
+          hidden_at?: string | null
           error_kind?: string | null
           game?: string
           id?: string

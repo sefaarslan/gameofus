@@ -54,3 +54,26 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ sess
     cards: s.scenario_ids.map((id, i) => ({ id, text: text.get(id) ?? "", flag: flags[i] })),
   });
 }
+
+/**
+ * Mobil: solo oyunu "Oyunlarım" listesinden kaldırır (yumuşak silme: `solo_sessions.hidden_at`; oturum, cevaplar, coin kaydı ve
+ * AI analizi silinmez). Günlük set kuralı ve +50 coin idempotency'si oturum satırına dayandığı için kaldırmak aynı günün setini
+ * yeniden oynatmaz. Yalnızca sahibi; idempotent. Detay (`GET`) doğrudan kimlikle hâlâ açılır.
+ */
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ sessionId: string }> }) {
+  const user = await getAuthUser(req);
+  if (!user) return apiError("UNAUTHORIZED", "Giriş gereklidir.", 401);
+  const { sessionId } = await params;
+  if (!UUID_RE.test(sessionId)) return apiError("SESSION_NOT_FOUND", "Oturum bulunamadı.", 404);
+
+  const { data: updated } = await createAdminClient()
+    .from("solo_sessions")
+    .update({ hidden_at: new Date().toISOString() })
+    .eq("id", sessionId)
+    .eq("user_id", user.id)
+    .eq("status", "completed")
+    .select("id");
+  if (!updated || updated.length === 0) return apiError("SESSION_NOT_FOUND", "Oturum bulunamadı.", 404);
+
+  return apiOk({ hidden: true });
+}

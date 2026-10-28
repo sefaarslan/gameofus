@@ -48,6 +48,10 @@ GET  /api/solo/red-flag/card?g=&l=&p=&q=&fmt=
 GET  /api/users/me                (mobil, Bearer JWT)
 GET  /api/users/history           (mobil, Bearer JWT; oda geçmişi, son 90 gün; düz dizi)
 GET  /api/users/solo-history      (mobil, Bearer JWT; + /[sessionId])
+DELETE /api/users/history/[roomCode]            (mobil; oyunu listeden kaldır, yumuşak silme)
+DELETE /api/users/solo-history/[sessionId]      (mobil; solo oyunu listeden kaldır)
+DELETE /api/users/ai-reports/room/[roomCode]    (mobil; oda AI yorumunu "Analizlerim"den kaldır)
+DELETE /api/users/ai-reports/solo/[sessionId]   (mobil; solo AI analizini "Analizlerim"den kaldır)
 POST /api/users/coins/spend       (mobil, Bearer JWT)
 POST /api/users/coins/earn        (mobil, Bearer JWT)
 ```
@@ -382,6 +386,15 @@ solo günlük set +50 (solo `complete` içinde, bkz. §10b). **Miktarı istemci 
   (`created … result_ready | completed | expired`); `role` `owner|guest`; `partnerName` karşı oyuncunun adı (yoksa/hesabını sildiyse `null`);
   `readingScore`/`completedAt` yalnızca sonuç hazırsa dolu (aksi `null`); `expired`/`resultReady` kolaylık alanları. Hata: JWT yoksa/geçersizse
   `401 UNAUTHORIZED` (katılımcı token'ı kabul edilmez). Sonuç ayrıntısı için `GET /api/rooms/{roomCode}/results` aynı JWT ile açılır (süresi dolmuş odada da).
+- **Listeden kaldırma (yumuşak silme, mobil "Oyunlarım" / "Analizlerim"):** `DELETE /api/users/history/{roomCode}` (ikili oda),
+  `DELETE /api/users/solo-history/{sessionId}` (solo oyun), `DELETE /api/users/ai-reports/room/{roomCode}` ve
+  `DELETE /api/users/ai-reports/solo/{sessionId}` (AI analizleri) → `200 { hidden: true }`. Veri **silinmez**: ilgili satırın `hidden_at`'i dolar ve
+  liste uçları (`history`, `solo-history`, `ai-reports`) bu satırları döndürmez. Geri alma ucu yoktur. Idempotent (zaten kaldırılmışsa 200);
+  kullanıcıya ait olmayan / var olmayan kayıt aynı `404` (`ROOM_NOT_FOUND` / `SESSION_NOT_FOUND`); JWT yoksa `401`. Bağımsızdır: oyunu kaldırmak
+  analizini, analizi kaldırmak oyunu listeden çıkarmaz. İkili odada yalnızca çağıranın katılımcı satırı etkilenir (partnerin listesi aynen kalır);
+  AI yorum için yalnızca satın alanın listesi. Kaldırılan kayıtlar kimlikle doğrudan açılmaya devam eder (`GET solo-history/{id}`, `rooms/{code}/results`,
+  AI `GET`) ve kurallar bozulmaz: kaldırılan günlük solo oyunun seti aynı gün yeniden oynanamaz (`409 ALREADY_PLAYED_TODAY`), coin iade/tekrar verilmez,
+  `today` yine "oynandı" gösterir. Saklama süresi dolunca satırlar yine silinir.
 - `PATCH /api/users/me` `{ "birthDate": "YYYY-AA-GG" }` → profil doğum tarihi (geçersiz `400`, 13 yaş altı `403 AGE_RESTRICTED`)
 - `DELETE /api/users/me` `{ "confirm": true }` → `{ deleted: true }` — **hesap silme** (App Store 5.1.1(v) / Google Play). Silinen: kurulan odalar
   (içeriğiyle), solo oyunlar, coin kayıtları, kullanıcı ve Auth kaydı. Başkalarının odalarındaki katılım anonimleştirilir
