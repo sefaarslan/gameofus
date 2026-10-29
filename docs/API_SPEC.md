@@ -11,9 +11,9 @@ Next.js API route sözleşmeleri. **Gerçek davranışın kaynağı `app/api/**`
 - Kritik işlemler (cevap/tahmin yazma, sonuç hesaplama, anket, token doğrulama) **server-side**'dır
   (service role). Client Supabase'e doğrudan yazmaz.
 - **Kimlik:** `participant_token` (ham değer client'ta; DB'de yalnızca SHA-256 `token_hash`). Token'ı
-  `Authorization: Bearer <token>` başlığıyla gönder; geriye dönük uyum için gövde (`participantToken`) ya da
-  `GET` isteklerinde `?participantToken=` fallback'i de kabul edilir (web istemcisi şu an bunu kullanır;
-  hardening'de header'a taşınması hedeflenir). Token DB'de plaintext tutulmaz.
+  `Authorization: Bearer <token>` başlığıyla gönder (web ve mobil okuma uçlarında `state`/`results` bunu kullanır); yazma uçlarında gövde
+  (`participantToken`) kabul edilir. `GET` isteklerinde `?participantToken=` yalnızca **eski istemciler için geçici yedektir** (URL'ler
+  proxy/CDN günlüklerine düşer; yeni istemci kullanmaz, mobil build'ler güncellenince kaldırılır). Token DB'de plaintext tutulmaz.
 - Expire olmuş odada yazma ve okuma reddedilir (`ROOM_EXPIRED`).
 - **Oda kodu (`roomCode`):** linkteki kod ile elle yazılan kod **aynı değerdir** (ayrı kısa kod/takma ad yok). Yeni odalar **6 karakter** (charset `ABCDEFGHJKMNPQRSTUVWXYZ23456789`: 0/1/I/L/O yok; ≈887 milyon olasılık, modulo yanlılığı olmayan üretim); eski odalar 8 karakterlidir ve geçerli kalır. `[roomCode]` alan **tüm uçlar** (join, state, submit-turn, complete, results; ayrıca `feedback` gövdesindeki `roomCode`) kodu **normalize eder**: harf boyutu, tire, boşluk ve diğer işaretler yok sayılır, büyük harfe çevrilir (`k7m-2pq`, `K7M 2PQ`, `K7M2PQ` → `K7M2PQ`; `lib/room-code-utils.ts` → `normalizeRoomCode`). Yanıtlardaki `roomCode` her zaman kanonik biçimdir. Ayrı bir "kodu çözümle" ucu yoktur: istemci kodu normalize edip doğrudan `join`'e gönderir.
 - **Kötüye kullanım sınırları (kod kısa olduğu için):** (1) `POST /rooms/{roomCode}/join` her deneme sayılır: **IP başına ve (giriş yapmışsa) kullanıcı başına dakikada 10**, aşılırsa `429 RATE_LIMITED`. (2) **Oda varlığı sızmaz.** Herkese açık uçlarda (`join`, `state`; link önizlemesi için oda zaten görünür) bulunamayan kod `404 ROOM_NOT_FOUND` ("Oda bulunamadı."). **Token gerektiren uçlarda (`results`, `submit-turn`, `complete`, `feedback`) "oda yok" ile "token yanlış" birebir aynı yanıtı verir: `403 INVALID_TOKEN` ("Geçersiz token.")**; oda durumları (`ROOM_EXPIRED`, `RESULT_NOT_READY`, `ALREADY_SUBMITTED`…) yalnızca kimlik doğrulandıktan **sonra** söylenir. (Geçersiz/süresi dolmuş JWT her durumda `401 UNAUTHORIZED`.) Başarısız denemeler (bulunamayan kod ya da yanlış token) aynı IP'den dakikada 10'u geçerse `429 RATE_LIMITED`; başarılı aramalar sayılmaz. (3) Oda dolunca `join_locked = true`; dolu odaya ikinci kişi `400 ROOM_FULL`. (4) Süresi dolan oda `400 ROOM_EXPIRED`.
@@ -147,6 +147,10 @@ Yanıt `201`. `roomUrl` `APP_BASE_URL` ortam değişkeninden üretilir; istemci 
 - **Webden kurulan oda yalnızca web'e açıktır** (deneme amaçlı; kurucusu hesapsız, `rooms.user_id` boş): mobil kimlikle (`platform: "mobile"` + Bearer JWT) katılma `403 ROOM_WEB_ONLY` ("Bu oda web'de kurulmuş ve yalnızca web'den oynanabilir."). **Mobilden kurulan odaya hem mobil hem web katılabilir.** Hız limiti ve normalize için bkz. Bölüm 1.
 - Aksi halde oda doluysa (`join_locked` ya da 2 participant) `ROOM_FULL`; değilse guest oluşturulur,
   `join_locked = true` ve `status = guest_joined` yapılır. Gövdede opsiyonel `gender` (`female|male`) ve `birthDate` (`YYYY-AA-GG`) katılanın **kendi** beyanıdır: `birthDate` `participants.birth_date`'e yazılır (odayla birlikte silinir); geçersiz → `400 INVALID_PAYLOAD`, **13 yaş altı → `403 AGE_RESTRICTED`** (katılımcı eklenmez).
+- **AI rızası (yalnızca hesapsız/web misafir, isteğe bağlı):** gövdede `aiConsent: true`, yalnızca **mobilden kurulmuş** odada ve hesapsız katılımda
+  `participants.ai_consent_at/version` (`web-ai-v1`) olarak saklanır; aksi halde yok sayılır. **Rıza verilirse `birthDate` da zorunludur** (yaş aralığı ve burç yoruma girer): yoksa `400 INVALID_PAYLOAD`; rıza yoksa doğum tarihi isteğe bağlıdır. Hesaplı oyuncunun rızası `users` tablosundadır. Web odalarında AI yoktur.
+  Rıza vermemek katılmayı etkilemez; yalnızca o odada yapay zekâ yorumu açılamaz (bkz. §10c `AI_PARTNER_CONSENT_REQUIRED`).
+  Katılımcı olmayanın `GET .../state` önizlemesinde nötr `room.mobileRoom` bayrağı gelir (web katılma ekranı onay kutusunu buna göre gösterir).
 - **Yaş koşullu oda (18+ kategori, ör. Cesur):** katılanın yaşı kendi hesabından doğrulanır. Mobil (JWT): profildeki `users.birth_date`;
   tarih yoksa `400 AGE_VERIFICATION_REQUIRED`, asgari yaşın altındaysa `403 AGE_RESTRICTED` (katılımcı eklenmez). Anonim web: doğum tarihi
   olmadığı için `400 AGE_VERIFICATION_REQUIRED` ("yalnızca mobil uygulamada oynanır"). Mevcut token ile yeniden giriş bu kontrolden etkilenmez.
@@ -413,6 +417,8 @@ solo günlük set +50 (solo `complete` içinde, bkz. §10b). **Miktarı istemci 
 ## 10c. AI yorum (ikili sonuç) — YALNIZCA MOBİL
 
 Web'de hiçbir yerde yoktur: web arayüzünde buton/kart/ipucu yok; `state`, `results`, `history` yanıtlarında AI ile ilgili alan yok.
+**Tek istisna:** mobilden kurulmuş odaya katılan hesapsız web oyuncusunun verisi de yoruma girebildiği için katılma ekranında isteğe bağlı bir rıza kutusu
+vardır (bkz. §5 `aiConsent`; önizlemede AI'a özgü olmayan `room.mobileRoom` bayrağı). Yorumun kendisi web'de asla gösterilmez.
 Hesapsız (katılımcı token'lı) web oyuncusu yorumu hiçbir yoldan göremez (partneri mobildeyse ondan rica eder; ürün tarafında bir şey yapılmaz).
 Model/sağlayıcı ortam değişkenlerinde (kodda değil): `AI_PRIMARY` (varsayılan `groq:openai/gpt-oss-120b`), `AI_FALLBACK` (isteğe bağlı,
 ör. `openrouter:google/gemini-2.5-flash-lite` ya da `groq:qwen/qwen3.8-27b`), `GROQ_API_KEY`, `OPENROUTER_API_KEY`,
@@ -424,13 +430,17 @@ JWT → `401 UNAUTHORIZED`; geçerli JWT ama bu odanın katılımcısı değil, 
 
 - `POST /api/users/ai-consent` `{ "version": "<rıza metni sürümü>" }` (1-32 karakter: harf, rakam, `.` `_` `-`) → `{ ok: true }`.
   Sunucu sürümü yalnızca saklar (`users.ai_consent_at/version`); metin mobilde. Rıza yoksa POST `403 AI_CONSENT_REQUIRED`.
-- `GET /api/rooms/[roomCode]/ai-commentary` → 200 `{ status: "none"|"generating"|"ready"|"failed", purchasedByMe, content?, createdAt? }`.
+- `GET /api/rooms/[roomCode]/ai-commentary` → 200 `{ status: "none"|"generating"|"ready"|"failed", purchasedByMe, content?, createdAt?, playersConsented? }`.
+  `playersConsented` yalnızca `none` iken gelir: odadaki **her** oyuncunun AI rızası var mı (hesaplıda `users.ai_consent_at`, web misafirinde `participants.ai_consent_at`).
+  `false` ise POST `403 AI_PARTNER_CONSENT_REQUIRED` döner; mobil "100 coinle aç" yerine "diğer oyuncu izin vermedi" gösterebilir.
   Odanın her katılımcısına ücretsiz (satın alan da, partner de). `none` hata değildir. `content` yalnızca `ready`. Süresi dolmuş oda da
   saklama süresi içinde JWT ile okunabilir (POST için de aynısı geçerli).
 - `POST /api/rooms/[roomCode]/ai-commentary` (gövde yok), sıra:
   1. Kimlik → hız sınırı (kullanıcı başına dakikada 5, günde 20; `429 RATE_LIMITED`) → katılımcı → rıza.
   2. Sonuç hazır değilse (`result_ready`/`completed` değil) `409 RESULT_NOT_READY`. **`expires_at` geçmiş odada da satın alma mümkündür** (`ROOM_EXPIRED` yoktur): sonuç, odanın saklama süresi (90 gün) boyunca açılabilir; oda silinmişse (saklama süresi geçmişse) oda bulunamaz ve diğer kimlik hatalarıyla aynı `403 INVALID_TOKEN` döner.
   3. Zaten `ready` kayıt varsa `200 { status:"ready", content, applied:false }` (**coin düşmez**; ikinci kişi okur). `generating` varsa `202 { status:"generating" }`.
+  3b. **Yeni üretimden önce** odadaki her oyuncunun AI rızası aranır; eksikse `403 AI_PARTNER_CONSENT_REQUIRED` ("Odadaki diğer oyuncu yapay zekâ yorumuna izin vermedi."),
+     **veri gönderilmeden ve coin düşmeden**. (Zaten üretilmiş yorumun okunması bu kuraldan etkilenmez.)
   4. Sağlayıcı kapasitesi yoksa `503 AI_UNAVAILABLE` (**coin düşmeden**, `refunded:false`).
   5. Yarış-güvenli `generating` satırı açılır (odada aynı anda tek aktif kayıt), sonra coin düşer: `reason:"ai_commentary"`, `refId:"<oda kodu>:<attempt>"`,
      100 coin; yetersizse satır silinir, `402 INSUFFICIENT_COINS`.

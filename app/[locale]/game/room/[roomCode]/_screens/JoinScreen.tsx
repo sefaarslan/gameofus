@@ -8,13 +8,19 @@ import type { Gender } from "@/lib/gender";
 
 interface JoinScreenProps {
   roomCode: string;
+  /** Oda mobilden kurulduysa (kurucu hesaplı) yapay zekâ yorumu açılabilir: isteğe bağlı rıza kutusu gösterilir. */
+  mobileRoom?: boolean;
   onJoined: (token: string) => void;
 }
 
 /**
- * Davetle katılma: her oyuncu kendi bilgisini kendisi girer (oda kuran gibi): ad, cinsiyet ve doğum tarihi (hepsi zorunlu; cinsiyet önceden seçili gelmez).
+ * Davetle katılma: her oyuncu kendi bilgisini kendisi girer. Web odalarında (AI yok) yalnızca ad istenir. Mobilden kurulmuş odada
+ * AI rıza kutusunun yanında cinsiyet ve doğum tarihi alanları HER ZAMAN açıktır: kutu işaretliyse doğum tarihi (ve bir cinsiyet
+ * seçimi, "belirtmek istemiyorum" dahil) zorunlu, değilse isteğe bağlıdır; yaş aralığı/burç/İspanyolca dil bilgisi yoruma yalnızca
+ * rıza varsa girer (sunucuda zorlanır). Kutu boşsa katılmadan önce "bu oyun için yapay zekâ yorumu açılamaz" uyarısı gösterilir.
+ * Web'de sahne modu ve 18+ yaş denetimi yoktur (yalnızca mobil).
  */
-export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
+export function JoinScreen({ roomCode, mobileRoom = false, onJoined }: JoinScreenProps) {
   const t = useTranslations("join");
   const tc = useTranslations("create");
   const tErr = useTranslations("error");
@@ -22,11 +28,16 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
   const [displayName, setDisplayName] = useState("");
   const [gender, setGender] = useState<Gender | null | undefined>(undefined);
   const [birthDate, setBirthDate] = useState("");
+  // İsteğe bağlı, varsayılan KAPALI (önceden işaretli gelmez): katılmak rızaya bağlı değildir
+  const [aiConsent, setAiConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Mobil odada alanlar her zaman açıktır; zorunlu olmaları yapay zekâ rızasına bağlıdır
+  const profileRequired = mobileRoom && aiConsent;
+
   function birthDateError(): string | null {
-    if (!birthDate.trim()) return t("birthDateRequired");
+    if (!birthDate.trim()) return profileRequired ? t("birthDateRequired") : null;
     const iso = parseBirthDateInput(birthDate);
     if (!iso) return tc("errors.birthDateInvalid");
     if (ageFromIso(iso) < 13) return tc("errors.birthDateTooYoung");
@@ -39,11 +50,11 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
       setError(tc("errors.nameRequired"));
       return;
     }
-    if (gender === undefined) {
+    if (profileRequired && gender === undefined) {
       setError(t("genderRequired"));
       return;
     }
-    const bdErr = birthDateError();
+    const bdErr = mobileRoom ? birthDateError() : null;
     if (bdErr) {
       setError(bdErr);
       return;
@@ -57,8 +68,9 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           displayName: displayName.trim(),
-          gender,
-          birthDate: parseBirthDateInput(birthDate),
+          // Yalnızca ekranda gösterilen (mobil oda) alanlar gider; boş bırakılan alan null gider
+          ...(mobileRoom ? { gender: gender ?? null, birthDate: parseBirthDateInput(birthDate) } : {}),
+          ...(mobileRoom ? { aiConsent } : {}),
         }),
       });
       const data = await res.json();
@@ -120,30 +132,63 @@ export function JoinScreen({ roomCode, onJoined }: JoinScreenProps) {
               </div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <GenderPicker label={tc("gender.label")} value={gender} onChange={setGender} />
-              <p className="text-xs text-on-surface-variant/70">{tc("gender.hint")}</p>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="join-birth" className="text-xs text-on-surface-variant flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm">calendar_month</span>
-                <span className="truncate">{tc("birthDate.label")}</span>
-              </label>
-              <div className="flex items-center bg-surface-container rounded-xl px-3 min-h-[44px] focus-within:ring-2 focus-within:ring-primary/40">
-                <input
-                  id="join-birth"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="bday"
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(maskBirthDateInput(e.target.value))}
-                  placeholder={tc("birthDate.placeholder")}
-                  maxLength={10}
-                  className="w-full bg-transparent text-label-md text-on-surface placeholder-on-surface-variant/60 py-2.5 focus:outline-none"
-                />
+            {mobileRoom && (
+              <div className="flex flex-col gap-2 bg-surface-container rounded-2xl px-4 py-3">
+                <label htmlFor="join-ai-consent" className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    id="join-ai-consent"
+                    type="checkbox"
+                    checked={aiConsent}
+                    onChange={(e) => setAiConsent(e.target.checked)}
+                    aria-describedby="join-ai-consent-detail"
+                    className="mt-0.5 h-5 w-5 shrink-0 accent-primary"
+                  />
+                  <span className="text-body-md text-on-surface">{t("aiConsent.label")}</span>
+                </label>
+                <p id="join-ai-consent-detail" className="text-xs text-on-surface-variant/80 pl-8">
+                  {t("aiConsent.detail")}
+                </p>
+                {!aiConsent && (
+                  <p role="status" className="text-xs font-medium text-on-surface-variant pl-8">
+                    {t("aiConsent.declinedNotice")}
+                  </p>
+                )}
               </div>
-            </div>
+            )}
+
+            {mobileRoom && (
+              <div className="flex flex-col gap-1.5">
+                <GenderPicker label={tc("gender.label")} value={gender} onChange={setGender} />
+                <p className="text-xs text-on-surface-variant/70">{tc("gender.hint")}</p>
+              </div>
+            )}
+
+            {mobileRoom && (
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="join-birth" className="text-xs text-on-surface-variant flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm">calendar_month</span>
+                  <span className="truncate">
+                    {tc("birthDate.label")}
+                    {!profileRequired && <span className="text-on-surface-variant/60"> ({tc("birthDate.optional")})</span>}
+                  </span>
+                </label>
+                <div className="flex items-center bg-surface-container rounded-xl px-3 min-h-[44px] focus-within:ring-2 focus-within:ring-primary/40">
+                  <input
+                    id="join-birth"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="bday"
+                    aria-required={profileRequired}
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(maskBirthDateInput(e.target.value))}
+                    placeholder={tc("birthDate.placeholder")}
+                    maxLength={10}
+                    className="w-full bg-transparent text-label-md text-on-surface placeholder-on-surface-variant/60 py-2.5 focus:outline-none"
+                  />
+                </div>
+                {profileRequired && <p className="text-xs text-on-surface-variant/70">{t("birthDateAiHint")}</p>}
+              </div>
+            )}
 
             {error && (
               <div role="alert" className="flex items-center gap-3 bg-error-container text-error rounded-2xl px-4 py-3">

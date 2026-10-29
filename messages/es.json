@@ -395,7 +395,13 @@
     "ageMobileOnly": "Este juego es solo para mayores de 18 años y solo se juega en la app móvil.",
     "hint": "Cada persona escribe sus propios datos.",
     "genderRequired": "Elige tu género",
-    "birthDateRequired": "Introduce tu fecha de nacimiento (DD.MM.AAAA)"
+    "birthDateRequired": "Introduce tu fecha de nacimiento (DD.MM.AAAA)",
+    "birthDateAiHint": "Obligatorio porque permitiste el comentario de IA. Tu fecha de nacimiento no se envía; solo se usan tu rango de edad y tu signo zodiacal.",
+    "aiConsent": {
+      "label": "Permito el comentario de IA (opcional)",
+      "detail": "Si quien creó la sala activa el comentario de IA en la app móvil, se enviará al servicio de IA (Groq): tu nombre, respuestas y predicciones; tu rango de edad (p. ej., 25-34) y el signo zodiacal calculado a partir de tu fecha de nacimiento (solo para ajustar el tono, nunca se menciona en el comentario); y, en las salas en español, tu género (si lo indicaste). Tu fecha de nacimiento no se envía. Si no lo permites, el juego funciona igual; solo no se podrá activar el comentario de IA en esta sala. El comentario no se muestra en la web.",
+      "declinedNotice": "Como no marcaste esta casilla, este juego no podrá ser interpretado por la IA: quien creó la sala no podrá activar el comentario de IA en la app móvil. El resto del juego funciona igual."
+    }
   },
   "game": {
     "yourAnswer": "Tu respuesta",

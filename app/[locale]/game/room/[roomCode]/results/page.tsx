@@ -121,7 +121,8 @@ export default function ResultsPage() {
 
     setParticipantToken(token);
 
-    fetch(`/api/rooms/${roomCode}/results?participantToken=${encodeURIComponent(token)}`)
+    // Token URL'de değil başlıkta taşınır (adresler proxy/CDN günlüklerine ve tarayıcı geçmişine düşer)
+    fetch(`/api/rooms/${roomCode}/results`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((json) => {
         if (json.error) {

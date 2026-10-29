@@ -10,6 +10,7 @@ import { corsOptions } from "@/lib/cors";
 import { getAuthUser } from "@/lib/auth";
 import { parseGender } from "@/lib/gender";
 import { MIN_APP_AGE, ageOn, parseBirthDate } from "@/lib/age";
+import { WEB_AI_CONSENT_VERSION } from "@/lib/ai/consent";
 
 export function OPTIONS() {
   return corsOptions();
@@ -32,7 +33,7 @@ export async function POST(
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { displayName, platform, gender, birthDate } = body as Record<string, unknown>;
+  const { displayName, platform, gender, birthDate, aiConsent } = body as Record<string, unknown>;
   const rawBodyToken = (body as Record<string, unknown>).participantToken;
   const participantToken = extractToken(req, typeof rawBodyToken === "string" ? rawBodyToken : null);
 
@@ -128,6 +129,13 @@ export async function POST(
   const rawToken = generateToken();
   const tokenHash = hashToken(rawToken);
   const guestGender = parseGender(gender);
+  // Hesapsız (web) misafirin isteğe bağlı AI rızası: yalnızca mobilden kurulmuş odada anlamlıdır (web odalarında AI yoktur) ve yalnızca
+  // kesin `true` kabul edilir. Hesaplı oyuncunun rızası `users` tablosundadır, buradaki alan yok sayılır.
+  const guestAiConsent = aiConsent === true && !authUser && !!room.user_id;
+  // Rıza veren oyuncunun yaş aralığı ve burcu yoruma girer: doğum tarihi rızayla birlikte zorunludur (rıza yoksa isteğe bağlı).
+  if (guestAiConsent && !guestBirth) {
+    return apiError("INVALID_PAYLOAD", "Yapay zekâ yorumuna izin vermek için doğum tarihi gereklidir.");
+  }
 
   const { data: guest, error: guestErr } = await supabase
     .from("participants")
@@ -142,6 +150,7 @@ export async function POST(
       // Katılanın kendi doğum tarihi (isteğe bağlı; yalnızca bu odada, oda silinince gider)
       ...(guestBirth && typeof birthDate === "string" ? { birth_date: birthDate } : {}),
       ...(authUser ? { user_id: authUser.id } : {}),
+      ...(guestAiConsent ? { ai_consent_at: new Date().toISOString(), ai_consent_version: WEB_AI_CONSENT_VERSION } : {}),
     })
     .select("id")
     .single();

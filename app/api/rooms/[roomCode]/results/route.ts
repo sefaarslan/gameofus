@@ -31,6 +31,7 @@ export async function GET(
 ) {
   // Kod büyük/küçük harf, tire ve boşluk fark etmez (K7M-2PQ = k7m2pq)
   const roomCode = normalizeRoomCode((await params).roomCode);
+  // Token `Authorization: Bearer` başlığında gelir. `?participantToken=` yalnızca eski istemciler için geçici yedektir (bkz. state/route.ts).
   const token = extractToken(req, req.nextUrl.searchParams.get("participantToken"));
 
   // Kimlik: katılımcı token'ı ya da giriş yapmış (mobil) kullanıcının Supabase JWT'si (geçmiş sonuçlar için)

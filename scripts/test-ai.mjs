@@ -1,5 +1,6 @@
 // AI yorum birim testleri (ağ ve veritabanı yok; test sağlayıcısı "fake" kullanılır):  node --no-warnings scripts/test-ai.mjs
 import { ageBandFor, buildDigest } from "../lib/ai/digest.ts";
+import { allParticipantsConsented, WEB_AI_CONSENT_VERSION } from "../lib/ai/consent.ts";
 import { COMMENTARY_JSON_SCHEMA, commentarySchema, isSoftIssue, qualityIssues } from "../lib/ai/schema.ts";
 import { generateCommentary, InvalidCommentaryError } from "../lib/ai/generate.ts";
 import { AiProviderError, chat } from "../lib/ai/provider.ts";
@@ -222,6 +223,16 @@ const prev = process.env.NODE_ENV;
 process.env.NODE_ENV = "production";
 ok(await rejects(() => chat({ provider: "fake", model: "ok", messages: [] }), (e) => e instanceof AiProviderError && e.kind === "not_configured"), "test sağlayıcısı üretimde kapalı");
 process.env.NODE_ENV = prev;
+
+// ── Rıza: yorum iki oyuncunun verisini kullanır, ikisinin de rızası gerekir ─────────────────
+const T = "2026-10-29T00:00:00Z";
+ok(WEB_AI_CONSENT_VERSION === "web-ai-v1", "web rıza sürümü sabit (metin değişince bilinçli artırılır)");
+ok(allParticipantsConsented([{ user_id: "u1", ai_consent_at: null }, { user_id: "u2", ai_consent_at: null }], { u1: T, u2: T }) === true, "iki hesaplı oyuncu da rıza verdi → izin");
+ok(allParticipantsConsented([{ user_id: "u1", ai_consent_at: null }, { user_id: "u2", ai_consent_at: null }], { u1: T, u2: null }) === false, "hesaplı misafir rıza vermedi → izin yok");
+ok(allParticipantsConsented([{ user_id: "u1", ai_consent_at: null }, { user_id: null, ai_consent_at: T }], { u1: T }) === true, "hesaplı kurucu + rızalı web misafiri → izin");
+ok(allParticipantsConsented([{ user_id: "u1", ai_consent_at: null }, { user_id: null, ai_consent_at: null }], { u1: T }) === false, "rızasız web misafiri → izin yok (verisi üçüncü tarafa gitmez)");
+ok(allParticipantsConsented([{ user_id: "u1", ai_consent_at: T }, { user_id: "u2", ai_consent_at: T }], { u1: T }) === false, "hesaplı oyuncuda `users` kaydı belirler, katılım satırındaki tarih yetmez");
+ok(allParticipantsConsented([], {}) === false, "katılımcı yoksa izin yok");
 
 // ── Yapılandırma ───────────────────────────────────────────────────────────
 const s = parseSpec("groq:openai/gpt-oss-120b", "primary");

@@ -356,6 +356,8 @@ export type Database = {
       }
       participants: {
         Row: {
+          ai_consent_at: string | null
+          ai_consent_version: string | null
           completed_at: string | null
           birth_date: string | null
           created_at: string
@@ -371,6 +373,8 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          ai_consent_at?: string | null
+          ai_consent_version?: string | null
           birth_date?: string | null
           completed_at?: string | null
           created_at?: string
@@ -386,6 +390,8 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          ai_consent_at?: string | null
+          ai_consent_version?: string | null
           birth_date?: string | null
           completed_at?: string | null
           created_at?: string

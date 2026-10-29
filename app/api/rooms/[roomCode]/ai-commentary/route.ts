@@ -5,7 +5,7 @@ import { corsOptions } from "@/lib/cors";
 import { apiError, apiOk } from "@/lib/api";
 import { normalizeRoomCode } from "@/lib/room-code-utils";
 import { checkRateLimitWindow } from "@/lib/rate-limit";
-import { authAiUser, resolveAiParticipant } from "@/lib/ai/access";
+import { authAiUser, bothPlayersConsented, resolveAiParticipant } from "@/lib/ai/access";
 import { modelSpecs, unavailable } from "@/lib/ai/http";
 import { buildDigest } from "@/lib/ai/digest";
 import { coinRef, currentCommentary, reapStale, refundIfCharged } from "@/lib/ai/commentary-store";
@@ -37,7 +37,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ room
 
   await reapStale(ctx.room.id, roomCode);
   const row = await currentCommentary(ctx.room.id);
-  if (!row) return apiOk({ status: "none", purchasedByMe: false });
+  // `playersConsented`: odadaki her oyuncunun AI rızası var mı. false ise POST `403 AI_PARTNER_CONSENT_REQUIRED` döner; mobil butonu gizleyebilir.
+  if (!row) return apiOk({ status: "none", purchasedByMe: false, playersConsented: await bothPlayersConsented(ctx.room.id) });
   return apiOk({
     status: row.status,
     purchasedByMe: row.purchased_by === user.id,
@@ -81,6 +82,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
     return apiOk({ status: "ready", content: existing.content, applied: false, purchasedByMe: existing.purchased_by === user.id });
   }
   if (existing?.status === "generating") return apiOk({ status: "generating" }, 202);
+
+  // 3b) YENİ üretim iki oyuncunun verisini üçüncü tarafa gönderir: odadaki herkesin AI rızası olmalı (hesaplıda `users`, web misafirinde
+  //     katılım satırı). Eksikse hiçbir şey gönderilmeden ve coin düşmeden döner. (Zaten üretilmiş yorumun okunması yukarıda etkilenmez.)
+  if (!(await bothPlayersConsented(room.id))) {
+    return apiError("AI_PARTNER_CONSENT_REQUIRED", "Odadaki diğer oyuncu yapay zekâ yorumuna izin vermedi.", 403);
+  }
 
   // 4) Kapasite ve veri HAZIR değilse coin düşmeden dön
   const specs = modelSpecs(req);

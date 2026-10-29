@@ -19,13 +19,15 @@ export async function GET(
 ) {
   // Kod büyük/küçük harf, tire ve boşluk fark etmez (K7M-2PQ = k7m2pq)
   const roomCode = normalizeRoomCode((await params).roomCode);
+  // Token `Authorization: Bearer` başlığında gelir. `?participantToken=` yalnızca eski istemciler (önbellekteki web paketi,
+  // eski mobil build'ler) için geçici yedektir; URL'ler günlüklere düştüğü için yeni istemci kullanmaz, mobil güncellenince kaldır.
   const token = extractToken(req, req.nextUrl.searchParams.get("participantToken"));
 
   const supabase = createAdminClient();
 
   const { data: room } = await supabase
     .from("rooms")
-    .select("id, room_code, status, game_mode, question_count, expires_at, locale, relationship_type")
+    .select("id, room_code, status, game_mode, question_count, expires_at, locale, relationship_type, user_id")
     .eq("room_code", roomCode)
     .maybeSingle();
 
@@ -62,6 +64,8 @@ export async function GET(
         expiresAt: room.expires_at,
         locale: room.locale ?? "tr",
         relationshipType: room.relationship_type ?? null,
+        // Mobilden kurulmuş oda (kurucu hesaplı). Web katılma ekranı buna göre rıza kutusunu gösterir; başka bilgi içermez.
+        mobileRoom: !!room.user_id,
       },
       participant: null,
       participants: participants.map((p) => ({ role: p.role, status: p.status })),

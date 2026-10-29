@@ -395,7 +395,13 @@
     "ageMobileOnly": "This game is for players 18+ and can only be played in the mobile app.",
     "hint": "Everyone enters their own details.",
     "genderRequired": "Please choose your gender",
-    "birthDateRequired": "Please enter your date of birth (DD.MM.YYYY)"
+    "birthDateRequired": "Please enter your date of birth (DD.MM.YYYY)",
+    "birthDateAiHint": "Required because you allowed AI commentary. Your birth date itself is not sent; only your age range and zodiac sign are used.",
+    "aiConsent": {
+      "label": "I allow AI commentary (optional)",
+      "detail": "If the room owner turns on AI commentary in the mobile app, the following is sent to the AI service (Groq): your name, answers and guesses; your age range (e.g. 25-34) and the zodiac sign calculated from your birth date (only to set the tone, never mentioned in the commentary); and, in Spanish rooms, your gender (if you provided it). Your birth date itself is not sent. If you don't allow it, the game works exactly the same; AI commentary just can't be turned on for this room. The commentary is not shown on the web.",
+      "declinedNotice": "Because this box isn't checked, this game can't be interpreted by AI: the room owner won't be able to turn on AI commentary for it in the mobile app. The rest of the game works exactly the same."
+    }
   },
   "game": {
     "yourAnswer": "Your answer",

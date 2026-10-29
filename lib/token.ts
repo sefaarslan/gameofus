@@ -13,7 +13,8 @@ export function hashToken(raw: string): string {
 
 /**
  * Authorization: Bearer <token> header → fallback sıralamasıyla token çıkarır.
- * Web (query param / body) ve mobile (Bearer header) akışlarını tek noktada birleştirir.
+ * Web ve mobil token'ı Bearer başlığıyla (okuma uçları) ya da gövdeyle (yazma uçları) gönderir; `fallback` gövde ya da
+ * (eski istemciler için, kullanımdan kalkıyor) query parametresidir. Token yeni kodda asla URL'de taşınmaz.
  */
 export function extractToken(req: NextRequest, fallback?: string | null): string | null {
   const authHeader = req.headers.get("authorization");

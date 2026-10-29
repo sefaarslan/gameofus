@@ -395,7 +395,13 @@
     "ageMobileOnly": "Bu oyun 18+ oyunculara özeldir ve yalnızca mobil uygulamada oynanır.",
     "hint": "Herkes kendi bilgisini kendisi girer.",
     "genderRequired": "Lütfen cinsiyetini seç",
-    "birthDateRequired": "Lütfen doğum tarihini gir (GG.AA.YYYY)"
+    "birthDateRequired": "Lütfen doğum tarihini gir (GG.AA.YYYY)",
+    "birthDateAiHint": "Yapay zekâ yorumuna izin verdiğin için gerekli. Doğum tarihin gönderilmez; yalnızca yaş aralığın ve burcun kullanılır.",
+    "aiConsent": {
+      "label": "Yapay zekâ yorumuna izin veriyorum (isteğe bağlı)",
+      "detail": "Oda sahibi mobil uygulamada yapay zekâ yorumu açarsa yapay zekâ hizmetine (Groq) şunlar gönderilir: adın, cevapların ve tahminlerin; yaş aralığın (ör. 25-34) ve doğum tarihinden hesaplanan burcun (yalnızca yorumun tonu için, yorumda geçmez); İspanyolca odalarda cinsiyetin (belirttiysen). Doğum tarihin gönderilmez. İzin vermezsen oyun aynen devam eder, yalnızca bu oda için yapay zekâ yorumu açılamaz. Yorum web'de gösterilmez.",
+      "declinedNotice": "İşaretlemediğin için bu oyun yapay zekâ tarafından yorumlanamayacak: oda sahibi mobil uygulamada bu oyun için yapay zekâ yorumunu açamaz. Oyunun geri kalanı aynen oynanır."
+    }
   },
   "game": {
     "yourAnswer": "Kendi cevabın",

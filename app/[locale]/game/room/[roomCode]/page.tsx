@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
@@ -36,6 +36,8 @@ interface RoomStateData {
     expiresAt: string;
     locale: string;
     relationshipType?: string | null;
+    /** Mobilden kurulmuş oda (katılan henüz katılımcı değilken önizlemede gelir) */
+    mobileRoom?: boolean;
   };
   participant: ParticipantInfo | null;
   participants: Array<{ role: string; displayName: string; status: string }>;
@@ -82,16 +84,15 @@ export default function RoomPage() {
   const [stateData, setStateData] = useState<RoomStateData | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchState = useCallback(
     async (currentToken: string | null) => {
       try {
-        const url = currentToken
-          ? `/api/rooms/${roomCode}/state?participantToken=${encodeURIComponent(currentToken)}`
-          : `/api/rooms/${roomCode}/state`;
-
-        const res = await fetch(url);
+        // Token URL'de değil başlıkta taşınır (adresler proxy/CDN günlüklerine ve tarayıcı geçmişine düşer)
+        const res = await fetch(
+          `/api/rooms/${roomCode}/state`,
+          currentToken ? { headers: { Authorization: `Bearer ${currentToken}` } } : undefined,
+        );
         const data = await res.json();
 
         if (!res.ok) {
@@ -138,30 +139,56 @@ export default function RoomPage() {
     });
   }, [roomCode, rawCode, fetchState, urlLocale]);
 
-  // Polling for share and waiting screens
+  // Polling for share and waiting screens: ilk dakika 3 sn, sonra seyrekleşir; sekme gizliyken istek atılmaz,
+  // sekme tekrar görününce hemen bir kez yoklanır (bekleyen kullanıcılar sunucuyu ve DB'yi gereksiz yormasın).
   useEffect(() => {
-    if (screen !== "share" && screen !== "waiting") {
-      if (pollRef.current) clearInterval(pollRef.current);
-      return;
-    }
+    if (screen !== "share" && screen !== "waiting") return;
 
-    pollRef.current = setInterval(async () => {
-      const data = await fetchState(token);
-      if (!data) return;
-      const nextScreen = pickScreen(data, token);
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const startedAt = Date.now();
+    const nextDelay = () => {
+      const waited = Date.now() - startedAt;
+      return waited < 60_000 ? 3000 : waited < 300_000 ? 5000 : 10_000;
+    };
 
-      if (nextScreen === "results") {
-        if (pollRef.current) clearInterval(pollRef.current);
-        setScreen("results");
-      } else if (screen === "share" && nextScreen === "game") {
-        setStateData(data);
-      } else if (nextScreen === "waiting") {
-        setStateData(data);
+    const schedule = () => {
+      timer = setTimeout(tick, nextDelay());
+    };
+
+    const tick = async () => {
+      if (cancelled) return;
+      if (document.hidden) {
+        schedule();
+        return;
       }
-    }, 3000);
+      const data = await fetchState(token);
+      if (cancelled) return;
+      if (data) {
+        const nextScreen = pickScreen(data, token);
+        if (nextScreen === "results") {
+          setScreen("results");
+          return;
+        }
+        if (screen === "share" && nextScreen === "game") setStateData(data);
+        else if (nextScreen === "waiting") setStateData(data);
+      }
+      schedule();
+    };
+
+    const onVisible = () => {
+      if (document.hidden || cancelled) return;
+      if (timer) clearTimeout(timer);
+      tick();
+    };
+
+    document.addEventListener("visibilitychange", onVisible);
+    schedule();
 
     return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, [screen, token, fetchState]);
 
@@ -228,7 +255,7 @@ export default function RoomPage() {
   }
 
   if (screen === "join") {
-    return <JoinScreen roomCode={roomCode} onJoined={handleJoined} />;
+    return <JoinScreen roomCode={roomCode} mobileRoom={stateData?.room.mobileRoom ?? false} onJoined={handleJoined} />;
   }
 
   if (screen === "share") {
