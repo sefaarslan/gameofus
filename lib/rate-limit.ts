@@ -2,10 +2,17 @@ import crypto from "crypto";
 import { after, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 
-/** İstek IP'sinin kısaltılmış SHA-256 özeti (ham IP saklanmaz). */
+/**
+ * İstek IP'sinin kısaltılmış SHA-256 özeti (ham IP saklanmaz).
+ * Vercel'de `x-forwarded-for` platform tarafından yazılır (güvenli). Self-host'ta ters proxy'nin yazdığı başlığın adı
+ * `CLIENT_IP_HEADER` ile verilir (örn. `cf-connecting-ip`); yalnızca origin proxy dışından erişilemiyorsa ayarla,
+ * aksi halde istemci başlığı taklit edip hız sınırlarını atlatabilir.
+ */
 export function ipHashFor(req: NextRequest): string {
+  const trustedName = process.env.CLIENT_IP_HEADER?.trim().toLowerCase();
+  const trusted = trustedName ? req.headers.get(trustedName)?.split(",")[0]?.trim() : null;
   const forwarded = req.headers.get("x-forwarded-for")?.split(",")[0];
-  const ip = forwarded || req.headers.get("x-real-ip") || "127.0.0.1";
+  const ip = trusted || forwarded || req.headers.get("x-real-ip") || "127.0.0.1";
   return crypto.createHash("sha256").update(ip).digest("hex").substring(0, 32);
 }
 

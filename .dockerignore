@@ -1,0 +1,22 @@
+# Gizli bilgiler imaja asla girmez
+.env
+.env.*
+.git
+.gitignore
+.claude
+
+# Üretilen / yerel
+node_modules
+.next
+.vercel
+tsconfig.tsbuildinfo
+.DS_Store
+
+# Uygulama çalışmak için gerek duymaz (içerik üretimi, doküman, migration'lar)
+docs
+supabase
+seeds
+scripts
+*.md
+Dockerfile
+.dockerignore
