@@ -260,7 +260,7 @@ Bu kurallar uygulama hızını ve gereksiz ağ/DB yükünü azaltmayı hedefler.
 3. **Tek request ile kayıt.** Cevap ve tahmin, **her soru sonunda tek bir API request** ile
    kaydedilir. Cevap ve tahmin için ayrı ayrı çağrı yapılmaz; aynı endpoint'e birlikte yazılır.
 
-4. **Realtime sadece durum için.** Realtime yalnızca **participant ve room status
+4. **Realtime sadece durum için.** (Mobil yalnızca `rooms` UPDATE olaylarını `room_code` filtresiyle dinler; yalnızca oda üyesi giriş yapmış kullanıcı alır, bkz. Bölüm 9 RLS.) Realtime yalnızca **participant ve room status
    değişiklikleri** için kullanılır (`rooms.status`, `participants.status`, opsiyonel
    `participants.last_seen_at`). `answers`, `predictions`, partnerin gerçek cevapları/tahminleri
    ve reveal öncesi sonuç detayları **Realtime'a açılmaz**.
@@ -335,6 +335,9 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   - Kullanıcı partnerin cevabını reveal öncesi okuyamaz.
   - Oda doluysa token'ı olmayan üçüncü kişi içeriğe erişemez.
   - Premium kullanıcı yalnızca kendi `user_id`'sine bağlı odaları yönetir.
+  - **`rooms` ve `participants` herkese açık okunamaz** (anon anahtarla `room_code`/oyuncu adı listelenemez; `room_code` erişim anahtarıdır). Anon'un bu tablolarda hiç yetkisi yoktur;
+    `authenticated` yalnızca **kendi katıldığı odanın** `rooms` satırını okur (`is_room_member`, SECURITY DEFINER; mobil Realtime bu politikayla çalışır), `participants`'a hiç erişemez.
+    Yeni tabloya anon/authenticated SELECT politikası ekleme; web Realtime kullanmaz. Test: `node --no-warnings scripts/test-rls-realtime.mjs`.
 - Expire kontrolü **okuma anında** `expires_at < now()` ile yapılır; cron job gerekmez.
 - Ücretsiz oda **24 saat**, premium oda **72 saat** sonra inaktif sayılır.
 - **Saklama/temizleme:** `/api/cron/cleanup` (Vercel Cron, günde bir; `CRON_SECRET` yoksa 503, yanlışsa 401) `cleanup_expired_data()` SQL
