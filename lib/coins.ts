@@ -3,21 +3,27 @@ import { createAdminClient } from "@/lib/supabase/server";
 /** Sunucuda sabit fiyatlar: istemci miktar göndermez, yalnızca neden (reason) bildirir. */
 export const COIN_PRICES = {
   room_create: 250,
-  ai_commentary: 100,
-  solo_ai: 100,
+  ai_commentary: 150,
+  solo_ai: 150,
 } as const;
 export type SpendReason = keyof typeof COIN_PRICES;
 
 export const COIN_REWARDS = {
   signup_bonus: 500,
-  ad_reward: 100,
+  ad_reward: 50,
   solo_reward: 50,
+  story_share: 25,
 } as const;
-export type EarnReason = "ad_reward";
+export type EarnReason = "ad_reward" | "story_share";
 
 /** Günlük solo set ödülü (+50): set günü başına YALNIZCA BİR kez (ref = `daily:<set_date>`); iki kategoriyi de oynayan ikinci oyunda coin almaz. */
 /** Reklam ödülü günlük üst sınırı (AdMob sunucu doğrulaması gelene kadar kötüye kullanımı sınırlar) */
-export const AD_REWARD_DAILY_LIMIT = 5;
+export const AD_REWARD_DAILY_LIMIT = 3;
+/** Story paylaşımı ödülü günlük üst sınırı (paylaşım doğrulanmaz; sınır kötüye kullanımı sınırlar) */
+export const STORY_SHARE_DAILY_LIMIT = 1;
+/** İlk tier satın alımında verilen hediye coin (hesap başına bir kez: reason `purchase`, ref `tier_gift`); yükseltme ek coin vermez. */
+export const TIER_GIFT_COINS = 1200;
+export const TIER_GIFT_REF = "tier_gift";
 
 export type CoinReason =
   | "signup_bonus"
@@ -29,6 +35,7 @@ export type CoinReason =
   | "solo_reward"
   | "solo_ai"
   | "solo_ai_refund"
+  | "story_share"
   | "purchase"
   | "admin_adjust";
 

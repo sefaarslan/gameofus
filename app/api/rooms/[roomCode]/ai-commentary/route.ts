@@ -26,7 +26,7 @@ const POST_LIMIT_DAY = { limit: 20, windowMs: 24 * 60 * 60 * 1000 };
 
 /**
  * GET: odanın AI yorum durumu. Odanın HER katılımcısına (satın alan da, partner de) ücretsiz. Yalnızca JWT (mobil).
- * `none` hata değildir: 200 ile döner, mobil "100 coinle aç" butonunu gösterir.
+ * `none` hata değildir: 200 ile döner, mobil "150 coinle aç" butonunu gösterir.
  */
 export async function GET(req: NextRequest, { params }: { params: Promise<{ roomCode: string }> }) {
   const roomCode = normalizeRoomCode((await params).roomCode);
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ room
   });
 }
 
-/** POST: AI yorumu satın al ve üret (100 coin). Sıra ve hata davranışı için docs/API_SPEC.md → "AI yorum". */
+/** POST: AI yorumu satın al ve üret (150 coin). Sıra ve hata davranışı için docs/API_SPEC.md → "AI yorum". */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ roomCode: string }> }) {
   const roomCode = normalizeRoomCode((await params).roomCode);
 

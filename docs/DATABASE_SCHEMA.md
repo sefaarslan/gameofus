@@ -62,7 +62,7 @@ Planlanan: `birth_date date null`. `premium_until` kaldırılmıştır.
 
 ### `credit_transactions` — coin hareketleri (audit + idempotency)
 
-`id`, `user_id` (users, cascade), `delta int` (≠0), `balance_after int` (≥0), `reason` (`signup_bonus`, `ad_reward`,
+`id`, `user_id` (users, cascade), `delta int` (≠0), `balance_after int` (≥0), `reason` (`signup_bonus`, `ad_reward`, `story_share`,
 `room_create`, `room_create_refund`, `ai_commentary`, `ai_commentary_refund`, `solo_reward`, `solo_ai`,
 `solo_ai_refund`, `purchase`, `admin_adjust`), `ref_id text null` (oda kodu / solo oturumu / satın alma kimliği),
 `created_at`. `unique(user_id, reason, ref_id) where ref_id is not null` → aynı işlem iki kez uygulanmaz. RLS açık;
@@ -233,8 +233,8 @@ Ayrı model; `questions` ile karıştırılmaz. RLS açık, policy yok (erişim 
 
 ### `purchases` — mobil IAP (Lemon Squeezy / `payments` kullanılmaz)
 
-`user_id` (null olabilir: hesap silinince bağlantı kopar, kayıt yasal süre için kalır), `product_type` (`premium_package` / `room_credit_pack`; coin+tier modelinde Lite/Premium
-paketleri için genişletilecek), `provider` (`app_store` / `play_store`), `provider_transaction_id`
+`user_id` (null olabilir: hesap silinince bağlantı kopar, kayıt yasal süre için kalır), `product_type` (`premium_package` / `room_credit_pack` eski değerler; hedef coin+tier modelinde
+`tier_lite` / `tier_premium` / `tier_upgrade` / `coin_pack_1200` / `coin_pack_3600`, bkz. PRD 12.2; tier hediye coin'i `credit_transactions`'a `reason: purchase`, `ref: tier_gift` ile hesap başına bir kez yazılır), `provider` (`app_store` / `play_store`), `provider_transaction_id`
 (unique), `amount`, `currency`, `status`, `created_at`. RLS: kullanıcı yalnızca kendi satırını okur.
 
 ### `rate_limits`

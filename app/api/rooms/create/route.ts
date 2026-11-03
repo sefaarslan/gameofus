@@ -13,7 +13,7 @@ import { isRelationshipType } from "@/lib/relationship";
 import { checkRateLimit, ipHashFor } from "@/lib/rate-limit";
 import { getAuthUser } from "@/lib/auth";
 import { COIN_PRICES, CoinError, applyCoins } from "@/lib/coins";
-import { canAccessTier, isTier, type Tier } from "@/lib/tier";
+import { LONG_SET_MIN_TIER, LONG_SET_QUESTION_COUNT, canAccessTier, isTier, type Tier } from "@/lib/tier";
 import { MIN_APP_AGE, ageOn, parseBirthDate } from "@/lib/age";
 import { parseGender } from "@/lib/gender";
 
@@ -107,6 +107,15 @@ export async function POST(req: NextRequest) {
   // Uygulamayı kullanmak için asgari yaş (web ve mobil): daha küçükse doğum tarihi saklanmaz, oda açılmaz
   if (ownerBirth && ageOn(ownerBirth) < MIN_APP_AGE) {
     return apiError("AGE_RESTRICTED", `Game of Us'ı kullanmak için en az ${MIN_APP_AGE} yaşında olmalısın.`, 403);
+  }
+
+  // Paket kilidi: mobilde 10 soruluk set Lite+ gerektirir (coin düşümünden önce kontrol edilir); web'de 5/10 ücretsiz
+  if (authUser && platform === "mobile" && count === LONG_SET_QUESTION_COUNT) {
+    const { data: u } = await supabase.from("users").select("tier").eq("id", authUser.id).maybeSingle();
+    const userTier: Tier = isTier(u?.tier) ? u.tier : "free";
+    if (!canAccessTier(userTier, LONG_SET_MIN_TIER)) {
+      return apiError("TIER_REQUIRED", "10 soruluk setler Lite paket gerektirir.", 403);
+    }
   }
 
   // Seçilen kategori bu ilişki türüne uygun mu, paket ve yaş koşulları (sunucu tarafı doğrulama)

@@ -11,3 +11,7 @@ export const tierRank = (t: Tier): number => TIERS.indexOf(t);
 export function canAccessTier(userTier: Tier, minTier: Tier): boolean {
   return tierRank(userTier) >= tierRank(minTier);
 }
+
+/** Mobilde 10 soruluk setler `lite` ve üstünü gerektirir (5 soruluk setler ücretsiz). Web'de 5 ve 10 soru ücretsizdir. */
+export const LONG_SET_QUESTION_COUNT = 10;
+export const LONG_SET_MIN_TIER: Tier = "lite";
