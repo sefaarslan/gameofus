@@ -230,11 +230,10 @@
     },
     "gender": {
       "label": "Género",
-      "hint": "Se usa para dibujar vuestros personajes y escribir comentarios más acertados. Si prefieres no decirlo, elige —.",
+      "hint": "Se usa para dibujar vuestros personajes y escribir comentarios más acertados. Si prefieres no decirlo, elige “Sin respuesta”.",
       "female": "Mujer",
       "male": "Hombre",
-      "unspecified": "—",
-      "unspecifiedAria": "Prefiero no decirlo"
+      "unspecified": "Sin respuesta"
     },
     "name": {
       "label": "Tu nombre",
