@@ -400,7 +400,16 @@
     "aiConsent": {
       "label": "Yapay zekâ yorumuna izin veriyorum (isteğe bağlı)",
       "detail": "Oda sahibi mobil uygulamada yapay zekâ yorumu açarsa yapay zekâ hizmetine (Groq) şunlar gönderilir: adın, cevapların ve tahminlerin; yaş aralığın (ör. 25-34) ve doğum tarihinden hesaplanan burcun (yalnızca yorumun tonu için, yorumda geçmez); İspanyolca odalarda cinsiyetin (belirttiysen). Doğum tarihin gönderilmez. İzin vermezsen oyun aynen devam eder, yalnızca bu oda için yapay zekâ yorumu açılamaz. Yorum web'de gösterilmez.",
-      "declinedNotice": "İşaretlemediğin için bu oyun yapay zekâ tarafından yorumlanamayacak: oda sahibi mobil uygulamada bu oyun için yapay zekâ yorumunu açamaz. Oyunun geri kalanı aynen oynanır."
+      "declinedNotice": "İşaretlemediğin için bu oyun yapay zekâ tarafından yorumlanamayacak: oda sahibi mobil uygulamada bu oyun için yapay zekâ yorumunu açamaz. Oyunun geri kalanı aynen oynanır.",
+      "more": "Neler paylaşılır?",
+      "declinedShort": "İşaretlemezsen bu oyun için yapay zekâ yorumu açılamaz.",
+      "dialogTitle": "Yapay zekâ yorumu ve verilerin",
+      "close": "Tamam",
+      "warnTitle": "Yapay zekâ yorumuna izin vermedin",
+      "warnBody": "Oda sonuçlarının Usight AI tarafından yorumlanmasını istiyorsan izin vermelisin.",
+      "warnAbout": "Usight AI, ikinizin cevap ve tahminlerini inceleyip benzerliklerinizi, farklarınızı ve konuşma başlangıçlarını anlatan kısa bir yorum yazar; yorum mobil uygulamada gösterilir.",
+      "warnAllow": "İzin ver ve katıl",
+      "warnSkip": "İzin vermeden katıl"
     }
   },
   "game": {

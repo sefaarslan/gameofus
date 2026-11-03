@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { GenderPicker } from "@/components/create/GenderPicker";
+import { InfoDialog } from "@/components/InfoDialog";
 import { ageFromIso, maskBirthDateInput, parseBirthDateInput } from "@/lib/date-input";
 import type { Gender } from "@/lib/gender";
 
@@ -17,7 +18,7 @@ interface JoinScreenProps {
  * Davetle katılma: her oyuncu kendi bilgisini kendisi girer. Web odalarında (AI yok) yalnızca ad istenir. Mobilden kurulmuş odada
  * AI rıza kutusunun yanında cinsiyet ve doğum tarihi alanları HER ZAMAN açıktır: kutu işaretliyse doğum tarihi (ve bir cinsiyet
  * seçimi, "belirtmek istemiyorum" dahil) zorunlu, değilse isteğe bağlıdır; yaş aralığı/burç/İspanyolca dil bilgisi yoruma yalnızca
- * rıza varsa girer (sunucuda zorlanır). Kutu boşsa katılmadan önce "bu oyun için yapay zekâ yorumu açılamaz" uyarısı gösterilir.
+ * rıza varsa girer (sunucuda zorlanır). Rıza kutusu formun en altında (Katıl düğmesinin üstünde) kompakttır; ayrıntılı açıklama "Neler paylaşılır?" ile açılan pencerededir. Kutu boşsa kısa bir "bu oyun için yapay zekâ yorumu açılamaz" notu gösterilir ve Katıl'a basınca (ad girildiyse) izin ver / izinsiz katıl seçeneklerini içeren bir uyarı penceresi açılır.
  * Web'de sahne modu ve 18+ yaş denetimi yoktur (yalnızca mobil).
  */
 export function JoinScreen({ roomCode, mobileRoom = false, onJoined }: JoinScreenProps) {
@@ -30,31 +31,47 @@ export function JoinScreen({ roomCode, mobileRoom = false, onJoined }: JoinScree
   const [birthDate, setBirthDate] = useState("");
   // İsteğe bağlı, varsayılan KAPALI (önceden işaretli gelmez): katılmak rızaya bağlı değildir
   const [aiConsent, setAiConsent] = useState(false);
+  const [consentInfoOpen, setConsentInfoOpen] = useState(false);
+  const [declineWarnOpen, setDeclineWarnOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Mobil odada alanlar her zaman açıktır; zorunlu olmaları yapay zekâ rızasına bağlıdır
   const profileRequired = mobileRoom && aiConsent;
 
-  function birthDateError(): string | null {
-    if (!birthDate.trim()) return profileRequired ? t("birthDateRequired") : null;
+  function birthDateError(consent: boolean): string | null {
+    if (!birthDate.trim()) return mobileRoom && consent ? t("birthDateRequired") : null;
     const iso = parseBirthDateInput(birthDate);
     if (!iso) return tc("errors.birthDateInvalid");
     if (ageFromIso(iso) < 13) return tc("errors.birthDateTooYoung");
     return null;
   }
 
-  async function handleJoin(e: React.FormEvent) {
+  /** Katıl'a basıldığında: rıza yoksa önce kısa bir uyarı penceresi açılır (kullanıcı izin verebilir ya da izinsiz devam edebilir) */
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!displayName.trim()) {
       setError(tc("errors.nameRequired"));
       return;
     }
-    if (profileRequired && gender === undefined) {
+    if (mobileRoom && !aiConsent) {
+      setError(null);
+      setDeclineWarnOpen(true);
+      return;
+    }
+    void join(aiConsent);
+  }
+
+  async function join(consent: boolean) {
+    if (!displayName.trim()) {
+      setError(tc("errors.nameRequired"));
+      return;
+    }
+    if (mobileRoom && consent && gender === undefined) {
       setError(t("genderRequired"));
       return;
     }
-    const bdErr = mobileRoom ? birthDateError() : null;
+    const bdErr = mobileRoom ? birthDateError(consent) : null;
     if (bdErr) {
       setError(bdErr);
       return;
@@ -70,7 +87,7 @@ export function JoinScreen({ roomCode, mobileRoom = false, onJoined }: JoinScree
           displayName: displayName.trim(),
           // Yalnızca ekranda gösterilen (mobil oda) alanlar gider; boş bırakılan alan null gider
           ...(mobileRoom ? { gender: gender ?? null, birthDate: parseBirthDateInput(birthDate) } : {}),
-          ...(mobileRoom ? { aiConsent } : {}),
+          ...(mobileRoom ? { aiConsent: consent } : {}),
         }),
       });
       const data = await res.json();
@@ -114,7 +131,7 @@ export function JoinScreen({ roomCode, mobileRoom = false, onJoined }: JoinScree
           <p className="text-body-md text-on-surface-variant text-center mb-1">{t("subtitle")}</p>
           <p className="text-xs text-on-surface-variant/70 text-center mb-6">{t("hint")}</p>
 
-          <form onSubmit={handleJoin} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="join-name" className="text-xs text-on-surface-variant">{t("name.label")}</label>
               <div className="relative">
@@ -131,30 +148,6 @@ export function JoinScreen({ roomCode, mobileRoom = false, onJoined }: JoinScree
                 />
               </div>
             </div>
-
-            {mobileRoom && (
-              <div className="flex flex-col gap-2 bg-surface-container rounded-2xl px-4 py-3">
-                <label htmlFor="join-ai-consent" className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    id="join-ai-consent"
-                    type="checkbox"
-                    checked={aiConsent}
-                    onChange={(e) => setAiConsent(e.target.checked)}
-                    aria-describedby="join-ai-consent-detail"
-                    className="mt-0.5 h-5 w-5 shrink-0 accent-primary"
-                  />
-                  <span className="text-body-md text-on-surface">{t("aiConsent.label")}</span>
-                </label>
-                <p id="join-ai-consent-detail" className="text-xs text-on-surface-variant/80 pl-8">
-                  {t("aiConsent.detail")}
-                </p>
-                {!aiConsent && (
-                  <p role="status" className="text-xs font-medium text-on-surface-variant pl-8">
-                    {t("aiConsent.declinedNotice")}
-                  </p>
-                )}
-              </div>
-            )}
 
             {mobileRoom && (
               <div className="flex flex-col gap-1.5">
@@ -190,6 +183,35 @@ export function JoinScreen({ roomCode, mobileRoom = false, onJoined }: JoinScree
               </div>
             )}
 
+            {mobileRoom && (
+              <div className="flex flex-col gap-1.5 bg-surface-container rounded-2xl px-4 py-3">
+                <label htmlFor="join-ai-consent" className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    id="join-ai-consent"
+                    type="checkbox"
+                    checked={aiConsent}
+                    onChange={(e) => setAiConsent(e.target.checked)}
+                    className="mt-0.5 h-5 w-5 shrink-0 accent-primary"
+                  />
+                  <span className="text-body-md text-on-surface">{t("aiConsent.label")}</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setConsentInfoOpen(true)}
+                  aria-haspopup="dialog"
+                  className="self-start ml-8 flex items-center gap-1 text-xs font-medium text-primary hover:underline underline-offset-2"
+                >
+                  <span className="material-symbols-outlined text-base">info</span>
+                  {t("aiConsent.more")}
+                </button>
+                {!aiConsent && (
+                  <p role="status" className="text-xs text-on-surface-variant pl-8">
+                    {t("aiConsent.declinedShort")}
+                  </p>
+                )}
+              </div>
+            )}
+
             {error && (
               <div role="alert" className="flex items-center gap-3 bg-error-container text-error rounded-2xl px-4 py-3">
                 <span className="material-symbols-outlined text-xl">error</span>
@@ -212,6 +234,50 @@ export function JoinScreen({ roomCode, mobileRoom = false, onJoined }: JoinScree
           </form>
         </div>
       </div>
+
+      <InfoDialog
+        open={consentInfoOpen}
+        title={t("aiConsent.dialogTitle")}
+        closeLabel={t("aiConsent.close")}
+        onClose={() => setConsentInfoOpen(false)}
+      >
+        <p>{t("aiConsent.detail")}</p>
+        <p className="font-medium text-on-surface">{t("aiConsent.declinedNotice")}</p>
+      </InfoDialog>
+
+      <InfoDialog
+        open={declineWarnOpen}
+        title={t("aiConsent.warnTitle")}
+        onClose={() => setDeclineWarnOpen(false)}
+        actions={
+          <div className="mt-6 flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setAiConsent(true);
+                setDeclineWarnOpen(false);
+                void join(true);
+              }}
+              className="w-full h-12 rounded-full bg-primary text-on-primary text-label-md font-semibold hover:bg-surface-tint active:scale-[0.98] transition-all"
+            >
+              {t("aiConsent.warnAllow")}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setDeclineWarnOpen(false);
+                void join(false);
+              }}
+              className="w-full h-12 rounded-full bg-surface-container text-label-md text-on-surface hover:bg-surface-container-high active:scale-[0.98] transition-all"
+            >
+              {t("aiConsent.warnSkip")}
+            </button>
+          </div>
+        }
+      >
+        <p>{t("aiConsent.warnBody")}</p>
+        <p>{t("aiConsent.warnAbout")}</p>
+      </InfoDialog>
     </div>
   );
 }
