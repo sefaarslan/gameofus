@@ -43,3 +43,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Next.js (next dev) kendiliğinden üretir; kaynağımız CLAUDE.md
+AGENTS.md
