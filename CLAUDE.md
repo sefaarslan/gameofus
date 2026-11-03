@@ -92,7 +92,7 @@ daha iyi konuşmalar başlatmak ve birbirini tahmin etme deneyimini oyunlaştır
 ### Deploy
 - **Vercel**; fonksiyon bölgesi Supabase ile aynı olmalı (**Frankfurt, `fra1`**) — her sorgu bölgeler arası
   gidiş-dönüş maliyeti taşır, bu yüzden API route'larında bağımsız sorgular paralel çalıştırılır.
-- Next.js sürümü **sabitlenir** (`16.2.6`, `latest` kullanılmaz); sürüm yükseltmesi bilinçli yapılır.
+- Next.js sürümü **sabitlenir** (`16.4.4`, `latest` kullanılmaz); sürüm yükseltmesi bilinçli yapılır. Sabit sürüm yamaları otomatik almaz: ayda bir `npm audit --omit=dev` çalıştır, güvenlik açığı varsa branch'te yükselt (`tsc`, `next build`, entegrasyon testleri, Vercel preview) sonra `main`'e al. `next dev` kendiliğinden `AGENTS.md` üretir (Next'in özelliği; bizim içeriğimiz değil).
 - Alan adı: `gameofus.app`.
 - **Self-host'a taşıma hazırlığı (Vercel hâlâ canlı hedef):** `docs/MIGRATION_VERCEL_TO_SELFHOST.md`. Kodda hazır: `Dockerfile`
   (`BUILD_STANDALONE=1` → `output: "standalone"`; Vercel'de ayarlanmaz), `CLIENT_IP_HEADER` (self-host'ta güvenilir IP başlığı;

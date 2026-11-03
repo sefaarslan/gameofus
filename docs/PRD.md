@@ -802,7 +802,7 @@ Web ve mobile, **ayrı kod tabanları** olarak geliştirilir, **ortak Supabase b
 - Stitch (arayüz tasarımı)
 - next-intl (TR/EN/ES çoklu dil desteği)
 - Fontlar self-host: Quicksand (`next/font`) ve yalnızca kullanılan ikonları içeren ~14 KB'lık Material Symbols alt kümesi (`npm run icons`); harici font isteği yoktur
-- Next.js sürümü sabitlenir (16.2.6)
+- Next.js sürümü sabitlenir (16.4.4)
 
 **Mobile (yeni):**
 
