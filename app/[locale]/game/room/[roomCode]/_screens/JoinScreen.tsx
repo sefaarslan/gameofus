@@ -204,11 +204,15 @@ export function JoinScreen({ roomCode, mobileRoom = false, onJoined }: JoinScree
                   <span className="material-symbols-outlined text-base">info</span>
                   {t("aiConsent.more")}
                 </button>
-                {!aiConsent && (
-                  <p role="status" className="text-xs text-on-surface-variant pl-8">
+                {/* İki not aynı hücrede üst üste durur, görünmeyen gizlenir: kart yüksekliği işaretlenince/kaldırılınca değişmez */}
+                <div className="grid pl-8">
+                  <p role="status" className={`col-start-1 row-start-1 text-xs text-on-surface-variant ${aiConsent ? "invisible" : ""}`}>
                     {t("aiConsent.declinedShort")}
                   </p>
-                )}
+                  <p role="status" className={`col-start-1 row-start-1 text-xs text-on-surface-variant ${aiConsent ? "" : "invisible"}`}>
+                    {t("aiConsent.allowedShort")}
+                  </p>
+                </div>
               </div>
             )}
 

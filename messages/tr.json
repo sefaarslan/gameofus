@@ -403,6 +403,7 @@
       "declinedNotice": "İşaretlemediğin için bu oyun yapay zekâ tarafından yorumlanamayacak: oda sahibi mobil uygulamada bu oyun için yapay zekâ yorumunu açamaz. Oyunun geri kalanı aynen oynanır.",
       "more": "Neler paylaşılır?",
       "declinedShort": "İşaretlemezsen bu oyun için yapay zekâ yorumu açılamaz.",
+      "allowedShort": "İzin verdin. Oda sahibi yorumu açarsa cevapların ve tahminlerin yapay zekâya gönderilir.",
       "dialogTitle": "Yapay zekâ yorumu ve verilerin",
       "close": "Tamam",
       "warnTitle": "Yapay zekâ yorumuna izin vermedin",

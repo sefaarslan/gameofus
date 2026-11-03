@@ -403,6 +403,7 @@
       "declinedNotice": "Because this box isn't checked, this game can't be interpreted by AI: the room owner won't be able to turn on AI commentary for it in the mobile app. The rest of the game works exactly the same.",
       "more": "What is shared?",
       "declinedShort": "If unchecked, AI commentary can't be turned on for this game.",
+      "allowedShort": "Allowed. If the room owner turns on commentary, your answers and guesses are sent to the AI.",
       "dialogTitle": "AI commentary and your data",
       "close": "Got it",
       "warnTitle": "You haven't allowed AI commentary",
