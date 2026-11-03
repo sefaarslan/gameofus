@@ -133,9 +133,9 @@ Web'deki tüm özelliklere ek olarak:
 
 1. Signin / Signout (**Google + Apple — Supabase Auth**; mobilde tüm oyun için giriş zorunlu) ve hesap silme
 2. Geçmiş oyunlar sekmesi (yalnızca sonuç görünümü)
-3. Coin + tier modeli: Lite / Premium paketleri, kategori kilitleri (bkz. Bölüm 12.2)
-4. Premium/Lite kategorilere kalıcı erişim
-5. Coin bakiyesi (oda −250, AI yorum −100; kayıt bonusu +500, reklam +100)
+3. Coin + tier modeli: tek seferlik paketler (Kahve kokusu / Bir fincan kahve / Kahve tatlı ikilisi), coin paketleri, kategori kilitleri (bkz. Bölüm 12.2)
+4. Lite/Premium kategorilere ve özelliklere kalıcı erişim
+5. Coin bakiyesi (oda −250, AI yorum −150; kayıt bonusu +500, reklam +50 günde 3, solo günlük set +50, story paylaşımı +25 günde 1)
 6. **AI yorum** (sonuç ekranında, coin ile; bkz. Bölüm 12.3)
 7. Push notification (partner katıldı / tamamladı / sonuç hazır)
 8. Deep linking (oda linkleri hem web hem mobile'dan açılabilir; `gameofus.app` üzerinden universal link)
@@ -241,7 +241,7 @@ Secret Choice, Prediction ve Orderline modlarının dengeli karışımıdır. MV
 - **Doğru cevap yoktur:** sonuç yalnızca **tolerans profili**dir: Green/Yellow/Red sayıları, tolerans eşiği `(green×2 + yellow)/18`, ve **Red sayısına (0-9) göre sabit bir başlık + tek cümlelik yorum** (merak uyandırıcı, hafif mizahi; ör. 0 → "Kırmızı bayrak mı? Hiç görmedim.", 5 → "Yarı yarıya şüpheci.", 9 → "Komple mayın arama ekibi."). Arketip sistemi kaldırılmıştır; yargı/teşhis dili yoktur.
 - **Karne (ücretsiz):** sabit başlık + cümle, mini 3×3 ızgara + sayılar + tolerans çubuğu; **Story görseli** (1080×1920), **WhatsApp'ta paylaş** ve link önizlemesinde gönderenin karnesini gösteren paylaşım linki; **"Cevaplarına göz at"** kartı (9 kartın senaryosu ve seçilen bayrak, iki kişilik sonuçtaki "Detayları gör" gibi); geri bildirim kartı; sayfa sonunda "Ana sayfaya dön".
 - **Web:** anonim, serbest set seçimi (günlük set yalnızca mobildir), her sette **1 oyun** (tekrar için mobil uygulamaya yönlendirme), coin yok; "AI ile derinlemesine analiz" butonu **pasif** ("Mobil uygulamada").
-- **Mobil (planlı):** **günlük set**: serbest set seçimi yoktur; her kategori (Arkadaşlık / Sevgili) için her gün yerel gece yarısı yeni bir set açılır (aynı gün herkes aynı seti oynar, dünün seti tekrar çıkmaz, kullanıcı günde kategori başına bir oyun oynar); set tamamlanınca **+50 coin, set günü başına bir kez** (sunucuda doğrulanır; iki kategoriyi de oynayan ikinci oyunda coin yok); AI analizi **−100 coin** (Bölüm 12.3; 2 paragraf, mizahi/samimi, sınır ve tolerans eşiği odaklı, teşhis/"ayrıl-kal" tavsiyesi yok). Oyun girişinde isim/cinsiyet sorulmaz; AI için yalnızca (opsiyonel) ilk isim, senaryolar + bayraklar + tema etiketleri gider.
+- **Mobil (planlı):** **günlük set**: serbest set seçimi yoktur; her kategori (Arkadaşlık / Sevgili) için her gün yerel gece yarısı yeni bir set açılır (aynı gün herkes aynı seti oynar, dünün seti tekrar çıkmaz, kullanıcı günde kategori başına bir oyun oynar); set tamamlanınca **+50 coin, set günü başına bir kez** (sunucuda doğrulanır; iki kategoriyi de oynayan ikinci oyunda coin yok); AI analizi **−150 coin** (Bölüm 12.3; 2 paragraf, mizahi/samimi, sınır ve tolerans eşiği odaklı, teşhis/"ayrıl-kal" tavsiyesi yok). Oyun girişinde isim/cinsiyet sorulmaz; AI için yalnızca (opsiyonel) ilk isim, senaryolar + bayraklar + tema etiketleri gider.
 - **Konumlandırma:** oda oluşturma akışında bir mod **değildir** (link/partner/oda yok). Girişler: landing bölümü (hero'da ayrı bağlantı yoktur), üst menüdeki "Solo" bağlantısı, footer, iki kişilik bekleme ve sonuç ekranlarında kapatılabilir kart; mobilde ana sayfa kartı ("Bugünün Seti #N", sonraki sete geri sayım, +50 coin rozeti).
 - **Sonraki sürümler:** kalabalık yüzdeleri, "arkadaşına gönder, aynı 9 kartı o da oynasın ve karşılaştırın" köprüsü (solo → iki kişilik ana döngü), yeni solo oyunlar (`solo_*` tabloları `game` alanıyla genişlemeye hazır).
 
@@ -483,34 +483,62 @@ Konuşma önerisi:
 
 Eski "tek seferlik premium + oda kredisi" ve daha önceki "3 günlük hak" modelleri **yerini coin + tier modeline bırakmıştır** (ayrıntılı iş listesi: `gameofus-mobile/tasklist.md` B4/B5/C1/C2).
 
+> **Durum (karar: 2026-11-03):** Coin değerleri (reklam, story, AI yorum fiyatları, günlük limitler) ve mobilde 10 soruluk set için `lite` kontrolü **backend'de uygulandı** (`lib/coins.ts`, `POST /api/rooms/create`, `POST /api/users/coins/earn`); mobil uygulama bu değerlere göre güncellenecek. Paket satın alma tarafı (`/api/iap/verify`, tier hediyesi, yükseltme) **henüz yazılmadı**. Fiyatlar Apple/Google fiyat noktalarına uydurularak ileride revize edilir.
+
 **Coin ekonomisi:**
 
-| Olay | Coin |
-|---|---|
-| Kayıt bonusu | +500 |
-| Ödüllü reklam izleme | +100 |
-| Oda oluşturma | −250 (tüm kullanıcılar, premium dahil) |
-| AI yorum açma | −100 (tüm kullanıcılar, premium dahil — maliyet öngörülebilirliği için bilinçli tercih) |
+| Olay | Coin | Kural |
+|---|---|---|
+| Kayıt bonusu | +500 | Auth trigger'ı |
+| Ödüllü reklam izleme | +50 | **Günde en fazla 3**; ücretli kullanıcı da isteğe bağlı izleyip kazanabilir |
+| Günlük Red Flag seti (solo) | +50 | Set günü başına bir kez |
+| Red Flag setini story'de paylaşma | +25 | **Günde bir kez**; paylaşım doğrulanmaz (yalnızca niyet), sunucuda idempotent (`story:<tarih>`) |
+| Oda oluşturma | −250 | Tüm kullanıcılar, ücretli dahil |
+| AI yorum açma (oda) ve solo AI analizi | −150 | Tüm kullanıcılar, ücretli dahil — maliyet öngörülebilirliği için bilinçli tercih |
 
-**Paketler (tek seferlik, consumable IAP — App Store / Play Store, RevenueCat):**
+Solo AI analizi de aynı fiyattır (−150): tüm AI yorumları 150 coin. Bir "oda + AI yorum" turu **400 coin**'dir.
 
-| Paket | Coin | Fiyat (taslak) | Kalıcı erişim |
+**Paketler (hepsi tek seferlik; App Store / Play Store IAP, RevenueCat):**
+
+| Paket | Tier | Fiyat (taslak) | Ürün türü |
 |---|---|---|---|
-| Lite | 2000 | ≈ $6.90 | Lite kategorileri |
-| Premium | 5000 | ≈ $10.90 | Lite + Premium kategorileri (ör. Cesur Sorular) |
+| **Kahve kokusu** | `free` | Ücretsiz (girişle otomatik) | — |
+| **Bir fincan kahve** | `lite` | 249 TL | Non-consumable (kalıcı) |
+| **Kahve tatlı ikilisi** | `premium` | 499 TL | Non-consumable (kalıcı) |
+| Yükseltme: Bir fincan kahve → Kahve tatlı ikilisi | `premium` | 249 TL | Non-consumable, yalnızca `lite` kullanıcıya gösterilir |
+| 1200 coin | — | 149 TL | Consumable |
+| 3600 coin | — | 349 TL | Consumable |
+
+**Paket içerikleri (her paket bir öncekinin hepsini içerir):**
+
+- **Kahve kokusu (free):** tüm bağ türleriyle oda kurma; tüm oyun modları; **5 soruluk setler**; oda paylaşma; oda sonuçlarını AI ile yorumlatma (coinle); günlük Red Flag Mayın Tarlası seti; set görselini story'de paylaşma.
+- **Bir fincan kahve (lite):** Kahve kokusu'nun hepsi + **1200 coin hediye** + **10 soruluk setler** + oyun kılavuzlarına tam erişim + özel gün kategorileri + zorunlu reklamların kalkması (ödüllü reklam isteğe bağlı kalır).
+- **Kahve tatlı ikilisi (premium):** Bir fincan kahve'nin hepsi + **Cesur Sorular** kategorisi (18+) + ileride çıkacak yeni oyunlara erişim. Coin hediyesi **1200**'dür (Fincan'ın üstüne 1200 daha eklenmez; toplam 2400 değil).
+
+> Oyun kılavuzları, özel gün kategorileri ve "yeni oyunlar" henüz yoktur; üzerinde çalışılıyor. Vaat edilen her özellik hazır olmadan ilgili paket mağazada satışa açılmamalıdır.
+
+**Kılavuzlar (planlı):** Bir kılavuz **3 odadan** oluşur; oda + AI yorum 400 coin olduğundan bir kılavuz **1200 coin** eder. Bu, 1200 coin'lik paketin ve Bir fincan kahve hediyesinin tam bir kılavuza denk gelmesi için bilinçli seçilmiştir. Free kullanıcı da kılavuz açabilir (coinle); "tam erişim"in tam kapsamı kılavuz içeriği netleşince yazılacaktır (açık nokta, 12.6).
+
+**Hediye coin ve yükseltme kuralı (kritik — doğrudan alım ile yükseltme aynı sonucu vermeli):**
+
+- Tier hediyesi **hesap başına yalnızca bir kez** verilir: `reason: purchase`, `ref = tier_gift` (idempotent). İlk tier satın alımı 1200 coin verir; sonraki herhangi bir tier satın alımı/yükseltmesi **ek coin vermez**. Böylece 499 TL'yi doğrudan alan da, 249 + 249 TL ile yükselten de toplam **1200 hediye coin** alır.
+- Yükseltme ürünü (249 TL) yalnızca `lite` kullanıcıya gösterilir; `free` kullanıcıya doğrudan 499 TL'lik ürün, `lite` kullanıcıya yalnızca yükseltme ürünü sunulur (iki kez ödeme engellenir). `premium` kullanıcıya hiçbir tier ürünü gösterilmez.
+- Coin paketleri (1200 / 3600) her satın almada coin ekler, tier'ı etkilemez; istendiği kadar tekrar alınabilir.
 
 Kurallar:
 
-- Paket **her satın almada coin ekler**; `tier` yalnızca **yükselir, asla düşmez** (`tier = max(mevcut, satın_alınan)`). Paket tekrar satın alınabilir.
-- **Kategori erişimi coin ile açılmaz**, yalnızca paket (tier) ile: `categories.min_tier` (`free / lite / premium`) ≥ kullanıcı `tier`'ı ise kilitli. Kategori başına ayrı ödeme yoktur; mesajlaşma net olmalıdır: *"Bir kez satın al, [Lite/Premium] kategorilerine kalıcı olarak eriş."*
-- **Restore Purchases** zorunludur (App Store): restore tier'ı geri yükler, coin'i **tekrar yüklemez** (coin tüketilebilirdir).
+- `tier` yalnızca **yükselir, asla düşmez** (`tier = max(mevcut, satın_alınan)`).
+- **Kategori ve özellik erişimi coin ile açılmaz**, yalnızca paket (tier) ile: `categories.min_tier` (`free / lite / premium`) ≥ kullanıcı `tier`'ı ise kilitli. 10 soruluk set (mobil) da `lite` ve üstünü gerektirir (sunucu `questionCount = 10` için tier'ı doğrular; web'de 5 ve 10 soru ücretsiz kalır). Kategori başına ayrı ödeme yoktur; mesajlaşma net olmalıdır: *"Bir kez satın al, kalıcı olarak eriş."*
+- **Restore Purchases** zorunludur (App Store): restore tier'ı geri yükler (non-consumable), coin'i **tekrar yüklemez** (hediye zaten `tier_gift` ref'iyle bir kez verilmiştir; coin paketleri tüketilebilirdir).
 - App Store 3.1.1: fiyat/faturalama net gösterilir; Terms of Use ve Privacy Policy bağlantıları bulunur.
-- Satın alma yalnızca sunucu doğrulamasıyla (`/api/iap/verify`) geçerli olur: `users` üzerinde coin artışı + `tier = GREATEST(mevcut, yeni)`; tüm hareketler `credit_transactions` audit tablosuna yazılır.
+- Satın alma yalnızca sunucu doğrulamasıyla (`/api/iap/verify`) geçerli olur: `users` üzerinde coin artışı (hediye/coin paketi) + `tier = GREATEST(mevcut, yeni)`; tüm hareketler `credit_transactions` audit tablosuna yazılır.
+
+**Birim ekonomisi notu (net gelir tahmini):** Türkiye'de fiyatın yaklaşık **%56,7'si** geliştiriciye kalır (KDV %20 Apple'da; Apple komisyonu %15 Small Business Program varsayımıyla; dijital hizmet vergisi %5 — Ocak 2027'de %2,5'e inmesi planlı; Mükerrer 20/B ile %15 stopaj). Örnek: 249 TL → ~141 TL, 499 TL → ~283 TL, 149 TL → ~84 TL. Vergi yolu (Mükerrer 20/B, yıllık 5,3 milyon TL hasılat sınırı) mali müşavirle teyit edilecektir.
 
 ### 12.3 AI yorum (mobile; backend canlı)
 
 - **Yalnızca mobil.** Web arayüzünde hiçbir yerde yoktur (buton, kart, ipucu ya da "mobilde aç" duyurusu eklenmez); hesapsız web oyuncusu yorumu göremez.
-- Sonuç ekranında "100 coin ile aç" butonu (herkes için aynı). Coin yetersizse paket ekranına yönlendirilir. **Yorumu odadaki iki kişiden biri açar; açılınca partner de ücretsiz okur** (ikinci kişi satın alamaz, okur).
+- Sonuç ekranında "150 coin ile aç" butonu (herkes için aynı). Coin yetersizse paket ekranına yönlendirilir. **Yorumu odadaki iki kişiden biri açar; açılınca partner de ücretsiz okur** (ikinci kişi satın alamaz, okur).
 - Rıza: kullanıcı AI yorum için bir kez onay verir (`POST /api/users/ai-consent`); metin mobilde, sürüm sunucuda saklanır.
 - Sunucu (`POST /api/rooms/[roomCode]/ai-commentary`): önce coin düşer, sonra LLM çağrısı yapılır; başarısızlıkta coin iade edilir. Yorum `ai_commentaries` tablosunda saklanır (oda başına tek aktif kayıt; aynı oda için tekrar ücret/maliyet yok).
 - Girdi: oda ilişki türü, oda dili, kodda hesaplanmış olgu kartları (soru/seçenek metniyle cevaplar ve tahminler; benzerlik; "eminim ama ıskaladı" anları), yaş aralığı ve (yalnızca İspanyolca için) cinsiyet. Serbest metin yoktur; doğum tarihi, kimlik, e-posta gönderilmez. Ton: sıcak, yargılamayan, spesifik; "uyum puanı/eşleşme" dili yok; `friend` odasında romantik çağrışım yok.
@@ -520,9 +548,9 @@ Kurallar:
 ### 12.4 Satın alma akışı (mobile)
 
 1. Kullanıcı giriş yapar (Google / Apple); kayıt bonusu coin hesabına işlenir.
-2. Oda kurar (−250 coin). Coin biterse reklam izleyerek (+100) ya da paket alarak coin kazanır.
-3. Kilitli bir kategoriye girmeye çalışırsa paket ekranına yönlendirilir.
-4. Paket satın alınır → sunucu doğrular → coin eklenir, `tier` yükselir, kategoriler kalıcı açılır.
+2. Oda kurar (−250 coin). Coin biterse reklam izleyerek (+50, günde 3), günlük Red Flag setini oynayarak (+50), story paylaşarak (+25, günde 1) ya da coin paketi alarak coin kazanır.
+3. Kilitli bir kategoriye, 10 soruluk sete veya başka bir `lite`/`premium` özelliğine girmeye çalışırsa paket ekranına yönlendirilir (`lite` kullanıcıya yalnızca yükseltme ürünü gösterilir).
+4. Paket satın alınır → sunucu doğrular → ilk tier alımında 1200 coin hediye eklenir, `tier` yükselir, özellikler kalıcı açılır. Coin paketi satın alınırsa yalnızca coin eklenir.
 
 Agresif satış, geri sayım, manipülatif metin veya ilişki baskısı kullanılmamalıdır.
 
@@ -543,8 +571,11 @@ Web'e giren bilgi, kullanıcının premium *durumu* değil, kategorinin *meta ve
 
 ### 12.6 Henüz belirlenmemiş noktalar
 
-- Paket fiyatlarının yerel para birimi karşılıkları (TL/EUR vb.) ve nihai tutarlar.
-- Reklam izleme için günlük üst sınır olup olmayacağı.
+- Paket fiyatlarının Apple/Google fiyat noktalarına uygun nihai tutarları (taslak TL fiyatları 12.2'de; ileride revize edilecek) ve TL dışı pazarlar için karşılıkları.
+- "Oyun kılavuzlarına tam erişim"in tam kapsamı: free kullanıcı hangi kılavuzları açabilir, kılavuz içerikleri ve ilerleme/fiyat modeli.
+- Özel gün kategorileri, kılavuzlar ve "yeni oyunlar" için içerik/geliştirme planı (paketler bunlar hazır olmadan satışa açılmaz).
+- Yükseltme (249 TL) ürününün Apple tarafında nasıl kurgulanacağı (ayrı non-consumable ürün, yalnızca `lite` kullanıcıya gösterim).
+- ~~Reklam izleme için günlük üst sınır~~ — karar verildi: günde 3 (12.2).
 - **[YAPILACAK — yayından önce] AI yorum rıza metni ve gizlilik politikası güncellemesi** (`docs/legal/privacy-policy-tr.md`, `docs/legal/terms-tr.md` ve mobil rıza ekranı). Metinde şunlar açıkça yazılmalı: (1) cevaplar ve tahminler üçüncü taraf LLM sağlayıcısına gider (Groq; yedek yapılandırılırsa OpenRouter ve onun model sağlayıcısı) ve saklama/eğitim politikaları; (2) modele giden veriler: oyuncu adları, soru/seçenek metniyle cevaplar ve tahminler, ilişki türü, oda dili, **yaş aralığı**, **cinsiyet (yalnızca İspanyolca dil bilgisi için)** ve **burç (doğum tarihinden türetilir; yorumu kişiselleştirmek için arka planda kullanılır, yorumda anılmaz)**; (3) gönderilmeyenler: doğum tarihi, e-posta, kimlikler; (4) AI yorumun eğlence amaçlı olduğu, tıbbi/psikolojik tavsiye olmadığı; (5) partnerin yorumu satın alan kişi aracılığıyla okuyabildiği (iki oyuncuya da görünür); (6) rıza sürümü `users.ai_consent_version` ile tutulur, metin değişince yeniden rıza istenir.
 - Doğum tarihinin saklama süresi (oda ile birlikte silinmesi önerilir; oda 24 saatte expire olur).
 
@@ -671,12 +702,14 @@ Tahmin kilitlendikten sonra **ara ekran yoktur**: kilitle düğmesi kısa süre 
 - Puan, istatistik veya kategori kırılımı yoktur
 - Karşı tarafın etiketi ilişki türüne göre uyarlanır
 
-### 13.8 Paket Ekranı — Lite / Premium (yalnızca mobile)
+### 13.8 Paket Ekranı — Kahve kokusu / Bir fincan kahve / Kahve tatlı ikilisi (yalnızca mobile)
 
 İçerikler:
 
-- Lite ve Premium paket kartları (coin miktarı, fiyat, hangi kategorilere kalıcı erişim verdiği)
-- Net mesaj: "Bir kez satın al, [Lite/Premium] kategorilerine kalıcı olarak eriş"
+- Üç paket kartı (Kahve kokusu geçerli plan olarak işaretli; Bir fincan kahve 249 TL; Kahve tatlı ikilisi 499 TL) — fiyat, hediye coin ve her paketin açtığı özellikler listesi (bkz. 12.2)
+- `lite` kullanıcıda "Kahve tatlı ikilisi" kartı yerine **yükseltme** (249 TL) gösterilir; `premium` kullanıcıda tier satın alma yoktur
+- Coin paketleri: 1200 coin (149 TL), 3600 coin (349 TL)
+- Net mesaj: "Bir kez satın al, kalıcı olarak eriş"
 - Satın alma CTA (IAP), **Restore Purchases**, Terms of Use ve Privacy Policy bağlantıları
 
 ### 13.9 Coin Bakiyesi ve Yetersiz Coin (yalnızca mobile)
@@ -684,8 +717,8 @@ Tahmin kilitlendikten sonra **ara ekran yoktur**: kilitle düğmesi kısa süre 
 İçerikler:
 
 - Profil menüsünde coin bakiyesi
-- Coin yetersizse: reklam izle (+100) veya paket ekranına yönlendirme
-- AI yorum için "100 coin ile aç" (bkz. Bölüm 12.3)
+- Coin yetersizse: reklam izle (+50, günde 3 hak) veya paket ekranına yönlendirme
+- AI yorum için "150 coin ile aç" (bkz. Bölüm 12.3)
 
 ### 13.10 Signin / Signout (yalnızca mobile)
 
@@ -841,7 +874,7 @@ Web ve mobile, **ayrı kod tabanları** olarak geliştirilir, **ortak Supabase b
 
 **Ödeme:**
 
-- Mobile App Store / Play Store IAP (RevenueCat; Lite ve Premium paketleri consumable, her satın alma coin ekler ve tier'ı yükseltir — bkz. Bölüm 12.2).
+- Mobile App Store / Play Store IAP (RevenueCat; Bir fincan kahve / Kahve tatlı ikilisi ve yükseltme **tek seferlik non-consumable**, tier'ı kalıcı yükseltir ve ilk alımda 1200 coin hediye eder; 1200 / 3600 coin paketleri consumable — bkz. Bölüm 12.2).
 - Lemon Squeezy veya başka bir web ödeme sağlayıcısı **kullanılmaz** — premium tamamen mobile'a özel olduğu için web'de ödeme entegrasyonu yoktur.
 
 ### Server-side işlem yaklaşımı
@@ -1136,7 +1169,7 @@ Mobile IAP satın almaları için (eski `payments` tablosunun yerini alır).
 |---|---|---|
 | id | uuid | Purchase ID |
 | user_id | uuid | Satın alan kayıtlı kullanıcı |
-| product_type | text | premium_package / room_credit_pack |
+| product_type | text | tier_lite / tier_premium / tier_upgrade / coin_pack_1200 / coin_pack_3600 (eski: premium_package / room_credit_pack) |
 | provider | text | app_store / play_store |
 | provider_transaction_id | text | Store işlem ID'si; idempotency için |
 | amount | numeric | Tutar |
@@ -1390,19 +1423,19 @@ Her ilişki türü 6 kategori görür (Sevgili ve Evli türlerinde biri premium 
 | Guest tanıma | Guest ilk katılımda token alır; aynı cihazdan token ile devam eder |
 | Token saklama | Web: localStorage (hardening'de HttpOnly cookie); Mobile: expo-secure-store |
 | Auth | Web'de ücretsiz oyun anonimdir (login yok). **Mobilde her oyun için Google/Apple girişi zorunludur** (anonim oyun yok); Supabase Auth yalnızca mobildedir |
-| **Premium modeli** | **Coin + tier: Lite (≈$6.90, 2000 coin) ve Premium (≈$10.90, 5000 coin) tek seferlik consumable paketler; paket tier'ı kalıcı yükseltir (asla düşürmez) ve coin ekler; kategori erişimi yalnızca tier ile (coin ile açılmaz). Eski "tek seferlik premium + oda kredisi" ve zaman bazlı modeller kaldırıldı** |
-| **Coin ekonomisi** | **Kayıt +500, reklam +100, oda −250, AI yorum −100 (herkes için)** |
+| **Premium modeli** | **Coin + tier, üç tek seferlik paket: Kahve kokusu (free, girişle otomatik), Bir fincan kahve (`lite`, 249 TL, 1200 coin hediye, 10 soruluk setler, kılavuzlar, özel gün kategorileri, reklamsız), Kahve tatlı ikilisi (`premium`, 499 TL, Fincan + Cesur + yeni oyunlar; hediye coin yine 1200, 2400 değil); Fincan→İkili yükseltme 249 TL ve ek coin vermez (hediye hesap başına bir kez, ref `tier_gift`); paketler kalıcı non-consumable, tier asla düşmez; coin paketleri 1200 = 149 TL, 3600 = 349 TL (consumable); kategori/özellik erişimi yalnızca tier ile. Eski "tek seferlik premium + oda kredisi", zaman bazlı ve "Lite/Premium consumable coin paketi" modelleri kaldırıldı. Karar: 2026-11-03** |
+| **Coin ekonomisi** | **Kayıt +500, reklam +50 (günde 3; ücretli kullanıcı da kazanabilir), solo günlük set +50, story paylaşımı +25 (günde 1), oda −250, tüm AI yorumları (oda ve solo) −150 (herkes için); oda + AI = 400 coin; bir kılavuz = 3 oda = 1200 coin. Karar: 2026-11-03; backend'de uygulandı** |
 | **Ödeme sağlayıcısı** | **Mobile App Store / Play Store IAP (RevenueCat); Lemon Squeezy kullanılmıyor** |
 | **Premium kapsamı** | **Yalnızca mobile; web hiçbir premium/login mantığı barındırmaz** |
-| Paket fiyatlarının yerel karşılıkları, reklam günlük limiti | Henüz belirlenmedi |
+| Fiyat noktalarına uygun nihai tutarlar, solo AI fiyatı, kılavuz kapsamı | Henüz belirlenmedi (bkz. 12.6) |
 | **İlişki türleri** | **Kanka (`friend`) / Sevgili (`dating`) / Evli (`partner`); oda kurulurken zorunlu, kurulduktan sonra değişmez; slug teknik, görünen isim çeviri. İngilizce: friend/partner, İspanyolca: amigo/pareja** |
 | **Kanka içerik kuralı** | **Kanka'ya açık hiçbir kategoride romantik çağrışım yok (otomatik denetim); ortak kategoriler tür-bağımsız** |
 | **Kategori filtresi** | **`categories.relationship_types` ile; sunucu doğrular; "Karışık Sürpriz" yalnızca uygun, ücretsiz kategorilerden çeker** |
 | **Geri bildirim** | **Sonuç ekranında isteğe bağlı mini anket (puan, AI ilgisi, yorum) + oda başına bir kez yumuşak çıkış istemi; zorunlu değil. Davranış metrikleri (partner katılımı, tamamlama) asıl memnuniyet sinyalidir** |
-| **AI yorum** | **Mobil, coin ile (−100), `insight_tag` + yapılandırılmış cevaplardan; yayın öncesi rıza/gizlilik netleştirilir; web'de yalnızca "yakında" olarak anlatılır** |
+| **AI yorum** | **Mobil, coin ile (−150; tüm AI yorumları), `insight_tag` + yapılandırılmış cevaplardan; yayın öncesi rıza/gizlilik netleştirilir; web'de yalnızca "yakında" olarak anlatılır** |
 | **Yaş doğrulama** | **Yalnızca mobilde (Cesur Sorular için, Sevgili/Evli + her iki oyuncu 18+: kurucu kurarken, karşı oyuncu katılırken kendi hesabından); webde 18+ odalara girilemez. Doğum tarihi webde isteğe bağlıdır (yorum kişiselleştirme) ve asgari yaş 13 olarak kontrol edilir** |
 | **Domain** | **`gameofus.app` (satın alındı, canlı); Instagram `@gameofus.app`** |
-| **Solo oyun (Red Flag Mayın Tarlası)** | **Doğru cevap yok, yalnızca tolerans profili + Red sayısına göre sabit başlık/cümle (arketip yok); sabit setler (2 kategori × 7 set, 9'ar kart; webde yalnızca 101, 102-107 yalnızca mobilde); ayrı model (`solo_*`); önce web (anonim, 1 oyun), sonra mobil (günlük set: günde +50 coin, AI −100 coin); oyun girişinde kişisel veri sorulmaz** |
+| **Solo oyun (Red Flag Mayın Tarlası)** | **Doğru cevap yok, yalnızca tolerans profili + Red sayısına göre sabit başlık/cümle (arketip yok); sabit setler (2 kategori × 7 set, 9'ar kart; webde yalnızca 101, 102-107 yalnızca mobilde); ayrı model (`solo_*`); önce web (anonim, 1 oyun), sonra mobil (günlük set: günde +50 coin, AI −150 coin); oyun girişinde kişisel veri sorulmaz** |
 | **Altyapı** | **Vercel fonksiyonları Supabase ile aynı bölgede (Frankfurt); Next.js sürümü sabit; fontlar/ikonlar self-host** |
 | Sonuç hesaplama | Server-side endpoint üzerinden yapılır |
 | Realtime kapsamı | Sadece oda/participant status güncellemeleri; answers/predictions realtime'a açılmaz |
@@ -1439,7 +1472,7 @@ MVP başarılı sayılacaktır eğer:
 
 Game of Us, iki kişinin — arkadaşlar, sevgililer ya da evli çiftler — birbirini tahmin ederek ve cevapları birlikte açarak daha iyi tanımasını sağlayan link bazlı bir uygulamadır. Web'de stabil bir MVP olarak çalışır; mobile app, aynı oyun deneyimini native bir katmanla (push notification, geçmiş oyunlar, premium kategoriler) genişletir.
 
-Web'de oyun tamamen anonimdir — link paylaşımı, iki kişilik oyun ve sonuç ekranı için kayıt gerekmez. Mobil uygulamada giriş (Google/Apple) zorunludur; satın alma ve coin yalnızca orada vardır: Lite/Premium paketleri kategorilere kalıcı erişim ve coin verir, coin oda kurmak ve AI yorumu açmak için harcanır.
+Web'de oyun tamamen anonimdir — link paylaşımı, iki kişilik oyun ve sonuç ekranı için kayıt gerekmez. Mobil uygulamada giriş (Google/Apple) zorunludur; satın alma ve coin yalnızca orada vardır: tek seferlik paketler (Bir fincan kahve, Kahve tatlı ikilisi) kategorilere ve özelliklere kalıcı erişim ile hediye coin verir, ayrıca coin paketleri satılır; coin oda kurmak ve AI yorumu açmak için harcanır.
 
 Ürünün en kritik varsayımı teknik değil, davranışsaldır:
 

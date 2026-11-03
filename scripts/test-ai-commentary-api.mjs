@@ -114,9 +114,9 @@ try {
 
   await setCoins(A, 1000);
   r = await P(code2, A, "fake:ok");
-  ok(r.status === 200 && r.json?.status === "ready" && r.json.applied === true && r.json.balance === 900, "başarılı satın alma: 200 ready, applied:true, bakiye 900");
+  ok(r.status === 200 && r.json?.status === "ready" && r.json.applied === true && r.json.balance === 850, "başarılı satın alma: 200 ready, applied:true, bakiye 850");
   ok(r.json?.content?.strengths?.length === 3 && !!r.json.content.headline, "içerik şemaya uygun (headline + 3 strengths…)");
-  ok((await coins(A)) === 900, "coin −100 düşüldü");
+  ok((await coins(A)) === 850, "coin −150 düşüldü");
   const bBefore = await coins(B);
   r = await G(code2, B);
   ok(r.status === 200 && r.json?.status === "ready" && r.json.purchasedByMe === false && !!r.json.content, "partner GET: ücretsiz okur, purchasedByMe:false");
@@ -138,9 +138,9 @@ try {
   let rows = await rowsOf(code3);
   ok(rows.length === 1 && rows[0].status === "failed" && rows[0].attempt === 1, "başarısız deneme kaydı: failed, attempt 1");
   let tx = await txOf(A, code3);
-  ok(tx.some((t) => t.reason === "ai_commentary" && t.delta === -100) && tx.some((t) => t.reason === "ai_commentary_refund" && t.delta === 100), "coin hareketleri: −100 ve +100 (iade)");
+  ok(tx.some((t) => t.reason === "ai_commentary" && t.delta === -150) && tx.some((t) => t.reason === "ai_commentary_refund" && t.delta === 150), "coin hareketleri: −150 ve +100 (iade)");
   r = await P(code3, A, "fake:rate_limit,fake:ok");
-  ok(r.status === 200 && r.json?.applied === true && r.json.balance === 900, "ana model 429 → yedek model devreye girdi, başarılı");
+  ok(r.status === 200 && r.json?.applied === true && r.json.balance === 850, "ana model 429 → yedek model devreye girdi, başarılı");
   rows = await rowsOf(code3);
   ok(rows.length === 2 && rows[1].attempt === 2 && rows[1].status === "ready" && String(rows[1].model).includes("ok"), "yeniden deneme: attempt 2, ready, yedek modelin adı kayıtlı");
   tx = await txOf(A, code3);
@@ -156,13 +156,13 @@ try {
   rows = await rowsOf(code4);
   ok(rows.filter((q) => q.status === "ready" || q.status === "generating").length === 1, "tek aktif kayıt");
   const spent = (1000 - (await coins(A))) + (1000 - (await coins(B)));
-  ok(spent === 100, `toplam coin düşümü tam 100 (${spent})`);
+  ok(spent === 150, `toplam coin düşümü tam 150 (${spent})`);
 
   // ── Takılmış (stale) kayıt: GET temizler ve iade eder ──────────────────────
   const g5 = await playRoom(A, B); const code5 = g5.code;
   await setCoins(A, 1000);
   const { data: room5 } = await db.from("rooms").select("id").eq("room_code", code5).single();
-  await db.rpc("apply_coins", { p_user: A.id, p_delta: -100, p_reason: "ai_commentary", p_ref: `${code5}:1` });
+  await db.rpc("apply_coins", { p_user: A.id, p_delta: -150, p_reason: "ai_commentary", p_ref: `${code5}:1` });
   await db.from("ai_commentaries").insert({ room_id: room5.id, purchased_by: A.id, locale: "tr", status: "generating", attempt: 1, consent_version: "test-v1", updated_at: new Date(Date.now() - 10 * 60_000).toISOString() });
   r = await G(code5, B);
   rows = await rowsOf(code5);
@@ -178,7 +178,7 @@ try {
   await setCoins(A, 1000);
   await db.from("rooms").update({ expires_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() }).eq("room_code", code8);
   r = await P(code8, A, "fake:ok");
-  ok(r.status === 200 && r.json?.applied === true && r.json.balance === 900, "süresi dolmuş odada satın alma: 200 (ROOM_EXPIRED yok)");
+  ok(r.status === 200 && r.json?.applied === true && r.json.balance === 850, "süresi dolmuş odada satın alma: 200 (ROOM_EXPIRED yok)");
   r = await G(code8, B);
   ok(r.status === 200 && r.json?.status === "ready", "süresi dolmuş odada partner GET ile okur");
   r = await P("ZZZZZ3", A, "fake:ok");

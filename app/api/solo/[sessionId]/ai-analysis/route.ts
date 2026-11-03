@@ -53,7 +53,7 @@ function adapterFor(session: SoloSessionRow): SoloAdapter | Response {
 const localeOf = (v: string): Locale => (v === "tr" || v === "en" || v === "es" ? v : "tr");
 
 /**
- * GET: oturumun AI analiz durumu (ücretsiz). `none` hata değildir: 200 ile döner, mobil "100 coinle aç" butonunu gösterir.
+ * GET: oturumun AI analiz durumu (ücretsiz). `none` hata değildir: 200 ile döner, mobil "150 coinle aç" butonunu gösterir.
  * Yanıt: { status, purchasedByMe, gameType, content?, createdAt? }. Yalnızca JWT (mobil) ve yalnızca oturumun sahibi.
  */
 export async function GET(req: NextRequest, { params }: { params: Promise<{ sessionId: string }> }) {
@@ -76,7 +76,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ sess
   });
 }
 
-/** POST: AI analizi satın al ve üret (100 coin, `solo_ai`). Sıra ve hata davranışı oda yorumuyla aynı (docs/API_SPEC.md §10d). */
+/** POST: AI analizi satın al ve üret (150 coin, `solo_ai`). Sıra ve hata davranışı oda yorumuyla aynı (docs/API_SPEC.md §10d). */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ sessionId: string }> }) {
   const { sessionId } = await params;
 

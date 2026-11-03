@@ -107,14 +107,14 @@ try {
   await setCoins(A, 1000);
   r = await P(s1.id, A, "fake:ok");
   const content = r.json?.content;
-  ok(r.status === 200 && r.json?.status === "ready" && r.json.applied === true && r.json.balance === 900 && r.json.gameType === "red_flag" && r.json.purchasedByMe === true, "başarılı satın alma: 200 ready, applied:true, bakiye 900, gameType");
+  ok(r.status === 200 && r.json?.status === "ready" && r.json.applied === true && r.json.balance === 850 && r.json.gameType === "red_flag" && r.json.purchasedByMe === true, "başarılı satın alma: 200 ready, applied:true, bakiye 850, gameType");
   ok(content?.gameType === "red_flag" && !!content.headline && !!content.summary && Array.isArray(content.sections) && content.sections.length === 4, "içerik zarfı: gameType, headline, summary, 4 bölüm");
   ok(content?.sections.every((s) => ["bullets", "questions", "text"].includes(s.kind) && !!s.title && (s.items?.length ?? 0) > 0) && content.sections[0].title === "Rahat bölgen" && content.sections[3].id === "self_questions", "bölümler: kind + sunucuda yerelleştirilmiş başlık (tr) + items");
-  ok((await coins(A)) === 900, "coin −100 (solo_ai) düşüldü");
+  ok((await coins(A)) === 850, "coin −150 (solo_ai) düşüldü");
   const rows1 = await rowsOf(s1.id);
   ok(rows1.length === 1 && rows1[0].status === "ready" && rows1[0].game === "red_flag" && rows1[0].prompt_version === "solo-v1.0" && rows1[0].consent_version === "test-v1", "kayıt: ready, game, prompt_version solo-v1.0, rıza sürümü");
   r = await P(s1.id, A, "fake:ok");
-  ok(r.status === 200 && r.json?.applied === false && r.json.status === "ready" && stable(r.json.content) === stable(content) && (await coins(A)) === 900, "ikinci POST: coin düşmez, aynı içerik (applied:false)");
+  ok(r.status === 200 && r.json?.applied === false && r.json.status === "ready" && stable(r.json.content) === stable(content) && (await coins(A)) === 850, "ikinci POST: coin düşmez, aynı içerik (applied:false)");
   r = await G(s1.id, A);
   ok(r.status === 200 && r.json?.status === "ready" && r.json.purchasedByMe === true && !!r.json.content && !!r.json.createdAt, "GET: ready + içerik + createdAt");
 
@@ -145,11 +145,11 @@ try {
   let rows = await rowsOf(s2.id);
   ok(rows.length === 1 && rows[0].status === "failed" && rows[0].attempt === 1, "başarısız deneme: failed, attempt 1");
   let tx = await txOf(A, s2.id);
-  ok(tx.some((t) => t.reason === "solo_ai" && t.delta === -100) && tx.some((t) => t.reason === "solo_ai_refund" && t.delta === 100), "coin hareketleri: solo_ai −100 ve solo_ai_refund +100");
+  ok(tx.some((t) => t.reason === "solo_ai" && t.delta === -150) && tx.some((t) => t.reason === "solo_ai_refund" && t.delta === 150), "coin hareketleri: solo_ai −150 ve solo_ai_refund +100");
   r = await G(s2.id, A);
   ok(r.json?.status === "failed" && r.json.purchasedByMe === true, "GET: failed");
   r = await P(s2.id, A, "fake:rate_limit,fake:ok");
-  ok(r.status === 200 && r.json?.applied === true && r.json.balance === 900, "ana model 429 → yedek model, yeniden deneme başarılı (−100)");
+  ok(r.status === 200 && r.json?.applied === true && r.json.balance === 850, "ana model 429 → yedek model, yeniden deneme başarılı (−150)");
   rows = await rowsOf(s2.id);
   tx = await txOf(A, s2.id);
   ok(rows.length === 2 && rows[1].attempt === 2 && rows[1].status === "ready", "yeniden deneme: attempt 2, ready");
@@ -163,12 +163,12 @@ try {
   const st = [x.status, y.status].sort();
   ok((st[0] === 200 && st[1] === 200) || (st[0] === 200 && st[1] === 202), `eşzamanlı POST yanıtları: ${st.join(",")}`);
   rows = await rowsOf(s3.id);
-  ok(rows.filter((q) => q.status === "ready" || q.status === "generating").length === 1 && 1000 - (await coins(A)) === 100, "tek aktif kayıt ve tek coin düşümü (−100)");
+  ok(rows.filter((q) => q.status === "ready" || q.status === "generating").length === 1 && 1000 - (await coins(A)) === 150, "tek aktif kayıt ve tek coin düşümü (−150)");
 
   // ── Takılmış (stale) kayıt ──────────────────────────────────────────────────
   const s4 = await soloSession(A);
   await setCoins(A, 1000);
-  await db.rpc("apply_coins", { p_user: A.id, p_delta: -100, p_reason: "solo_ai", p_ref: `${s4.id}:1` });
+  await db.rpc("apply_coins", { p_user: A.id, p_delta: -150, p_reason: "solo_ai", p_ref: `${s4.id}:1` });
   await db.from("ai_solo_analyses").insert({ session_id: s4.id, purchased_by: A.id, game: "red_flag", locale: "tr", status: "generating", attempt: 1, consent_version: "test-v1", updated_at: new Date(Date.now() - 10 * 60_000).toISOString() });
   r = await G(s4.id, A);
   rows = await rowsOf(s4.id);
