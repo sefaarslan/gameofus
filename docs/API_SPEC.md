@@ -383,7 +383,7 @@ Geçersiz/eksik JWT → `401 UNAUTHORIZED`. Coin yazımı yalnızca sunucuda, at
 Ekonomi: kayıt +500 (Auth trigger'ı, otomatik) · reklam +50 (günde en fazla 3) · story paylaşımı +25 (günde 1) · oda −250 · AI yorum −150 · solo AI −150 ·
 solo günlük set +50 (solo `complete` içinde, bkz. §10b). **Miktarı istemci göndermez**, yalnızca `reason`.
 
-- `GET /api/users/me` → `{ id, coins, tier, birthDate, aiConsent }` (`aiConsent`: `{ version, at }` ya da rıza yoksa `null`)
+- `GET /api/users/me` → `{ id, coins, tier, daily, birthDate, aiConsent }` (`aiConsent`: `{ version, at }` ya da rıza yoksa `null`; `daily`: `{ ad_reward, story_share }`, her biri `{ limit, remaining, nextAt }` — kayan 24 saatlik kazanım hakları, `nextAt` yalnızca `remaining = 0` iken en erken yeni hakkın açılacağı an, aksi `null`)
 - `GET /api/users/history` → **düz dizi** (sarmalayıcı yok), en yeni önce (`created_at` azalan), en çok 100:
   `[{ roomCode, locale, relationshipType, status, role, partnerName, readingScore, completedAt, createdAt, gameMode, questionCount, expiresAt, expired, resultReady }]`.
   Kullanıcının (`participants.user_id`) tüm odaları; yalnızca `created_at` son 90 gün içinde olanlar. `status` ham `rooms.status`
@@ -406,7 +406,7 @@ solo günlük set +50 (solo `complete` içinde, bkz. §10b). **Miktarı istemci 
 - `POST /api/users/coins/spend` `{ "reason": "ai_commentary" | "solo_ai", "refId": "…" }` → `{ balance, applied, spent }`;
   yetersiz bakiye `402 INSUFFICIENT_COINS`; aynı `refId` ikinci kez düşmez (`applied: false`). Oda coin'i `rooms/create`
   içinde düşülür.
-- `POST /api/users/coins/earn` `{ "reason": "ad_reward" | "story_share", "refId": "…" }` → `{ balance, applied, earned }`.
+- `POST /api/users/coins/earn` `{ "reason": "ad_reward" | "story_share", "refId": "…" }` → `{ balance, applied, earned, daily }` (`daily`: `{ limit, remaining, nextAt }`, o neden için işlemden sonraki hak durumu).
   `ad_reward` +50, son 24 saatte en fazla 3 (`429 AD_LIMIT_REACHED`); `story_share` +25, son 24 saatte en fazla 1
   (`429 STORY_LIMIT_REACHED`; paylaşım doğrulanmaz, yalnızca günlük sınır korur). Limitler ücretli kullanıcı için de geçerlidir. Bkz. PRD 12.2.
 - `POST /api/rooms/[roomCode]/join` (mobil): `platform: "mobile"` + Bearer JWT zorunlu (`401`); misafir katılımcı `user_id`'ye bağlanır

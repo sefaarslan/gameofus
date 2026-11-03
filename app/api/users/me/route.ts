@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { corsOptions } from "@/lib/cors";
 import { apiError, apiOk } from "@/lib/api";
 import { MIN_APP_AGE, ageOn, parseBirthDate } from "@/lib/age";
+import { dailyEarnStatus } from "@/lib/coins";
 
 export function OPTIONS() {
   return corsOptions();
@@ -14,17 +15,22 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser(req);
   if (!user) return apiError("UNAUTHORIZED", "Giriş gereklidir.", 401);
 
-  const { data } = await createAdminClient()
-    .from("users")
-    .select("room_credits, tier, birth_date, ai_consent_at, ai_consent_version")
-    .eq("id", user.id)
-    .maybeSingle();
+  const [{ data }, daily] = await Promise.all([
+    createAdminClient()
+      .from("users")
+      .select("room_credits, tier, birth_date, ai_consent_at, ai_consent_version")
+      .eq("id", user.id)
+      .maybeSingle(),
+    dailyEarnStatus(user.id),
+  ]);
   if (!data) return apiError("INTERNAL_ERROR", "Kullanıcı kaydı bulunamadı.", 500);
 
   return apiOk({
     id: user.id,
     coins: data.room_credits,
     tier: data.tier,
+    // Günlük kazanım hakları (kayan 24 saat): { ad_reward, story_share } her biri { limit, remaining, nextAt }
+    daily,
     birthDate: data.birth_date,
     // AI yorum rızası (yoksa null); mobil metin sürümü değiştiğinde yeniden rıza ister
     aiConsent: data.ai_consent_at ? { version: data.ai_consent_version, at: data.ai_consent_at } : null,
