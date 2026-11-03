@@ -25,6 +25,42 @@ export const STORY_SHARE_DAILY_LIMIT = 1;
 export const TIER_GIFT_COINS = 1200;
 export const TIER_GIFT_REF = "tier_gift";
 
+export const DAILY_EARN_LIMITS: Record<EarnReason, number> = {
+  ad_reward: AD_REWARD_DAILY_LIMIT,
+  story_share: STORY_SHARE_DAILY_LIMIT,
+};
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+export type DailyEarnStatus = { limit: number; remaining: number; nextAt: string | null };
+
+/**
+ * Günlük kazanım hakları (kayan 24 saat). `remaining` kalan hak; hak 0 ise `nextAt` en erken yeni hakkın açılacağı an (ISO), aksi halde null.
+ * Tek sorgu: iki neden de aynı `credit_transactions` taramasından hesaplanır.
+ */
+export async function dailyEarnStatus(userId: string): Promise<Record<EarnReason, DailyEarnStatus>> {
+  const reasons = Object.keys(DAILY_EARN_LIMITS) as EarnReason[];
+  const { data } = await createAdminClient()
+    .from("credit_transactions")
+    .select("reason, created_at")
+    .eq("user_id", userId)
+    .in("reason", reasons)
+    .gte("created_at", new Date(Date.now() - DAY_MS).toISOString())
+    .order("created_at", { ascending: true });
+
+  const status = {} as Record<EarnReason, DailyEarnStatus>;
+  for (const reason of reasons) {
+    const limit = DAILY_EARN_LIMITS[reason];
+    const times = (data ?? []).filter((r) => r.reason === reason).map((r) => new Date(r.created_at).getTime());
+    const remaining = Math.max(0, limit - times.length);
+    status[reason] = {
+      limit,
+      remaining,
+      nextAt: remaining === 0 ? new Date(times[times.length - limit] + DAY_MS).toISOString() : null,
+    };
+  }
+  return status;
+}
+
 export type CoinReason =
   | "signup_bonus"
   | "ad_reward"

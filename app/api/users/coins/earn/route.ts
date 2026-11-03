@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/auth";
-import { AD_REWARD_DAILY_LIMIT, COIN_REWARDS, CoinError, STORY_SHARE_DAILY_LIMIT, applyCoins, type EarnReason } from "@/lib/coins";
+import { COIN_REWARDS, CoinError, applyCoins, dailyEarnStatus, type EarnReason } from "@/lib/coins";
 import { corsOptions } from "@/lib/cors";
 import { apiError, apiOk, type ApiErrorCode } from "@/lib/api";
 
@@ -9,12 +8,12 @@ export function OPTIONS() {
   return corsOptions();
 }
 
-const DAILY_LIMITS: Record<EarnReason, { limit: number; code: ApiErrorCode; message: string }> = {
-  ad_reward: { limit: AD_REWARD_DAILY_LIMIT, code: "AD_LIMIT_REACHED", message: "Günlük reklam ödülü sınırına ulaşıldı." },
-  story_share: { limit: STORY_SHARE_DAILY_LIMIT, code: "STORY_LIMIT_REACHED", message: "Günlük story ödülü sınırına ulaşıldı." },
+const LIMIT_ERRORS: Record<EarnReason, { code: ApiErrorCode; message: string }> = {
+  ad_reward: { code: "AD_LIMIT_REACHED", message: "Günlük reklam ödülü sınırına ulaşıldı." },
+  story_share: { code: "STORY_LIMIT_REACHED", message: "Günlük story ödülü sınırına ulaşıldı." },
 };
 
-const isEarnReason = (v: unknown): v is EarnReason => typeof v === "string" && v in DAILY_LIMITS;
+const isEarnReason = (v: unknown): v is EarnReason => typeof v === "string" && v in LIMIT_ERRORS;
 
 /**
  * Coin kazanma: reklam ödülü (+50, günde 3) ve story paylaşımı (+25, günde 1; paylaşım doğrulanmaz, yalnızca günlük sınır korur).
@@ -38,21 +37,13 @@ export async function POST(req: NextRequest) {
   }
 
   // Günlük sınır: son 24 saatte aynı nedenle verilen ödül sayısı
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { count } = await createAdminClient()
-    .from("credit_transactions")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .eq("reason", reason)
-    .gte("created_at", since);
-  const daily = DAILY_LIMITS[reason];
-  if ((count ?? 0) >= daily.limit) {
-    return apiError(daily.code, daily.message, 429);
+  if ((await dailyEarnStatus(user.id))[reason].remaining === 0) {
+    return apiError(LIMIT_ERRORS[reason].code, LIMIT_ERRORS[reason].message, 429);
   }
 
   try {
     const { balance, applied } = await applyCoins(user.id, COIN_REWARDS[reason], reason, refId);
-    return apiOk({ balance, applied, earned: applied ? COIN_REWARDS[reason] : 0 });
+    return apiOk({ balance, applied, earned: applied ? COIN_REWARDS[reason] : 0, daily: (await dailyEarnStatus(user.id))[reason] });
   } catch (e) {
     if (e instanceof CoinError && e.code === "USER_NOT_FOUND") return apiError("INTERNAL_ERROR", "Kullanıcı kaydı bulunamadı.", 500);
     return apiError("INTERNAL_ERROR", "Coin eklenemedi.", 500);
