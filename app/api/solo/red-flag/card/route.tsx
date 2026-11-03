@@ -1,5 +1,7 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import type { ReactElement } from "react";
 import { NextRequest } from "next/server";
-import { ImageResponse } from "next/og";
 import tr from "@/messages/tr.json";
 import en from "@/messages/en.json";
 import es from "@/messages/es.json";
@@ -32,27 +34,38 @@ function Glyph({ flag, size = 104 }: { flag: Flag; size?: number }) {
   );
 }
 
-async function loadFonts(origin: string) {
-  const files = [
-    ["Quicksand-500-latin.woff", 500],
-    ["Quicksand-500-latin-ext.woff", 500],
-    ["Quicksand-700-latin.woff", 700],
-    ["Quicksand-700-latin-ext.woff", 700],
-  ] as const;
-  return Promise.all(
-    files.map(async ([file, weight]) => ({
-      name: "Quicksand",
-      data: await (await fetch(`${origin}/fonts/${file}`)).arrayBuffer(),
-      weight: weight as 500 | 700,
-      style: "normal" as const,
-    })),
-  );
+// Quicksand 500/700: Google'ın latin + latin-ext alt kümeleri tek dosyada birleştirilmiştir (Türkçe/İspanyolca harfler dahil, 542 karakter).
+// Satori aynı aileye kayıtlı iki dosya arasında harf bazında geçiş yapmaz, bu yüzden ağırlık başına TEK dosya kullanılır.
+const FONT_FILES = [
+  ["Quicksand-500.ttf", 500],
+  ["Quicksand-700.ttf", 700],
+] as const;
+type CardFont = { name: "Quicksand"; data: ArrayBuffer; weight: 500 | 700; style: "normal" };
+
+// Yazı tipleri dosyadan bir kez okunur ve sunucu belleğinde tutulur (`next.config.ts` → outputFileTracingIncludes dosyaları pakete katar)
+let fonts: Promise<CardFont[]> | null = null;
+function loadFonts(): Promise<CardFont[]> {
+  fonts ??= Promise.all(
+    FONT_FILES.map(async ([file, weight]) => {
+      const buf = await readFile(path.join(process.cwd(), "public", "fonts", file));
+      return { name: "Quicksand" as const, data: buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer, weight, style: "normal" as const };
+    }),
+  ).catch((err) => {
+    fonts = null; // bir sonraki istek yeniden dener
+    throw err;
+  });
+  return fonts;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const FLAG_BY_LETTER: Record<string, Flag> = { G: "green", Y: "yellow", R: "red" };
 
-/** `q` = virgülle ayrılmış `<G|Y|R><senaryo uuid>` (en fazla 3, bayrak başına bir senaryo). Metin DB'den okunur. */
+const CARD_HEADERS = { "Cache-Control": "public, max-age=86400, s-maxage=31536000, immutable" };
+
+const TEXT_TTL_MS = 60 * 60 * 1000;
+const textCache = new Map<string, { text: string; at: number }>();
+
+/** `q` = virgülle ayrılmış `<G|Y|R><senaryo uuid>` (en fazla 3, bayrak başına bir senaryo). Metin DB'den okunur; sıcak örnekte 1 saat bellekte tutulur. */
 async function loadPicks(raw: string | null): Promise<{ flag: Flag; text: string }[]> {
   if (!raw) return [];
   const parsed = raw
@@ -64,19 +77,51 @@ async function loadPicks(raw: string | null): Promise<{ flag: Flag; text: string
       return flag && UUID_RE.test(id) ? [{ flag, id }] : [];
     });
   if (parsed.length === 0) return [];
-  const { data } = await createAdminClient()
-    .from("solo_scenarios")
-    .select("id, scenario_text")
-    .in("id", parsed.map((p) => p.id));
-  const textById = new Map((data ?? []).map((r) => [r.id as string, r.scenario_text as string]));
+  const now = Date.now();
+  const missing = parsed.filter((p) => {
+    const hit = textCache.get(p.id);
+    return !hit || now - hit.at > TEXT_TTL_MS;
+  });
+  if (missing.length > 0) {
+    const { data } = await createAdminClient()
+      .from("solo_scenarios")
+      .select("id, scenario_text")
+      .in("id", missing.map((p) => p.id));
+    for (const r of data ?? []) textCache.set(r.id as string, { text: r.scenario_text as string, at: now });
+    if (textCache.size > 2000) textCache.clear();
+  }
   return parsed.flatMap((p) => {
-    const text = textById.get(p.id);
+    const text = textCache.get(p.id)?.text;
     return text ? [{ flag: p.flag, text }] : [];
   });
 }
 
+/**
+ * Kartı PNG'ye çevirir: Satori yerleşimi (SVG) yapar, yerel resvg rasterleştirir. Next'in `next/og` (WASM resvg) yolundan ~3 kat hızlıdır.
+ * Aşama süreleri `Server-Timing` ile döner (fonts, db, layout, raster, png, render, total).
+ */
+async function render(el: ReactElement, width: number, height: number, fontList: CardFont[], timing: Record<string, number>, t0: number) {
+  const r0 = performance.now();
+  const [{ default: satori }, { Resvg }] = await Promise.all([import("satori"), import("@resvg/resvg-js")]);
+  const svg = await satori(el, { width, height, fonts: fontList });
+  timing.layout = performance.now() - r0;
+  const r1 = performance.now();
+  // Sistem fontları taranmaz: metin Satori'de yola çevrilir, taramak istek başına yüzlerce ms tutar
+  const img = new Resvg(svg, { fitTo: { mode: "width", value: width }, font: { loadSystemFonts: false } }).render();
+  timing.raster = performance.now() - r1;
+  const r2 = performance.now();
+  const png = img.asPng();
+  timing.png = performance.now() - r2;
+  timing.render = performance.now() - r0;
+  timing.total = performance.now() - t0;
+  const serverTiming = Object.entries(timing).map(([k, v]) => `${k};dur=${v.toFixed(1)}`).join(", ");
+  return new Response(png as BodyInit, { headers: { "Content-Type": "image/png", "Server-Timing": serverTiming, ...CARD_HEADERS } });
+}
+
 export async function GET(req: NextRequest) {
-  const { searchParams, origin } = new URL(req.url);
+  const t0 = performance.now();
+  const timing: Record<string, number> = {};
+  const { searchParams } = new URL(req.url);
   const flags = decodeGrid(searchParams.get("g"));
   if (!flags) return new Response("Invalid grid", { status: 400 });
   const lang = (["tr", "en", "es"].includes(searchParams.get("l") ?? "") ? searchParams.get("l") : "en") as Lang;
@@ -87,13 +132,16 @@ export async function GET(req: NextRequest) {
   const pack = getPack(searchParams.get("p"));
   const packLabel = pack ? t.packs.label.replace("{category}", t.packs.categories[pack.category]).replace("{n}", String(pack.number)) : null;
   const verdict = (t.verdicts as Record<string, { title: string; line: string }>)[String(Math.min(counts.red, RED_FLAG_CARD_COUNT))];
-  const [fonts, picks] = await Promise.all([loadFonts(origin), searchParams.get("fmt") === "og" ? [] : loadPicks(searchParams.get("q"))]);
+  const [cardFonts, picks] = await Promise.all([
+    loadFonts().then((f) => ((timing.fonts = performance.now() - t0), f)),
+    searchParams.get("fmt") === "og" ? [] : loadPicks(searchParams.get("q")).then((p) => ((timing.db = performance.now() - t0), p)),
+  ]);
 
   // Link önizlemesi (WhatsApp/sosyal): yatay 1200×630 varyant
   if (searchParams.get("fmt") === "og") {
     const c = 150;
     const g = 16;
-    return new ImageResponse(
+    return render(
       (
         <div
           style={{
@@ -136,14 +184,18 @@ export async function GET(req: NextRequest) {
           </div>
         </div>
       ),
-      { width: 1200, height: 630, fonts, headers: { "Cache-Control": "public, max-age=86400, s-maxage=31536000, immutable" } },
+      1200,
+      630,
+      cardFonts,
+      timing,
+      t0,
     );
   }
 
   const cell = 124;
   const gap = 14;
 
-  return new ImageResponse(
+  return render(
     (
       <div
         style={{
@@ -281,11 +333,10 @@ export async function GET(req: NextRequest) {
         </div>
       </div>
     ),
-    {
-      width: W,
-      height: H,
-      fonts,
-      headers: { "Cache-Control": "public, max-age=86400, s-maxage=31536000, immutable" },
-    },
+    W,
+    H,
+    cardFonts,
+    timing,
+    t0,
   );
 }
