@@ -40,8 +40,13 @@ export function GenderPicker({
               role="radio"
               aria-checked={selected}
               onClick={() => onChange(optionValue)}
-              className={`flex-1 flex items-center justify-center rounded-lg text-xs font-semibold transition-all ${
-                selected ? "bg-primary text-on-primary" : "text-on-surface-variant hover:bg-surface-container-high"
+              className={`flex-1 flex items-center justify-center rounded-lg text-xs transition-all ${
+                selected
+                  ? "bg-primary text-on-primary font-semibold"
+                  : optionValue === null
+                    ? // "Belirtmek istemiyorum" ikincil seçenek: soluk (opaklık %80 = AA kontrastının alt sınırı, daha soluğu okunmaz) ve daha ince
+                      "text-on-surface-variant/80 font-medium hover:bg-surface-container-high"
+                    : "text-on-surface-variant font-semibold hover:bg-surface-container-high"
               }`}
             >
               {t(key)}
