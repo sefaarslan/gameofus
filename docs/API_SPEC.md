@@ -46,6 +46,7 @@ GET  /api/solo/[sessionId]/ai-analysis   (mobil, Bearer JWT; AI analiz durumu, �
 POST /api/solo/[sessionId]/ai-analysis   (mobil, Bearer JWT; 150 coin, satın al + üret)
 GET  /api/solo/red-flag/card?g=&l=&p=&q=&fmt=
 GET  /api/users/me                (mobil, Bearer JWT)
+GET  /api/users/overview          (mobil, Bearer JWT; me + history + soloHistory + aiReports + soloToday tek istekte, ETag)
 GET  /api/users/history           (mobil, Bearer JWT; oda geçmişi, son 90 gün; düz dizi)
 GET  /api/users/solo-history      (mobil, Bearer JWT; + /[sessionId])
 DELETE /api/users/history/[roomCode]            (mobil; oyunu listeden kaldır, yumuşak silme)
@@ -375,6 +376,46 @@ yok sayılır). Uzun süreli cache; cevap verisi içermez, yalnızca oyuncunun p
 
 `Authorization: Bearer <CRON_SECRET>` zorunlu (env yoksa `503`, yanlışsa `401`). Süresi dolmuş anonim verileri siler (bkz.
 `docs/DATABASE_SCHEMA.md`, `lib/retention.ts`) ve `{ ok, rooms, solo, rateLimits, rounds }` döner. İstemciler çağırmaz.
+
+## 10a-0. `GET /api/users/overview` (mobil, birleşik özet) ve ETag
+
+Ekran açılışlarında 3-5 ayrı GET yerine TEK istek: tek JWT doğrulaması, tek kullanıcı kaydı sorgusu, bölümler paralel (`Promise.all`). Mevcut uçlar **aynen** durur
+(eski sürümler/diğer ekranlar kullanır); bu uç yalnızca ek. İş mantığı ortak yükleyicilerdedir (`lib/user-data.ts`): her bölüm karşılığı olan ucun yanıtıyla
+**birebir aynıdır** (filtreler, 90 gün sınırı, listeden kaldırılanların çıkmaması, `expired` hesabı dahil; iki uç ayrışamaz).
+
+`GET /api/users/overview?include=<bölümler>&timezone=<IANA>` — `Authorization: Bearer <Supabase JWT>` (yoksa/geçersizse `401 UNAUTHORIZED`).
+
+| Parametre | Kural |
+|---|---|
+| `include` | Virgülle ayrılmış bölümler: `me`, `history`, `soloHistory`, `aiReports`, `soloToday`. **Verilmezse hepsi.** Yalnızca istenen bölüm hesaplanır. Bilinmeyen ad ya da boş değer (`include=`) → `400 INVALID_PAYLOAD`. Tekrarlar/boşluklar atılır; yanıt anahtar sırası her zaman yukarıdaki sıradır. |
+| `timezone` | IANA (ör. `Europe/Istanbul`). **`soloToday` istenirse (include yoksa dahil) zorunlu**: yoksa/boşsa `400 INVALID_PAYLOAD`. Geçersiz bir ad `GET /solo/red-flag/today` ile aynı kuralla `Europe/Istanbul`'a düşer. `soloToday` istenmediyse gerekmez. |
+
+Yanıt `200` (istenmeyen bölümün anahtarı yoktur):
+
+```json
+{
+  "generatedAt": "2026-11-20T10:00:00.000Z",
+  "me":          { "id": "…", "coins": 900, "tier": "free", "daily": { "ad_reward": {…}, "story_share": {…} }, "birthDate": null, "aiConsent": null },
+  "history":     [ { "roomCode": "K7M2PQ", "…": "…" } ],
+  "soloHistory": { "items": [ { "sessionId": "…", "…": "…" } ] },
+  "aiReports":   [ { "type": "room", "…": "…" } ],
+  "soloToday":   { "setDate": "2026-11-20", "setNumber": 20, "nextSetAt": "…", "rewardAvailable": true, "categories": [ "…" ] },
+  "errors":      { "aiReports": "INTERNAL_ERROR" }
+}
+```
+
+- Bölüm şekilleri: `me`→`GET /users/me`, `history`→`GET /users/history` (**düz dizi**), `soloHistory`→`GET /users/solo-history` (**`{ items: [...] }` nesnesi**, düz dizi DEĞİL), `aiReports`→`GET /users/ai-reports` (düz dizi), `soloToday`→`GET /solo/red-flag/today`.
+  (`me` bugün `adFree` dönmez; ucun yanıtı neyse bölüm odur.)
+- **Kısmi hata:** bir bölüm okunamazsa diğerleri yine döner (`200`); başarısız bölümün anahtarı yanıtta olmaz ve `errors.<bölüm>` hata kodunu taşır (`INTERNAL_ERROR`). Hata yoksa `errors` alanı hiç gelmez. İstenen **tüm** bölümler başarısızsa `500 INTERNAL_ERROR` (gövdede `error.errors`).
+- **Hız sınırı:** kullanıcı başına dakikada **30** istek (`429 RATE_LIMITED`); sınır kullanıcıya özeldir. Not: tek tek uçlarda kullanıcı bazlı hız sınırı yoktur.
+- Veri yalnızca JWT'deki kullanıcıya aittir; başka kullanıcının verisi hiçbir koşulda dönmez.
+
+**ETag / koşullu istek (overview + mevcut tek tek GET uçları: `users/me`, `users/history`, `users/solo-history`, `users/ai-reports`, `solo/red-flag/today`):**
+yanıt gövdesinden hesaplanan **zayıf ETag** (`ETag: W/"…"`) ve `Cache-Control: private, no-cache` döner. İstemci `If-None-Match` gönderirse ve veri değişmediyse **`304 Not Modified`**
+(gövdesiz; `ETag` ve `Cache-Control` yine döner; liste ve `*` desteklenir, zayıf karşılaştırma). Overview'da ETag **`generatedAt` OLMADAN** hesaplanır (her istekte değişir, 304'ü bozar).
+iOS/Android ağ katmanı `If-None-Match`'i otomatik uygular. CORS: `If-None-Match` izinli, `ETag` açık başlıktır.
+Davranış notu: tek tek uçlarda bir sorgu hatası artık sessizce boş liste (`200 []`) yerine `500 INTERNAL_ERROR` döner (istemci geçici DB hatasını "veri yok" diye önbelleğe yazmasın).
+Testler: `node --no-warnings scripts/test-overview.mjs` (birim) ve `OVERVIEW_ALLOW_TEST_OVERRIDE=1 npx next dev -p 3001` + `BASE=http://localhost:3001 node --no-warnings scripts/test-overview-api.mjs` (entegrasyon; kısmi hata testi için `x-overview-test-fail` kancası yalnızca dev + bu env ile çalışır, üretimde etkisizdir).
 
 ## 10a. Mobil: kullanıcı ve coin endpoint'leri
 

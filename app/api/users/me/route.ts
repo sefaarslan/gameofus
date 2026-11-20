@@ -2,39 +2,23 @@ import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/auth";
 import { corsOptions } from "@/lib/cors";
-import { apiError, apiOk } from "@/lib/api";
+import { apiError, apiFailure, apiOk, apiOkEtag } from "@/lib/api";
 import { MIN_APP_AGE, ageOn, parseBirthDate } from "@/lib/age";
-import { dailyEarnStatus } from "@/lib/coins";
+import { loadMe } from "@/lib/user-data";
 
 export function OPTIONS() {
   return corsOptions();
 }
 
-/** Mobil: giriş yapmış kullanıcının coin bakiyesi ve tier'ı. Authorization: Bearer <Supabase JWT>. */
+/** Mobil: giriş yapmış kullanıcının coin bakiyesi ve tier'ı. Authorization: Bearer <Supabase JWT>. ETag/`If-None-Match` desteklenir. */
 export async function GET(req: NextRequest) {
   const user = await getAuthUser(req);
   if (!user) return apiError("UNAUTHORIZED", "Giriş gereklidir.", 401);
-
-  const [{ data }, daily] = await Promise.all([
-    createAdminClient()
-      .from("users")
-      .select("room_credits, tier, birth_date, ai_consent_at, ai_consent_version")
-      .eq("id", user.id)
-      .maybeSingle(),
-    dailyEarnStatus(user.id),
-  ]);
-  if (!data) return apiError("INTERNAL_ERROR", "Kullanıcı kaydı bulunamadı.", 500);
-
-  return apiOk({
-    id: user.id,
-    coins: data.room_credits,
-    tier: data.tier,
-    // Günlük kazanım hakları (kayan 24 saat): { ad_reward, story_share } her biri { limit, remaining, nextAt }
-    daily,
-    birthDate: data.birth_date,
-    // AI yorum rızası (yoksa null); mobil metin sürümü değiştiğinde yeniden rıza ister
-    aiConsent: data.ai_consent_at ? { version: data.ai_consent_version, at: data.ai_consent_at } : null,
-  });
+  try {
+    return apiOkEtag(req, await loadMe(user.id));
+  } catch (err) {
+    return apiFailure(err);
+  }
 }
 
 /**
