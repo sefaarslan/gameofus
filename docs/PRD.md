@@ -861,7 +861,7 @@ Web ve mobile, **ayrı kod tabanları** olarak geliştirilir, **ortak Supabase b
 
 **Deploy:**
 
-- Web: Vercel — fonksiyon bölgesi Supabase ile aynı (Frankfurt, `fra1`); alan adı `gameofus.app`. API route'larında bağımsız sorgular paralel çalıştırılır (bölgeler arası gidiş-dönüş maliyetini ve gecikmeyi azaltmak için)
+- Web: Hetzner Cloud CX23 (Nürnberg) + Coolify + Cloudflare (2026-11-21'den beri; öncesinde Vercel `fra1`); sunucu Supabase'e (Frankfurt) yakın seçildi; alan adı `gameofus.app` (kanonik `www.gameofus.app`). API route'larında bağımsız sorgular paralel çalıştırılır (bölgeler arası gidiş-dönüş maliyetini ve gecikmeyi azaltmak için). Ayrıntı: `docs/MIGRATION_VERCEL_TO_SELFHOST.md` §10
 - Mobile: Expo Application Services (EAS) ile App Store / Play Store
 
 **Auth:**

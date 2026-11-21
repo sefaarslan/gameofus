@@ -1,5 +1,7 @@
 # Vercel → self-host (Coolify) taşıma rehberi
 
+> **DURUM (2026-11-21): TAŞINDI.** Üretim Hetzner CX23 + Coolify + Cloudflare'de çalışıyor; Vercel yalnızca geri dönüş için açık. Güncel mimari, işletim ve açık işler: **§10**. Aşağıdaki §1-§9 taşıma planıdır (tarihsel).
+
 > Amaç: Canlıya Vercel Pro ile çıkıp, maliyet ya da ihtiyaç doğduğunda **kesintisiz** self-host'a geçebilmek.
 > Bu belge hem "şimdi yapılan hazırlıkları" hem "taşıma günü adımlarını" içerir. Karar ve gerekçeler: CLAUDE.md §2 (Deploy).
 
@@ -120,4 +122,41 @@ Değerleri bir parola yöneticisinde sakla (sunucu gidince yeniden yazman gereki
   geçici yedek olarak duruyor; mobil build'lerin başlık kullandığını doğrulayınca `extractToken` çağrılarındaki query yedeğini kaldır (URL'ler proxy/CDN günlüklerine düşer).
 - **Web'de herkese açık gizlilik / kullanım şartları / hesap silme sayfası yok** (politika `gameofus.app/account-deletion` adresinden söz ediyor). Store başvurusu herkese açık bir gizlilik politikası URL'si ister.
 - `@supabase/ssr` ve `@supabase/supabase-js` sürümleri `latest` (sabitlenmeli).
-- `docker build` gerçek ortamda henüz çalıştırılmadı (geliştirme makinesinde Docker yok).
+- ~~`docker build` gerçek ortamda henüz çalıştırılmadı~~ → **Çalıştırıldı** (Coolify, sunucuda; x86'da `@resvg/resvg-js` dahil sorunsuz, derleme ~4 dk).
+
+---
+
+## 10. Güncel durum ve işletim (2026-11-21)
+
+### Mimari
+```
+istemci → Cloudflare (ücretsiz, Proxied, SSL Full strict) → Hetzner CX23 (x86, Nürnberg, Ubuntu 24.04) → Traefik (Coolify) → gameofus-prod (Docker, :3000)
+                                                                                                           └→ Supabase Cloud (Frankfurt): DB, Auth, Realtime
+```
+- **Alan adları:** `www.gameofus.app` kanonik; `gameofus.app` → `www`'ye 307 (Coolify "www redirect"). Web oyuncularının oda token'ları `localStorage`'da `www` kaynağına bağlı: kaynağı değiştirme.
+  `coolify.gameofus.app` (yönetim paneli, 2FA açık), `staging.gameofus.app` (ayrı Supabase projesi). Alan adı kaydı Vercel'de, DNS Cloudflare'de.
+- **Sunucu:** swap 4 GB, otomatik güvenlik güncellemeleri açık, SSH yalnızca anahtarla. `/data/coolify/source/.env` yedeği parola yöneticisinde.
+- **Hetzner Firewall:** 22 herkese; 80/443 **yalnızca Cloudflare IP aralıklarına** (`cloudflare.com/ips-v4`, `ips-v6`; liste değişirse güncelle). Doğrudan IP erişimi kapalı
+  (`curl -m 5 -k -sI https://<sunucu-ip>` zaman aşımı vermeli, çıkış kodu 28). Panel portları (8000, 6001, 6002) kapalı.
+
+### Deploy
+- `main`'e push → GitHub webhook (`coolify.gameofus.app`) → **yalnızca gameofus-prod** yeniden derlenir (~4 dk). Staging'e webhook YOK (4 GB RAM: iki eşzamanlı derleme belleği tüketir).
+- Başarısız derleme çalışan sürümü kaldırmaz ("Deployment failed. Removing the new version"). Çalışma zamanı hatalarını yakalamak için Coolify'da Healthcheck (`GET /en`, 200) açık tutulmalı;
+  imajda `curl` bulunur.
+- Coolify ortam değişkenleri — **Build:** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SITE_URL`. **Runtime:** `SUPABASE_SERVICE_ROLE_KEY`, `GROQ_API_KEY`,
+  `APP_BASE_URL`, `CLIENT_IP_HEADER=cf-connecting-ip`. `CRON_SECRET`, `AI_ALLOW_TEST_OVERRIDE`, `OVERVIEW_ALLOW_TEST_OVERRIDE` üretimde **tanımlanmaz**.
+- **Ders:** Dockerfile build arg verilmeyen `NEXT_PUBLIC_*` değişkenini boş metin yapar; `??` boş metne düşmez (`new URL("")` derlemeyi düşürdü). Kodda `||` kullan.
+
+### İzleme ve temizlik
+- UptimeRobot: `/en`, `/tr`, `/api/categories` (5 dk). Coolify'ın kendi bildirimleri henüz kurulu değil.
+- `pg_cron`: günlük 03:17 UTC `cleanup_expired_data_all()`. Doğrula: `select * from cron.job;`, `select status, start_time from cron.job_run_details order by start_time desc limit 5;`
+
+### Geri dönüş (Vercel hâlâ açıkken)
+Cloudflare DNS'te `gameofus.app` ve `www` A kayıtlarını Vercel adreslerine çevir (`64.29.17.1`, `216.198.79.65`; `www` için ayrıca `64.29.17.65`), **DNS only** yap, SSL modunu **Full**'a al.
+Vercel Hobby planı ticari kullanıma kapalıdır: bu yalnızca kısa süreli geri dönüş içindir.
+
+### Açık işler
+1. **Supabase yedeği** (R2'ye zamanlanmış `pg_dump`, geri yükleme provası): store başvurusundan önce. Ücretsiz planda otomatik yedek yoktur; ilk satın almada Pro.
+2. Mobil uygulamanın API için `gameofus.app` mi `www` mi çağırdığını mobil repoda doğrula (apex → `www` 307; bazı istemciler farklı alan adına yönlendirmede `Authorization` başlığını düşürür).
+3. Birkaç gün sorunsuz çalışınca: `vercel.json` ve `app/api/cron/cleanup/route.ts`'i sil, Vercel projesini kapat, `proxy.ts` matcher'ındaki `_vercel`'i çıkar.
+4. Coolify bildirimleri (Telegram/Discord), `supabase/.temp/` için `.gitignore` satırı, `npm audit` (aylık).

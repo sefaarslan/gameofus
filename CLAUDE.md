@@ -90,14 +90,24 @@ daha iyi konuşmalar başlatmak ve birbirini tahmin etme deneyimini oyunlaştır
   sonuç hesaplama, token doğrulama.
 
 ### Deploy
-- **Vercel**; fonksiyon bölgesi Supabase ile aynı olmalı (**Frankfurt, `fra1`**) — her sorgu bölgeler arası
-  gidiş-dönüş maliyeti taşır, bu yüzden API route'larında bağımsız sorgular paralel çalıştırılır.
+- **Üretim (2026-11-21'den beri): Hetzner Cloud CX23 (x86, Nürnberg) + Coolify (Traefik) + Cloudflare** (ücretsiz plan, `gameofus.app` ve `www` Proxied,
+  SSL **Full (strict)**; 80/443 yalnızca Cloudflare IP aralıklarına açık, doğrudan IP erişimi kapalı). Veritabanı, Auth ve Realtime Supabase Cloud'da (**Frankfurt**);
+  sunucu bu yüzden Frankfurt'a yakın (Nürnberg) seçildi: her sorgu bölgeler arası gidiş-dönüş maliyeti taşır, API route'larında bağımsız sorgular paralel çalıştırılır.
+  Vercel projesi yalnızca geri dönüş için açık durur (üretim trafiği taşımamalı); kapatılınca bu satır güncellenir.
+- Uygulama, `Dockerfile` ile derlenen tek bir imajdır (`BUILD_STANDALONE=1` → `output: "standalone"`, port 3000, imajda `curl` var: Coolify sağlık kontrolü için).
+  `main`'e her push, GitHub webhook ile **yalnızca üretim** uygulamasını yeniden derler (~4 dk; başarısız derleme çalışan sürümü kaldırmaz). Staging
+  (`staging.gameofus.app`, ayrı Supabase projesi) **elle** deploy edilir: sunucu 4 GB RAM, iki eşzamanlı derleme belleği tüketir.
+- `NEXT_PUBLIC_*` değişkenleri **derleme zamanında** gömülür (Coolify'da Buildtime), gizli anahtarlar yalnızca Runtime'dır. Build arg verilmezse Dockerfile bunları
+  **boş metin** yapar: kodda `process.env.X || varsayılan` kullan, `??` kullanma (`layout.tsx` bu yüzden bir kez derlemeyi düşürdü).
+- Kanonik adres **`https://www.gameofus.app`**; `gameofus.app` → `www`'ye yönlendirilir. Web oyuncularının oda token'ları `localStorage`'da `www` kaynağına bağlıdır: kaynağı değiştirme.
 - Next.js sürümü **sabitlenir** (`16.4.4`, `latest` kullanılmaz); sürüm yükseltmesi bilinçli yapılır. Sabit sürüm yamaları otomatik almaz: ayda bir `npm audit --omit=dev` çalıştır, güvenlik açığı varsa branch'te yükselt (`tsc`, `next build`, entegrasyon testleri, Vercel preview) sonra `main`'e al. `next dev` kendiliğinden `AGENTS.md` üretir (Next'in özelliği; bizim içeriğimiz değil).
 - Alan adı: `gameofus.app`.
-- **Self-host'a taşıma hazırlığı (Vercel hâlâ canlı hedef):** `docs/MIGRATION_VERCEL_TO_SELFHOST.md`. Kodda hazır: `Dockerfile`
-  (`BUILD_STANDALONE=1` → `output: "standalone"`; Vercel'de ayarlanmaz), `CLIENT_IP_HEADER` (self-host'ta güvenilir IP başlığı;
-  Vercel'de ayarlanmaz), pg_cron temizliği (`20260621000000_pg_cron_cleanup.sql`; doğrulanana kadar `vercel.json` cron'u yerinde kalır).
-  Mobil uygulama API'ye **her zaman `gameofus.app`** ile bağlanır (`*.vercel.app` değil); taşıma uygulama güncellemesi gerektirmemeli.
+- **`CLIENT_IP_HEADER=cf-connecting-ip`** (üretimde ayarlı): hız sınırları gerçek istemci IP'sini bu başlıktan okur; origin yalnızca Cloudflare'e açık olduğu için
+  başlık taklit edilemez. Origin kilidi bozulursa (80/443 herkese açılırsa) bu ayarı kaldır.
+- **Temizlik cron'u** Supabase içinde `pg_cron` ile çalışır (`cleanup_expired_data_all()`, günlük 03:17 UTC; `20260621000000_pg_cron_cleanup.sql`). `vercel.json` ve
+  `/api/cron/cleanup` Vercel kapatılana kadar yerinde, sonra silinecek (`CRON_SECRET` üretimde yoktur).
+- İşletim notları, geri dönüş adımları ve açık işler: `docs/MIGRATION_VERCEL_TO_SELFHOST.md` §10. Mobil uygulama API'ye `gameofus.app` ile bağlanır (`*.vercel.app` değil);
+  mobilin `gameofus.app` mi `www` mi çağırdığı mobil repoda **doğrulanacak** (apex `www`'ye 307 yönlendirir; farklı alan adına yönlendirmede bazı istemciler `Authorization` başlığını düşürür).
 
 ### Ödeme
 - **Web'de ödeme / login / premium UI yoktur.** Web yalnızca premium kategorileri kilitli gösterir ve
