@@ -149,6 +149,14 @@ istemci → Cloudflare (ücretsiz, Proxied, SSL Full strict) → Hetzner CX23 (x
 
 ### İzleme ve temizlik
 - UptimeRobot: `/en`, `/tr`, `/api/categories` (5 dk). Coolify'ın kendi bildirimleri henüz kurulu değil.
+
+### Cloudflare notları
+- **Cache Rule** (Caching → Cache Rules): URI Path `starts with /api/solo/red-flag/card` → *Eligible for cache*, Edge/Browser TTL origin'in `Cache-Control` başlığına uyar (kart `s-maxage=31536000, immutable` gönderir).
+  Uzantısız yollar Cloudflare'de varsayılan olarak önbelleğe alınmaz, kural olmadan `cf-cache-status: DYNAMIC` döner ve her benzersiz kart 1,2-2,4 sn CPU harcar. Doğrulama: aynı kartı iki kez iste → `MISS`, sonra `HIT`.
+- **Hız sınırı IP'si doğrulandı** (2026-11-21): bulunamayan koda 12 ardışık `GET /api/rooms/ZZZ999/state` → 10 × `404`, sonra `429`; sahte `X-Forwarded-For` başlığı da `429` aldı (yani `CLIENT_IP_HEADER=cf-connecting-ip` okunuyor,
+  başlık taklit edilemiyor). Bu ayar kaldırılırsa istemci kendi `X-Forwarded-For`'ını göndererek sınırı atlatabilir.
+- **Zaman aşımı:** Cloudflare ~100 sn sonra `524` döner. AI üretimi bunun altında kalır (ana model ~20 sn + yedek ~15 sn zaman aşımı); modelleri/zaman aşımlarını artırırsan bunu hatırla.
+  Koddaki `maxDuration = 60` yalnızca Vercel'de etkiliydi, kendi sunucumuzda zorlanmaz.
 - `pg_cron`: günlük 03:17 UTC `cleanup_expired_data_all()`. Doğrula: `select * from cron.job;`, `select status, start_time from cron.job_run_details order by start_time desc limit 5;`
 
 ### Geri dönüş (Vercel hâlâ açıkken)
@@ -159,4 +167,8 @@ Vercel Hobby planı ticari kullanıma kapalıdır: bu yalnızca kısa süreli ge
 1. **Supabase yedeği** (R2'ye zamanlanmış `pg_dump`, geri yükleme provası): store başvurusundan önce. Ücretsiz planda otomatik yedek yoktur; ilk satın almada Pro.
 2. Mobil uygulamanın API için `gameofus.app` mi `www` mi çağırdığını mobil repoda doğrula (apex → `www` 307; bazı istemciler farklı alan adına yönlendirmede `Authorization` başlığını düşürür).
 3. Birkaç gün sorunsuz çalışınca: `vercel.json` ve `app/api/cron/cleanup/route.ts`'i sil, Vercel projesini kapat, `proxy.ts` matcher'ındaki `_vercel`'i çıkar.
-4. Coolify bildirimleri (Telegram/Discord), `supabase/.temp/` için `.gitignore` satırı, `npm audit` (aylık).
+4. Coolify bildirimleri (Telegram/Discord), `npm audit` (aylık).
+5. **Reklam SSV geri çağrısı** (`/api/ads/ssv`) yazılınca Google'ın istekleri Cloudflare WAF / bot korumasına takılmamalı: o yol için bir *skip* kuralı ekle ve Google'ın doğrulama aracıyla test et.
+6. **Universal link dosyaları** (`apple-app-site-association`, `assetlinks.json`): yönlendirmesiz ve `Content-Type: application/json` ile sunulmalı (`next.config.ts` `headers()`).
+   Apex (`gameofus.app`) `www`'ye 307 verdiği için uygulamadaki *associated domains* kaydı **`www.gameofus.app`** olmalı (Apple yönlendirme kabul etmez). Yol `.well-known` noktası içerdiği için
+   `proxy.ts` matcher'ı (dil yönlendirmesi) bu dosyaları zaten atlar.

@@ -40,6 +40,9 @@ yarn-error.log*
 # claude code
 .claude/
 
+# Supabase CLI (npx supabase link): yerel bağlantı bilgisi, commit edilmez
+supabase/.temp/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
