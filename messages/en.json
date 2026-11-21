@@ -253,6 +253,7 @@
         "orderline": "Guess the order",
         "mixed": "A bit of everything"
       },
+      "mobileOnly": "On mobile",
       "scene": {
         "name": "Scene",
         "desc": "Animated stick-figure mini scenes",

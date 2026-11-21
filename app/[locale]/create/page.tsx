@@ -32,11 +32,12 @@ interface Category {
 type ClassicMode = Exclude<GameMode, "scene">;
 
 // Her mod kendi ton ve ikonunu taşır (seçiliyken hepsi dolu kırmızıya döner)
-const MODES: Array<{ value: ClassicMode; icon: string; tint: string; color: string; popular?: boolean }> = [
+// `mobileOnly`: web'de kapalı (soluk, "Mobilde" rozeti); yalnızca mobil uygulamada paketle (Lite+) oynanır. Sunucu kuralı: `lib/tier.ts` MIXED_MODE_MIN_TIER.
+const MODES: Array<{ value: ClassicMode; icon: string; tint: string; color: string; popular?: boolean; mobileOnly?: boolean }> = [
   { value: "secret_choice", icon: "visibility_off", tint: "bg-primary-container/60", color: "text-[#ae2f34]", popular: true },
   { value: "prediction", icon: "lightbulb", tint: "bg-tertiary-container/45", color: "text-[#6b5900]" },
   { value: "orderline", icon: "format_list_numbered", tint: "bg-secondary-container", color: "text-[#4b4642]" },
-  { value: "mixed", icon: "casino", tint: "bg-error-container", color: "text-[#ae2f34]" },
+  { value: "mixed", icon: "casino", tint: "bg-error-container", color: "text-[#ae2f34]", mobileOnly: true },
 ];
 
 // Kanka: el sıkışma · Sevgili: elde kalp · Evli: yüzük/elmas (dolu stil)
@@ -65,7 +66,8 @@ const CATEGORY_ICONS: Record<string, string> = {
  * (sessionStorage; sekme kapanınca silinir) tutulur. Oda kurulunca silinir; sunucuya hiçbir şey gitmez.
  */
 const DRAFT_KEY = "gou_create_draft";
-const GAME_MODES: readonly GameMode[] = ["secret_choice", "prediction", "orderline", "mixed", "scene"];
+// Karma Tur webde seçilemez (taslakta eski bir "mixed" varsa varsayılana düşer)
+const GAME_MODES: readonly GameMode[] = ["secret_choice", "prediction", "orderline", "scene"];
 
 interface CreateDraft {
   step: 1 | 2;
@@ -92,7 +94,7 @@ function readDraft(): Partial<CreateDraft> | null {
       birthDate: maskBirthDateInput(str(d.birthDate, 10)),
       gender: isGender(d.gender) ? d.gender : null,
       relationshipType: isRelationshipType(d.relationshipType) ? d.relationshipType : null,
-      gameMode: GAME_MODES.includes(d.gameMode as GameMode) && (d.gameMode !== "scene" || SCENE_MODE_ENABLED) ? (d.gameMode as GameMode) : "mixed",
+      gameMode: GAME_MODES.includes(d.gameMode as GameMode) && (d.gameMode !== "scene" || SCENE_MODE_ENABLED) ? (d.gameMode as GameMode) : "secret_choice",
       questionCount: d.questionCount === 10 ? 10 : 5,
       categoryId: idOrNull(d.categoryId),
       chapterId: idOrNull(d.chapterId),
@@ -122,7 +124,7 @@ export default function CreatePage() {
   const [birthDate, setBirthDate] = useState("");
   const [gender, setGender] = useState<Gender | null>(null);
   const [relationshipType, setRelationshipType] = useState<RelationshipType | null>(null);
-  const [gameMode, setGameMode] = useState<GameMode>("mixed");
+  const [gameMode, setGameMode] = useState<GameMode>("secret_choice");
   const [questionCount, setQuestionCount] = useState<5 | 10>(5);
   const [chapterId, setChapterId] = useState<string | null>(null);
   const chapterRef = useRef<HTMLDivElement>(null);
@@ -590,7 +592,7 @@ export default function CreatePage() {
                       trailing={<span className="text-xs text-on-surface-variant">{t("mode.hint")}</span>}
                     />
                     <div className="grid grid-cols-2 gap-3 pt-2.5">
-                      {MODES.map(({ value, icon, tint, color, popular }) => (
+                      {MODES.map(({ value, icon, tint, color, popular, mobileOnly }) => (
                         <div key={value} className="relative flex">
                           <ChoiceCard
                             selected={gameMode === value}
@@ -600,7 +602,10 @@ export default function CreatePage() {
                             iconColor={color}
                             title={t(`mode.options.${value}`)}
                             desc={t(`mode.descs.${value}`)}
-                            className="flex-1 rounded-[20px] p-4"
+                            disabled={mobileOnly}
+                            hideMarker={mobileOnly}
+                            trailing={mobileOnly ? <Pill tone="muted">{t("mode.mobileOnly")}</Pill> : undefined}
+                            className={`flex-1 rounded-[20px] p-4 ${mobileOnly ? "opacity-60 cursor-not-allowed" : ""}`}
                           />
                           {popular && (
                             <FloatBadge tone="gold" icon="local_fire_department">

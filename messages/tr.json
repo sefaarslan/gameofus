@@ -253,6 +253,7 @@
         "orderline": "Sırayı tahmin et",
         "mixed": "Hepsinden biraz"
       },
+      "mobileOnly": "Mobilde",
       "scene": {
         "name": "Sahne",
         "desc": "Çöp adam animasyonlu mini senaryolar",

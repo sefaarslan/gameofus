@@ -253,6 +253,7 @@
         "orderline": "Adivina el orden",
         "mixed": "Un poco de todo"
       },
+      "mobileOnly": "En la app",
       "scene": {
         "name": "Escena",
         "desc": "Minihistorias animadas con monigotes",

@@ -13,7 +13,7 @@ import { isRelationshipType } from "@/lib/relationship";
 import { checkRateLimit, ipHashFor } from "@/lib/rate-limit";
 import { getAuthUser } from "@/lib/auth";
 import { COIN_PRICES, CoinError, applyCoins } from "@/lib/coins";
-import { LONG_SET_MIN_TIER, LONG_SET_QUESTION_COUNT, canAccessTier, isTier, type Tier } from "@/lib/tier";
+import { LONG_SET_MIN_TIER, LONG_SET_QUESTION_COUNT, MIXED_MODE_MIN_TIER, canAccessTier, isTier, type Tier } from "@/lib/tier";
 import { MIN_APP_AGE, ageOn, parseBirthDate } from "@/lib/age";
 import { parseGender } from "@/lib/gender";
 
@@ -109,12 +109,16 @@ export async function POST(req: NextRequest) {
     return apiError("AGE_RESTRICTED", `Game of Us'ı kullanmak için en az ${MIN_APP_AGE} yaşında olmalısın.`, 403);
   }
 
-  // Paket kilidi: mobilde 10 soruluk set Lite+ gerektirir (coin düşümünden önce kontrol edilir); web'de 5/10 ücretsiz
-  if (authUser && platform === "mobile" && count === LONG_SET_QUESTION_COUNT) {
+  // Paket kilidi (yalnızca giriş yapmış mobil kullanıcı; coin düşümünden önce): 10 soruluk set ve Karma Tur modu Lite+ gerektirir.
+  // Web'de (anonim) ikisi de kısıtsızdır. Mevcut odalara dokunulmaz: kural yalnızca yeni oda kurarken geçerlidir.
+  if (authUser && platform === "mobile" && (count === LONG_SET_QUESTION_COUNT || mode === "mixed")) {
     const { data: u } = await supabase.from("users").select("tier").eq("id", authUser.id).maybeSingle();
     const userTier: Tier = isTier(u?.tier) ? u.tier : "free";
-    if (!canAccessTier(userTier, LONG_SET_MIN_TIER)) {
+    if (count === LONG_SET_QUESTION_COUNT && !canAccessTier(userTier, LONG_SET_MIN_TIER)) {
       return apiError("TIER_REQUIRED", "10 soruluk setler Lite paket gerektirir.", 403);
+    }
+    if (mode === "mixed" && !canAccessTier(userTier, MIXED_MODE_MIN_TIER)) {
+      return apiError("TIER_REQUIRED", "Karma Tur modu Lite paket gerektirir.", 403);
     }
   }
 

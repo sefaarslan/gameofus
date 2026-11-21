@@ -110,6 +110,10 @@ Doğrulama:
 - `categoryId` opsiyonel. Hem `categoryId` hem `relationshipType` varsa kategori o türe uygun olmalı
   (`categories.relationship_types`), yoksa `INVALID_PAYLOAD`.
 - IP hash'e göre saatte 10 / günde 50 oda sınırı (`RATE_LIMITED`).
+- **Karma Tur kilidi (mobil):** `gameMode: "mixed"` yalnızca `platform: "mobile"` + giriş yapmış `lite`/`premium` kullanıcıya açıktır; `free` tier → `403 TIER_REQUIRED`
+  ("Karma Tur modu Lite paket gerektirir."), 10 soruluk set kuralıyla aynı yerde, **coin düşümünden önce**. Diğer modlar (`secret_choice | prediction | orderline`)
+  ücretsizdir. Web'in anonim akışı (`platform` yok) değişmez: sunucu orada `mixed`'i yine kabul eder; web arayüzü modu "Mobilde" diye soluk/pasif gösterir.
+  Yalnızca yeni oda kurmayı etkiler: daha önce açılmış Karma Tur odaları (`rooms.game_mode = 'mixed'`) oynanmaya ve katılıma devam eder (kilit `join`/`state`/`submit-turn`'de yoktur).
 - **Paket kilidi (mobil):** kategorinin `min_tier`'ı `free` değilse yalnızca giriş yapmış ve tier'ı yeterli kullanıcı seçebilir;
   anonim web veya yetersiz tier → `403 TIER_REQUIRED`. Coin düşümünden **önce** kontrol edilir.
 - **Yaş koşulu:** `min_age > 0` olan kategoride (Cesur = 18) `relationshipType` zorunlu (kategori yalnızca `dating|partner`),
@@ -453,7 +457,7 @@ solo günlük set +50 (solo `complete` içinde, bkz. §10b). **Miktarı istemci 
 - `POST /api/rooms/[roomCode]/join` (mobil): `platform: "mobile"` + Bearer JWT zorunlu (`401`); misafir katılımcı `user_id`'ye bağlanır
   (geçmiş ve hesap silme için). Katılımcı token'ı gövdede `participantToken` ile gönderilir (Authorization'da JWT varsa).
 - `POST /api/rooms/create` (mobil): `platform: "mobile"` + Bearer JWT zorunlu (`401`); `questionCount: 10` yalnızca `lite`+ tier'a açıktır
-  (aksi `403 TIER_REQUIRED`, coin düşümünden önce; web'de 5/10 ücretsiz); oda −250 coin düşülür
+  (aksi `403 TIER_REQUIRED`, coin düşümünden önce; web'de 5/10 ücretsiz) ve `gameMode: "mixed"` (Karma Tur) da `lite`+ gerektirir (aynı hata/yer); oda −250 coin düşülür
   (`402 INSUFFICIENT_COINS`), oda başarısız olursa iade edilir, `rooms.user_id` bağlanır. `platform` göndermeyen anonim
   web istekleri ücretsizdir ve değişmez.
 

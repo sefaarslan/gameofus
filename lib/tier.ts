@@ -15,3 +15,6 @@ export function canAccessTier(userTier: Tier, minTier: Tier): boolean {
 /** Mobilde 10 soruluk setler `lite` ve üstünü gerektirir (5 soruluk setler ücretsiz). Web'de 5 ve 10 soru ücretsizdir. */
 export const LONG_SET_QUESTION_COUNT = 10;
 export const LONG_SET_MIN_TIER: Tier = "lite";
+
+/** Mobilde "Karma Tur" oyun modu (`gameMode: "mixed"`) `lite` ve üstünü gerektirir. Web'de anonim oda kurmada kısıt yoktur (web arayüzü modu kapalı gösterir). */
+export const MIXED_MODE_MIN_TIER: Tier = "lite";
