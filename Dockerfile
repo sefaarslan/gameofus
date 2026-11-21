@@ -30,6 +30,9 @@ RUN npm run build
 
 FROM base AS runner
 WORKDIR /app
+# Coolify'ın HTTP sağlık kontrolü container içinde `curl` çalıştırır; node:22-slim'de yoktur.
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production \
     PORT=3000 \
     HOSTNAME=0.0.0.0

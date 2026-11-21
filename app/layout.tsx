@@ -5,7 +5,8 @@ import "./globals.css";
 
 // Paylaşım önizlemeleri (WhatsApp vb.) mutlak URL ister. VERCEL_URL her deployment'a özel
 // *.vercel.app adresidir; kalıcı alan adımızı kullanıyoruz.
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gameofus.app";
+// `||`: Docker derlemesi değişkeni boş metin olarak tanımlayabilir (build arg verilmediğinde); `??` boş metni geçerli sayıp `new URL("")` ile çöker.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://gameofus.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
