@@ -31,16 +31,106 @@
           "description": "Birbirinizi derinden tanıyın",
           "minutes": 12,
           "mode": "prediction",
-          "categorySlug": "values",
+          "categorySlug": "communication",
           "questionCount": 10
         },
         {
           "order": 3,
-          "title": "Hayal Listesi",
-          "description": "Birlikte hayal edin, gülerek bitirin",
+          "title": "Keyif Listesi",
+          "description": "Sizi en çok neyin mutlu ettiğini sıralayın, gülerek bitirin",
           "minutes": 8,
           "mode": "orderline",
           "categorySlug": "lifestyle",
+          "questionCount": 5
+        }
+      ]
+    },
+    {
+      "id": "new-years-eve-2026",
+      "slug": "new-years-eve",
+      "occasion": "Yılbaşı Gecesi",
+      "title": "Yılbaşı Gecesi Kılavuzu",
+      "subtitle": "Yılı uğurla, yeni yıla birlikte gir. İstediğin oyundan başlayabilirsin.",
+      "relationshipTypes": [
+        "friend",
+        "dating",
+        "partner"
+      ],
+      "minTier": "lite",
+      "players": 2,
+      "startsAt": "2026-12-24T00:00:00.000Z",
+      "endsAt": "2027-01-02T00:00:00.000Z",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Yılı Uğurla",
+          "description": "Hızlı evet-hayır turuyla geçen yıla veda edin",
+          "minutes": 5,
+          "mode": "secret_choice",
+          "categorySlug": "lifestyle",
+          "questionCount": 5
+        },
+        {
+          "order": 2,
+          "title": "Yeni Yıl Önceliklerimiz",
+          "description": "Önümüzdeki yıl neyi öne çıkaracağınızı sıralayın",
+          "minutes": 8,
+          "mode": "orderline",
+          "categorySlug": "values",
+          "questionCount": 5
+        },
+        {
+          "order": 3,
+          "title": "Gece Yarısı Sohbeti",
+          "description": "Geri sayıma kadar birbirinizi daha iyi tanıyın",
+          "minutes": 12,
+          "mode": "prediction",
+          "categorySlug": "values",
+          "questionCount": 10
+        }
+      ]
+    },
+    {
+      "id": "birthday-2027",
+      "slug": "birthday",
+      "occasion": "Doğum Günü",
+      "title": "Doğum Günü Kılavuzu",
+      "subtitle": "Pasta gelmeden ısının, birbirinizi tanıyın, dileklerle bitirin. İstediğin oyundan başlayabilirsin.",
+      "relationshipTypes": [
+        "friend",
+        "dating",
+        "partner"
+      ],
+      "minTier": "lite",
+      "players": 2,
+      "startsAt": null,
+      "endsAt": null,
+      "steps": [
+        {
+          "order": 1,
+          "title": "Pasta Öncesi Isınma",
+          "description": "Hafif sorularla ısının",
+          "minutes": 5,
+          "mode": "mixed",
+          "categorySlug": null,
+          "questionCount": 5
+        },
+        {
+          "order": 2,
+          "title": "Beni Ne Kadar Tanıyorsun?",
+          "description": "Birbirinizin alışkanlıklarını ve tercihlerini tahmin edin",
+          "minutes": 12,
+          "mode": "prediction",
+          "categorySlug": "lifestyle",
+          "questionCount": 10
+        },
+        {
+          "order": 3,
+          "title": "Dilek Sözleri",
+          "description": "Sizi en çok mutlu eden sözleri sıralayın",
+          "minutes": 8,
+          "mode": "orderline",
+          "categorySlug": "communication",
           "questionCount": 5
         }
       ]

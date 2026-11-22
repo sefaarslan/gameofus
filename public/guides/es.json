@@ -31,16 +31,106 @@
           "description": "Conózcanse a un nivel más profundo",
           "minutes": 12,
           "mode": "prediction",
-          "categorySlug": "values",
+          "categorySlug": "communication",
           "questionCount": 10
         },
         {
           "order": 3,
-          "title": "Lista de sueños",
-          "description": "Sueñen juntos y terminen con una sonrisa",
+          "title": "Lista de placeres",
+          "description": "Ordenen lo que más les hace felices y terminen sonriendo",
           "minutes": 8,
           "mode": "orderline",
           "categorySlug": "lifestyle",
+          "questionCount": 5
+        }
+      ]
+    },
+    {
+      "id": "new-years-eve-2026",
+      "slug": "new-years-eve",
+      "occasion": "Nochevieja",
+      "title": "Guía de Nochevieja",
+      "subtitle": "Despide el año y entra en el nuevo juntos. Empieza por el juego que quieras.",
+      "relationshipTypes": [
+        "friend",
+        "dating",
+        "partner"
+      ],
+      "minTier": "lite",
+      "players": 2,
+      "startsAt": "2026-12-24T00:00:00.000Z",
+      "endsAt": "2027-01-02T00:00:00.000Z",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Despide el año",
+          "description": "Una ronda rápida de sí o no para decir adiós al año",
+          "minutes": 5,
+          "mode": "secret_choice",
+          "categorySlug": "lifestyle",
+          "questionCount": 5
+        },
+        {
+          "order": 2,
+          "title": "Prioridades del año nuevo",
+          "description": "Ordenen lo que más importa en el año que viene",
+          "minutes": 8,
+          "mode": "orderline",
+          "categorySlug": "values",
+          "questionCount": 5
+        },
+        {
+          "order": 3,
+          "title": "Charla de medianoche",
+          "description": "Conózcanse mejor antes de la cuenta atrás",
+          "minutes": 12,
+          "mode": "prediction",
+          "categorySlug": "values",
+          "questionCount": 10
+        }
+      ]
+    },
+    {
+      "id": "birthday-2027",
+      "slug": "birthday",
+      "occasion": "Cumpleaños",
+      "title": "Guía de cumpleaños",
+      "subtitle": "Caliéntense antes de la tarta, descubran cuánto se conocen y terminen con buenos deseos. Empieza por el juego que quieras.",
+      "relationshipTypes": [
+        "friend",
+        "dating",
+        "partner"
+      ],
+      "minTier": "lite",
+      "players": 2,
+      "startsAt": null,
+      "endsAt": null,
+      "steps": [
+        {
+          "order": 1,
+          "title": "Antes de la tarta",
+          "description": "Caliéntense con preguntas ligeras",
+          "minutes": 5,
+          "mode": "mixed",
+          "categorySlug": null,
+          "questionCount": 5
+        },
+        {
+          "order": 2,
+          "title": "¿Cuánto me conoces?",
+          "description": "Adivinen los hábitos y gustos del otro",
+          "minutes": 12,
+          "mode": "prediction",
+          "categorySlug": "lifestyle",
+          "questionCount": 10
+        },
+        {
+          "order": 3,
+          "title": "Palabras de cumpleaños",
+          "description": "Ordenen las palabras que más les hacen felices",
+          "minutes": 8,
+          "mode": "orderline",
+          "categorySlug": "communication",
           "questionCount": 5
         }
       ]
