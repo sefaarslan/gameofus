@@ -1,7 +1,7 @@
 // Kılavuz dosyalarını (public/guides/{tr,en,es}.json) doğrular. Hata varsa çıkış kodu 1: `npm run build` bu betikle başlar, yani deploy durur.
 //   node scripts/check-guides.mjs            (GUIDES_DIR ile başka bir klasör denenebilir; testler için)
 // Kategori bilgisi seeds/v2/*.ts içinden okunur (tek doğruluk kaynağı; `.dockerignore` bu iki yolu imaja alır).
-import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const DIR = resolve(process.env.GUIDES_DIR ?? "public/guides");
@@ -11,6 +11,7 @@ const REL = ["friend", "dating", "partner"];
 const TIERS = ["free", "lite", "premium"];
 const ROOM_MODES = ["secret_choice", "prediction", "orderline", "mixed"]; // solo/Red Flag yok
 const COUNTS = [5, 10];
+const MAX_IMAGE_BYTES = 150_000; // kapak görseli üst sınırı (mobil şartı)
 const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 // "Sırayla oyna" dayatması (uyarı): ürün kararı, adımlar öneridir ve istenen oyundan başlanır
 const FORCED_ORDER = {
@@ -91,7 +92,11 @@ function checkGuide(l, g, i) {
     for (const k of ["title", "description"]) if (typeof st[k] === "string" && FORCED_ORDER[l]?.test(st[k])) warn(`${sa}: ${k} "sırayla oyna" dayatması gibi duruyor: "${st[k]}"`);
   });
   // Kapak görseli: mobil yolu kimlikten türetir (img/<id>.jpg). Yoksa uyarı (deploy durmaz; mobil görselsiz gösterir ya da yedeğe düşer)
-  if (typeof g.id === "string" && l === "tr" && !existsSync(join(DIR, "img", `${g.id}.jpg`))) warn(`${g.id}: kapak görseli yok (public/guides/img/${g.id}.jpg)`);
+  if (typeof g.id === "string" && l === "tr") {
+    const img = join(DIR, "img", `${g.id}.jpg`);
+    if (!existsSync(img)) warn(`${g.id}: kapak görseli yok (public/guides/img/${g.id}.jpg)`);
+    else if (statSync(img).size > MAX_IMAGE_BYTES) fail(`${g.id}: kapak görseli ${Math.round(statSync(img).size / 1000)} KB; en çok ${MAX_IMAGE_BYTES / 1000} KB olmalı (mobil şartı; 5:4 oran, ~1000 px genişlik)`);
+  }
   for (const k of ["subtitle", "title"]) if (typeof g[k] === "string" && FORCED_ORDER[l]?.test(g[k])) warn(`${at}: ${k} "sırayla oyna" dayatması gibi duruyor: "${g[k]}"`);
 }
 
