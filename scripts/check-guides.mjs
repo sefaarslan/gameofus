@@ -90,6 +90,8 @@ function checkGuide(l, g, i) {
     }
     for (const k of ["title", "description"]) if (typeof st[k] === "string" && FORCED_ORDER[l]?.test(st[k])) warn(`${sa}: ${k} "sırayla oyna" dayatması gibi duruyor: "${st[k]}"`);
   });
+  // Kapak görseli: mobil yolu kimlikten türetir (img/<id>.jpg). Yoksa uyarı (deploy durmaz; mobil görselsiz gösterir ya da yedeğe düşer)
+  if (typeof g.id === "string" && l === "tr" && !existsSync(join(DIR, "img", `${g.id}.jpg`))) warn(`${g.id}: kapak görseli yok (public/guides/img/${g.id}.jpg)`);
   for (const k of ["subtitle", "title"]) if (typeof g[k] === "string" && FORCED_ORDER[l]?.test(g[k])) warn(`${at}: ${k} "sırayla oyna" dayatması gibi duruyor: "${g[k]}"`);
 }
 

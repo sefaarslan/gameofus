@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
         source: "/guides/:file*.json",
         headers: [{ key: "Cache-Control", value: "public, max-age=300, s-maxage=300, stale-while-revalidate=86400" }],
       },
+      // Kapak görselleri (img/<kılavuz id>.jpg): dosya adı sabit olduğu için kısa önbellek (değiştirilen görsel saatler içinde yansır)
+      {
+        source: "/guides/img/:file*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400" }],
+      },
     ];
   },
   turbopack: {
