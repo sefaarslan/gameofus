@@ -153,6 +153,10 @@ istemci → Cloudflare (ücretsiz, Proxied, SSL Full strict) → Hetzner CX23 (x
 ### Cloudflare notları
 - **Cache Rule** (Caching → Cache Rules): URI Path `starts with /api/solo/red-flag/card` → *Eligible for cache*, Edge/Browser TTL origin'in `Cache-Control` başlığına uyar (kart `s-maxage=31536000, immutable` gönderir).
   Uzantısız yollar Cloudflare'de varsayılan olarak önbelleğe alınmaz, kural olmadan `cf-cache-status: DYNAMIC` döner ve her benzersiz kart 1,2-2,4 sn CPU harcar. Doğrulama: aynı kartı iki kez iste → `MISS`, sonra `HIT`.
+- **Cache Rule: kılavuzlar** (`/guides/*`): URI Path `starts with /guides/` → *Eligible for cache*, Edge TTL **Use cache-control header if present, bypass cache if not**, Browser TTL **Respect origin TTL**.
+  Neden: `.json` Cloudflare'in varsayılan önbellek uzantılarında yok, kural olmadan `cf-cache-status: DYNAMIC` döner (her istek sunucuya gider; ölçülen ~0,35 sn). `.jpg` varsayılan olarak zaten önbelleğe girer (`HIT`), ama Browser TTL'i 4 saate sabitler (`max-age=14400`), kural bunu origin'in 3600'üne çeker.
+  Origin başlıkları `next.config.ts`'te: JSON `max-age=300, s-maxage=300`, görsel `max-age=3600, s-maxage=3600`. Doğrulama: `curl -sI https://www.gameofus.app/guides/tr.json | grep -i cf-cache-status` iki ardışık istekte `MISS`, sonra `HIT`.
+  **Purge:** JSON'a purge gerekmez (en geç 5 dk). **Kapak görseli değiştirilirse** (aynı id = aynı URL) ilgili URL'yi Purge by URL ile temizle; yeni kılavuz/görsel eklemek (yeni URL) purge gerektirmez.
 - **Hız sınırı IP'si doğrulandı** (2026-11-21): bulunamayan koda 12 ardışık `GET /api/rooms/ZZZ999/state` → 10 × `404`, sonra `429`; sahte `X-Forwarded-For` başlığı da `429` aldı (yani `CLIENT_IP_HEADER=cf-connecting-ip` okunuyor,
   başlık taklit edilemiyor). Bu ayar kaldırılırsa istemci kendi `X-Forwarded-For`'ını göndererek sınırı atlatabilir.
 - **Zaman aşımı:** Cloudflare ~100 sn sonra `524` döner. AI üretimi bunun altında kalır (ana model ~20 sn + yedek ~15 sn zaman aşımı); modelleri/zaman aşımlarını artırırsan bunu hatırla.
