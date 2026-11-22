@@ -18,5 +18,9 @@ supabase
 seeds
 scripts
 *.md
+
+# ...ama `npm run build` kılavuz doğrulamasıyla başlar (scripts/check-guides.mjs; hata verirse deploy durur) ve kategorileri seeds/v2'den okur
+!scripts/check-guides.mjs
+!seeds/v2
 Dockerfile
 .dockerignore

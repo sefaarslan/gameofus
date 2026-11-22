@@ -1,0 +1,133 @@
+// Kılavuz dosyalarını (public/guides/{tr,en,es}.json) doğrular. Hata varsa çıkış kodu 1: `npm run build` bu betikle başlar, yani deploy durur.
+//   node scripts/check-guides.mjs            (GUIDES_DIR ile başka bir klasör denenebilir; testler için)
+// Kategori bilgisi seeds/v2/*.ts içinden okunur (tek doğruluk kaynağı; `.dockerignore` bu iki yolu imaja alır).
+import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { join, resolve } from "node:path";
+
+const DIR = resolve(process.env.GUIDES_DIR ?? "public/guides");
+const SEEDS = resolve("seeds/v2");
+const LANGS = ["tr", "en", "es"];
+const REL = ["friend", "dating", "partner"];
+const TIERS = ["free", "lite", "premium"];
+const ROOM_MODES = ["secret_choice", "prediction", "orderline", "mixed"]; // solo/Red Flag yok
+const COUNTS = [5, 10];
+const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+// "Sırayla oyna" dayatması (uyarı): ürün kararı, adımlar öneridir ve istenen oyundan başlanır
+const FORCED_ORDER = {
+  tr: /sırayla|sırasıyla|sırayı\s+boz|sırasını\s+boz|atlama/i,
+  en: /\bin order\b|\bin sequence\b|sequentially|one by one|don'?t skip|do not skip|\bskip\b/i,
+  es: /\ben orden\b|secuencial|uno por uno|no te saltes|sin saltar/i,
+};
+
+let errors = 0, warnings = 0;
+const fail = (m) => { errors++; console.error("✗ " + m); };
+const warn = (m) => { warnings++; console.warn("! " + m); };
+
+// ── Kategoriler: slug → { types, premium } (seed dosyalarından; yalnızca ilk slug/relationshipTypes/isPremium) ─────────────
+const cats = new Map();
+if (!existsSync(SEEDS)) {
+  fail(`${SEEDS} yok: kategori denetimi yapılamaz (.dockerignore seeds/v2'yi imaja almalı)`);
+} else {
+  for (const f of readdirSync(SEEDS).filter((x) => x.endsWith(".ts") && x !== "types.ts" && x !== "helpers.ts")) {
+    const src = readFileSync(join(SEEDS, f), "utf8");
+    const slug = src.match(/\bslug:\s*"([a-z0-9_]+)"/)?.[1];
+    const types = src.match(/\brelationshipTypes:\s*\[([^\]]*)\]/)?.[1].match(/"(\w+)"/g)?.map((s) => s.replace(/"/g, ""));
+    const premium = /\bisPremium:\s*true/.test(src);
+    if (!slug || !types?.length) { fail(`seeds/v2/${f}: slug/relationshipTypes okunamadı`); continue; }
+    cats.set(slug, { types, premium });
+  }
+}
+
+// ── Dosyaları oku ────────────────────────────────────────────────────────────────────────────────────────────────────────
+const data = {};
+for (const l of LANGS) {
+  const file = join(DIR, `${l}.json`);
+  if (!existsSync(file)) { fail(`${l}.json yok`); continue; }
+  try { data[l] = JSON.parse(readFileSync(file, "utf8")); } catch (e) { fail(`${l}.json geçerli JSON değil: ${e.message}`); }
+}
+
+const str = (v, max) => typeof v === "string" && v.trim().length > 0 && v.length <= max;
+
+function checkGuide(l, g, i) {
+  const at = `${l}.json guides[${i}]${g?.id ? ` (${g.id})` : ""}`;
+  if (!g || typeof g !== "object") return fail(`${at}: nesne değil`);
+  if (!str(g.id, 80) || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(g.id)) fail(`${at}: id kararlı bir slug olmalı (küçük harf, rakam, tire; yıl ekle)`);
+  if (!str(g.slug, 80) || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(g.slug)) fail(`${at}: slug geçersiz`);
+  for (const k of ["occasion", "title", "subtitle"]) if (!str(g[k], 200)) fail(`${at}: ${k} boş/çok uzun`);
+  if (str(g.title, 200) && g.title.length > 60) warn(`${at}: title uzun (${g.title.length} > 60)`);
+  if (str(g.subtitle, 200) && g.subtitle.length > 140) warn(`${at}: subtitle uzun (${g.subtitle.length} > 140)`);
+  const rel = g.relationshipTypes;
+  if (!Array.isArray(rel) || !rel.length || !rel.every((r) => REL.includes(r)) || new Set(rel).size !== rel.length) fail(`${at}: relationshipTypes friend|dating|partner dizisi olmalı (boş değil, tekrarsız)`);
+  if (!TIERS.includes(g.minTier)) fail(`${at}: minTier ${TIERS.join("|")} olmalı`);
+  if (!Number.isInteger(g.players) || g.players < 2) fail(`${at}: players ≥ 2 tamsayı olmalı`);
+
+  // Pencere (isteğe bağlı): ikisi birlikte, ISO, startsAt < endsAt
+  const s = g.startsAt ?? null, e = g.endsAt ?? null;
+  if ((s === null) !== (e === null)) fail(`${at}: startsAt ve endsAt birlikte verilmeli ya da ikisi de boş olmalı`);
+  else if (s !== null) {
+    if (typeof s !== "string" || typeof e !== "string" || !ISO.test(s) || !ISO.test(e) || Number.isNaN(Date.parse(s)) || Number.isNaN(Date.parse(e))) fail(`${at}: startsAt/endsAt ISO 8601 UTC (…Z) olmalı`);
+    else if (!(Date.parse(s) < Date.parse(e))) fail(`${at}: startsAt < endsAt olmalı`);
+  }
+
+  if (!Array.isArray(g.steps) || g.steps.length === 0) return fail(`${at}: steps boş`);
+  g.steps.forEach((st, j) => {
+    const sa = `${at} adım ${j + 1}`;
+    if (st.order !== j + 1) fail(`${sa}: order ${j + 1} olmalı (1'den ardışık)`);
+    for (const k of ["title", "description"]) if (!str(st[k], 200)) fail(`${sa}: ${k} boş/çok uzun`);
+    if (!Number.isInteger(st.minutes) || st.minutes < 1 || st.minutes > 120) fail(`${sa}: minutes 1-120 tamsayı olmalı`);
+    if (!ROOM_MODES.includes(st.mode)) fail(`${sa}: mode ${ROOM_MODES.join("|")} olmalı (solo/Red Flag yok), gelen: ${JSON.stringify(st.mode)}`);
+    if (!COUNTS.includes(st.questionCount)) fail(`${sa}: questionCount 5|10 olmalı`);
+    if (st.categorySlug !== null) {
+      const c = typeof st.categorySlug === "string" ? cats.get(st.categorySlug) : undefined;
+      if (!c) { if (cats.size) fail(`${sa}: categorySlug "${st.categorySlug}" mevcut bir kategori değil (ya da null)`); }
+      else {
+        if (c.premium) fail(`${sa}: "${st.categorySlug}" premium/18+ bir kategori; kılavuz (lite) buna dayanamaz`);
+        // Oda kurma ekranı bağ türüne göre kategoriyi doğrular (uyumsuzsa sunucu INVALID_PAYLOAD verir): kılavuzun HER bağ türü için geçerli olmalı.
+        // Kanka'ya açık kılavuzda romantik kategori bu yüzden zaten giremez.
+        const bad = Array.isArray(rel) ? rel.filter((r) => REL.includes(r) && !c.types.includes(r)) : [];
+        if (bad.length) fail(`${sa}: "${st.categorySlug}" yalnızca [${c.types}] bağlarına açık; kılavuz ${bad.join("/")} için de seçilebilir`);
+      }
+    }
+    for (const k of ["title", "description"]) if (typeof st[k] === "string" && FORCED_ORDER[l]?.test(st[k])) warn(`${sa}: ${k} "sırayla oyna" dayatması gibi duruyor: "${st[k]}"`);
+  });
+  for (const k of ["subtitle", "title"]) if (typeof g[k] === "string" && FORCED_ORDER[l]?.test(g[k])) warn(`${at}: ${k} "sırayla oyna" dayatması gibi duruyor: "${g[k]}"`);
+}
+
+for (const l of LANGS) {
+  const d = data[l];
+  if (!d) continue;
+  if (d.version !== 1) fail(`${l}.json: version 1 olmalı`);
+  if (!Array.isArray(d.guides)) { fail(`${l}.json: guides dizi olmalı`); continue; }
+  const ids = new Set();
+  d.guides.forEach((g, i) => {
+    checkGuide(l, g, i);
+    if (g?.id) { if (ids.has(g.id)) fail(`${l}.json: yinelenen id "${g.id}"`); ids.add(g.id); }
+  });
+}
+
+// ── Diller arası tutarlılık: aynı id'ler, aynı yapı (yalnızca metinler dile göre değişir) ────────────────────────────────
+const ref = data.tr;
+if (ref && Array.isArray(ref.guides)) {
+  for (const l of LANGS.slice(1)) {
+    const d = data[l];
+    if (!d || !Array.isArray(d.guides)) continue;
+    const a = ref.guides.map((g) => g?.id), b = d.guides.map((g) => g?.id);
+    if (JSON.stringify(a) !== JSON.stringify(b)) { fail(`tr.json ve ${l}.json aynı id'lere/sıraya sahip değil: [${a}] ≠ [${b}]`); continue; }
+    ref.guides.forEach((g, i) => {
+      const o = d.guides[i];
+      for (const k of ["slug", "relationshipTypes", "minTier", "players", "startsAt", "endsAt"]) {
+        if (JSON.stringify(g[k] ?? null) !== JSON.stringify(o[k] ?? null)) fail(`${g.id}: ${k} tr ve ${l} arasında farklı`);
+      }
+      if ((g.steps?.length ?? 0) !== (o.steps?.length ?? 0)) { fail(`${g.id}: adım sayısı tr (${g.steps?.length}) ≠ ${l} (${o.steps?.length})`); return; }
+      g.steps.forEach((s, j) => {
+        for (const k of ["order", "minutes", "mode", "categorySlug", "questionCount"]) {
+          if (JSON.stringify(s[k] ?? null) !== JSON.stringify(o.steps[j][k] ?? null)) fail(`${g.id} adım ${j + 1}: ${k} tr ve ${l} arasında farklı`);
+        }
+      });
+    });
+  }
+}
+
+const n = ref?.guides?.length ?? 0;
+console.log(errors ? `\n${errors} hata, ${warnings} uyarı` : `✔ ${n} kılavuz, ${LANGS.length} dil: tamam${warnings ? ` (${warnings} uyarı)` : ""}`);
+process.exit(errors ? 1 : 0);

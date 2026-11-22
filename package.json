@@ -2,7 +2,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/check-guides.mjs && next build",
+    "check:guides": "node scripts/check-guides.mjs",
     "start": "next start",
     "lint": "eslint .",
     "icons": "node scripts/build-icon-font.mjs"

@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "guides": [
+    {
+      "id": "valentines-day-2027",
+      "slug": "valentines-day",
+      "occasion": "San Valentín",
+      "title": "Guía de San Valentín",
+      "subtitle": "Entra en calor, profundiza o termina entre risas. Empieza por el juego que quieras.",
+      "relationshipTypes": [
+        "dating",
+        "partner"
+      ],
+      "minTier": "lite",
+      "players": 2,
+      "startsAt": "2027-02-01T00:00:00.000Z",
+      "endsAt": "2027-02-15T00:00:00.000Z",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Ronda mixta",
+          "description": "Calentamiento con preguntas ligeras",
+          "minutes": 5,
+          "mode": "mixed",
+          "categorySlug": null,
+          "questionCount": 5
+        },
+        {
+          "order": 2,
+          "title": "Profundiza",
+          "description": "Conózcanse a un nivel más profundo",
+          "minutes": 12,
+          "mode": "prediction",
+          "categorySlug": "values",
+          "questionCount": 10
+        },
+        {
+          "order": 3,
+          "title": "Lista de sueños",
+          "description": "Sueñen juntos y terminen con una sonrisa",
+          "minutes": 8,
+          "mode": "orderline",
+          "categorySlug": "lifestyle",
+          "questionCount": 5
+        }
+      ]
+    }
+  ]
+}

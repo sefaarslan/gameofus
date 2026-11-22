@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "guides": [
+    {
+      "id": "valentines-day-2027",
+      "slug": "valentines-day",
+      "occasion": "Sevgililer Günü",
+      "title": "Sevgililer Günü Kılavuzu",
+      "subtitle": "Isın, derinleş ya da gülerek bitir. İstediğin oyundan başlayabilirsin.",
+      "relationshipTypes": [
+        "dating",
+        "partner"
+      ],
+      "minTier": "lite",
+      "players": 2,
+      "startsAt": "2027-02-01T00:00:00.000Z",
+      "endsAt": "2027-02-15T00:00:00.000Z",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Karma Tur",
+          "description": "Isınma, hafif sorular",
+          "minutes": 5,
+          "mode": "mixed",
+          "categorySlug": null,
+          "questionCount": 5
+        },
+        {
+          "order": 2,
+          "title": "Derinleş",
+          "description": "Birbirinizi derinden tanıyın",
+          "minutes": 12,
+          "mode": "prediction",
+          "categorySlug": "values",
+          "questionCount": 10
+        },
+        {
+          "order": 3,
+          "title": "Hayal Listesi",
+          "description": "Birlikte hayal edin, gülerek bitirin",
+          "minutes": 8,
+          "mode": "orderline",
+          "categorySlug": "lifestyle",
+          "questionCount": 5
+        }
+      ]
+    }
+  ]
+}

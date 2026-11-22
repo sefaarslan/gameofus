@@ -57,6 +57,8 @@ POST /api/users/coins/spend       (mobil, Bearer JWT)
 POST /api/users/coins/earn        (mobil, Bearer JWT)
 ```
 
+Statik dosya (API değil): `GET /guides/{tr|en|es}.json` — özel gün kılavuzları, kimlik gerekmez (bkz. §10e).
+
 Ayrı bir `calculate-results` endpoint'i **yoktur**: sonuç, ikinci oyuncu `complete` çağırdığında aynı
 istek içinde hesaplanır. Planlanan (mobil için): `POST /api/iap/verify`. Lemon Squeezy webhook'u **kullanılmaz**.
 
@@ -555,6 +557,24 @@ Oturum yok, başkasının oturumu ya da anonim web oturumu (`user_id` boş) → 
 Migration: `20260617000000_ai_solo_analysis.sql`.
 
 ---
+
+## 10e. Kılavuzlar (statik dosya; API ucu YOK)
+
+Kılavuz = bir özel gün için önerilen oda oyunları listesi. Veritabanı tablosu, `/api/guides` ucu ya da kullanıcıya özel mantık **yoktur**:
+içerik web reposunda üç statik dosyadır ve herkese açıktır (kilit mobil arayüzde, kullanıcının paketine göre hesaplanır).
+Yeni kılavuz yayınlamak = dosyaları düzenleyip deploy etmek (mobil sürüm gerekmez).
+
+- `GET https://www.gameofus.app/guides/{tr|en|es}.json` — kimlik gerekmez. Başlık: `Cache-Control: public, max-age=300, s-maxage=300, stale-while-revalidate=86400` (`next.config.ts`, `headers()`); değişiklik dakikalar içinde yansır.
+- Dosya: `{ "version": 1, "guides": [ … ] }`. Üç dosyada **aynı** id'ler, aynı adım sayısı/sırası ve aynı yapısal alanlar; yalnızca `occasion`, `title`, `subtitle` ve adım `title`/`description` metinleri dile göre değişir.
+- Kılavuz: `id` (kararlı, benzersiz; mobil tamamlandı işaretlerini bununla tutar, yıl ekle: `valentines-day-2027`), `slug`, `occasion`, `title`, `subtitle`,
+  `relationshipTypes` (`friend|dating|partner` dizisi; tek eleman → mobil bağ türünü hazır seçer, birden fazla → kullanıcı seçer), `minTier` (şimdilik `lite`; kilidi mobil hesaplar),
+  `players` (2), `startsAt`/`endsAt` (isteğe bağlı, ISO UTC; yalnızca ana sayfadaki "özel gün" şeridinin penceresi, dışında da Profil → Kılavuzlar'da görünür), `steps`.
+- Adım: `order` (1'den ardışık), `title`, `description`, `minutes` (tahmini süre), `mode` (`secret_choice|prediction|orderline|mixed`; solo/Red Flag girilemez),
+  `categorySlug` (`null` = Karışık Sürpriz; yoksa mevcut bir kategori), `questionCount` (5 | 10). Toplam süre/adım sayısı dosyada yazılmaz, mobil hesaplar. Bilinmeyen alanlar istemcide yok sayılır.
+- Adımlar öneridir: metinlerde "sırayla oyna" dayatması yazılmaz. Her adımda mobil oda kurma ekranını o adımın ayarlarıyla hazır açar. `mixed` ve `questionCount: 10` mobilde `lite`+ gerektirir (kılavuz zaten `lite`).
+- **Kategori kuralı:** adımın kategorisi kılavuzun **her** `relationshipTypes` değerine açık olmalı (oda kurma ekranı bağ türüne göre doğrular; uyumsuzsa sunucu `INVALID_PAYLOAD` verir). Örn. `["dating","partner"]` kılavuzunda `romance` (yalnızca Sevgili) ya da `future` (yalnızca Evli) kullanılamaz; ortak kategoriler `communication`, `lifestyle`, `values`. Premium/18+ kategori (`bold`) girilemez. `friend` içeren kılavuzda romantik kategori bu yüzden zaten giremez.
+- **Doğrulama:** `node scripts/check-guides.mjs` (`npm run check:guides`). `npm run build` bununla başlar, hata verirse (çıkış 1) derleme/deploy durur. Hata: geçersiz JSON/şema, id'lerin 3 dosyada farklı olması, adım sayısı/yapı farkı, oda dışı mod, bilinmeyen/premium/uyumsuz kategori, `questionCount` ≠ 5|10, `startsAt ≥ endsAt`. Uyarı (deploy'u durdurmaz): "sırayla/in order/en orden" dayatması, aşırı uzun başlık.
+  Docker imajında betik ve `seeds/v2` için `.dockerignore` istisnası vardır.
 
 ## 10. `POST /api/feedback`
 

@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "guides": [
+    {
+      "id": "valentines-day-2027",
+      "slug": "valentines-day",
+      "occasion": "Valentine's Day",
+      "title": "Valentine's Day Guide",
+      "subtitle": "Warm up, go deeper or finish with a laugh. Start with whichever game you like.",
+      "relationshipTypes": [
+        "dating",
+        "partner"
+      ],
+      "minTier": "lite",
+      "players": 2,
+      "startsAt": "2027-02-01T00:00:00.000Z",
+      "endsAt": "2027-02-15T00:00:00.000Z",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Mixed Round",
+          "description": "A warm-up with light questions",
+          "minutes": 5,
+          "mode": "mixed",
+          "categorySlug": null,
+          "questionCount": 5
+        },
+        {
+          "order": 2,
+          "title": "Go Deeper",
+          "description": "Get to know each other on a deeper level",
+          "minutes": 12,
+          "mode": "prediction",
+          "categorySlug": "values",
+          "questionCount": 10
+        },
+        {
+          "order": 3,
+          "title": "Dream List",
+          "description": "Dream together and finish with a smile",
+          "minutes": 8,
+          "mode": "orderline",
+          "categorySlug": "lifestyle",
+          "questionCount": 5
+        }
+      ]
+    }
+  ]
+}

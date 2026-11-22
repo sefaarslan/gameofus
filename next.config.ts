@@ -10,6 +10,15 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: { "/api/solo/red-flag/card": ["./public/fonts/*.ttf"] },
   // Yerel (native) ikili içeren paketler paketlenmez, Node'dan doğrudan yüklenir
   serverExternalPackages: ["@resvg/resvg-js", "satori"],
+  // Kılavuz dosyaları (public/guides/*.json): herkese açık statik içerik; kısa önbellek, yayınlanan değişiklik dakikalar içinde yansır.
+  async headers() {
+    return [
+      {
+        source: "/guides/:file*.json",
+        headers: [{ key: "Cache-Control", value: "public, max-age=300, s-maxage=300, stale-while-revalidate=86400" }],
+      },
+    ];
+  },
   turbopack: {
     root: __dirname,
   },
