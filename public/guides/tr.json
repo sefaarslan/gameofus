@@ -135,5 +135,63 @@
         }
       ]
     }
-  ]
+  ],
+  "homework": {
+    "id": "sevgi-haritasi",
+    "slug": "sevgi-haritasi",
+    "occasion": "",
+    "title": "Sevgi Haritası",
+    "subtitle": "Birbirinizin iç dünyasını ne kadar tanıyorsunuz? Üç oyun, her birinin ardından kısa bir sohbet.",
+    "description": "Her adımda ikiniz de ayrı ayrı cevaplayıp birbirinizi tahmin edin. Sonuçlar açılınca alttaki soruları birlikte konuşun. Doğru ya da yanlış yok; amaç merak etmek ve dinlemek.",
+    "relationshipTypes": [
+      "dating",
+      "partner"
+    ],
+    "minTier": "lite",
+    "players": 2,
+    "steps": [
+      {
+        "order": 1,
+        "title": "Günlük dünyası",
+        "description": "Alışkanlıklar, tercihler ve gün içindeki küçük şeyler.",
+        "minutes": 15,
+        "mode": "prediction",
+        "categorySlug": "lifestyle",
+        "questionCount": 5,
+        "talk": [
+          "Bu aralar gününde seni en çok ne yoruyor?",
+          "Tahminlerden hangisi seni şaşırttı? Doğrusunu anlat.",
+          "Günün en sevdiğin anı hangisi?"
+        ]
+      },
+      {
+        "order": 2,
+        "title": "Duygular ve ihtiyaçlar",
+        "description": "Zor anlarda neye ihtiyaç duyduğunuz ve nasıl konuştuğunuz.",
+        "minutes": 15,
+        "mode": "prediction",
+        "categorySlug": "communication",
+        "questionCount": 5,
+        "talk": [
+          "Canın sıkkınken sana en iyi ne gelir?",
+          "Kendini en çok ne zaman duyulmuş hissediyorsun?",
+          "Bu aralar aklını kurcalayan bir şey var mı?"
+        ]
+      },
+      {
+        "order": 3,
+        "title": "Değerler ve hayaller",
+        "description": "Sizin için en önemli olanlar ve geleceğe dair istekler.",
+        "minutes": 15,
+        "mode": "orderline",
+        "categorySlug": "values",
+        "questionCount": 5,
+        "talk": [
+          "Sıralamalarınız en çok nerede ayrıldı? Neden öyle sıraladığını anlat.",
+          "Önümüzdeki bir yılda en çok neyin gerçekleşmesini istiyorsun?",
+          "Çocukluğundan bugüne taşıdığın, senin için değerli olan şey ne?"
+        ]
+      }
+    ]
+  }
 }
