@@ -86,3 +86,36 @@ export async function checkRateLimitWindow(
   }
   return true;
 }
+
+/**
+ * Eşzamanlı isteklere dayanıklı kısa pencere sınırı: ÖNCE kendi kaydını yazar, SONRA penceredeki sayıya bakar; sınır aşıldıysa
+ * kaydını geri alır ve false döner. Böylece aynı anda gelen N istekten en fazla `limit` tanesi geçer (`checkRateLimitWindow`
+ * önce sayıp yanıttan sonra yazdığı için paralel patlamayı durdurmaz). Veritabanı hatasında isteği engellemez.
+ */
+export async function reserveRateLimitSlot(
+  key: string,
+  action: string,
+  limits: { limit: number; windowMs: number },
+): Promise<boolean> {
+  const supabase = createAdminClient();
+  const now = new Date();
+  const { data: mine, error } = await supabase
+    .from("rate_limits")
+    .insert({ key, action, count: 1, window_start: now.toISOString() })
+    .select("id")
+    .single();
+  if (error || !mine) return true;
+
+  const since = new Date(now.getTime() - limits.windowMs).toISOString();
+  const { count } = await supabase
+    .from("rate_limits")
+    .select("*", { count: "exact", head: true })
+    .eq("key", key)
+    .eq("action", action)
+    .gte("created_at", since);
+  if ((count ?? 0) <= limits.limit) return true;
+
+  // Reddedilen deneme sayaçta kalmasın: ısrarla deneyen istemcinin engeli sonsuza uzamasın
+  await supabase.from("rate_limits").delete().eq("id", mine.id);
+  return false;
+}

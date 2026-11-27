@@ -10,14 +10,16 @@ import { generateUniqueRoomCode } from "@/lib/room-code";
 import { getRoomExpiry } from "@/lib/expire";
 import { apiError, apiOk } from "@/lib/api";
 import { isRelationshipType } from "@/lib/relationship";
-import { checkRateLimit, ipHashFor } from "@/lib/rate-limit";
+import { checkRateLimit, ipHashFor, reserveRateLimitSlot } from "@/lib/rate-limit";
 import { getAuthUser } from "@/lib/auth";
 import { COIN_PRICES, CoinError, applyCoins } from "@/lib/coins";
-import { FREE_ROOMS_MIN_TIER, LONG_SET_MIN_TIER, LONG_SET_QUESTION_COUNT, MIXED_MODE_MIN_TIER, canAccessTier, isTier, type Tier } from "@/lib/tier";
+import { FREE_ROOMS_MIN_TIER, LONG_SET_MIN_TIER, LONG_SET_QUESTION_COUNT, MIXED_MODE_MIN_TIER, canAccessTier, isCategoryOffered, isTier, type Tier } from "@/lib/tier";
 import { MIN_APP_AGE, ageOn, parseBirthDate } from "@/lib/age";
 import { parseGender } from "@/lib/gender";
 
 const RATE_LIMIT = { perHour: 10, perDay: 50 };
+/** `lite`+ için günlük/saatlik sınır yoktur; yalnızca betikle seri oda açmayı durduran kullanıcı başına dakikalık sınır. */
+const PAID_BURST_LIMIT = { limit: 5, windowMs: 60_000 };
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -101,11 +103,15 @@ export async function POST(req: NextRequest) {
     profile = data;
   }
   const userTier: Tier = isTier(profile?.tier) ? profile.tier : "free";
-  // `lite`+ : oda kurma ücretsiz ve sınırsız
+  // `lite`+ : oda kurma ücretsiz; günlük/saatlik sınır yok (yalnızca dakikalık bot sınırı)
   const freeRoom = !!authUser && canAccessTier(userTier, FREE_ROOMS_MIN_TIER);
 
-  // Rate limiting (anonim web ve `free` tier)
-  if (!freeRoom && !(await checkRateLimit(ipHashFor(req), "create_room", RATE_LIMIT))) {
+  // Rate limiting: anonim web ve `free` tier IP başına saatlik/günlük; `lite`+ kullanıcı başına dakikalık
+  const allowed =
+    authUser && freeRoom
+      ? await reserveRateLimitSlot(`u:${authUser.id}`, "create_room_burst", PAID_BURST_LIMIT)
+      : await checkRateLimit(ipHashFor(req), "create_room", RATE_LIMIT);
+  if (!allowed) {
     return apiError("RATE_LIMITED", "Kısa sürede çok fazla oda oluşturdunuz.", 429);
   }
 
@@ -119,9 +125,9 @@ export async function POST(req: NextRequest) {
     return apiError("AGE_RESTRICTED", `Game of Us'ı kullanmak için en az ${MIN_APP_AGE} yaşında olmalısın.`, 403);
   }
 
-  // Paket kilidi (yalnızca giriş yapmış mobil kullanıcı; coin düşümünden önce): 10 soruluk set ve Karma Tur modu Lite+ gerektirir.
-  // Web'de (anonim) ikisi de kısıtsızdır. Mevcut odalara dokunulmaz: kural yalnızca yeni oda kurarken geçerlidir.
-  if (authUser && platform === "mobile" && (count === LONG_SET_QUESTION_COUNT || mode === "mixed")) {
+  // Paket kilidi (giriş yapmış HER istek; `platform` alanı gönderilmese de — aksi halde alan atlanarak kilit aşılırdı; coin düşümünden önce):
+  // 10 soruluk set ve Karma Tur modu Lite+ gerektirir. Web'de (anonim, JWT yok) ikisi de kısıtsızdır. Mevcut odalara dokunulmaz: kural yalnızca yeni oda kurarken geçerlidir.
+  if (authUser && (count === LONG_SET_QUESTION_COUNT || mode === "mixed")) {
     if (count === LONG_SET_QUESTION_COUNT && !canAccessTier(userTier, LONG_SET_MIN_TIER)) {
       return apiError("TIER_REQUIRED", "10 soruluk setler Lite paket gerektirir.", 403);
     }
@@ -139,6 +145,11 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
     if (selectedRelationship && (!cat || !cat.relationship_types.includes(selectedRelationship))) {
       return apiError("INVALID_PAYLOAD", "Bu kategori seçilen ilişki türüne uygun değil.");
+    }
+
+    // Satışta olmayan paketin kategorisi (Cesur) hiçbir kullanıcıya açılmaz
+    if (cat && !isCategoryOffered(cat.min_tier)) {
+      return apiError("INVALID_PAYLOAD", "Bu kategori şu anda kullanılamıyor.");
     }
 
     if (cat) {

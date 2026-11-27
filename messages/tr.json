@@ -180,9 +180,9 @@
     "mobileTeaser": {
       "badge": "Mobil Uygulama",
       "title": "Daha derin bir deneyim için",
-      "desc": "AI yorumları, premium kategoriler ve geçmiş oyunlar yakında Game of Us mobil uygulamasında seni bekliyor.",
+      "desc": "AI yorumları, özel gün kılavuzları ve geçmiş oyunlar yakında Game of Us mobil uygulamasında seni bekliyor.",
       "featAi": "AI ile ikinize özel yorum",
-      "feat1": "Premium kategorilere kalıcı erişim",
+      "feat1": "Sınırsız oda ve özel gün kılavuzları",
       "feat2": "Geçmiş oyunlarını istediğin zaman incele",
       "feat3": "Partner oynadığında anında bildirim al",
       "comingSoon": "Yakında geliyor",
@@ -254,22 +254,6 @@
         "mixed": "Hepsinden biraz"
       },
       "mobileOnly": "Mobilde",
-      "scene": {
-        "name": "Sahne",
-        "desc": "Çöp adam animasyonlu mini senaryolar",
-        "soon": "Yakında",
-        "new": "Yeni",
-        "chapterLabel": "Bölüm seç",
-        "chapterHint": "Bölümler hazırlanıyor, çok yakında burada.",
-        "sceneCount": "{count} sahne",
-        "emptyForBond": "Bu bağ için bölümler yakında.",
-        "chapters": {
-          "first_date": {
-            "title": "İlk Buluşma",
-            "desc": "Hesap, eski sevgili mesajı, dökülen içecek…"
-          }
-        }
-      },
       "hint": "Nasıl oynanacak?",
       "popular": "Popüler"
     },
@@ -316,8 +300,7 @@
         "home_money": "Düzen & Denge",
         "communication": "Anlama & Dinleme",
         "lifestyle": "Alışkanlıklar & Tercihler",
-        "values": "İlkeler & Öncelikler",
-        "bold": "Cesaret & Sınırlar"
+        "values": "İlkeler & Öncelikler"
       }
     },
     "premiumModal": {

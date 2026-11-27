@@ -70,6 +70,15 @@ try {
   r = await create(mobile("mixed", { questionCount: 10 }), lite.jwt);
   ok(r.status === 201, `lite + mixed + 10 soru → 201 (status ${r.status})`);
 
+  // `platform` alanını atlayarak kilit aşılamaz (JWT'li her istek kilide tabi)
+  before = await coins(free);
+  r = await create({ gameMode: "mixed", questionCount: 5 }, free.jwt);
+  ok(r.status === 403 && r.json?.error?.code === "TIER_REQUIRED", `free JWT, platform yok + mixed → 403 (status ${r.status})`);
+  r = await create({ gameMode: "prediction", questionCount: 10 }, free.jwt);
+  ok(r.status === 403 && r.json?.error?.code === "TIER_REQUIRED", `free JWT, platform yok + 10 soru → 403 (status ${r.status})`);
+  r = await create({ platform: "web", gameMode: "mixed", questionCount: 10 }, free.jwt);
+  ok(r.status === 403 && (await coins(free)) === before, `free JWT, platform "web" → 403, coin düşmez (status ${r.status})`);
+
   // mobil, JWT yok → 401 (kilitten önce)
   r = await create(mobile("mixed"));
   ok(r.status === 401, "mobil + mixed + JWT yok → 401");

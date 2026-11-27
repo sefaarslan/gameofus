@@ -180,9 +180,9 @@
     "mobileTeaser": {
       "badge": "Mobile App",
       "title": "For a deeper experience",
-      "desc": "AI insights, premium categories and game history are coming soon to the Game of Us mobile app.",
+      "desc": "AI insights, special-day guides and game history are coming soon to the Game of Us mobile app.",
       "featAi": "AI insights made just for the two of you",
-      "feat1": "Permanent access to premium categories",
+      "feat1": "Unlimited rooms and special-day guides",
       "feat2": "Review your past games anytime",
       "feat3": "Get notified instantly when your partner plays",
       "comingSoon": "Coming soon",
@@ -254,22 +254,6 @@
         "mixed": "A bit of everything"
       },
       "mobileOnly": "On mobile",
-      "scene": {
-        "name": "Scene",
-        "desc": "Animated stick-figure mini scenes",
-        "soon": "Coming soon",
-        "new": "New",
-        "chapterLabel": "Pick a chapter",
-        "chapterHint": "Chapters are being prepared, coming very soon.",
-        "sceneCount": "{count} scenes",
-        "emptyForBond": "Chapters for this bond are coming soon.",
-        "chapters": {
-          "first_date": {
-            "title": "First Date",
-            "desc": "The bill, a text from an ex, a spilled drink…"
-          }
-        }
-      },
       "hint": "How to play?",
       "popular": "Popular"
     },
@@ -316,8 +300,7 @@
         "home_money": "Order & Balance",
         "communication": "Understanding & Listening",
         "lifestyle": "Habits & Preferences",
-        "values": "Principles & Priorities",
-        "bold": "Courage & Limits"
+        "values": "Principles & Priorities"
       }
     },
     "premiumModal": {

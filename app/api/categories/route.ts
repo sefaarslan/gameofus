@@ -3,7 +3,7 @@ import { apiError, apiOk } from "@/lib/api";
 import { corsOptions } from "@/lib/cors";
 import { isRelationshipType } from "@/lib/relationship";
 import { getAuthUser } from "@/lib/auth";
-import { canAccessTier, isTier, type Tier } from "@/lib/tier";
+import { canAccessTier, isCategoryOffered, isTier, type Tier } from "@/lib/tier";
 
 export function OPTIONS() {
   return corsOptions();
@@ -41,7 +41,8 @@ export async function GET(req: Request) {
 
   const userTier: Tier = isTier(userRow.data?.tier) ? userRow.data.tier : "free";
   return apiOk(
-    categories.map((c) => ({
+    // Satışta olmayan paketin kategorileri (Cesur) listede dönmez
+    categories.filter((c) => isCategoryOffered(c.min_tier)).map((c) => ({
       ...c,
       // locked: bu kullanıcı bu kategoriyi seçemez (paket yetersiz ya da web). Yaş koşulu (min_age) oda kurarken ayrıca doğrulanır.
       locked: !canAccessTier(userTier, isTier(c.min_tier) ? c.min_tier : "free"),

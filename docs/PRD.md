@@ -114,7 +114,7 @@ Kullanıcıya verilen temel değerler:
 4. Karşı oyuncu kendi adını davet linkinden girer (oda kurarken onun bilgisi alınmaz)
 5. Oyun modu seçimi — **dört mod: Secret Choice, Prediction, Orderline, Karma**
 6. Soru sayısı seçimi (5 / 10)
-7. Kategori seçimi (dropdown; varsayılan "Karışık Sürpriz"; ilişki türüne göre filtrelenir; premium kategoriler kilitli rozetle gösterilir — bkz. Bölüm 12.5)
+7. Kategori seçimi (dropdown; varsayılan "Karışık Sürpriz"; ilişki türüne göre filtrelenir; `premium` kategoriler satışa dönene kadar gizlidir — bkz. Bölüm 12.5)
 8. Link oluşturma, kopyalama, WhatsApp ile paylaşma
 9. Karşı tarafın linkten katılması (anonim guest token ile)
 10. Birleştirilmiş tur: her soruda kendi cevabını verme + karşı tarafı tahmin etme (tek ekran)
@@ -247,11 +247,13 @@ Secret Choice, Prediction ve Orderline modlarının dengeli karışımıdır. MV
 
 ### 8.6 Sahne — animasyonlu senaryo modu (planlı)
 
+> **2026-11-27:** Sahne modu **web'den tamamen kaldırıldı** (arayüz kartı ve kodu). Aşağıdaki web'e ilişkin maddeler geçersizdir; mobil için plan olarak durur.
+
 İki kişilik, merak odaklı tahmin modu: oyuncular kısa animasyonlu sahneler izler; sahne kritik anda donar, oyuncu hem kendi tepkisini seçer hem partnerinin ne yapacağını tahmin eder (birleşik tur ilkesiyle aynı). 5 sahnelik bir **bölüm**de cevaplar mühürlenir; partner de bitirince **gerçek sonlar animasyonla izlenir** (partnerin karakteri gerçek seçimini canlandırır). Sonra skor ("sen onu / o seni"), sorular-cevaplar ve AI analizi.
 
 - **Görsel yöntem (karar):** kodla çizilen SVG çöp adam (kafa dışında 5-6 px çizgiler, mitten eller), 2 kemikli IK kollar, yüz/poz/hareket sözlükleri, mekân ve yakın plan ara kare (insert panel) kütüphanesi; harici avatar/animasyon servisi, Rive, Lottie, DiceBear kullanılmaz. Geniş planda temas çizilmez, temas anları yakın plan ara karelerle anlatılır. İçerik veridir (bölüm JSON'u: sahneler, 4 seçenek, her seçeneğin kendi sonu; TR/EN/ES). Yeni bölüm yalnızca mevcut mekân/prop/ara kare kütüphanesi kapsıyorsa kod gerektirmez; yeni mekân/ara kare SVG parçasıdır. Fon müziği bölüm başına tek parça (CC0/özgün, `docs/music-licenses.md`), ses efekti yok.
 - **Karakterler:** cinsiyet (oda kurulurken opsiyonel) saç/aksesuar katmanını belirler; belirtilmediyse nötr. Karakter kimlikleri renkle ayrışır (A turkuaz, B pembe).
-- **Monetizasyon:** oynamak ve skor/özet ücretsiz. **Animasyonlu "Sonları izle" yalnızca mobilde coin ile açılır (100 coin, kilit odaya bağlıdır: biri açınca ikisi de izler; her kullanıcının ilk bölüm izlemesi ücretsiz; bölüm başına fiyat `chapters` tablosunda).** Sahne odası da diğer odalar gibi 250 coin. Web'de coin yoktur: web oynar, skor/özeti görür, izleme için "Uygulamada izle" CTA'sı çıkar. AI analizi izleme kilidine dahildir (yapılandırılabilir).
+- **Monetizasyon:** oynamak ve skor/özet ücretsiz. **Animasyonlu "Sonları izle" yalnızca mobilde coin ile açılır (100 coin, kilit odaya bağlıdır: biri açınca ikisi de izler; her kullanıcının ilk bölüm izlemesi ücretsiz; bölüm başına fiyat `chapters` tablosunda).** Sahne odası da diğer odalarla aynı ücret kuralına tabidir (`free` 100 coin, `lite`+ ücretsiz). Web'de coin yoktur: web oynar, skor/özeti görür, izleme için "Uygulamada izle" CTA'sı çıkar. AI analizi izleme kilidine dahildir (yapılandırılabilir).
 - **Mimari kararları:** mevcut kalıba uyar: anonim katılımcı token'ı, service-role API route'ları (RPC/`auth.uid()` RLS'i değil), yeni tablolarda RLS açık + policy yok; ayrı model (`chapters`, `scene_answers`, `room_unlocks`, `room_ai_analyses`; `questions`'a karıştırılmaz); partnerin cevapları kendi 5 cevabını mühürlemeden dönmez; coin için `apply_coins` (reason `scene_watch`, ref = oda). Hesap silme, saklama temizliği ve metrik arşivi yeni tablolara genişletilir. Oda süresi sahne için ayrıca değerlendirilecek (partner geç bitirirse izleme penceresi kapanmasın).
 - **Durum:** oda oluşturma sayfasında mod listesinin sonunda **pasif ("Yakında") kart** olarak yer alır (`SCENE_MODE_ENABLED = false`); bölüm seçimi arayüzü hazır bekler: açıldığında seçilince kategori/soru sayısı yerine bölüm seçimi gelir (Bölüm 13.2); önce web demosu (tek sahne, veritabanı/API'siz) ile görsel/performans doğrulaması, sonra şema ve API. Dizi/katalog (sezon, bölüm) çerçevesi ve süreklilik sonraya bırakıldı; `chapters`'a `series_id/season/episode/available_from-until` alanları metadata olarak şimdiden eklenir.
 
@@ -272,7 +274,7 @@ Oda oluşturma **iki adımlı sihirbazdır** (web mobil/masaüstü ve mobil uygu
 5. "Oyun modunu seç" ile 2. adıma geçer (ad ve bağ eksikse satır içi uyarı gösterilir).
 
 **Adım 2 — Ne oynuyoruz?**
-6. Kategori seçer (yatay kaydırmalı kartlar; ilişki türüne uygun kategoriler; ilk kart "Karışık Sürpriz"; kilitli premium kategoriler platforma göre farklı davranır — bkz. Bölüm 12.5). Oyun modunu seçer: tek listede beş mod, hepsi aynı kart diliyle: Secret Choice, Prediction, Orderline, Karma ve listenin **sonunda tam genişlikte Sahne** (backend hazır olana kadar pasif, "Yakında" rozetli; hazır olunca "Yeni" rozetli ve seçilebilir). Sahne seçilebilir olduğunda seçilince kategori ve soru sayısı gizlenir, alt kısım **bölüm seçimine** döner (ilişki türüne göre filtreli; bağ için bölüm yoksa "yakında" boş durumu; içerik hazır olana kadar bölüm kartları pasif ve oda kurma butonu pasif); klasik modlarda 7-8 gösterilir.
+6. Kategori seçer (yatay kaydırmalı kartlar; ilişki türüne uygun kategoriler; ilk kart "Karışık Sürpriz"). Oyun modunu seçer: tek listede aynı kart diliyle Secret Choice, Prediction, Orderline ve Karma (webde soluk/pasif, "Mobilde").
 7. Soru sayısını seçer (5 hızlı ~5 dk "İDEAL" / 10 standart ~10 dk).
 8. Canlı özet kartı ("Oyun Paketi Hazır: kategori • soru sayısı • mod") görünür.
 9. "Oyun linki oluştur" butonuna tıklar. Geri düğmesi/tarayıcı geri tuşu 1. adıma döner, girilen bilgiler korunur. Sayfa yenilense veya kullanıcı başka sayfaya gidip dönse de sihirbaz kaldığı adımdan, girilen bilgilerle devam eder (taslak yalnızca tarayıcı oturumunda tutulur, oda kurulunca silinir).
@@ -559,20 +561,20 @@ Kategori seçimi her iki platformda da vardır; davranış platforma göre farkl
 | Durum | Web | Mobile (tier yetersiz) | Mobile (tier yeterli) |
 |---|---|---|---|
 | Temel kategori | Seçilebilir, oynanabilir | Seçilebilir, oynanabilir | Seçilebilir, oynanabilir |
-| Premium kategori | Görünür, kilitli rozet; tıklanınca "Bu kategori yalnızca Game of Us mobil uygulamasında açılır" mesajı | Kilitli; tıklanınca paket ekranına yönlendirme | Kalıcı açık |
+| Premium kategori (Cesur) | **Gizli** (satışta değil) | **Gizli** (satışta değil) | — |
 
 Web'e giren bilgi, kullanıcının premium *durumu* değil, kategorinin *meta verisi*dir (`is_premium` / `min_tier` kategori seviyesinde tanımlıdır, kullanıcı seviyesinde değil). Web hiçbir zaman "bu kullanıcı premium mu" sorusunu sormaz.
 
 **İlişki türü filtresi (hem web hem mobile):** Kategori listesi seçilen ilişki türüne göre filtrelenir (`categories.relationship_types`). Örnekler: *Kanka Testi* yalnızca Kanka'da, *Romantizm* yalnızca Sevgili'de, *Ev & Para* yalnızca Evli'nda görünür; *İletişim, Yaşam Tarzı, Değerler* üçünde de görünür. Sunucu, seçilen kategorinin türe uygunluğunu doğrular.
 
-**Cesur Sorular (premium, yalnızca Sevgili ve Evli):** Kanka'da hiç gösterilmez. Mobilde ek olarak her iki oyuncunun 18+ olması gerekir: **kurucu oda kurarken** (`users.birth_date` ya da gövdedeki `birthDate`), **karşı oyuncu katılırken** kendi hesabındaki doğum tarihiyle (`POST /api/rooms/{roomCode}/join` → `AGE_VERIFICATION_REQUIRED` / `AGE_RESTRICTED`); kimse başkasının doğum tarihini girmez. Webde bu kategori kilitli olduğu için doğum tarihi 18+ koşulunda **kullanılmaz** (oyuncu isterse kendi tarihini yorum kişiselleştirme için isteğe bağlı girebilir) ve webden anonim katılan kişi 18+ odaya giremez ("mobil uygulamada oynanır"). App Store: açık cinsel içerik yoktur ("cesur/romantik" çerçeve), yaş derecelendirmesi 17+ olarak ayarlanır.
+**Cesur Sorular (premium, yalnızca Sevgili ve Evli; 2026-11-27'den beri gizli, satışa dönünce aşağıdaki kurallar geçerli):** Kanka'da hiç gösterilmez. Mobilde ek olarak her iki oyuncunun 18+ olması gerekir: **kurucu oda kurarken** (`users.birth_date` ya da gövdedeki `birthDate`), **karşı oyuncu katılırken** kendi hesabındaki doğum tarihiyle (`POST /api/rooms/{roomCode}/join` → `AGE_VERIFICATION_REQUIRED` / `AGE_RESTRICTED`); kimse başkasının doğum tarihini girmez. Webde bu kategori kilitli olduğu için doğum tarihi 18+ koşulunda **kullanılmaz** (oyuncu isterse kendi tarihini yorum kişiselleştirme için isteğe bağlı girebilir) ve webden anonim katılan kişi 18+ odaya giremez ("mobil uygulamada oynanır"). App Store: açık cinsel içerik yoktur ("cesur/romantik" çerçeve), yaş derecelendirmesi 17+ olarak ayarlanır.
 
 ### 12.6 Henüz belirlenmemiş noktalar
 
 - Paket fiyatlarının Apple/Google fiyat noktalarına uygun nihai tutarları (taslak TL fiyatları 12.2'de; ileride revize edilecek) ve TL dışı pazarlar için karşılıkları.
 - "Oyun kılavuzlarına tam erişim"in tam kapsamı: free kullanıcı hangi kılavuzları açabilir, kılavuz içerikleri ve ilerleme/fiyat modeli.
 - Özel gün kategorileri, kılavuzlar ve "yeni oyunlar" için içerik/geliştirme planı (paketler bunlar hazır olmadan satışa açılmaz).
-- **Cesur Sorular görünürlüğü (açık karar):** `premium` satılmadığı için kategori kimseye açılamıyor; kilitli gösterilmeye devam mı etsin, tamamen gizlensin mi?
+- ~~Cesur Sorular görünürlüğü~~ — karar verildi (2026-11-27): satışa dönene kadar web'de ve mobilde gizli.
 - ~~Reklam izleme için günlük üst sınır~~ — karar verildi: günde 3 (12.2).
 - **[YAPILACAK — yayından önce] AI yorum rıza metni ve gizlilik politikası güncellemesi** (`docs/legal/privacy-policy-tr.md`, `docs/legal/terms-tr.md` ve mobil rıza ekranı). Metinde şunlar açıkça yazılmalı: (1) cevaplar ve tahminler üçüncü taraf LLM sağlayıcısına gider (Groq; yedek yapılandırılırsa OpenRouter ve onun model sağlayıcısı) ve saklama/eğitim politikaları; (2) modele giden veriler: oyuncu adları, soru/seçenek metniyle cevaplar ve tahminler, ilişki türü, oda dili, **yaş aralığı**, **cinsiyet (yalnızca İspanyolca dil bilgisi için)** ve **burç (doğum tarihinden türetilir; yorumu kişiselleştirmek için arka planda kullanılır, yorumda anılmaz)**; (3) gönderilmeyenler: doğum tarihi, e-posta, kimlikler; (4) AI yorumun eğlence amaçlı olduğu, tıbbi/psikolojik tavsiye olmadığı; (5) partnerin yorumu satın alan kişi aracılığıyla okuyabildiği (iki oyuncuya da görünür); (6) rıza sürümü `users.ai_consent_version` ile tutulur, metin değişince yeniden rıza istenir.
 - Doğum tarihinin saklama süresi (oda ile birlikte silinmesi önerilir; oda 24 saatte expire olur).
@@ -600,7 +602,7 @@ Amaç: Kullanıcının ürünü 10 saniyede anlamasını sağlamak.
 - Nasıl Çalışır bölümü — **4 adım**: Oda oluştur → Linki paylaş → Cevapları birlikte aç → **AI sizi yorumlasın** (4. adım "Mobil uygulamada" rozetiyle)
 - Oyun modları bölümü
 - Sonuç önizlemesi
-- Mobil uygulama teaser'ı (AI yorum, premium kategoriler, geçmiş oyunlar, bildirim; "Yakında geliyor" + Instagram takip bağlantısı)
+- Mobil uygulama teaser'ı (AI yorum, sınırsız oda ve özel gün kılavuzları, geçmiş oyunlar, bildirim; "Yakında geliyor" + Instagram takip bağlantısı)
 - Footer: logo, "Bizi Instagram'da takip et @gameofus.app", telif
 - Hero rozeti kapsayıcıdır (ilişki odaklı değil, arkadaşları da kapsar); hiçbir yerde yalnızca çiftleri varsayan dil kullanılmaz
 
@@ -633,11 +635,10 @@ Tasarım mobil uygulamayla aynıdır: numaralı bölüm başlıkları (1, 2, 3),
 Buton: > Oyun modunu seç (ad/bağ eksikse satır içi uyarı)
 
 **Adım 2 — Ne oynuyoruz?**
-- 1 · **Kategori**: yatay kayan kartlar (dokunmatikte kaydırma, masaüstünde yan ok düğmeleri; hiçbir ekranda alt alta sarmaz); ilk kart "Karışık Sürpriz" (varsayılan); ilişki türüne uygun kategoriler + kilitli premium kategoriler (kilit ikonlu); kategoriler sayfa açılırken bir kez çekilip istemcide filtrelenir
-- 2 · **Oyun modu**: tek listede aynı kart diliyle (Secret Choice "Popüler" rozetli, Prediction, Orderline, Karma; varsayılan Karma; listenin sonunda **Sahne** — şimdilik pasif, "Yakında"). Modlar arasında başlık/stil ayrımı yoktur
+- 1 · **Kategori**: yatay kayan kartlar (dokunmatikte kaydırma, masaüstünde yan ok düğmeleri; hiçbir ekranda alt alta sarmaz); ilk kart "Karışık Sürpriz" (varsayılan); ilişki türüne uygun kategoriler (`premium` olanlar gizli); kategoriler sayfa açılırken bir kez çekilip istemcide filtrelenir
+- 2 · **Oyun modu**: tek listede aynı kart diliyle (Secret Choice "Popüler" rozetli ve varsayılan, Prediction, Orderline, Karma soluk/pasif "Mobilde"). Sahne modu webde yoktur. Modlar arasında başlık/stil ayrımı yoktur
 - 3 · **Soru sayısı ve süre**: 5 soru (~5 dk, HIZLI, "İDEAL" rozetli) / 10 soru (~10 dk, STANDART)
 - Canlı özet kartı: "Oyun Paketi Hazır — kategori • soru sayısı • mod"
-- Sahne açıldığında seçiliyse kategori ve soru sayısı yerine **bölüm seçimi**: kartlarda ad, açıklama, sahne sayısı (coin bilgisi yalnızca mobilde); ilk bölüm varsayılan seçili gelecek. Şimdilik bölüm içeriği olmadığı için kartlar "Yakında" ve pasif
 
 Butonlar: geri (←) ve > Oyun linki oluştur
 

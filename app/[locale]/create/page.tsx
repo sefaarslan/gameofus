@@ -1,22 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import { RELATIONSHIP_TYPES, isRelationshipType, type RelationshipType } from "@/lib/relationship";
 import { isGender, type Gender } from "@/lib/gender";
 import { GenderPicker } from "@/components/create/GenderPicker";
-import { StickFigureIcon } from "@/components/create/StickFigureIcon";
-import { ChapterPicker } from "@/components/create/ChapterPicker";
 import { Carousel } from "@/components/create/Carousel";
 import { ageFromIso, maskBirthDateInput, parseBirthDateInput } from "@/lib/date-input";
 import { ChoiceCard, FloatBadge, NumberBadge, Pill, SectionHeader } from "@/components/create/ui";
-import { SCENE_MODE_ENABLED } from "@/lib/scene-chapters";
 
 // Tasarım mobil uygulamadaki oda oluşturma ekranıyla aynıdır (gameofus-mobile/src/app/game/create.tsx).
 
-type GameMode = "secret_choice" | "prediction" | "orderline" | "mixed" | "scene";
+type GameMode = "secret_choice" | "prediction" | "orderline" | "mixed";
 
 interface Category {
   id: string;
@@ -29,11 +26,9 @@ interface Category {
   relationship_types: RelationshipType[];
 }
 
-type ClassicMode = Exclude<GameMode, "scene">;
-
 // Her mod kendi ton ve ikonunu taşır (seçiliyken hepsi dolu kırmızıya döner)
 // `mobileOnly`: web'de kapalı (soluk, "Mobilde" rozeti); yalnızca mobil uygulamada paketle (Lite+) oynanır. Sunucu kuralı: `lib/tier.ts` MIXED_MODE_MIN_TIER.
-const MODES: Array<{ value: ClassicMode; icon: string; tint: string; color: string; popular?: boolean; mobileOnly?: boolean }> = [
+const MODES: Array<{ value: GameMode; icon: string; tint: string; color: string; popular?: boolean; mobileOnly?: boolean }> = [
   { value: "secret_choice", icon: "visibility_off", tint: "bg-primary-container/60", color: "text-[#ae2f34]", popular: true },
   { value: "prediction", icon: "lightbulb", tint: "bg-tertiary-container/45", color: "text-[#6b5900]" },
   { value: "orderline", icon: "format_list_numbered", tint: "bg-secondary-container", color: "text-[#4b4642]" },
@@ -53,7 +48,6 @@ const CATEGORY_ICONS: Record<string, string> = {
   social_life: "groups",
   lifestyle: "spa",
   values: "psychology",
-  bold: "local_fire_department",
   friend_test: "mood",
   wild_scenarios: "rocket_launch",
   romance: "local_florist",
@@ -67,7 +61,7 @@ const CATEGORY_ICONS: Record<string, string> = {
  */
 const DRAFT_KEY = "gou_create_draft";
 // Karma Tur webde seçilemez (taslakta eski bir "mixed" varsa varsayılana düşer)
-const GAME_MODES: readonly GameMode[] = ["secret_choice", "prediction", "orderline", "scene"];
+const GAME_MODES: readonly GameMode[] = ["secret_choice", "prediction", "orderline"];
 
 interface CreateDraft {
   step: 1 | 2;
@@ -78,7 +72,6 @@ interface CreateDraft {
   gameMode: GameMode;
   questionCount: 5 | 10;
   categoryId: string | null;
-  chapterId: string | null;
 }
 
 function readDraft(): Partial<CreateDraft> | null {
@@ -94,10 +87,9 @@ function readDraft(): Partial<CreateDraft> | null {
       birthDate: maskBirthDateInput(str(d.birthDate, 10)),
       gender: isGender(d.gender) ? d.gender : null,
       relationshipType: isRelationshipType(d.relationshipType) ? d.relationshipType : null,
-      gameMode: GAME_MODES.includes(d.gameMode as GameMode) && (d.gameMode !== "scene" || SCENE_MODE_ENABLED) ? (d.gameMode as GameMode) : "secret_choice",
+      gameMode: GAME_MODES.includes(d.gameMode as GameMode) ? (d.gameMode as GameMode) : "secret_choice",
       questionCount: d.questionCount === 10 ? 10 : 5,
       categoryId: idOrNull(d.categoryId),
-      chapterId: idOrNull(d.chapterId),
     };
   } catch {
     return null;
@@ -126,8 +118,6 @@ export default function CreatePage() {
   const [relationshipType, setRelationshipType] = useState<RelationshipType | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>("secret_choice");
   const [questionCount, setQuestionCount] = useState<5 | 10>(5);
-  const [chapterId, setChapterId] = useState<string | null>(null);
-  const chapterRef = useRef<HTMLDivElement>(null);
   const [draftLoaded, setDraftLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -178,7 +168,6 @@ export default function CreatePage() {
       if (d.gameMode) setGameMode(d.gameMode);
       if (d.questionCount) setQuestionCount(d.questionCount);
       setSelectedCategoryId(d.categoryId ?? null);
-      setChapterId(d.chapterId ?? null);
       // 2. adımda yenilendiyse yine 2. adımdan devam et (gerekli alanlar dolu olmalı)
       if (d.step === 2 && d.displayName?.trim() && d.relationshipType) setStep(2);
     }
@@ -191,13 +180,13 @@ export default function CreatePage() {
     try {
       const draft: CreateDraft = {
         step, displayName, birthDate, gender, relationshipType,
-        gameMode, questionCount, categoryId: selectedCategoryId, chapterId,
+        gameMode, questionCount, categoryId: selectedCategoryId,
       };
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
     } catch {
       /* depolama kapalı/dolu: taslak tutulmaz, sihirbaz yine çalışır */
     }
-  }, [draftLoaded, step, displayName, birthDate, gender, relationshipType, gameMode, questionCount, selectedCategoryId, chapterId]);
+  }, [draftLoaded, step, displayName, birthDate, gender, relationshipType, gameMode, questionCount, selectedCategoryId]);
 
   // Geri yüklenen kategori artık listede yoksa (kategori seti değişti / dil değişti) seçimi temizle
   useEffect(() => {
@@ -234,19 +223,9 @@ export default function CreatePage() {
 
   function handleRelationshipChange(value: RelationshipType) {
     setRelationshipType(value);
-    setChapterId(null);
     setSelectedCategoryId((prev) => {
       const cat = allCategories.find((c) => c.id === prev);
       return cat && cat.relationship_types.includes(value) ? prev : null;
-    });
-  }
-
-  function selectScene() {
-    setGameMode("scene");
-    // Bölüm seçimi mod listesinin altında kalabilir (özellikle mobilde): seçimden sonra yumuşakça görünür yap
-    requestAnimationFrame(() => {
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      chapterRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
     });
   }
 
@@ -259,7 +238,6 @@ export default function CreatePage() {
   }
 
   const selectedCategory = allCategories.find((c) => c.id === selectedCategoryId) ?? null;
-  const isScene = gameMode === "scene";
 
   // Doğum tarihi boşsa sorun yok (isteğe bağlı); doluysa geçerli olmalı ve asgari yaş (13) sağlanmalı
   function birthDateError(): string | null {
@@ -285,9 +263,6 @@ export default function CreatePage() {
       setError(!displayName.trim() ? t("errors.nameRequired") : !relationshipType ? t("errors.relationshipRequired") : birthDateError());
       return;
     }
-    // Sahne bölümleri hazır olana kadar oda kurulamaz (sunucu da bu modu henüz kabul etmez)
-    if (isScene) return;
-
     // Double-check limit before submitting
     const stored = localStorage.getItem("gou_my_room");
     if (stored) {
@@ -546,8 +521,8 @@ export default function CreatePage() {
 
               {step === 2 && (
                 <>
-                  {/* 1 — Kategori (Sahne seçiliyken gizli: yerine bölüm seçimi) */}
-                  {!isScene && (categoriesLoading || allCategories.length > 0) && (
+                  {/* 1 — Kategori */}
+                  {(categoriesLoading || allCategories.length > 0) && (
                     <div className="mb-6">
                       <SectionHeader n={1} icon="apps" title={t("category.label")} trailing={<Pill tone="tertiary">{t("category.badge")}</Pill>} />
                       {categoriesLoading ? (
@@ -583,10 +558,10 @@ export default function CreatePage() {
                     </div>
                   )}
 
-                  {/* 2 — Oyun modu: tek listede aynı kart diliyle; Sahne sonda (backend hazır olana kadar pasif) */}
+                  {/* 2 — Oyun modu */}
                   <div className="mb-6">
                     <SectionHeader
-                      n={isScene ? 1 : 2}
+                      n={2}
                       icon="sports_esports"
                       title={t("mode.label")}
                       trailing={<span className="text-xs text-on-surface-variant">{t("mode.hint")}</span>}
@@ -614,98 +589,69 @@ export default function CreatePage() {
                           )}
                         </div>
                       ))}
-                      <div className="col-span-2 flex">
-                        <ChoiceCard
-                          selected={isScene}
-                          onClick={selectScene}
-                          disabled={!SCENE_MODE_ENABLED}
-                          icon="movie"
-                          iconNode={<StickFigureIcon className="w-6 h-6" />}
-                          iconTint="bg-surface-container"
-                          title={t("mode.scene.name")}
-                          desc={t("mode.scene.desc")}
-                          trailing={
-                            isScene ? undefined : (
-                              <Pill tone="tertiary">{SCENE_MODE_ENABLED ? t("mode.scene.new") : t("mode.scene.soon")}</Pill>
-                            )
-                          }
-                          className={`flex-1 rounded-[20px] p-4 ${SCENE_MODE_ENABLED ? "" : "opacity-70 cursor-not-allowed"}`}
-                        />
-                      </div>
                     </div>
                   </div>
 
-                  {/* Sahne: kategori ve soru sayısı yerine bölüm seçimi */}
-                  {isScene && (
-                    <div ref={chapterRef} className="scroll-mt-4 mb-6">
-                      <ChapterPicker relationshipType={relationshipType} selectedId={chapterId} onSelect={setChapterId} />
-                    </div>
-                  )}
-
                   {/* 3 — Soru sayısı ve süre */}
-                  {!isScene && (
-                    <div className="mb-5">
-                      <SectionHeader
-                        n={3}
-                        icon="layers"
-                        title={t("questions.label")}
-                        trailing={<span className="text-xs text-on-surface-variant">{t("questions.badge")}</span>}
-                      />
-                      <div className="grid grid-cols-2 gap-3 pt-2.5">
-                        {([5, 10] as const).map((count) => {
-                          const selected = questionCount === count;
-                          return (
-                            <div key={count} className="relative flex">
-                              <button
-                                type="button"
-                                onClick={() => setQuestionCount(count)}
-                                aria-pressed={selected}
-                                className={`flex-1 flex flex-col items-center py-4 rounded-2xl border transition-all min-h-[44px] ${
-                                  selected
-                                    ? "border-primary bg-primary text-on-primary shadow-primary-glow"
-                                    : "border-outline-variant bg-surface-container-lowest text-on-surface hover:border-outline"
-                                }`}
-                              >
-                                <span className={`w-9 h-9 rounded-full flex items-center justify-center mb-1.5 ${selected ? "bg-on-primary/15" : "bg-primary-container/50"}`}>
-                                  <span className={`material-symbols-outlined text-lg ${selected ? "text-on-primary" : "text-primary"}`}>
-                                    {count === 5 ? "bolt" : "timer"}
-                                  </span>
+                  <div className="mb-5">
+                    <SectionHeader
+                      n={3}
+                      icon="layers"
+                      title={t("questions.label")}
+                      trailing={<span className="text-xs text-on-surface-variant">{t("questions.badge")}</span>}
+                    />
+                    <div className="grid grid-cols-2 gap-3 pt-2.5">
+                      {([5, 10] as const).map((count) => {
+                        const selected = questionCount === count;
+                        return (
+                          <div key={count} className="relative flex">
+                            <button
+                              type="button"
+                              onClick={() => setQuestionCount(count)}
+                              aria-pressed={selected}
+                              className={`flex-1 flex flex-col items-center py-4 rounded-2xl border transition-all min-h-[44px] ${
+                                selected
+                                  ? "border-primary bg-primary text-on-primary shadow-primary-glow"
+                                  : "border-outline-variant bg-surface-container-lowest text-on-surface hover:border-outline"
+                              }`}
+                            >
+                              <span className={`w-9 h-9 rounded-full flex items-center justify-center mb-1.5 ${selected ? "bg-on-primary/15" : "bg-primary-container/50"}`}>
+                                <span className={`material-symbols-outlined text-lg ${selected ? "text-on-primary" : "text-primary"}`}>
+                                  {count === 5 ? "bolt" : "timer"}
                                 </span>
-                                <span className="text-body-md font-bold">{count} {t("questions.word")}</span>
-                                <span className={`text-xs mb-1.5 ${selected ? "text-on-primary/80" : "text-on-surface-variant"}`}>
-                                  {count === 5 ? t("questions.durationFast") : t("questions.durationStandard")}
-                                </span>
-                                <span className={`text-[10px] font-bold tracking-wider ${selected ? "text-on-primary" : "text-on-surface-variant"}`}>
-                                  {count === 5 ? t("questions.quickLabel") : t("questions.standardLabel")}
-                                </span>
-                              </button>
-                              {count === 5 && (
-                                <FloatBadge tone="green" icon="check">
-                                  {t("questions.ideal")}
-                                </FloatBadge>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
+                              </span>
+                              <span className="text-body-md font-bold">{count} {t("questions.word")}</span>
+                              <span className={`text-xs mb-1.5 ${selected ? "text-on-primary/80" : "text-on-surface-variant"}`}>
+                                {count === 5 ? t("questions.durationFast") : t("questions.durationStandard")}
+                              </span>
+                              <span className={`text-[10px] font-bold tracking-wider ${selected ? "text-on-primary" : "text-on-surface-variant"}`}>
+                                {count === 5 ? t("questions.quickLabel") : t("questions.standardLabel")}
+                              </span>
+                            </button>
+                            {count === 5 && (
+                              <FloatBadge tone="green" icon="check">
+                                {t("questions.ideal")}
+                              </FloatBadge>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
-                  )}
+                  </div>
 
                   {/* Canlı özet */}
-                  {!isScene && (
-                    <div className="flex items-center gap-3 bg-surface-container-lowest border border-outline-variant rounded-2xl px-4 py-3.5 mb-4 shadow-soft-sm">
-                      <span className="w-10 h-10 rounded-full bg-primary-container/50 flex items-center justify-center shrink-0">
-                        <span className="material-symbols-outlined text-lg text-primary">redeem</span>
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-label-md font-bold text-on-background">{t("summary.title")}</p>
-                        <p className="text-xs text-on-surface-variant truncate">
-                          {selectedCategory?.name ?? t("category.all")} • {questionCount} {t("questions.word")} • {t(`mode.options.${gameMode as ClassicMode}`)}
-                        </p>
-                      </div>
-                      <span className="material-symbols-outlined icon-fill text-[22px] text-[#4caf50]">check_circle</span>
+                  <div className="flex items-center gap-3 bg-surface-container-lowest border border-outline-variant rounded-2xl px-4 py-3.5 mb-4 shadow-soft-sm">
+                    <span className="w-10 h-10 rounded-full bg-primary-container/50 flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-lg text-primary">redeem</span>
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-label-md font-bold text-on-background">{t("summary.title")}</p>
+                      <p className="text-xs text-on-surface-variant truncate">
+                        {selectedCategory?.name ?? t("category.all")} • {questionCount} {t("questions.word")} • {t(`mode.options.${gameMode}`)}
+                      </p>
                     </div>
-                  )}
+                    <span className="material-symbols-outlined icon-fill text-[22px] text-[#4caf50]">check_circle</span>
+                  </div>
                 </>
               )}
 
@@ -720,7 +666,7 @@ export default function CreatePage() {
               {/* Action */}
               <button
                 type="submit"
-                disabled={loading || (step === 2 && isScene)}
+                disabled={loading}
                 className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary text-body-lg font-semibold py-4 rounded-full hover:bg-surface-tint disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-primary-glow mb-2"
               >
                 {loading ? (

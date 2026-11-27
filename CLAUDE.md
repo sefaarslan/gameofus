@@ -110,8 +110,8 @@ daha iyi konuşmalar başlatmak ve birbirini tahmin etme deneyimini oyunlaştır
   mobilin `gameofus.app` mi `www` mi çağırdığı mobil repoda **doğrulanacak** (apex `www`'ye 307 yönlendirir; farklı alan adına yönlendirmede bazı istemciler `Authorization` başlığını düşürür).
 
 ### Ödeme
-- **Web'de ödeme / login / premium UI yoktur.** Web yalnızca premium kategorileri kilitli gösterir ve
-  "mobil uygulamada açılır" mesajı verir.
+- **Web'de ödeme / login / premium UI yoktur.** `premium` satılmadığı için **Cesur kategorisi web'de ve mobilde gizlidir**
+  (aşağıya bkz.). İleride paketle açılan bir kategori eklenirse web onu kilitli gösterip "mobil uygulamada açılır" mesajı verir.
 - Ödeme **yalnızca mobilde**, App Store / Play Store IAP (RevenueCat) ile; Lemon Squeezy
   **kullanılmaz**. Güncel model **coin + tier**'dir (Lite / Premium paketleri; bkz. PRD Bölüm 12).
   Mobil tarafın ayrıntılı iş listesi `gameofus-mobile/tasklist.md` içindedir.
@@ -164,12 +164,12 @@ bkz. Bölüm 7 — Performans & Veri Akışı Kuralları.)
   `lib/auth.ts` (`getAuthUser`: Bearer Supabase JWT); katılımcı token'ı (64 hex) ile karışmaz. Fiyatlar/ödüller `lib/coins.ts`.
   Ekonomi (karar 2026-11-27; backend'de uygulandı, `lib/coins.ts`; ayrıntı `docs/PRD.md` 12.2): kayıt +500 (Auth trigger'ı) · reklam +20 (kayan 24 saatte 3; ücretli kullanıcı da kazanır) ·
   story paylaşımı +25 (günde 1, doğrulanmaz; `POST /api/users/coins/earn` `reason: story_share`) · solo günlük set +25 · oda −100 · AI yorum −250 · solo AI −250.
-  **`lite` ve üstü için oda kurma ücretsiz ve sınırsızdır** (`FREE_ROOMS_MIN_TIER`, `lib/tier.ts`): coin düşülmez (iade de yok), `create_room` hız sınırı uygulanmaz; yalnızca `free` tier ve anonim web sınıra tabidir. Tier okunamazsa istek `500` ile durur (paketliden coin düşülmesin).
+  **`lite` ve üstü için oda kurma ücretsiz ve sınırsızdır** (`FREE_ROOMS_MIN_TIER`, `lib/tier.ts`): coin düşülmez (iade de yok), saatlik/günlük `create_room` sınırı uygulanmaz; yalnızca betikle seri açmayı durduran **kullanıcı başına dakikada 5** sınırı vardır (`reserveRateLimitSlot`, eşzamanlı isteklere dayanıklı). Saatlik/günlük sınır `free` tier ve anonim web içindir. Tier okunamazsa istek `500` ile durur (paketliden coin düşülmesin).
   AI iadesi güncel fiyatı değil **gerçekten düşülen tutarı** geri verir (`refundIfCharged`, `refundSoloIfCharged`).
   **Paketler (karar 2026-11-27; satın alma/IAP tarafı HENÜZ YOK — `iap/verify` yazılacak):**
   Satışta tek ücretli paket: **Bir fincan kahve** (`lite`, 299 TL tek seferlik: 1.000 coin hediye, ücretsiz sınırsız oda, 10 soruluk setler, Karma Tur, kılavuzlar, özel gün kategorileri, reklamsız); **Kahve kokusu** (`free`) girişle otomatik.
-  **`premium` tier satılmıyor** (yükseltme, Cesur ve "yeni oyunlar" mağaza çıkışı sonrasına ertelendi): `iap/verify` yalnızca `tier_lite` → `lite` eşlemeli, `premium`'a ulaşan hiçbir yol olmamalı; şemadaki `premium` değeri ve Cesur'un `min_tier`'ı kalır (Cesur'un web'de gizlenip gizlenmeyeceği açık karar).
-  Coin paketleri: 1.000 = 149 TL, 2.500 = 299 TL (consumable). Tier hediyesi hesap başına bir kez (`ref = tier_gift`). Mobilde 10 soruluk set `lite`+ gerektirir (`POST /api/rooms/create` → `403 TIER_REQUIRED`, uygulandı; web'de 5/10 ücretsiz kalır). **Karma Tur modu (`gameMode: "mixed"`) de mobilde `lite`+ gerektirir** (aynı uç/kod, coin düşümünden önce; `MIXED_MODE_MIN_TIER`, `lib/tier.ts`); yalnızca yeni oda kurmayı etkiler, mevcut Karma odaları oynanır. Web sunucu tarafında kısıtsız kalır ama arayüz Karma'yı "Mobilde" diye soluk/pasif gösterir (webde varsayılan mod Evet/Hayır). Hediye sabitleri `lib/coins.ts` (`TIER_GIFT_COINS`, `TIER_GIFT_REF`). Test: `BASE=http://localhost:3001 node --no-warnings scripts/test-coin-economy-api.mjs`.
+  **`premium` tier satılmıyor** (yükseltme, Cesur ve "yeni oyunlar" mağaza çıkışı sonrasına ertelendi): `iap/verify` yalnızca `tier_lite` → `lite` eşlemeli, `premium`'a ulaşan hiçbir yol olmamalı; şemadaki `premium` değeri ve Cesur'un `min_tier`'ı kalır. **Cesur gizlidir** (`PREMIUM_TIER_ON_SALE = false`, `lib/tier.ts`): `GET /api/categories` döndürmez, oda kurmada `400 INVALID_PAYLOAD`; mevcut Cesur odaları oynanır. Satış açılınca bayrak `true` yapılır.
+  Coin paketleri: 1.000 = 149 TL, 2.500 = 299 TL (consumable). Tier hediyesi hesap başına bir kez (`ref = tier_gift`). Mobilde 10 soruluk set `lite`+ gerektirir (`POST /api/rooms/create` → `403 TIER_REQUIRED`, uygulandı; web'de 5/10 ücretsiz kalır). Paket kilitleri **JWT'li her isteğe** uygulanır (`platform` alanı atlanarak aşılamaz). **Karma Tur modu (`gameMode: "mixed"`) de mobilde `lite`+ gerektirir** (aynı uç/kod, coin düşümünden önce; `MIXED_MODE_MIN_TIER`, `lib/tier.ts`); yalnızca yeni oda kurmayı etkiler, mevcut Karma odaları oynanır. Web sunucu tarafında kısıtsız kalır ama arayüz Karma'yı "Mobilde" diye soluk/pasif gösterir (webde varsayılan mod Evet/Hayır). Hediye sabitleri `lib/coins.ts` (`TIER_GIFT_COINS`, `TIER_GIFT_REF`). Test: `BASE=http://localhost:3001 node --no-warnings scripts/test-coin-economy-api.mjs`.
   Net gelir tahmini ≈ fiyatın %56,7'si (Apple %15 + DHV %5 + 20/B stopaj %15; KDV Apple'da).
   **Web bu bilgiyi hiçbir API isteğinde sormaz veya taşımaz** (web odaları anonim ve ücretsiz kalır).
   **Kategori erişimi yalnızca tier ile** (`categories.min_tier`, `lib/tier.ts`: `premium ≥ lite ≥ free`; per-kategori takip yok) ve
@@ -398,7 +398,7 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   `AI_ALLOW_TEST_OVERRIDE=1 npx next dev -p 3001` + `BASE=http://localhost:3001 node --no-warnings scripts/test-ai-commentary-api.mjs` (entegrasyon; gerçek modele gitmez).
 
 ### Abuse / rate limit (başlangıç limitleri)
-- Aynı IP/IP-hash için saatte max **10**, günde max **50** oda oluşturma.
+- Aynı IP/IP-hash için saatte max **10**, günde max **50** oda oluşturma (anonim web ve `free` tier). `lite`+ kullanıcıda bunun yerine kullanıcı başına dakikada **5** (`action = create_room_burst`).
 - Katılma denemesi: IP başına ve kullanıcı başına dakikada **10**; bulunamayan oda kodu: IP başına dakikada **10** (`rate_limits`, `action` = `join_attempt` / `room_miss`).
 - Aynı oda için max **2** participant; oda dolunca `join_locked = true`.
 
@@ -441,11 +441,8 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   (opsiyonel) `categoryId`, (opsiyonel) `birthDate` (`YYYY-AA-GG`, kendi doğum tarihi; < 13 yaş `403 AGE_RESTRICTED`), (opsiyonel) `gender` (`female` | `male`; boş = belirtilmedi). **Yalnızca kurucunun bilgisi**: `partnerName`/`partnerGender`/`partnerBirthDate` gönderilse bile yok sayılır.
   **Oda oluşturma sayfası iki adımlı sihirbazdır (web + mobil görünüm; durum bileşende, sunucuya yalnızca son adımda tek istek):**
   **Adım 1 "Kimler oynuyor?"** (ilişki türü + "Sen" kartı: ad (zorunlu), cinsiyet ve isteğe bağlı doğum tarihi (GG.AA.YYYY maskeli); webde yalnızca ad ve bağ zorunludur; mod ne olursa olsun aynı) →
-  **Adım 2 "Ne oynuyoruz?"** (kategori → oyun modu → soru sayısı + canlı özet). Tasarım **mobil uygulamadaki `create.tsx` ile aynıdır** (numaralı bölüm başlıkları, dolu kırmızı seçili kartlar, köşe seçim işareti, yatay kaydırmalı kategori kartları, "Popüler"/"İDEAL" rozetleri, özet kartı; parçalar `components/create/ui.tsx`). Sahne açıldığında mod bölümü kategori'nin üstüne alınmalı (Sahne seçilince kategori/soru sayısı kaybolacağı için).
-  Geri tuşu 2. adımdan 1. adıma döner (`history.pushState({ createStep: 2 })`). **Taslak korunur:** sihirbaz durumu (adım, adlar, cinsiyetler, ilişki türü, mod, kategori, soru sayısı, bölüm) `sessionStorage` `gou_create_draft` anahtarında tutulur; sayfa yenilenince/başka sayfaya gidip dönünce kaldığı adımdan devam eder, oda kurulunca silinir, sekme kapanınca gider; sunucuya hiçbir şey gitmez (geri yüklenen değerler doğrulanır, listede olmayan kategori temizlenir). Mod seçicide **Sahne** (animasyonlu senaryo modu,
-  planlı) diğer 4 modla **aynı kart diliyle, tek listede** durur (ayrı başlık/farklı stil yok; hepsi birer oyun modudur), listenin
-  **sonunda** tam genişlikte; backend hazır olana kadar **pasiftir** ("Yakında" rozeti; `SCENE_MODE_ENABLED = false`, `lib/scene-chapters.ts`),
-  hazır olunca bayrak true yapılır ("Yeni" rozeti, seçilebilir). Seçilebilir olduğunda Sahne seçilince kategori ve soru sayısı gizlenir (durumları korunur), yerine **bölüm seçimi** (`components/create/ChapterPicker.tsx`) gelir; bölüm içeriği/`chapters` API'si hazır olana kadar bölüm kartları "Yakında" ve pasiftir (geçici katalog: `lib/scene-chapters.ts`), oda oluşturma butonu Sahne seçiliyken pasif kalır ve istemci/sunucu `gameMode: "scene"` ile oda kurmaz. Bölümler ilişki türüne göre filtrelenir (bağ için bölüm yoksa boş durum); bölüm seçimi ilişki türü değişince sıfırlanır.
+  **Adım 2 "Ne oynuyoruz?"** (kategori → oyun modu → soru sayısı + canlı özet). Tasarım **mobil uygulamadaki `create.tsx` ile aynıdır** (numaralı bölüm başlıkları, dolu kırmızı seçili kartlar, köşe seçim işareti, yatay kaydırmalı kategori kartları, "Popüler"/"İDEAL" rozetleri, özet kartı; parçalar `components/create/ui.tsx`).
+  Geri tuşu 2. adımdan 1. adıma döner (`history.pushState({ createStep: 2 })`). **Taslak korunur:** sihirbaz durumu (adım, adlar, cinsiyetler, ilişki türü, mod, kategori, soru sayısı) `sessionStorage` `gou_create_draft` anahtarında tutulur; sayfa yenilenince/başka sayfaya gidip dönünce kaldığı adımdan devam eder, oda kurulunca silinir, sekme kapanınca gider; sunucuya hiçbir şey gitmez (geri yüklenen değerler doğrulanır, listede olmayan kategori temizlenir). Mod seçicide dört mod vardır (Karma webde soluk/pasif, "Mobilde"). **Sahne modu webde yoktur** (2026-11-27'de arayüzden ve koddan kaldırıldı; yalnızca mobil için planlı).
 - Kategori seçimi **yatay kayan kartlardır** (`components/create/Carousel.tsx`: dokunmatikte kaydırma, masaüstünde yan ok düğmeleri; hiçbir ekranda alt alta sarmaz); ilk kart "Karışık Sürpriz" (kategori yok, varsayılan). Kategoriler sayfa
   açılırken bir kez çekilir, tür değişince istemcide filtrelenir; sunucu yine de uyumu doğrular
   (uyumsuzsa `INVALID_PAYLOAD`).
@@ -456,7 +453,7 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   döndürür; kullanma).
 - Kategoriler (v2): `friend_test`, `wild_scenarios`, `social_life` (yalnızca Kanka); `first_date`,
   `romance` (yalnızca Sevgili); `future`, `home_money` (yalnızca Evli); `communication`,
-  `lifestyle`, `values` (üçü); `bold` (Sevgili + Evli, **premium**, 18+).
+  `lifestyle`, `values` (üçü); `bold` (Sevgili + Evli, **premium**, 18+; şu an gizli, sunulmuyor).
 
 ---
 

@@ -74,20 +74,49 @@ try {
   for (const tier of ["lite", "premium"]) {
     const u = await mkUser(tier);
     await set(u, { tier, room_credits: 0 });
+    u.tierName = tier;
     r = await room(u);
     ok(r.status === 201 && (await coins(u)) === 0, `${tier}: 0 coin ile oda → 201, bakiye 0`);
     r = await room(u, undefined, { gameMode: "mixed", questionCount: 10 });
     ok(r.status === 201 && (await coins(u)) === 0, `${tier}: Karma + 10 soru → 201, ücretsiz`);
     ok((await roomTx(u)).length === 0, `${tier}: deftere oda hareketi yazılmadı (düşüm de iade de yok)`);
     if (tier === "lite") {
+      // Günlük/saatlik IP sınırı yok; yalnızca dakikada 5 (bu dakikada 2 oda açıldı)
       const st = [];
-      for (let i = 0; i < 12; i++) st.push((await room(u, freeIp)).status); // IP zaten sınırda
-      ok(st.every((s) => s === 201), `lite: sınırdaki IP'den bile 12 oda → hepsi 201 (${st.join(",")})`);
+      for (let i = 0; i < 4; i++) st.push((await room(u, freeIp)).status); // IP zaten saatlik sınırda
+      ok(st.slice(0, 3).every((s) => s === 201) && st[3] === 429, `lite: sınırdaki IP'den de açar; dakikada 5, 6. → 429 (${st.join(",")})`);
+      // Bir dakika geçmiş gibi: pencere kayıtlarını eskit
+      const old = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+      await db.from("rate_limits").update({ created_at: old }).eq("key", `u:${u.id}`).eq("action", "create_room_burst");
+      // Saatlik/günlük sınır olmadığını göster: eski kayıt sayısını çok yükselt
+      await db.from("rate_limits").insert(Array.from({ length: 80 }, () => ({ key: `u:${u.id}`, action: "create_room_burst", count: 1, created_at: old })));
       await set(u, { room_credits: 700 });
       r = await room(u);
-      ok(r.status === 201 && (await coins(u)) === 700, "lite: bakiyesi olsa da coin düşmez");
+      ok(r.status === 201 && (await coins(u)) === 700, "lite: dakika dolunca yine açar (80+ eski oda engel değil), coin düşmez");
     }
   }
+
+  // Paralel patlama (bot): aynı anda 15 istekten en fazla 5'i geçer
+  const bot = await mkUser("bot");
+  await set(bot, { tier: "lite" });
+  const burst = await Promise.all(Array.from({ length: 15 }, () => room(bot)));
+  const passed = burst.filter((x) => x.status === 201).length, limited = burst.filter((x) => x.status === 429).length;
+  ok(passed <= 5 && passed + limited === 15, `paralel 15 istek: ${passed} geçti, ${limited} → 429`);
+  const { count: kept } = await db.from("rate_limits").select("*", { count: "exact", head: true }).eq("key", `u:${bot.id}`).eq("action", "create_room_burst");
+  ok(kept === passed, `reddedilen denemeler sayaçta kalmaz (${kept} kayıt)`);
+
+  // Cesur (premium satışta değil): listede yok, oda kurulamaz
+  const { data: bold } = await db.from("categories").select("id").eq("slug", "bold").eq("locale", "tr").single();
+  const premiumUser = users.find((x) => x.id !== bot.id && x.tierName === "premium");
+  await db.from("users").update({ birth_date: "1990-01-01" }).eq("id", premiumUser.id);
+  for (const [who, jwt] of [["anonim", undefined], ["premium", premiumUser.jwt]]) {
+    const list = await (await fetch(`${BASE}/api/categories?locale=tr&relationshipType=dating`, { headers: jwt ? { Authorization: `Bearer ${jwt}` } : {} })).json();
+    ok(Array.isArray(list) && list.length >= 3 && !list.some((c) => c.slug === "bold" || c.min_tier === "premium"), `kategoriler (${who}): Cesur yok (${list.length} kategori)`);
+  }
+  r = await room(premiumUser, undefined, { categoryId: bold.id, birthDate: "1990-01-01" });
+  ok(r.status === 400 && r.json?.error?.code === "INVALID_PAYLOAD", `premium + Cesur → 400 (status ${r.status})`);
+  r = await room(null, undefined, { categoryId: bold.id });
+  ok(r.status === 400 && r.json?.error?.code === "INVALID_PAYLOAD", `anonim + Cesur → 400 (status ${r.status})`);
 
   // web anonim: ücretsiz, hız sınırı aynı
   r = await room(null);

@@ -180,9 +180,9 @@
     "mobileTeaser": {
       "badge": "App Móvil",
       "title": "Para una experiencia más profunda",
-      "desc": "Los comentarios con IA, las categorías premium y el historial de juegos estarán próximamente en la app móvil de Game of Us.",
+      "desc": "Los comentarios con IA, las guías para fechas especiales y el historial de juegos estarán próximamente en la app móvil de Game of Us.",
       "featAi": "Comentarios con IA hechos para vosotros",
-      "feat1": "Acceso permanente a categorías premium",
+      "feat1": "Salas ilimitadas y guías para fechas especiales",
       "feat2": "Revisa tus juegos anteriores cuando quieras",
       "feat3": "Recibe notificaciones cuando tu pareja juegue",
       "comingSoon": "Próximamente",
@@ -254,22 +254,6 @@
         "mixed": "Un poco de todo"
       },
       "mobileOnly": "En la app",
-      "scene": {
-        "name": "Escena",
-        "desc": "Minihistorias animadas con monigotes",
-        "soon": "Próximamente",
-        "new": "Nuevo",
-        "chapterLabel": "Elige un capítulo",
-        "chapterHint": "Los capítulos se están preparando, muy pronto aquí.",
-        "sceneCount": "{count} escenas",
-        "emptyForBond": "Pronto habrá capítulos para este vínculo.",
-        "chapters": {
-          "first_date": {
-            "title": "Primera cita",
-            "desc": "La cuenta, un mensaje de un ex, una bebida derramada…"
-          }
-        }
-      },
       "hint": "¿Cómo se juega?",
       "popular": "Popular"
     },
@@ -316,8 +300,7 @@
         "home_money": "Orden y Equilibrio",
         "communication": "Comprensión y Escucha",
         "lifestyle": "Hábitos y Preferencias",
-        "values": "Principios y Prioridades",
-        "bold": "Valentía y Límites"
+        "values": "Principios y Prioridades"
       }
     },
     "premiumModal": {

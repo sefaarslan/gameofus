@@ -21,3 +21,10 @@ export const MIXED_MODE_MIN_TIER: Tier = "lite";
 
 /** Oda kurma bu tier ve üstü için ücretsiz ve sınırsızdır (coin düşülmez, oda oluşturma hız sınırı uygulanmaz). */
 export const FREE_ROOMS_MIN_TIER: Tier = "lite";
+
+/**
+ * `premium` tier şu anda satılmıyor (2026-11-27): `min_tier = premium` kategoriler (Cesur Sorular) web'de ve mobilde GİZLİDİR —
+ * kategori listesinde dönmez, oda kurmada reddedilir. Veritabanında kalır; satış açılınca `true` yapılır. Mevcut odalar oynanır.
+ */
+export const PREMIUM_TIER_ON_SALE = false;
+export const isCategoryOffered = (minTier: string | null | undefined): boolean => PREMIUM_TIER_ON_SALE || minTier !== "premium";
