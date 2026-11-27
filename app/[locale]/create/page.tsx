@@ -5,10 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import { RELATIONSHIP_TYPES, isRelationshipType, type RelationshipType } from "@/lib/relationship";
-import { isGender, type Gender } from "@/lib/gender";
-import { GenderPicker } from "@/components/create/GenderPicker";
 import { Carousel } from "@/components/create/Carousel";
-import { ageFromIso, maskBirthDateInput, parseBirthDateInput } from "@/lib/date-input";
 import { ChoiceCard, FloatBadge, NumberBadge, Pill, SectionHeader } from "@/components/create/ui";
 
 // Tasarım mobil uygulamadaki oda oluşturma ekranıyla aynıdır (gameofus-mobile/src/app/game/create.tsx).
@@ -66,8 +63,6 @@ const GAME_MODES: readonly GameMode[] = ["secret_choice", "prediction", "orderli
 interface CreateDraft {
   step: 1 | 2;
   displayName: string;
-  birthDate: string;
-  gender: Gender | null;
   relationshipType: RelationshipType | null;
   gameMode: GameMode;
   questionCount: 5 | 10;
@@ -84,8 +79,6 @@ function readDraft(): Partial<CreateDraft> | null {
     return {
       step: d.step === 2 ? 2 : 1,
       displayName: str(d.displayName, 30),
-      birthDate: maskBirthDateInput(str(d.birthDate, 10)),
-      gender: isGender(d.gender) ? d.gender : null,
       relationshipType: isRelationshipType(d.relationshipType) ? d.relationshipType : null,
       gameMode: GAME_MODES.includes(d.gameMode as GameMode) ? (d.gameMode as GameMode) : "secret_choice",
       questionCount: d.questionCount === 10 ? 10 : 5,
@@ -112,9 +105,6 @@ export default function CreatePage() {
   // Yalnızca oda kuranın bilgisi alınır; karşı taraf kendi adını davet linkinden kendisi girer.
   const [step, setStep] = useState<1 | 2>(1);
   const [displayName, setDisplayName] = useState("");
-  // Doğum tarihi isteğe bağlı (webde yalnızca oyuncu adı zorunludur); "GG.AA.YYYY" metni
-  const [birthDate, setBirthDate] = useState("");
-  const [gender, setGender] = useState<Gender | null>(null);
   const [relationshipType, setRelationshipType] = useState<RelationshipType | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>("secret_choice");
   const [questionCount, setQuestionCount] = useState<5 | 10>(5);
@@ -162,8 +152,6 @@ export default function CreatePage() {
     const d = readDraft();
     if (d) {
       if (d.displayName) setDisplayName(d.displayName);
-      if (d.birthDate) setBirthDate(d.birthDate);
-      setGender(d.gender ?? null);
       setRelationshipType(d.relationshipType ?? null);
       if (d.gameMode) setGameMode(d.gameMode);
       if (d.questionCount) setQuestionCount(d.questionCount);
@@ -179,14 +167,14 @@ export default function CreatePage() {
     if (!draftLoaded) return;
     try {
       const draft: CreateDraft = {
-        step, displayName, birthDate, gender, relationshipType,
+        step, displayName, relationshipType,
         gameMode, questionCount, categoryId: selectedCategoryId,
       };
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
     } catch {
       /* depolama kapalı/dolu: taslak tutulmaz, sihirbaz yine çalışır */
     }
-  }, [draftLoaded, step, displayName, birthDate, gender, relationshipType, gameMode, questionCount, selectedCategoryId]);
+  }, [draftLoaded, step, displayName, relationshipType, gameMode, questionCount, selectedCategoryId]);
 
   // Geri yüklenen kategori artık listede yoksa (kategori seti değişti / dil değişti) seçimi temizle
   useEffect(() => {
@@ -239,28 +227,17 @@ export default function CreatePage() {
 
   const selectedCategory = allCategories.find((c) => c.id === selectedCategoryId) ?? null;
 
-  // Doğum tarihi boşsa sorun yok (isteğe bağlı); doluysa geçerli olmalı ve asgari yaş (13) sağlanmalı
-  function birthDateError(): string | null {
-    if (!birthDate.trim()) return null;
-    const iso = parseBirthDateInput(birthDate);
-    if (!iso) return t("errors.birthDateInvalid");
-    if (ageFromIso(iso) < 13) return t("errors.birthDateTooYoung");
-    return null;
-  }
-
   function handleContinue() {
     if (!displayName.trim()) return setError(t("errors.nameRequired"));
     if (!relationshipType) return setError(t("errors.relationshipRequired"));
-    const bdErr = birthDateError();
-    if (bdErr) return setError(bdErr);
     setError(null);
     goToStep2();
   }
 
   async function handleSubmit() {
-    if (!displayName.trim() || !relationshipType || birthDateError()) {
+    if (!displayName.trim() || !relationshipType) {
       setStep(1);
-      setError(!displayName.trim() ? t("errors.nameRequired") : !relationshipType ? t("errors.relationshipRequired") : birthDateError());
+      setError(!displayName.trim() ? t("errors.nameRequired") : t("errors.relationshipRequired"));
       return;
     }
     // Double-check limit before submitting
@@ -285,8 +262,6 @@ export default function CreatePage() {
           questionCount,
           locale,
           categoryId: selectedCategoryId,
-          gender,
-          ...(birthDate.trim() ? { birthDate: parseBirthDateInput(birthDate) } : {}),
         }),
       });
       const data = await res.json();
@@ -472,7 +447,7 @@ export default function CreatePage() {
                     <p className="text-xs text-on-surface-variant mb-3">{t("you.hint")}</p>
 
                     <label htmlFor="create-name" className="block text-xs text-on-surface-variant mb-1.5">{t("name.label")}</label>
-                    <div className="relative mb-4">
+                    <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">badge</span>
                       <input
                         id="create-name"
@@ -484,38 +459,7 @@ export default function CreatePage() {
                         className="w-full pl-11 pr-4 py-3.5 bg-surface-container-lowest border border-outline-variant rounded-2xl text-body-md text-on-surface placeholder-on-surface-variant/50 shadow-soft-sm focus:outline-none focus:border-primary transition-colors"
                       />
                     </div>
-                    <div className="flex gap-3">
-                      <div className="flex-1 min-w-0">
-                        <GenderPicker label={t("gender.label")} value={gender} onChange={setGender} />
-                      </div>
-                      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                        <label htmlFor="create-birth" className="text-xs text-on-surface-variant flex items-center gap-1">
-                          <span className="material-symbols-outlined text-sm">calendar_month</span>
-                          <span className="truncate">{t("birthDate.label")}</span>
-                        </label>
-                        <div className="flex items-center bg-surface-container rounded-xl px-3 min-h-[44px] focus-within:ring-2 focus-within:ring-primary/40">
-                          <input
-                            id="create-birth"
-                            type="text"
-                            inputMode="numeric"
-                            autoComplete="bday"
-                            value={birthDate}
-                            onChange={(e) => setBirthDate(maskBirthDateInput(e.target.value))}
-                            placeholder={t("birthDate.placeholder")}
-                            maxLength={10}
-                            aria-describedby="create-birth-opt"
-                            className="w-full bg-transparent text-label-md text-on-surface placeholder-on-surface-variant/60 py-2.5 focus:outline-none"
-                          />
-                        </div>
-                        <span id="create-birth-opt" className="text-[11px] text-on-surface-variant/70">({t("birthDate.optional")})</span>
-                      </div>
-                    </div>
                   </section>
-
-                  <div className="flex items-start gap-2.5 bg-primary-container/25 rounded-2xl px-4 py-3 mb-4">
-                    <span className="material-symbols-outlined text-base text-primary mt-px">auto_awesome</span>
-                    <p className="flex-1 text-xs text-on-surface-variant leading-relaxed">{t("gender.hint")}</p>
-                  </div>
                 </>
               )}
 

@@ -270,7 +270,7 @@ Oda oluşturma **iki adımlı sihirbazdır** (web mobil/masaüstü ve mobil uygu
 
 **Adım 1 — Kimler oynuyor?** (hangi mod seçilirse seçilsin aynıdır)
 3. **Aralarındaki bağı seçer: Kanka / Sevgili / Evli** (zorunlu).
-4. Kendi adını girer (zorunlu) ve (opsiyonel) doğum tarihini (GG.AA.YYYY) ve cinsiyetini seçer: Kadın / Erkek / Diğer (varsayılan; Diğer = belirtilmedi, nötr karakter ve nötr dil). **Karşı oyuncunun adı/cinsiyeti/doğum tarihi sorulmaz** — karşı taraf davet linkinden kendi adını (ve gerektiğinde cinsiyetini) kendisi girer.
+4. Kendi adını girer (zorunlu). Webde cinsiyet ve doğum tarihi **sorulmaz** (2026-11-27); mobil uygulama bunları kendi ekranında alabilir. **Karşı oyuncunun adı/cinsiyeti/doğum tarihi sorulmaz** — karşı taraf davet linkinden kendi adını (mobilden kurulmuş odada ayrıca cinsiyet ve doğum tarihini) kendisi girer.
 5. "Oyun modunu seç" ile 2. adıma geçer (ad ve bağ eksikse satır içi uyarı gösterilir).
 
 **Adım 2 — Ne oynuyoruz?**
@@ -628,8 +628,7 @@ Tasarım mobil uygulamayla aynıdır: numaralı bölüm başlıkları (1, 2, 3),
 
 **Adım 1 — Kimler oynuyor?** (yalnızca oda kuranın bilgisi)
 - 1 · **Aranızdaki bağ** (3 kart: Kanka / Sevgili / Evli; zorunlu)
-- 2 · **Sen** kartı (zorunlu rozeti): ismin (zorunlu) + yan yana cinsiyet (segmentli: Kadın / Erkek / Diğer; varsayılan Diğer = belirtilmedi (null)) ve **Doğum Tarihi** (isteğe bağlı, GG.AA.YYYY maskeli; geçersiz ya da 13 yaş altı tarih satır içi uyarı verir). **Webde yalnızca ad ve bağ zorunludur**
-- Cinsiyet notu kutusu: "Karakterlerinizi çizmek ve yorumları daha doğru yazmak için kullanılır. İstersen boş bırakabilirsin."
+- 2 · **Sen** kartı (zorunlu rozeti): yalnızca ismin (zorunlu). Webde cinsiyet ve doğum tarihi alanı ve açıklama kutusu **yoktur** (2026-11-27). **Webde yalnızca ad ve bağ istenir**
 - Karşı oyuncunun bilgisi **sorulmaz**: kendi adını davet linkinden girer
 
 Buton: > Oyun modunu seç (ad/bağ eksikse satır içi uyarı)
@@ -1278,8 +1277,8 @@ Anonim oyun oluşturma login gerektirmediği için kötüye kullanım riski vard
 - Analytics tarafında soru/cevap içeriği değil, event seviyesinde davranış metrikleri tutulmalıdır.
 - **Geri bildirim (`feedback`):** yalnızca puan, AI ilgisi, kısa serbest yorum (≤ 500 karakter) ve oda meta verisi (dil, mod, ilişki türü, platform) tutulur; cevap/tahmin içeriği asla. Kimlik yalnızca `participant_id`'dir (anonim kalır). Yazma token doğrulayan sunucu endpoint'i üzerindendir, tablo ve metrik görünümleri `anon/authenticated` erişimine kapalıdır. Anket yalnızca sonuçlar hazır olduktan sonra kabul edilir.
 - **Her oyuncu yalnızca kendi bilgisini girer** (karşı oyuncunun adı/cinsiyeti/doğum tarihi oda kurarken alınmaz; `rooms.partner_*` sütunları kaldırıldı) — üçüncü kişi verisi toplanmaz, kişinin onayı kendi beyanıdır.
-- **Cinsiyet** (opsiyonel; web ve mobil, herkes kendisi için: kurucu oda kurarken, karşı oyuncu davetle katılırken): yalnızca `participants.gender`'da, oda silinince gider; hesap profiline, metrik görünümlerine, arşiv tablolarına ve loglara yazılmaz; hesap silmede başkalarının odalarındaki katılımdan da kaldırılır. İki oyuncunun cinsiyeti ve ilişki türü birlikte hassas olduğundan ayrıca sızdırılmaz. AI'a (yalnızca ikili AI yorum/sahne analizi) rıza metninde belirtilerek gider; prompt'ta cinsiyetin yalnızca dil bilgisi/doğal ifade için kullanılması, genelleme/klişe üretilmemesi zorunludur. Solo AI'a gitmez. Gizlilik politikasına ve mağaza veri beyanına eklenir.
-- **Doğum tarihi** (web ve mobil, isteğe bağlı; webde yalnızca ad ve bağ zorunludur; kurucu oda kurarken, karşı oyuncu davetle katılırken kendisi girer): kişinin **kendi** beyanı, `participants.birth_date`'te odayla birlikte tutulur (oda silinince gider; hesap silmede kaldırılır; profile/metriklere/loglara yazılmaz). Mobilde ayrıca profildeki tarih 18+ kategorilerde oda kurarken/katılırken kullanılır; başkası adına girilmez. Asgari yaş 13 (daha küçük tarih reddedilir, saklanmaz). AI yorum için LLM'e gönderilen veriler gizlilik açısından özel değerlendirme gerektirir ve rıza metninde belirtilir (bkz. Bölüm 12.5).
+- **Cinsiyet** (opsiyonel; herkes kendisi için: mobilde kurucu oda kurarken, karşı oyuncu davetle katılırken; web oda kurma ekranında sorulmaz): yalnızca `participants.gender`'da, oda silinince gider; hesap profiline, metrik görünümlerine, arşiv tablolarına ve loglara yazılmaz; hesap silmede başkalarının odalarındaki katılımdan da kaldırılır. İki oyuncunun cinsiyeti ve ilişki türü birlikte hassas olduğundan ayrıca sızdırılmaz. AI'a (yalnızca ikili AI yorum/sahne analizi) rıza metninde belirtilerek gider; prompt'ta cinsiyetin yalnızca dil bilgisi/doğal ifade için kullanılması, genelleme/klişe üretilmemesi zorunludur. Solo AI'a gitmez. Gizlilik politikasına ve mağaza veri beyanına eklenir.
+- **Doğum tarihi** (isteğe bağlı; mobilde kurucu oda kurarken, karşı oyuncu davetle katılırken kendisi girer; web oda kurma ekranında sorulmaz): kişinin **kendi** beyanı, `participants.birth_date`'te odayla birlikte tutulur (oda silinince gider; hesap silmede kaldırılır; profile/metriklere/loglara yazılmaz). Mobilde ayrıca profildeki tarih 18+ kategorilerde oda kurarken/katılırken kullanılır; başkası adına girilmez. Asgari yaş 13 (daha küçük tarih reddedilir, saklanmaz). AI yorum için LLM'e gönderilen veriler gizlilik açısından özel değerlendirme gerektirir ve rıza metninde belirtilir (bkz. Bölüm 12.5).
 
 ---
 
