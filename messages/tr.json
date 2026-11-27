@@ -128,7 +128,6 @@
     "howItWorks": "Nasıl Çalışır",
     "modes": "Oyun Modları",
     "solo": "Solo",
-    "faq": "SSS",
     "start": "Hemen Başla",
     "menu": "Menü"
   },
@@ -474,7 +473,8 @@
     "connection": "Bağlantı hatası."
   },
   "faq": {
-    "title": "Sıkça sorulan sorular",
+    "eyebrow": "Sıkça sorulan sorular",
+    "title": "Merak ettiğin her şey",
     "items": [
       {
         "id": "what",

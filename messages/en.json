@@ -128,7 +128,6 @@
     "howItWorks": "How It Works",
     "modes": "Game Modes",
     "solo": "Solo",
-    "faq": "FAQ",
     "start": "Start Now",
     "menu": "Menu"
   },
@@ -474,7 +473,8 @@
     "connection": "Connection error."
   },
   "faq": {
-    "title": "Frequently asked questions",
+    "eyebrow": "Frequently asked questions",
+    "title": "Everything you want to know",
     "items": [
       {
         "id": "what",

@@ -119,12 +119,6 @@ export function AppHeader({ locale }: AppHeaderProps) {
             >
               {tNav("solo")}
             </Link>
-            <Link
-              href={`/${locale}#sss`}
-              className="text-label-md text-on-surface-variant hover:text-primary transition-colors"
-            >
-              {tNav("faq")}
-            </Link>
           </nav>
         )}
 
@@ -186,13 +180,6 @@ export function AppHeader({ locale }: AppHeaderProps) {
               onClick={() => setMobileOpen(false)}
             >
               {tNav("solo")}
-            </Link>
-            <Link
-              href={`/${locale}#sss`}
-              className="text-body-md text-on-surface-variant hover:text-primary py-3 border-b border-outline-variant/10 transition-colors"
-              onClick={() => setMobileOpen(false)}
-            >
-              {tNav("faq")}
             </Link>
             <Link
               href={`/${locale}/create`}
