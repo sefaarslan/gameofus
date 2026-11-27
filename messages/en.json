@@ -230,7 +230,6 @@
     },
     "gender": {
       "label": "Gender",
-      "hint": "Used to draw your characters and to write more fitting comments. If you'd rather not say, pick “No answer”.",
       "female": "Female",
       "male": "Male",
       "unspecified": "No answer"

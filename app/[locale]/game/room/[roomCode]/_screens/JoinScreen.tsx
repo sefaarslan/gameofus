@@ -149,12 +149,7 @@ export function JoinScreen({ roomCode, mobileRoom = false, onJoined }: JoinScree
               </div>
             </div>
 
-            {mobileRoom && (
-              <div className="flex flex-col gap-1.5">
-                <GenderPicker label={tc("gender.label")} value={gender} onChange={setGender} />
-                <p className="text-xs text-on-surface-variant/70">{tc("gender.hint")}</p>
-              </div>
-            )}
+            {mobileRoom && <GenderPicker label={tc("gender.label")} value={gender} onChange={setGender} />}
 
             {mobileRoom && (
               <div className="flex flex-col gap-1.5">

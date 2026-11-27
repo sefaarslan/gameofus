@@ -230,7 +230,6 @@
     },
     "gender": {
       "label": "Cinsiyet",
-      "hint": "Karakterlerinizi çizmek ve yorumları daha doğru yazmak için kullanılır. Belirtmek istemezsen “Cevapsız”ı seçebilirsin.",
       "female": "Kadın",
       "male": "Erkek",
       "unspecified": "Cevapsız"
