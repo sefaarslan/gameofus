@@ -316,10 +316,10 @@ export default function CreatePage() {
               </button>
 
               <button
-                onClick={() => router.push(`/#premium`)}
+                onClick={() => router.push(`/#sss`)}
                 className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary text-body-md font-semibold py-4 rounded-full hover:bg-surface-tint active:scale-95 transition-all shadow-primary-glow"
               >
-                <span className="material-symbols-outlined icon-fill text-xl">smartphone</span>
+                <span className="material-symbols-outlined icon-fill text-xl">info</span>
                 {t("limitUpgrade")}
               </button>
             </div>

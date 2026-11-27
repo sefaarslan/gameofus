@@ -128,7 +128,7 @@
     "howItWorks": "How It Works",
     "modes": "Game Modes",
     "solo": "Solo",
-    "premium": "Premium",
+    "faq": "FAQ",
     "start": "Start Now",
     "menu": "Menu"
   },
@@ -176,18 +176,6 @@
         "desc": "Rank the cards by your own priorities. Test how well your partner knows you.",
         "tag": "Discovery"
       }
-    },
-    "mobileTeaser": {
-      "badge": "Mobile App",
-      "title": "For a deeper experience",
-      "desc": "AI insights, special-day guides and game history are coming soon to the Game of Us mobile app.",
-      "featAi": "AI insights made just for the two of you",
-      "feat1": "Unlimited rooms and special-day guides",
-      "feat2": "Review your past games anytime",
-      "feat3": "Get notified instantly when your partner plays",
-      "comingSoon": "Coming soon",
-      "storeNote": "Launching on App Store and Google Play.",
-      "followNote": "Launch news on"
     },
     "mockup": {
       "partnerOnline": "Alex online",
@@ -312,7 +300,7 @@
     "limitTitle": "You already have a game in progress",
     "limitDesc": "With the free version you can run one game at a time. Download the Game of Us mobile app to play more.",
     "limitGoBack": "Back to my game",
-    "limitUpgrade": "Download the App",
+    "limitUpgrade": "Learn more",
     "you": {
       "title": "You",
       "badge": "Required",
@@ -485,10 +473,95 @@
     "goHome": "Back to home",
     "connection": "Connection error."
   },
-  "premium": {
-    "title": "Keep the game night going",
-    "subtitle": "More games and longer question sets will be available with premium soon.",
-    "price": "249 TL — 3-day access",
-    "cta": "I'm interested"
+  "faq": {
+    "title": "Frequently asked questions",
+    "items": [
+      {
+        "id": "what",
+        "q": "What is Game of Us?",
+        "a": "Game of Us is a two-player game where you guess how your partner, best friend or spouse will answer a question. At the end of every game you get a Reading Score that shows how well you read each other."
+      },
+      {
+        "id": "how",
+        "q": "How do you play?",
+        "a": "Create a room, pick a category and a game mode, and send the invite link to the other person. You both answer at the same time, with no waiting for turns. At the end you see your guesses and your Reading Score together."
+      },
+      {
+        "id": "download",
+        "q": "Do we both need to download the app?",
+        "a": "No. The person invited can tap the link and join from a browser, for free, without downloading anything."
+      },
+      {
+        "id": "score",
+        "q": "What is the Reading Score?",
+        "a": "The Reading Score is not a compatibility test. It doesn't measure whether you think alike, but how accurately you guess what the other person will answer. In other words, it shows how well you know each other."
+      },
+      {
+        "id": "couples",
+        "q": "Is it only for couples?",
+        "a": "No. You can play Game of Us with your sweetheart, your best friend or your spouse. You choose the kind of bond when you create the room, and the questions follow."
+      },
+      {
+        "id": "modes",
+        "q": "Which game modes are there?",
+        "list": [
+          {
+            "name": "Yes / No",
+            "text": "Secretly pick your own answer, then guess what your partner picked."
+          },
+          {
+            "name": "Scenario",
+            "text": "Predict the answer your partner will give."
+          },
+          {
+            "name": "Ranking",
+            "text": "Put the cards in order of importance and see who cares about what."
+          },
+          {
+            "name": "Mixed",
+            "text": "All the modes mixed together, with a surprise in every round (coming soon to the mobile app)."
+          },
+          {
+            "name": "Red Flag Minefield",
+            "text": "A solo mode where you discover your red lines."
+          }
+        ]
+      },
+      {
+        "id": "redflag",
+        "q": "What is Red Flag Minefield?",
+        "a": "A solo mode: each set has 9 situations, and on every card you pick one of three flags (Green, Yellow or Red Flag) to decide which situations are a red line for you. At the end you see your red flag tolerance. The upcoming mobile app will bring a new set every day."
+      },
+      {
+        "id": "guides",
+        "q": "What are game guides?",
+        "a": "Guides are game packs made for a particular moment, such as Valentine's Day or New Year's Eve. Each guide has a few games and you can start with whichever you like, so you can enjoy your time together without having to decide what to play. Guides are coming soon to the mobile app."
+      },
+      {
+        "id": "ai",
+        "q": "What is the AI commentary?",
+        "a": "After the game, AI looks at your answers and writes a personal commentary about where you read each other best and what surprised you most. This feature is coming soon to the mobile app: you will be able to unlock the AI commentary with coins, both in room games and in Red Flag Minefield."
+      },
+      {
+        "id": "price",
+        "q": "Is it free?",
+        "a": "Yes, you can play Game of Us for free. In the upcoming mobile app you will get gift coins when you sign up, and you will be able to earn more by watching ads, sharing to your story and playing the daily Red Flag set. If you want more, there will be a one-time premium pack: unlimited rooms, 10-question sets, Mixed mode, guides and an ad-free experience. No subscription: pay once and it's yours forever."
+      },
+      {
+        "id": "privacy",
+        "q": "Are my answers private? What does my partner see?",
+        "a": "Your answers are shown to the person you play with only after you have both finished. If the AI commentary is unlocked (with the required permissions), the answers are sent to an AI service provider so the commentary can be written. We don't sell your answers or use them for advertising."
+      },
+      {
+        "id": "delete",
+        "q": "How do I delete my account and data?",
+        "a": "In the upcoming mobile app you can permanently delete your account and data at any time via Profile > Settings > Delete account (except purchase records that we are legally required to keep). You can also request deletion by writing to gameofusapp@gmail.com."
+      },
+      {
+        "id": "platforms",
+        "q": "Which languages and devices are supported?",
+        "a": "Game of Us supports Turkish, English and Spanish. Right now you can play from any browser at gameofus.app; the iPhone and Android app is coming soon."
+      }
+    ]
   }
 }

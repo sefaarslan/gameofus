@@ -2,8 +2,7 @@ import { useTranslations } from "next-intl";
 import { JoinByCode } from "@/components/JoinByCode";
 import { Link } from "@/i18n/navigation";
 import { SiteFooter } from "@/components/SiteFooter";
-import { InstagramIcon } from "@/components/InstagramIcon";
-import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/social";
+import { Faq } from "@/components/Faq";
 import { SoloLogo } from "@/components/solo/SoloLogo";
 
 // ── Hero Game Card Mockup ─────────────────────────────────────────
@@ -413,86 +412,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Mobile App Teaser ─────────────────────────────────────── */}
-      <section className="py-6 md:py-8 pb-12 md:pb-16" id="premium">
-        <div className="bg-gradient-to-br from-surface to-surface-container-high rounded-[2rem] p-8 md:p-14 shadow-soft-active border border-outline-variant/20 flex flex-col md:flex-row items-center justify-center gap-10 md:gap-14 relative overflow-hidden">
-          {/* Ambient blobs */}
-          <div className="absolute -right-24 -top-24 w-72 h-72 bg-tertiary-container/15 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -left-24 -bottom-24 w-72 h-72 bg-primary-container/15 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Left: text */}
-          <div className="flex-1 max-w-lg relative z-10 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-tertiary-container text-on-tertiary-container rounded-full text-label-md text-xs mb-5">
-              <span className="material-symbols-outlined text-sm icon-fill">smartphone</span>
-              <span>{t("mobileTeaser.badge")}</span>
-            </div>
-            <h2 className="text-headline-md md:text-[2rem] text-on-background mb-4 font-bold">
-              {t("mobileTeaser.title")}
-            </h2>
-            <p className="text-body-lg text-on-surface-variant mb-7 max-w-md">
-              {t("mobileTeaser.desc")}
-            </p>
-            <ul className="flex flex-col gap-3.5 text-left">
-              {(["featAi", "feat1", "feat2", "feat3"] as const).map((key, i) => (
-                <li key={i} className="flex items-center gap-3 text-on-background text-body-md">
-                  <span className="material-symbols-outlined text-primary text-base bg-primary-container/25 p-1.5 rounded-full icon-fill">
-                    {["auto_awesome", "lock_open", "history", "notifications"][i]}
-                  </span>
-                  {t(`mobileTeaser.${key}`)}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Right: store badges */}
-          <div className="w-full md:w-[300px] shrink-0 relative z-10">
-            <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/10 shadow-soft-active flex flex-col items-center text-center gap-6">
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <span className="material-symbols-outlined text-primary icon-fill text-3xl">smartphone</span>
-              </div>
-
-              <div>
-                <p className="text-label-lg font-bold text-on-background mb-1">{t("mobileTeaser.comingSoon")}</p>
-                <p className="text-xs text-on-surface-variant">{t("mobileTeaser.storeNote")}</p>
-              </div>
-
-              <div className="flex flex-col gap-3 w-full">
-                {/* App Store badge */}
-                <div className="flex items-center gap-3 bg-on-surface/5 rounded-xl px-4 py-3 select-none opacity-50">
-                  <svg viewBox="0 0 24 24" className="w-6 h-6 fill-on-surface-variant" aria-hidden="true">
-                    <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
-                  </svg>
-                  <div className="text-left">
-                    <p className="text-[10px] text-on-surface-variant leading-tight">Download on the</p>
-                    <p className="text-sm font-semibold text-on-background leading-tight">App Store</p>
-                  </div>
-                </div>
-                {/* Google Play badge */}
-                <div className="flex items-center gap-3 bg-on-surface/5 rounded-xl px-4 py-3 select-none opacity-50">
-                  <span className="material-symbols-outlined text-on-surface-variant text-2xl">play_circle</span>
-                  <div className="text-left">
-                    <p className="text-[10px] text-on-surface-variant leading-tight">Get it on</p>
-                    <p className="text-sm font-semibold text-on-background leading-tight">Google Play</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col items-center gap-1.5">
-                <span className="text-xs text-on-surface-variant">{t("mobileTeaser.followNote")}</span>
-                <a
-                  href={INSTAGRAM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-label-md font-semibold text-primary hover:underline"
-                >
-                  <InstagramIcon className="w-4 h-4" />
-                  @{INSTAGRAM_HANDLE}
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── Sıkça sorulan sorular ─────────────────────────────────── */}
+      <Faq />
     </main>
     <SiteFooter />
     </>

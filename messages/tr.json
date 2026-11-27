@@ -128,7 +128,7 @@
     "howItWorks": "Nasıl Çalışır",
     "modes": "Oyun Modları",
     "solo": "Solo",
-    "premium": "Premium",
+    "faq": "SSS",
     "start": "Hemen Başla",
     "menu": "Menü"
   },
@@ -176,18 +176,6 @@
         "desc": "Seçenekleri kendi önceliklerine göre sırala. Partnerinin seninkini ne kadar bildiğini test et.",
         "tag": "Keşif"
       }
-    },
-    "mobileTeaser": {
-      "badge": "Mobil Uygulama",
-      "title": "Daha derin bir deneyim için",
-      "desc": "AI yorumları, özel gün kılavuzları ve geçmiş oyunlar yakında Game of Us mobil uygulamasında seni bekliyor.",
-      "featAi": "AI ile ikinize özel yorum",
-      "feat1": "Sınırsız oda ve özel gün kılavuzları",
-      "feat2": "Geçmiş oyunlarını istediğin zaman incele",
-      "feat3": "Partner oynadığında anında bildirim al",
-      "comingSoon": "Yakında geliyor",
-      "storeNote": "App Store ve Google Play'de yayınlanacak.",
-      "followNote": "Çıkış haberleri için"
     },
     "mockup": {
       "partnerOnline": "Ayşe online",
@@ -312,7 +300,7 @@
     "limitTitle": "Zaten devam eden bir oyunun var",
     "limitDesc": "Ücretsiz sürümle aynı anda bir oyun yürütebilirsin. Daha fazla oyun için Game of Us mobil uygulamasını indir.",
     "limitGoBack": "Mevcut oyunuma dön",
-    "limitUpgrade": "Mobil Uygulamayı İndir",
+    "limitUpgrade": "Daha fazla bilgi",
     "you": {
       "title": "Sen",
       "badge": "Zorunlu",
@@ -485,10 +473,95 @@
     "goHome": "Ana sayfaya dön",
     "connection": "Bağlantı hatası."
   },
-  "premium": {
-    "title": "Oyun gecesini uzat",
-    "subtitle": "Daha fazla oyun ve daha uzun soru setleri yakında premium ile açılacak.",
-    "price": "249 TL — 3 günlük erişim",
-    "cta": "İlgileniyorum"
+  "faq": {
+    "title": "Sıkça sorulan sorular",
+    "items": [
+      {
+        "id": "what",
+        "q": "Game of Us nedir?",
+        "a": "Game of Us, partnerinin, kankanın ya da eşinin bir soruya ne cevap vereceğini tahmin ettiğin iki kişilik bir oyun. Her oyunun sonunda, karşındakini ne kadar iyi okuduğunu gösteren bir Okuma Skoru alırsın."
+      },
+      {
+        "id": "how",
+        "q": "Nasıl oynanır?",
+        "a": "Bir oda aç, kategori ve oyun modunu seç, davet linkini karşı tarafa gönder. İkiniz aynı anda cevaplarsınız; sıra beklemek yok. Sonunda tahminlerinizi ve Okuma Skorunuzu birlikte görürsünüz."
+      },
+      {
+        "id": "download",
+        "q": "İkimizin de uygulamayı indirmesi gerekiyor mu?",
+        "a": "Hayır. Davet edilen kişi linke tıklayıp tarayıcıdan, hiçbir şey indirmeden ve ücretsiz katılabilir."
+      },
+      {
+        "id": "score",
+        "q": "Okuma Skoru nedir?",
+        "a": "Okuma Skoru bir uyum testi değil. Aynı şeyleri düşünüp düşünmediğinizi değil, karşındakinin ne cevap vereceğini ne kadar doğru tahmin ettiğini ölçer. Yani skor, birbirinizi ne kadar tanıdığınızı gösterir."
+      },
+      {
+        "id": "couples",
+        "q": "Sadece çiftler için mi?",
+        "a": "Hayır. Game of Us'ı sevgilinle, kankanla ya da eşinle oynayabilirsin. Odayı kurarken bağ türünü seçersin, sorular da buna göre gelir."
+      },
+      {
+        "id": "modes",
+        "q": "Hangi oyun modları var?",
+        "list": [
+          {
+            "name": "Evet / Hayır",
+            "text": "Gizlice kendi cevabını seç, partnerinin ne seçtiğini tahmin et."
+          },
+          {
+            "name": "Senaryo",
+            "text": "Partnerinin vereceği cevabı önceden kestir."
+          },
+          {
+            "name": "Sıralama",
+            "text": "Kartları önem sırasına diz, kimin neyi önemsediğini gör."
+          },
+          {
+            "name": "Karma",
+            "text": "Bütün modlar her turda sürpriz şekilde karışır (yakında mobil uygulamada)."
+          },
+          {
+            "name": "Red Flag Mayın Tarlası",
+            "text": "Tek başına oynanan, kırmızı çizgilerini keşfettiğin mod."
+          }
+        ]
+      },
+      {
+        "id": "redflag",
+        "q": "Red Flag Mayın Tarlası nedir?",
+        "a": "Tek kişilik bir mod: her sette 9 durum var ve her kartta üç bayraktan birini (Green, Yellow ya da Red Flag) seçerek hangi durumların senin için kırmızı çizgi olduğunu belirlersin. Sonunda red flag tolerans oranını görürsün. Yakında gelecek mobil uygulamada her gün yeni bir set olacak."
+      },
+      {
+        "id": "guides",
+        "q": "Oyun kılavuzları nedir?",
+        "a": "Kılavuzlar, belirli bir an için hazırlanmış oyun paketleridir; örneğin Sevgililer Günü ya da yılbaşı gecesi için. Her kılavuzda birkaç oyun var ve istediğinden başlayabilirsin, böylece ne oynayacağını düşünmeden birlikte keyifli bir zaman geçirebilirsiniz. Kılavuzlar yakında mobil uygulamada."
+      },
+      {
+        "id": "ai",
+        "q": "AI yorumu nedir?",
+        "a": "Oyun bittikten sonra yapay zekâ cevaplarınıza bakıp birbirinizi en iyi okuduğunuz ve en çok şaşırdığınız konuları anlatan kişisel bir yorum yazar. Bu özellik yakında mobil uygulamada: hem oda oyunlarında hem de Red Flag Mayın Tarlası'nda AI yorumunu coin'le açabileceksin."
+      },
+      {
+        "id": "price",
+        "q": "Ücretsiz mi?",
+        "a": "Evet, Game of Us'ı ücretsiz oynayabilirsin. Yakında gelecek mobil uygulamada kayıt olunca hediye coin alacaksın; reklam izleyerek, story paylaşarak ve her gün Red Flag setini oynayarak da coin kazanabileceksin. Daha fazlasını isteyenler için tek seferlik bir premium paket olacak: sınırsız oda, 10 soruluk setler, Karma modu, kılavuzlar ve reklamsız deneyim. Abonelik yok; bir kere ödersin, sonsuza kadar senin olur."
+      },
+      {
+        "id": "privacy",
+        "q": "Cevaplarım gizli mi? Partnerim neleri görür?",
+        "a": "Cevapların oynadığın kişiye ancak ikiniz de tamamladıktan sonra gösterilir. Yapay zekâ yorumu açılırsa (gerekli izinler verilmişse) cevaplar, yorumun yazılması için bir yapay zekâ hizmet sağlayıcısına gönderilir. Cevaplarını satmayız ve reklam için kullanmayız."
+      },
+      {
+        "id": "delete",
+        "q": "Hesabımı ve verilerimi nasıl silerim?",
+        "a": "Yakında gelecek mobil uygulamada Profil > Ayarlar > Hesabı sil adımlarıyla hesabını ve verilerini istediğin zaman kalıcı olarak silebilirsin (yasal olarak saklanması gereken satın alma kayıtları hariç). Ya da gameofusapp@gmail.com adresine yazarak silme talebinde bulunabilirsin."
+      },
+      {
+        "id": "platforms",
+        "q": "Hangi dilleri ve cihazları destekliyor?",
+        "a": "Game of Us Türkçe, İngilizce ve İspanyolca destekliyor. Şu anda gameofus.app üzerinden herhangi bir tarayıcıdan oynayabilirsin; iPhone ve Android uygulaması yakında."
+      }
+    ]
   }
 }

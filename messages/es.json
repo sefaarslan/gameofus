@@ -128,7 +128,7 @@
     "howItWorks": "Cómo Funciona",
     "modes": "Modos de juego",
     "solo": "Solo",
-    "premium": "Premium",
+    "faq": "Preguntas",
     "start": "Empezar",
     "menu": "Menú"
   },
@@ -176,18 +176,6 @@
         "desc": "Ordena las tarjetas según tus prioridades. Pon a prueba cuánto te conoce tu pareja.",
         "tag": "Descubrimiento"
       }
-    },
-    "mobileTeaser": {
-      "badge": "App Móvil",
-      "title": "Para una experiencia más profunda",
-      "desc": "Los comentarios con IA, las guías para fechas especiales y el historial de juegos estarán próximamente en la app móvil de Game of Us.",
-      "featAi": "Comentarios con IA hechos para vosotros",
-      "feat1": "Salas ilimitadas y guías para fechas especiales",
-      "feat2": "Revisa tus juegos anteriores cuando quieras",
-      "feat3": "Recibe notificaciones cuando tu pareja juegue",
-      "comingSoon": "Próximamente",
-      "storeNote": "Disponible en App Store y Google Play.",
-      "followNote": "Novedades del lanzamiento en"
     },
     "mockup": {
       "partnerOnline": "Alex en línea",
@@ -312,7 +300,7 @@
     "limitTitle": "Ya tienes un juego en curso",
     "limitDesc": "Con la versión gratuita puedes tener un juego a la vez. Descarga la app móvil de Game of Us para jugar más.",
     "limitGoBack": "Volver a mi juego",
-    "limitUpgrade": "Descargar la App",
+    "limitUpgrade": "Más información",
     "you": {
       "title": "Tú",
       "badge": "Obligatorio",
@@ -485,10 +473,95 @@
     "goHome": "Volver al inicio",
     "connection": "Error de conexión."
   },
-  "premium": {
-    "title": "Continúa la noche de juegos",
-    "subtitle": "Más juegos y sets de preguntas más largos estarán disponibles con premium pronto.",
-    "price": "2,99 USD — acceso único",
-    "cta": "Me interesa"
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "items": [
+      {
+        "id": "what",
+        "q": "¿Qué es Game of Us?",
+        "a": "Game of Us es un juego para dos en el que adivinas qué responderá tu pareja, tu colega o tu cónyuge a una pregunta. Al final de cada partida recibes una Puntuación de lectura que muestra lo bien que lees a la otra persona."
+      },
+      {
+        "id": "how",
+        "q": "¿Cómo se juega?",
+        "a": "Crea una sala, elige una categoría y un modo de juego y envía el enlace de invitación a la otra persona. Respondéis a la vez, sin esperar turnos. Al final veis juntos vuestras predicciones y vuestra Puntuación de lectura."
+      },
+      {
+        "id": "download",
+        "q": "¿Tenemos que descargar la app los dos?",
+        "a": "No. La persona invitada puede tocar el enlace y unirse desde el navegador, gratis y sin descargar nada."
+      },
+      {
+        "id": "score",
+        "q": "¿Qué es la Puntuación de lectura?",
+        "a": "La Puntuación de lectura no es un test de compatibilidad. No mide si pensáis igual, sino con cuánta precisión adivinas lo que responderá la otra persona. Es decir, muestra cuánto os conocéis."
+      },
+      {
+        "id": "couples",
+        "q": "¿Es solo para parejas?",
+        "a": "No. Puedes jugar a Game of Us con tu pareja, con tu colega o con tu cónyuge. Al crear la sala eliges el tipo de vínculo y las preguntas se adaptan a él."
+      },
+      {
+        "id": "modes",
+        "q": "¿Qué modos de juego hay?",
+        "list": [
+          {
+            "name": "Sí / No",
+            "text": "Elige en secreto tu respuesta y adivina qué ha elegido tu pareja."
+          },
+          {
+            "name": "Escenario",
+            "text": "Anticipa la respuesta que dará tu pareja."
+          },
+          {
+            "name": "Ranking",
+            "text": "Ordena las tarjetas por importancia y descubre qué le importa a cada uno."
+          },
+          {
+            "name": "Mixto",
+            "text": "Todos los modos se mezclan, con una sorpresa en cada ronda (pronto en la app móvil)."
+          },
+          {
+            "name": "Campo Minado de Red Flags",
+            "text": "Un modo en solitario en el que descubres tus líneas rojas."
+          }
+        ]
+      },
+      {
+        "id": "redflag",
+        "q": "¿Qué es el Campo Minado de Red Flags?",
+        "a": "Un modo para una persona: cada set tiene 9 situaciones y en cada carta eliges una de tres banderas (Green, Yellow o Red Flag) para decidir qué situaciones son una línea roja para ti. Al final ves tu nivel de tolerancia a las red flags. En la próxima app móvil habrá un set nuevo cada día."
+      },
+      {
+        "id": "guides",
+        "q": "¿Qué son las guías de juego?",
+        "a": "Las guías son paquetes de juegos pensados para un momento concreto, como San Valentín o Nochevieja. Cada guía tiene varios juegos y podéis empezar por el que queráis, para disfrutar juntos sin tener que pensar a qué jugar. Las guías llegarán pronto a la app móvil."
+      },
+      {
+        "id": "ai",
+        "q": "¿Qué es el comentario de IA?",
+        "a": "Cuando termina la partida, la IA revisa vuestras respuestas y escribe un comentario personal sobre dónde os habéis leído mejor y qué os ha sorprendido más. Esta función llegará pronto a la app móvil: podrás desbloquear el comentario de IA con monedas, tanto en las partidas en sala como en el Campo Minado de Red Flags."
+      },
+      {
+        "id": "price",
+        "q": "¿Es gratis?",
+        "a": "Sí, puedes jugar a Game of Us gratis. En la próxima app móvil recibirás monedas de regalo al registrarte, y podrás ganar más viendo anuncios, compartiendo en tu historia y jugando cada día al set de Red Flags. Si quieres más, habrá un paquete premium de pago único: salas ilimitadas, sets de 10 preguntas, el modo Mixto, las guías y una experiencia sin anuncios. Sin suscripción: pagas una vez y es tuyo para siempre."
+      },
+      {
+        "id": "privacy",
+        "q": "¿Mis respuestas son privadas? ¿Qué ve mi pareja?",
+        "a": "Tus respuestas solo se muestran a la persona con la que juegas cuando los dos habéis terminado. Si se desbloquea el comentario de IA (con los permisos necesarios), las respuestas se envían a un proveedor de servicios de IA para redactar el comentario. No vendemos tus respuestas ni las usamos para publicidad."
+      },
+      {
+        "id": "delete",
+        "q": "¿Cómo elimino mi cuenta y mis datos?",
+        "a": "En la próxima app móvil podrás eliminar de forma permanente tu cuenta y tus datos cuando quieras desde Perfil > Ajustes > Eliminar cuenta (salvo los registros de compra que debemos conservar por ley). También puedes solicitar la eliminación escribiendo a gameofusapp@gmail.com."
+      },
+      {
+        "id": "platforms",
+        "q": "¿Qué idiomas y dispositivos admite?",
+        "a": "Game of Us está disponible en turco, inglés y español. Ahora mismo puedes jugar desde cualquier navegador en gameofus.app; la app para iPhone y Android llegará pronto."
+      }
+    ]
   }
 }

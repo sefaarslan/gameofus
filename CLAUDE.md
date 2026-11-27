@@ -110,6 +110,7 @@ daha iyi konuşmalar başlatmak ve birbirini tahmin etme deneyimini oyunlaştır
   mobilin `gameofus.app` mi `www` mi çağırdığı mobil repoda **doğrulanacak** (apex `www`'ye 307 yönlendirir; farklı alan adına yönlendirmede bazı istemciler `Authorization` başlığını düşürür).
 
 ### Ödeme
+- **SSS (`components/Faq.tsx`, `messages/*.json` → `faq`, ana sayfa sonu `#sss`):** eski mobil tanıtım ("Premium") bölümünün yerine geçti (2026-11-27). Mobil uygulama **henüz mağazalarda değil**: uygulamaya özgü özellikler (AI yorumu, kılavuzlar, coin, paket) "yakında" diye anlatılır; web'de AI/paketten söz edilen tek yer SSS'dir. Gizlilik yanıtı AI sağlayıcısına gönderimi açıkça söyler ("üçüncü kişilerle paylaşmayız" yazma). İletişim: `gameofusapp@gmail.com`. Mağaza yayınında "yakında" ifadeleri güncellenir.
 - **Web'de ödeme / login / premium UI yoktur.** `premium` satılmadığı için **Cesur kategorisi web'de ve mobilde gizlidir**
   (aşağıya bkz.). İleride paketle açılan bir kategori eklenirse web onu kilitli gösterip "mobil uygulamada açılır" mesajı verir.
 - Ödeme **yalnızca mobilde**, App Store / Play Store IAP (RevenueCat) ile; Lemon Squeezy
@@ -522,7 +523,7 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
 
 Ayrıntılı durum için `docs/PRD.md` Bölüm 21 esas alınır. Özet:
 
-- **Web (tamamlandı, canlıda):** landing (4 adımlı "nasıl çalışır", mobil/AI teaser, footer), oda oluşturma
+- **Web (tamamlandı, canlıda):** landing (4 adımlı "nasıl çalışır", sayfa sonunda SSS, footer), oda oluşturma
   (ilişki türü + kategori), 4 oyun modu (Secret Choice, Prediction, Orderline, Karma), birleştirilmiş tur,
   soft realtime, server-side sonuç, sonuç ekranı + geri bildirim, 3 dil, premium kategori
   kilidi (mobile yönlendirme), soru seti v2, ilişki türüne duyarlı metinler, metrik görünümleri.
