@@ -13,7 +13,7 @@ import { isRelationshipType } from "@/lib/relationship";
 import { checkRateLimit, ipHashFor } from "@/lib/rate-limit";
 import { getAuthUser } from "@/lib/auth";
 import { COIN_PRICES, CoinError, applyCoins } from "@/lib/coins";
-import { LONG_SET_MIN_TIER, LONG_SET_QUESTION_COUNT, MIXED_MODE_MIN_TIER, canAccessTier, isTier, type Tier } from "@/lib/tier";
+import { FREE_ROOMS_MIN_TIER, LONG_SET_MIN_TIER, LONG_SET_QUESTION_COUNT, MIXED_MODE_MIN_TIER, canAccessTier, isTier, type Tier } from "@/lib/tier";
 import { MIN_APP_AGE, ageOn, parseBirthDate } from "@/lib/age";
 import { parseGender } from "@/lib/gender";
 
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   const { displayName, gameMode, questionCount, locale, categoryId, relationshipType, platform, birthDate, gender } =
     body as Record<string, unknown>;
 
-  // Mobil (giriş zorunlu): geçerli Supabase JWT'si gerekir; oda coin ile açılır (−250). Web anonimdir ve ücretsiz kalır.
+  // Mobil (giriş zorunlu): geçerli Supabase JWT'si gerekir; `free` tier odayı coin ile açar, `lite`+ ücretsiz. Web anonimdir ve ücretsiz kalır.
   const authUser = await getAuthUser(req);
   if (platform === "mobile" && !authUser) {
     return apiError("UNAUTHORIZED", "Giriş gereklidir.", 401);
@@ -91,13 +91,23 @@ export async function POST(req: NextRequest) {
   // Cinsiyet (opsiyonel; boş/geçersiz = belirtilmedi). Çöp adam karakteri ve AI dili için; yalnızca bu odada saklanır.
   const ownerGender = parseGender(gender);
 
-  // Rate limiting
-  const allowed = await checkRateLimit(ipHashFor(req), "create_room", RATE_LIMIT);
-  if (!allowed) {
+  const supabase = createAdminClient();
+
+  // Giriş yapmış kullanıcının paketi ve doğum tarihi (tek sorgu). Okunamazsa devam edilmez: aksi halde paketli kullanıcıdan coin düşülebilirdi.
+  let profile: { tier: string; birth_date: string | null } | null = null;
+  if (authUser) {
+    const { data, error } = await supabase.from("users").select("tier, birth_date").eq("id", authUser.id).maybeSingle();
+    if (error) return apiError("INTERNAL_ERROR", "Kullanıcı kaydı okunamadı.", 500);
+    profile = data;
+  }
+  const userTier: Tier = isTier(profile?.tier) ? profile.tier : "free";
+  // `lite`+ : oda kurma ücretsiz ve sınırsız
+  const freeRoom = !!authUser && canAccessTier(userTier, FREE_ROOMS_MIN_TIER);
+
+  // Rate limiting (anonim web ve `free` tier)
+  if (!freeRoom && !(await checkRateLimit(ipHashFor(req), "create_room", RATE_LIMIT))) {
     return apiError("RATE_LIMITED", "Kısa sürede çok fazla oda oluşturdunuz.", 429);
   }
-
-  const supabase = createAdminClient();
 
   // Kurucunun doğum tarihi (opsiyonel; gönderildiyse geçerli olmalı). Partner yaşı katılırken kendi hesabından doğrulanır.
   const ownerBirth = birthDate == null ? null : parseBirthDate(birthDate);
@@ -112,8 +122,6 @@ export async function POST(req: NextRequest) {
   // Paket kilidi (yalnızca giriş yapmış mobil kullanıcı; coin düşümünden önce): 10 soruluk set ve Karma Tur modu Lite+ gerektirir.
   // Web'de (anonim) ikisi de kısıtsızdır. Mevcut odalara dokunulmaz: kural yalnızca yeni oda kurarken geçerlidir.
   if (authUser && platform === "mobile" && (count === LONG_SET_QUESTION_COUNT || mode === "mixed")) {
-    const { data: u } = await supabase.from("users").select("tier").eq("id", authUser.id).maybeSingle();
-    const userTier: Tier = isTier(u?.tier) ? u.tier : "free";
     if (count === LONG_SET_QUESTION_COUNT && !canAccessTier(userTier, LONG_SET_MIN_TIER)) {
       return apiError("TIER_REQUIRED", "10 soruluk setler Lite paket gerektirir.", 403);
     }
@@ -141,12 +149,10 @@ export async function POST(req: NextRequest) {
       }
       let userBirth: string | null = null;
       if (authUser && (minTier !== "free" || cat.min_age > 0)) {
-        const { data: u } = await supabase.from("users").select("tier, birth_date").eq("id", authUser.id).maybeSingle();
-        const userTier: Tier = isTier(u?.tier) ? u.tier : "free";
         if (!canAccessTier(userTier, minTier)) {
           return apiError("TIER_REQUIRED", `Bu kategori ${minTier === "premium" ? "Premium" : "Lite"} paket gerektirir.`, 403);
         }
-        userBirth = u?.birth_date ?? null;
+        userBirth = profile?.birth_date ?? null;
       }
 
       // Yaş koşulu (Cesur Sorular 18+): kurucu burada, partner katılırken (kendi hesabındaki doğum tarihiyle) doğrulanır;
@@ -252,10 +258,11 @@ export async function POST(req: NextRequest) {
 
   const expiresAt = getRoomExpiry(false);
 
-  // Coin: oda açılmadan önce düşülür (idempotent: ref = oda kodu); sonraki bir adım başarısız olursa iade edilir
-  if (authUser) {
+  // Coin (yalnızca `free` tier mobil kullanıcı): oda açılmadan önce düşülür (idempotent: ref = oda kodu); sonraki bir adım başarısız olursa iade edilir
+  const chargedUserId = authUser && !freeRoom ? authUser.id : null;
+  if (chargedUserId) {
     try {
-      await applyCoins(authUser.id, -COIN_PRICES.room_create, "room_create", roomCode);
+      await applyCoins(chargedUserId, -COIN_PRICES.room_create, "room_create", roomCode);
     } catch (e) {
       if (e instanceof CoinError && e.code === "INSUFFICIENT_COINS") {
         return apiError("INSUFFICIENT_COINS", "Oda açmak için yeterli coin yok.", 402);
@@ -264,9 +271,9 @@ export async function POST(req: NextRequest) {
     }
   }
   const refundCoins = async () => {
-    if (!authUser) return;
+    if (!chargedUserId) return;
     try {
-      await applyCoins(authUser.id, COIN_PRICES.room_create, "room_create_refund", roomCode);
+      await applyCoins(chargedUserId, COIN_PRICES.room_create, "room_create_refund", roomCode);
     } catch {
       /* iade başarısız olursa kayıt credit_transactions'ta düşüm olarak kalır; elle düzeltilir */
     }

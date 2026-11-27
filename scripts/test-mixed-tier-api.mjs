@@ -65,7 +65,7 @@ try {
   for (const [n, u] of [["lite", lite], ["premium", prem]]) {
     before = await coins(u);
     r = await create(mobile("mixed"), u.jwt);
-    ok(r.status === 201 && (await coins(u)) < before, `${n} + mixed → 201, coin düştü (status ${r.status})`);
+    ok(r.status === 201 && (await coins(u)) === before, `${n} + mixed → 201, coin düşmedi (lite+ ücretsiz) (status ${r.status})`);
   }
   r = await create(mobile("mixed", { questionCount: 10 }), lite.jwt);
   ok(r.status === 201, `lite + mixed + 10 soru → 201 (status ${r.status})`);

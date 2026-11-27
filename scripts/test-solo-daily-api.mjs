@@ -83,29 +83,29 @@ try {
   ok(st1b.status === 201 && st1b.json.sessionId !== st1.json.sessionId, "tamamlamadan tekrar başlatma serbest (yarım kalan oturum)");
 
   r = await finish(st1);
-  ok(r.status === 200 && r.json.reward?.earned === 50 && r.json.reward.balance === startCoins + 50 && r.json.grid === "GRGYGYRYR" && typeof r.json.tolerance === "number", "complete: 200, +50 coin, sonuç şekli aynı (grid, tolerance)");
-  ok((await coins(A)) === startCoins + 50, "bakiye +50");
+  ok(r.status === 200 && r.json.reward?.earned === 25 && r.json.reward.balance === startCoins + 25 && r.json.grid === "GRGYGYRYR" && typeof r.json.tolerance === "number", "complete: 200, +50 coin, sonuç şekli aynı (grid, tolerance)");
+  ok((await coins(A)) === startCoins + 25, "bakiye +25");
   const { data: tx } = await db.from("credit_transactions").select("delta, reason, ref_id").eq("user_id", A.id).eq("reason", "solo_reward");
-  ok(tx?.length === 1 && tx[0].delta === 50 && tx[0].ref_id === `daily:${setDate}`, "defter: solo_reward +50, ref daily:<set_date>");
+  ok(tx?.length === 1 && tx[0].delta === 25 && tx[0].ref_id === `daily:${setDate}`, "defter: solo_reward +25, ref daily:<set_date>");
   r = await finish(st1);
-  ok(r.status === 200 && r.json.reward?.earned === 50 && (await coins(A)) === startCoins + 50, "complete tekrarı: aynı sonuç, ikinci ödül yok");
+  ok(r.status === 200 && r.json.reward?.earned === 25 && (await coins(A)) === startCoins + 25, "complete tekrarı: aynı sonuç, ikinci ödül yok");
 
   r = await startDaily(A, "friend");
   ok(r.status === 409 && r.json?.error?.code === "ALREADY_PLAYED_TODAY" && r.json.error.sessionId === st1.json.sessionId, "aynı kategoriyi tekrar başlat → 409 ALREADY_PLAYED_TODAY + sessionId");
   r = await finish(st1b);
   ok(r.status === 409 && r.json?.error?.code === "ALREADY_PLAYED_TODAY", "yarım kalan ikinci oturumu tamamlama → 409 (benzersiz indeks)");
-  ok((await coins(A)) === startCoins + 50, "409 sonrası bakiye değişmedi");
+  ok((await coins(A)) === startCoins + 25, "409 sonrası bakiye değişmedi");
 
   // ── İkinci kategori: oynanır ama coin yok ───────────────────────────────────
   const st2 = await startDaily(A, "romantic");
   ok(st2.status === 201 && st2.json.pack === romantic.pack, "ikinci kategori başlatıldı");
   r = await finish(st2, "RRRRRRRRR");
-  ok(r.status === 200 && r.json.reward?.earned === 0 && r.json.reward.reason === "already_rewarded" && r.json.reward.balance === startCoins + 50, "ikinci kategori: coin yok (already_rewarded), bakiye aynı");
+  ok(r.status === 200 && r.json.reward?.earned === 0 && r.json.reward.reason === "already_rewarded" && r.json.reward.balance === startCoins + 25, "ikinci kategori: coin yok (already_rewarded), bakiye aynı");
 
   // ── today / history güncellendi ─────────────────────────────────────────────
   r = await today(A);
   const pf = r.json.categories.find((c) => c.category === "friend"), pr = r.json.categories.find((c) => c.category === "romantic");
-  ok(pf.played && pf.sessionId === st1.json.sessionId && pf.grid === "GRGYGYRYR" && pf.counts.red === 3 && pf.coinsEarned === 50 && pr.played && pr.counts.red === 9 && pr.coinsEarned === 0, "today: iki kategori oynandı, sessionId/grid/counts/coinsEarned");
+  ok(pf.played && pf.sessionId === st1.json.sessionId && pf.grid === "GRGYGYRYR" && pf.counts.red === 3 && pf.coinsEarned === 25 && pr.played && pr.counts.red === 9 && pr.coinsEarned === 0, "today: iki kategori oynandı, sessionId/grid/counts/coinsEarned");
   ok(r.json.rewardAvailable === false, "today: ödül alındı (rewardAvailable false)");
   const other = await today(B);
   ok(other.json.categories.every((c) => c.played === false) && other.json.rewardAvailable === true, "başka kullanıcının durumu etkilenmedi");
@@ -119,7 +119,7 @@ try {
   const bst = await startDaily(B, "romantic");
   ok(bst.status === 201 && bst.json.pack === romantic.pack, "B aynı günün aynı setini alır");
   r = await finish(bst, "GGGGGGGGG");
-  ok(r.json.reward?.earned === 50, "B ilk oyununda +50 alır (ödül kullanıcı başına)");
+  ok(r.json.reward?.earned === 25, "B ilk oyununda +25 alır (ödül kullanıcı başına)");
 
   // ── Serbest kip (pack) ödülsüz, web kipi bozulmadı ──────────────────────────
   const before = await coins(A);

@@ -106,7 +106,7 @@ try {
   // ── Oyunlarım + Analizlerim: solo ──────────────────────────────────────────
   const st = await startDaily(A, "friend");
   const done = await finish(st);
-  ok(done.status === 200 && done.json.reward?.earned === 50, "solo: günlük oyun tamamlandı (+50)");
+  ok(done.status === 200 && done.json.reward?.earned === 25, "solo: günlük oyun tamamlandı (+25)");
   const sid = st.json.sessionId;
   const soloIds = async () => ((await call("GET", "/api/users/solo-history", { jwt: A.jwt })).json?.items ?? []).map((x) => x.sessionId);
   ok((await soloIds()).includes(sid), "solo-history: oyun listede");

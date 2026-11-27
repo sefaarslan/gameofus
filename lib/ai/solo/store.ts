@@ -2,7 +2,7 @@
 // generating → ready | failed; takılmış kayıtlar tembel temizlenir; iade yalnızca düşüm gerçekten yapıldıysa.
 
 import { createAdminClient } from "@/lib/supabase/server";
-import { COIN_PRICES, applyCoins } from "@/lib/coins";
+import { applyCoins } from "@/lib/coins";
 import type { Database } from "@/types/database.types";
 
 export type SoloAnalysisRow = Database["public"]["Tables"]["ai_solo_analyses"]["Row"];
@@ -19,14 +19,15 @@ export async function refundSoloIfCharged(userId: string, sessionId: string, att
   const supabase = createAdminClient();
   const { data: charged } = await supabase
     .from("credit_transactions")
-    .select("id")
+    .select("delta")
     .eq("user_id", userId)
     .eq("reason", "solo_ai")
     .eq("ref_id", ref)
     .maybeSingle();
   if (!charged) return false;
   try {
-    await applyCoins(userId, COIN_PRICES.solo_ai, "solo_ai_refund", ref);
+    // Güncel fiyat değil, o gün GERÇEKTEN düşülen tutar iade edilir (fiyat değişse de eksik/fazla iade olmaz)
+    await applyCoins(userId, -charged.delta, "solo_ai_refund", ref);
     return true;
   } catch {
     console.error("[ai-solo] coin iadesi başarısız", { attempt }); // kişisel veri yok; izlenebilir olsun

@@ -1,7 +1,7 @@
 // AI yorum kayıtları ve coin iadesi yardımcıları (sunucu tarafı).
 
 import { createAdminClient } from "@/lib/supabase/server";
-import { COIN_PRICES, applyCoins } from "@/lib/coins";
+import { applyCoins } from "@/lib/coins";
 import type { Database } from "@/types/database.types";
 
 export type CommentaryRow = Database["public"]["Tables"]["ai_commentaries"]["Row"];
@@ -21,14 +21,15 @@ export async function refundIfCharged(userId: string, roomCode: string, attempt:
   const supabase = createAdminClient();
   const { data: charged } = await supabase
     .from("credit_transactions")
-    .select("id")
+    .select("delta")
     .eq("user_id", userId)
     .eq("reason", "ai_commentary")
     .eq("ref_id", ref)
     .maybeSingle();
   if (!charged) return false;
   try {
-    await applyCoins(userId, COIN_PRICES.ai_commentary, "ai_commentary_refund", ref);
+    // Güncel fiyat değil, o gün GERÇEKTEN düşülen tutar iade edilir (fiyat değişse de eksik/fazla iade olmaz)
+    await applyCoins(userId, -charged.delta, "ai_commentary_refund", ref);
     return true;
   } catch {
     console.error("[ai] coin iadesi başarısız", { attempt }); // kişisel veri yok; izlenebilir olsun

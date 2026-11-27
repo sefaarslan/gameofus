@@ -234,7 +234,7 @@ Ayrı model; `questions` ile karıştırılmaz. RLS açık, policy yok (erişim 
 ### `purchases` — mobil IAP (Lemon Squeezy / `payments` kullanılmaz)
 
 `user_id` (null olabilir: hesap silinince bağlantı kopar, kayıt yasal süre için kalır), `product_type` (`premium_package` / `room_credit_pack` eski değerler; hedef coin+tier modelinde
-`tier_lite` / `tier_premium` / `tier_upgrade` / `coin_pack_1200` / `coin_pack_3600`, bkz. PRD 12.2; tier hediye coin'i `credit_transactions`'a `reason: purchase`, `ref: tier_gift` ile hesap başına bir kez yazılır), `provider` (`app_store` / `play_store`), `provider_transaction_id`
+`tier_lite` / `coin_pack_1000` / `coin_pack_2500` (ertelendi: `tier_premium`, `tier_upgrade`; check kısıtı `iap/verify` ile güncellenecek), bkz. PRD 12.2; tier hediye coin'i `credit_transactions`'a `reason: purchase`, `ref: tier_gift` ile hesap başına bir kez yazılır), `provider` (`app_store` / `play_store`), `provider_transaction_id`
 (unique), `amount`, `currency`, `status`, `created_at`. RLS: kullanıcı yalnızca kendi satırını okur.
 
 ### `rate_limits`

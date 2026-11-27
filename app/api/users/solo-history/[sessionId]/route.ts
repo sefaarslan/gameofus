@@ -57,7 +57,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ sess
 
 /**
  * Mobil: solo oyunu "Oyunlarım" listesinden kaldırır (yumuşak silme: `solo_sessions.hidden_at`; oturum, cevaplar, coin kaydı ve
- * AI analizi silinmez). Günlük set kuralı ve +50 coin idempotency'si oturum satırına dayandığı için kaldırmak aynı günün setini
+ * AI analizi silinmez). Günlük set kuralı ve +25 coin idempotency'si oturum satırına dayandığı için kaldırmak aynı günün setini
  * yeniden oynatmaz. Yalnızca sahibi; idempotent. Detay (`GET`) doğrudan kimlikle hâlâ açılır.
  */
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ sessionId: string }> }) {

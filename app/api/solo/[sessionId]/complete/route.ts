@@ -27,7 +27,7 @@ interface Reward {
 }
 
 /**
- * Günlük set ödülü (mobil, kullanıcıya bağlı oturum): set günü başına YALNIZCA BİR kez (+50). İdempotent
+ * Günlük set ödülü (mobil, kullanıcıya bağlı oturum): set günü başına YALNIZCA BİR kez (+25). İdempotent
  * (ref = `daily:<set_date>`), yani iki kategoriyi de oynayan ikinci oyunda coin almaz. Serbest kipte (`set_date` boş) ödül yoktur.
  */
 async function rewardSession(

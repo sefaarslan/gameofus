@@ -18,3 +18,6 @@ export const LONG_SET_MIN_TIER: Tier = "lite";
 
 /** Mobilde "Karma Tur" oyun modu (`gameMode: "mixed"`) `lite` ve üstünü gerektirir. Web'de anonim oda kurmada kısıt yoktur (web arayüzü modu kapalı gösterir). */
 export const MIXED_MODE_MIN_TIER: Tier = "lite";
+
+/** Oda kurma bu tier ve üstü için ücretsiz ve sınırsızdır (coin düşülmez, oda oluşturma hız sınırı uygulanmaz). */
+export const FREE_ROOMS_MIN_TIER: Tier = "lite";

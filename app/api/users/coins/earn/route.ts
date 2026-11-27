@@ -16,8 +16,8 @@ const LIMIT_ERRORS: Record<EarnReason, { code: ApiErrorCode; message: string }> 
 const isEarnReason = (v: unknown): v is EarnReason => typeof v === "string" && v in LIMIT_ERRORS;
 
 /**
- * Coin kazanma: reklam ödülü (+50, günde 3) ve story paylaşımı (+25, günde 1; paylaşım doğrulanmaz, yalnızca günlük sınır korur).
- * Kayıt bonusu (+500) Auth trigger'ıyla, solo ödülü (+50) solo `complete` içinde, satın alma `iap/verify` ile verilir; bu endpoint onları vermez.
+ * Coin kazanma: reklam ödülü (+20, günde 3) ve story paylaşımı (+25, günde 1; paylaşım doğrulanmaz, yalnızca günlük sınır korur).
+ * Kayıt bonusu (+500) Auth trigger'ıyla, solo ödülü (+25) solo `complete` içinde, satın alma `iap/verify` ile verilir; bu endpoint onları vermez.
  * Not: AdMob sunucu doğrulaması (SSV) gelene kadar günlük sınır tek korumadır.
  */
 export async function POST(req: NextRequest) {

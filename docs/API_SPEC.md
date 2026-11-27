@@ -43,7 +43,7 @@ POST /api/feedback
 POST /api/solo/red-flag/start
 POST /api/solo/[sessionId]/complete
 GET  /api/solo/[sessionId]/ai-analysis   (mobil, Bearer JWT; AI analiz durumu, ücretsiz)
-POST /api/solo/[sessionId]/ai-analysis   (mobil, Bearer JWT; 150 coin, satın al + üret)
+POST /api/solo/[sessionId]/ai-analysis   (mobil, Bearer JWT; 250 coin, satın al + üret)
 GET  /api/solo/red-flag/card?g=&l=&p=&q=&fmt=
 GET  /api/users/me                (mobil, Bearer JWT)
 GET  /api/users/overview          (mobil, Bearer JWT; me + history + soloHistory + aiReports + soloToday tek istekte, ETag)
@@ -111,7 +111,7 @@ Doğrulama:
   `friend|dating|partner` olmalı, yoksa `INVALID_PAYLOAD`. Gönderilmezse oda `null` türle kurulur.
 - `categoryId` opsiyonel. Hem `categoryId` hem `relationshipType` varsa kategori o türe uygun olmalı
   (`categories.relationship_types`), yoksa `INVALID_PAYLOAD`.
-- IP hash'e göre saatte 10 / günde 50 oda sınırı (`RATE_LIMITED`).
+- IP hash'e göre saatte 10 / günde 50 oda sınırı (`RATE_LIMITED`): anonim web ve `free` tier için; `lite`+ kullanıcıya uygulanmaz.
 - **Karma Tur kilidi (mobil):** `gameMode: "mixed"` yalnızca `platform: "mobile"` + giriş yapmış `lite`/`premium` kullanıcıya açıktır; `free` tier → `403 TIER_REQUIRED`
   ("Karma Tur modu Lite paket gerektirir."), 10 soruluk set kuralıyla aynı yerde, **coin düşümünden önce**. Diğer modlar (`secret_choice | prediction | orderline`)
   ücretsizdir. Web'in anonim akışı (`platform` yok) değişmez: sunucu orada `mixed`'i yine kabul eder; web arayüzü modu "Mobilde" diye soluk/pasif gösterir.
@@ -335,7 +335,7 @@ Yanıta `category`, `setDate` (`YYYY-MM-DD`), `setNumber` (paylaşım kartındak
       "completedAt": "…", "grid": "GRGYGYRYR", "counts": { "green": 3, "yellow": 3, "red": 3 }, "tolerance": 50, "coinsEarned": 50 } ] }
 ```
 
-`rewardAvailable`: o set gününün +50 ödülü henüz alınmadı (herhangi bir kategoriyi tamamlamak verir). Sayaç `nextSetAt`'e geri sayar.
+`rewardAvailable`: o set gününün +25 ödülü henüz alınmadı (herhangi bir kategoriyi tamamlamak verir). Sayaç `nextSetAt`'e geri sayar.
 
 ### `POST /api/solo/[sessionId]/complete`
 
@@ -357,7 +357,7 @@ Yanıta `category`, `setDate` (`YYYY-MM-DD`), `setNumber` (paylaşım kartındak
 döndürmez: istemci ve paylaşım görseli, Red sayısına göre sabit metni (`solo.verdicts.<red>`) kendi dilinde seçer.
 
 **Mobil (kullanıcıya bağlı oturum) yanıtına `reward` eklenir:** `{ "earned": 20, "balance": 520 }` veya ödül yoksa
-`{ "earned": 0, "reason": "already_rewarded" }`. Kural: **+50 coin, set günü başına kullanıcı başına yalnızca bir kez** — yalnızca
+`{ "earned": 0, "reason": "already_rewarded" }`. Kural: **+25 coin, set günü başına kullanıcı başına yalnızca bir kez** — yalnızca
 **günlük set kipinde** (iki kategoriyi de oynayan ikinci oyunda coin yok; ref `daily:<set_date>`); idempotent (aynı oturum tekrar `complete`
 edilirse ek coin yok). Serbest `pack` kipinde (günlük olmayan mobil oturum) ve web'de `reward` alanı yoktur. Günlük oyunda aynı günün aynı seti
 başka bir oturumda zaten tamamlanmışsa `409 ALREADY_PLAYED_TODAY`.
@@ -427,8 +427,8 @@ Testler: `node --no-warnings scripts/test-overview.mjs` (birim) ve `OVERVIEW_ALL
 
 Kimlik: `Authorization: Bearer <Supabase JWT>` (Google/Apple girişi). Web anonimdir ve bunları **hiç çağırmaz**.
 Geçersiz/eksik JWT → `401 UNAUTHORIZED`. Coin yazımı yalnızca sunucuda, atomik ve idempotent (`apply_coins`, SQL).
-Ekonomi: kayıt +500 (Auth trigger'ı, otomatik) · reklam +50 (günde en fazla 3) · story paylaşımı +25 (günde 1) · oda −250 · AI yorum −150 · solo AI −150 ·
-solo günlük set +50 (solo `complete` içinde, bkz. §10b). **Miktarı istemci göndermez**, yalnızca `reason`.
+Ekonomi: kayıt +500 (Auth trigger'ı, otomatik) · reklam +20 (kayan 24 saatte en fazla 3) · story paylaşımı +25 (günde 1) · oda −100 (yalnızca `free`; `lite`+ ücretsiz ve sınırsız) · AI yorum −250 · solo AI −250 ·
+solo günlük set +25 (solo `complete` içinde, bkz. §10b). **Miktarı istemci göndermez**, yalnızca `reason`.
 
 - `GET /api/users/me` → `{ id, coins, tier, daily, birthDate, aiConsent }` (`aiConsent`: `{ version, at }` ya da rıza yoksa `null`; `daily`: `{ ad_reward, story_share }`, her biri `{ limit, remaining, nextAt }` — kayan 24 saatlik kazanım hakları, `nextAt` yalnızca `remaining = 0` iken en erken yeni hakkın açılacağı an, aksi `null`)
 - `GET /api/users/history` → **düz dizi** (sarmalayıcı yok), en yeni önce (`created_at` azalan), en çok 100:
@@ -454,14 +454,14 @@ solo günlük set +50 (solo `complete` içinde, bkz. §10b). **Miktarı istemci 
   yetersiz bakiye `402 INSUFFICIENT_COINS`; aynı `refId` ikinci kez düşmez (`applied: false`). Oda coin'i `rooms/create`
   içinde düşülür.
 - `POST /api/users/coins/earn` `{ "reason": "ad_reward" | "story_share", "refId": "…" }` → `{ balance, applied, earned, daily }` (`daily`: `{ limit, remaining, nextAt }`, o neden için işlemden sonraki hak durumu).
-  `ad_reward` +50, son 24 saatte en fazla 3 (`429 AD_LIMIT_REACHED`); `story_share` +25, son 24 saatte en fazla 1
+  `ad_reward` +20, son 24 saatte en fazla 3 (`429 AD_LIMIT_REACHED`); `story_share` +25, son 24 saatte en fazla 1
   (`429 STORY_LIMIT_REACHED`; paylaşım doğrulanmaz, yalnızca günlük sınır korur). Limitler ücretli kullanıcı için de geçerlidir. Bkz. PRD 12.2.
 - `POST /api/rooms/[roomCode]/join` (mobil): `platform: "mobile"` + Bearer JWT zorunlu (`401`); misafir katılımcı `user_id`'ye bağlanır
   (geçmiş ve hesap silme için). Katılımcı token'ı gövdede `participantToken` ile gönderilir (Authorization'da JWT varsa).
 - `POST /api/rooms/create` (mobil): `platform: "mobile"` + Bearer JWT zorunlu (`401`); `questionCount: 10` yalnızca `lite`+ tier'a açıktır
-  (aksi `403 TIER_REQUIRED`, coin düşümünden önce; web'de 5/10 ücretsiz) ve `gameMode: "mixed"` (Karma Tur) da `lite`+ gerektirir (aynı hata/yer); oda −250 coin düşülür
-  (`402 INSUFFICIENT_COINS`), oda başarısız olursa iade edilir, `rooms.user_id` bağlanır. `platform` göndermeyen anonim
-  web istekleri ücretsizdir ve değişmez.
+  (aksi `403 TIER_REQUIRED`, coin düşümünden önce; web'de 5/10 ücretsiz) ve `gameMode: "mixed"` (Karma Tur) da `lite`+ gerektirir (aynı hata/yer).
+  **Oda ücreti:** yalnızca `free` tier'dan −100 coin düşülür (`402 INSUFFICIENT_COINS`; oda başarısız olursa iade edilir). **`lite` ve üstünde oda ücretsiz ve sınırsızdır:** coin düşülmez, deftere hareket yazılmaz, oda oluşturma hız sınırı (`429 RATE_LIMITED`) uygulanmaz. Her durumda `rooms.user_id` bağlanır. `platform` göndermeyen anonim
+  web istekleri ücretsizdir ve değişmez (hız sınırı geçerli).
 
 ## 10c. AI yorum (ikili sonuç) — YALNIZCA MOBİL
 
@@ -481,7 +481,7 @@ JWT → `401 UNAUTHORIZED`; geçerli JWT ama bu odanın katılımcısı değil, 
   Sunucu sürümü yalnızca saklar (`users.ai_consent_at/version`); metin mobilde. Rıza yoksa POST `403 AI_CONSENT_REQUIRED`.
 - `GET /api/rooms/[roomCode]/ai-commentary` → 200 `{ status: "none"|"generating"|"ready"|"failed", purchasedByMe, content?, createdAt?, playersConsented? }`.
   `playersConsented` yalnızca `none` iken gelir: odadaki **her** oyuncunun AI rızası var mı (hesaplıda `users.ai_consent_at`, web misafirinde `participants.ai_consent_at`).
-  `false` ise POST `403 AI_PARTNER_CONSENT_REQUIRED` döner; mobil "150 coinle aç" yerine "diğer oyuncu izin vermedi" gösterebilir.
+  `false` ise POST `403 AI_PARTNER_CONSENT_REQUIRED` döner; mobil "250 coinle aç" yerine "diğer oyuncu izin vermedi" gösterebilir.
   Odanın her katılımcısına ücretsiz (satın alan da, partner de). `none` hata değildir. `content` yalnızca `ready`. Süresi dolmuş oda da
   saklama süresi içinde JWT ile okunabilir (POST için de aynısı geçerli).
 - `POST /api/rooms/[roomCode]/ai-commentary` (gövde yok), sıra:
@@ -492,7 +492,7 @@ JWT → `401 UNAUTHORIZED`; geçerli JWT ama bu odanın katılımcısı değil, 
      **veri gönderilmeden ve coin düşmeden**. (Zaten üretilmiş yorumun okunması bu kuraldan etkilenmez.)
   4. Sağlayıcı kapasitesi yoksa `503 AI_UNAVAILABLE` (**coin düşmeden**, `refunded:false`).
   5. Yarış-güvenli `generating` satırı açılır (odada aynı anda tek aktif kayıt), sonra coin düşer: `reason:"ai_commentary"`, `refId:"<oda kodu>:<attempt>"`,
-     150 coin (`COIN_PRICES.ai_commentary`); yetersizse satır silinir, `402 INSUFFICIENT_COINS`.
+     250 coin (`COIN_PRICES.ai_commentary`); yetersizse satır silinir, `402 INSUFFICIENT_COINS`.
   6. Ana modelle üretilir (~20 sn zaman aşımı; geçersiz çıktıda bir kez düzeltme turu); olmazsa yedek model. Başarılı: `200 { status:"ready", content, balance, applied:true, purchasedByMe:true }`.
   7. Başarısız: satır `failed`, coin iadesi (`reason:"ai_commentary_refund"`, aynı `refId`; iade yalnızca düşüm gerçekten yapıldıysa), `503 AI_UNAVAILABLE` + `refunded:true`.
      Yeniden denemede `attempt` artar (yeni coin referansı).
@@ -532,7 +532,7 @@ Oturum yok, başkasının oturumu ya da anonim web oturumu (`user_id` boş) → 
 - `POST /api/solo/{sessionId}/ai-analysis` (gövde yok), sıra: kimlik → hız sınırı (kullanıcı başına dakikada 5, günde 20; `429 RATE_LIMITED`) → oturum sahipliği
   → rıza (`403 AI_CONSENT_REQUIRED`; aynı `ai-v1`) → oturum tamamlanmamışsa `409 RESULT_NOT_READY` → zaten `ready` ise `200 { status:"ready", gameType, content,
   applied:false }` (coin düşmez), `generating` ise `202 { status:"generating", gameType }` → kapasite yoksa `503 AI_UNAVAILABLE` (coin düşmeden, `refunded:false`)
-  → yarış-güvenli tek aktif kayıt → coin düş (`reason:"solo_ai"`, 150 coin; `refId = "<sessionId>:<attempt>"`: yeniden denemede `attempt` artar, bedava deneme olmaz;
+  → yarış-güvenli tek aktif kayıt → coin düş (`reason:"solo_ai"`, 250 coin; `refId = "<sessionId>:<attempt>"`: yeniden denemede `attempt` artar, bedava deneme olmaz;
   yetersizse `402 INSUFFICIENT_COINS`, kayıt silinir) → ana model, olmazsa yedek model → başarı: `200 { status:"ready", gameType, content, balance, applied:true, purchasedByMe:true }`;
   başarısızlık: satır `failed`, coin iadesi (`reason:"solo_ai_refund"`, aynı `refId`; yalnızca düşüm yapıldıysa) ve `503 AI_UNAVAILABLE` + `refunded:true` + `gameType`.
 - `GET /api/users/solo-history` (+ detay): her öğede `gameType` ve `aiStatus`. `GET /api/users/ai-reports`: `type:"solo"` satırları (bkz. §10c).

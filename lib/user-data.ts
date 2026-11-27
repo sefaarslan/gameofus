@@ -262,7 +262,7 @@ export async function loadSoloToday(userId: string, timezone: string, now = new 
     setDate,
     setNumber: setNumber(setDate),
     nextSetAt: nextSetAt(now, timezone),
-    /** Bugün henüz ödül alınmadı (herhangi bir kategoriyi tamamlamak +50 verir) */
+    /** Bugün henüz ödül alınmadı (herhangi bir kategoriyi tamamlamak +25 verir) */
     rewardAvailable: !reward.data,
     categories,
   };
