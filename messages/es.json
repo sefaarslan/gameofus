@@ -483,13 +483,8 @@
       },
       {
         "id": "how",
-        "q": "¿Cómo se juega?",
-        "a": "Crea una sala, elige una categoría y un modo de juego y envía el enlace de invitación a la otra persona. Respondéis a la vez, sin esperar turnos. Al final veis juntos vuestras predicciones y vuestra Puntuación de lectura."
-      },
-      {
-        "id": "download",
-        "q": "¿Tenemos que descargar la app los dos?",
-        "a": "No. La persona invitada puede tocar el enlace y unirse desde el navegador, gratis y sin descargar nada."
+        "q": "¿Cómo se juega? ¿Hay que descargar la app?",
+        "a": "Crea una sala, elige una categoría y un modo de juego y envía el enlace de invitación. La persona invitada se une gratis desde el navegador, sin descargar nada. No hay que esperar turnos; cuando los dos terminéis, veréis juntos vuestras predicciones y vuestra Puntuación de lectura."
       },
       {
         "id": "score",
@@ -539,18 +534,13 @@
       },
       {
         "id": "ai",
-        "q": "¿Qué es el comentario de IA?",
-        "a": "Cuando termina la partida, la IA revisa vuestras respuestas y escribe un comentario personal sobre dónde os habéis leído mejor y qué os ha sorprendido más. Esta función llegará pronto a la app móvil: podrás desbloquear el comentario de IA con monedas, tanto en las partidas en sala como en el Campo Minado de Red Flags."
+        "q": "¿Qué es el comentario de IA? ¿Mis respuestas son privadas?",
+        "a": "Pronto en la app móvil, el comentario de IA (se desbloquea con monedas) os contará dónde os habéis leído mejor y qué os ha sorprendido más. Tus respuestas solo se muestran a la persona con la que juegas cuando los dos habéis terminado. Si se desbloquea el comentario (con los permisos necesarios), las respuestas se envían a un proveedor de servicios de IA; no las vendemos ni las usamos para publicidad."
       },
       {
         "id": "price",
         "q": "¿Es gratis?",
         "a": "Sí, puedes jugar a Game of Us gratis. En la próxima app móvil recibirás monedas de regalo al registrarte, y podrás ganar más viendo anuncios, compartiendo en tu historia y jugando cada día al set de Red Flags. Si quieres más, habrá un paquete premium de pago único: salas ilimitadas, sets de 10 preguntas, el modo Mixto, las guías y una experiencia sin anuncios. Sin suscripción: pagas una vez y es tuyo para siempre."
-      },
-      {
-        "id": "privacy",
-        "q": "¿Mis respuestas son privadas? ¿Qué ve mi pareja?",
-        "a": "Tus respuestas solo se muestran a la persona con la que juegas cuando los dos habéis terminado. Si se desbloquea el comentario de IA (con los permisos necesarios), las respuestas se envían a un proveedor de servicios de IA para redactar el comentario. No vendemos tus respuestas ni las usamos para publicidad."
       },
       {
         "id": "delete",

@@ -483,13 +483,8 @@
       },
       {
         "id": "how",
-        "q": "Nasıl oynanır?",
-        "a": "Bir oda aç, kategori ve oyun modunu seç, davet linkini karşı tarafa gönder. İkiniz aynı anda cevaplarsınız; sıra beklemek yok. Sonunda tahminlerinizi ve Okuma Skorunuzu birlikte görürsünüz."
-      },
-      {
-        "id": "download",
-        "q": "İkimizin de uygulamayı indirmesi gerekiyor mu?",
-        "a": "Hayır. Davet edilen kişi linke tıklayıp tarayıcıdan, hiçbir şey indirmeden ve ücretsiz katılabilir."
+        "q": "Nasıl oynanır, uygulama indirmek gerekiyor mu?",
+        "a": "Bir oda aç, kategori ve oyun modunu seç, davet linkini gönder. Davet edilen kişi hiçbir şey indirmeden, tarayıcıdan ücretsiz katılır. Sıra beklemek yok; ikiniz de bitirince tahminlerinizi ve Okuma Skorunuzu birlikte görürsünüz."
       },
       {
         "id": "score",
@@ -539,18 +534,13 @@
       },
       {
         "id": "ai",
-        "q": "AI yorumu nedir?",
-        "a": "Oyun bittikten sonra yapay zekâ cevaplarınıza bakıp birbirinizi en iyi okuduğunuz ve en çok şaşırdığınız konuları anlatan kişisel bir yorum yazar. Bu özellik yakında mobil uygulamada: hem oda oyunlarında hem de Red Flag Mayın Tarlası'nda AI yorumunu coin'le açabileceksin."
+        "q": "AI yorumu nedir, cevaplarım gizli mi?",
+        "a": "Yakında mobil uygulamada coin'le açacağın AI yorumu, birbirinizi en iyi okuduğunuz ve en çok şaşırdığınız konuları anlatacak. Cevapların oynadığın kişiye ancak ikiniz de bitirince görünür. Yorum açılırsa (gerekli izinlerle) cevaplar bir yapay zekâ hizmet sağlayıcısına gönderilir; satmayız, reklam için kullanmayız."
       },
       {
         "id": "price",
         "q": "Ücretsiz mi?",
         "a": "Evet, Game of Us'ı ücretsiz oynayabilirsin. Yakında gelecek mobil uygulamada kayıt olunca hediye coin alacaksın; reklam izleyerek, story paylaşarak ve her gün Red Flag setini oynayarak da coin kazanabileceksin. Daha fazlasını isteyenler için tek seferlik bir premium paket olacak: sınırsız oda, 10 soruluk setler, Karma modu, kılavuzlar ve reklamsız deneyim. Abonelik yok; bir kere ödersin, sonsuza kadar senin olur."
-      },
-      {
-        "id": "privacy",
-        "q": "Cevaplarım gizli mi? Partnerim neleri görür?",
-        "a": "Cevapların oynadığın kişiye ancak ikiniz de tamamladıktan sonra gösterilir. Yapay zekâ yorumu açılırsa (gerekli izinler verilmişse) cevaplar, yorumun yazılması için bir yapay zekâ hizmet sağlayıcısına gönderilir. Cevaplarını satmayız ve reklam için kullanmayız."
       },
       {
         "id": "delete",

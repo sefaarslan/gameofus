@@ -602,7 +602,7 @@ Amaç: Kullanıcının ürünü 10 saniyede anlamasını sağlamak.
 - Nasıl Çalışır bölümü — **4 adım**: Oda oluştur → Linki paylaş → Cevapları birlikte aç → **AI sizi yorumlasın** (4. adım "Mobil uygulamada" rozetiyle)
 - Oyun modları bölümü
 - Sonuç önizlemesi
-- ~~Mobil uygulama teaser'ı~~ **Sıkça sorulan sorular** (13 soru, TR/EN/ES, sayfanın sonu `#sss`; üst menüde bağlantısı yoktur; sade çizgili liste, aynı anda tek soru açık; 2026-11-27). Mağazada yayın öncesi uygulama özellikleri "yakında" diye anlatılır; iletişim `gameofusapp@gmail.com`
+- ~~Mobil uygulama teaser'ı~~ **Sıkça sorulan sorular** (11 soru, TR/EN/ES, sayfanın sonu `#sss`; üst menüde bağlantısı yoktur; sade çizgili liste, aynı anda tek soru açık; 2026-11-27). Mağazada yayın öncesi uygulama özellikleri "yakında" diye anlatılır; iletişim `gameofusapp@gmail.com`
 - Footer: logo, "Bizi Instagram'da takip et @gameofus.app", telif
 - Hero rozeti kapsayıcıdır (ilişki odaklı değil, arkadaşları da kapsar); hiçbir yerde yalnızca çiftleri varsayan dil kullanılmaz
 

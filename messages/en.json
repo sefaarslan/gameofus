@@ -483,13 +483,8 @@
       },
       {
         "id": "how",
-        "q": "How do you play?",
-        "a": "Create a room, pick a category and a game mode, and send the invite link to the other person. You both answer at the same time, with no waiting for turns. At the end you see your guesses and your Reading Score together."
-      },
-      {
-        "id": "download",
-        "q": "Do we both need to download the app?",
-        "a": "No. The person invited can tap the link and join from a browser, for free, without downloading anything."
+        "q": "How do you play, and do we need the app?",
+        "a": "Create a room, pick a category and a game mode, and send the invite link. The person invited joins from a browser for free, with nothing to download. No waiting for turns; once you have both finished, you see your guesses and your Reading Score together."
       },
       {
         "id": "score",
@@ -539,18 +534,13 @@
       },
       {
         "id": "ai",
-        "q": "What is the AI commentary?",
-        "a": "After the game, AI looks at your answers and writes a personal commentary about where you read each other best and what surprised you most. This feature is coming soon to the mobile app: you will be able to unlock the AI commentary with coins, both in room games and in Red Flag Minefield."
+        "q": "What is the AI commentary, and are my answers private?",
+        "a": "Coming soon to the mobile app, the AI commentary (unlocked with coins) will tell you where you read each other best and what surprised you most. Your answers are shown to the person you play with only after you have both finished. If the commentary is unlocked (with the required permissions), the answers are sent to an AI service provider; we don't sell them or use them for advertising."
       },
       {
         "id": "price",
         "q": "Is it free?",
         "a": "Yes, you can play Game of Us for free. In the upcoming mobile app you will get gift coins when you sign up, and you will be able to earn more by watching ads, sharing to your story and playing the daily Red Flag set. If you want more, there will be a one-time premium pack: unlimited rooms, 10-question sets, Mixed mode, guides and an ad-free experience. No subscription: pay once and it's yours forever."
-      },
-      {
-        "id": "privacy",
-        "q": "Are my answers private? What does my partner see?",
-        "a": "Your answers are shown to the person you play with only after you have both finished. If the AI commentary is unlocked (with the required permissions), the answers are sent to an AI service provider so the commentary can be written. We don't sell your answers or use them for advertising."
       },
       {
         "id": "delete",
