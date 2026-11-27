@@ -13,7 +13,7 @@ const EMAIL_RE = /([\w.+-]+@[\w-]+\.[\w.-]*\w)/;
 function withMailLinks(text: string) {
   return text.split(EMAIL_RE).map((part, i) =>
     i % 2 === 1 ? (
-      <a key={i} href={`mailto:${part}`} className="font-bold text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary break-all">
+      <a key={i} href={`mailto:${part}`} className="font-bold text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary inline-block max-w-full break-all">
         {part}
       </a>
     ) : (
@@ -71,6 +71,12 @@ export function Faq() {
               </div>
             </details>
           ))}
+        </div>
+
+        {/* Destek: açılır soruların dışında, her zaman görünür (mobil uygulama "Nasıl Oynanır & Destek" bu bölümü açar) */}
+        <div className="mt-7 md:mt-9 px-1 text-center">
+          <h3 className="text-[15px] font-bold text-on-background">{t("support.title")}</h3>
+          <p className="mt-1 text-[13.5px] md:text-[14.5px] leading-[1.75] font-medium text-on-surface-variant">{withMailLinks(t("support.text"))}</p>
         </div>
       </div>
     </section>

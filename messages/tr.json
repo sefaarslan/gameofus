@@ -122,7 +122,7 @@
     "error": "Gönderilemedi, tekrar dener misin?",
     "thanks": "Teşekkürler, çok işimize yarıyor 💛"
   },
-  "footer": { "follow": "Bizi Instagram'da takip et" },
+  "footer": { "follow": "Bizi Instagram'da takip et", "privacy": "Gizlilik Politikası", "terms": "Kullanım Koşulları" },
   "meta": { "description": "Birbirinizi ne kadar iyi tanıyorsunuz?" },
   "nav": {
     "howItWorks": "Nasıl Çalışır",
@@ -475,6 +475,10 @@
   "faq": {
     "eyebrow": "Sıkça sorulan sorular",
     "title": "Merak ettiğin her şey",
+    "support": {
+      "title": "Yardıma mı ihtiyacın var?",
+      "text": "Soru, sorun ve geri bildirim için bize yaz: gameofusapp@gmail.com"
+    },
     "items": [
       {
         "id": "what",
@@ -484,7 +488,7 @@
       {
         "id": "how",
         "q": "Nasıl oynanır, uygulama indirmek gerekiyor mu?",
-        "a": "Bir oda aç, kategori ve oyun modunu seç, davet linkini gönder. Davet edilen kişi hiçbir şey indirmeden, tarayıcıdan ücretsiz katılır. Sıra beklemek yok; ikiniz de bitirince tahminlerinizi ve Okuma Skorunuzu birlikte görürsünüz."
+        "a": "Bir oda aç, kategori ve oyun modunu seç, davet linkini ya da kodunu gönder. Uygulama indirmek şart değil: gameofus.app'te hesap açmadan oynayabilirsin; mobil uygulamada Google veya Apple ile giriş yaparsın. Uygulamadan kurulan odaya karşı taraf tarayıcıdan da katılabilir, web'de kurulan oda ise web'de oynanır. İkiniz de bitirince tahminlerinizi ve Okuma Skorunuzu birlikte görürsünüz."
       },
       {
         "id": "score",
@@ -501,11 +505,11 @@
         "q": "Hangi oyun modları var?",
         "list": [
           {
-            "name": "Evet / Hayır",
+            "name": "Secret Choice (Evet / Hayır)",
             "text": "Gizlice kendi cevabını seç, partnerinin ne seçtiğini tahmin et."
           },
           {
-            "name": "Senaryo",
+            "name": "Tahmin (Senaryo)",
             "text": "Partnerinin vereceği cevabı önceden kestir."
           },
           {
@@ -513,44 +517,58 @@
             "text": "Kartları önem sırasına diz, kimin neyi önemsediğini gör."
           },
           {
-            "name": "Karma",
-            "text": "Bütün modlar her turda sürpriz şekilde karışır (yakında mobil uygulamada)."
+            "name": "Karma Tur",
+            "text": "Modlar her turda sürpriz şekilde karışır. Mobil uygulamada “Bir fincan kahve” paketiyle açılır."
           },
           {
             "name": "Red Flag Mayın Tarlası",
-            "text": "Tek başına oynanan, kırmızı çizgilerini keşfettiğin mod."
+            "text": "Tek başına oynanan, kırmızı çizgilerini keşfettiğin oyun."
           }
         ]
       },
       {
         "id": "redflag",
         "q": "Red Flag Mayın Tarlası nedir?",
-        "a": "Tek kişilik bir mod: her sette 9 durum var ve her kartta üç bayraktan birini (Green, Yellow ya da Red Flag) seçerek hangi durumların senin için kırmızı çizgi olduğunu belirlersin. Sonunda red flag tolerans oranını görürsün. Yakında gelecek mobil uygulamada her gün yeni bir set olacak."
+        "a": "Tek kişilik bir oyun: her sette 9 durum var ve her kartta Green, Yellow ya da Red Flag seçerek hangi durumların senin için kırmızı çizgi olduğunu belirlersin. Sonunda seçimlerine göre bir sonuç karnesi görürsün. Mobil uygulamada Arkadaşlık ve Sevgili kategorilerinde her gün yeni bir set var; her kategoriyi günde bir kez oynayabilirsin."
       },
       {
         "id": "guides",
         "q": "Oyun kılavuzları nedir?",
-        "a": "Kılavuzlar, belirli bir an için hazırlanmış oyun paketleridir; örneğin Sevgililer Günü ya da yılbaşı gecesi için. Her kılavuzda birkaç oyun var ve istediğinden başlayabilirsin, böylece ne oynayacağını düşünmeden birlikte keyifli bir zaman geçirebilirsiniz. Kılavuzlar yakında mobil uygulamada."
+        "a": "Kılavuzlar, belirli bir an için önerilen oyunlardır; örneğin Sevgililer Günü, yılbaşı gecesi ya da doğum günü. İstediğin oyundan başlayabilirsin, oda ayarları hazır gelir. Çiftler için Sevgi Haritası'nda ise her oyunun ardından konuşacağınız sorular var. Mobil uygulamada Profil > Kılavuzlar bölümündedir ve “Bir fincan kahve” paketiyle açılır."
       },
       {
         "id": "ai",
-        "q": "AI yorumu nedir, cevaplarım gizli mi?",
-        "a": "Yakında mobil uygulamada coin'le açacağın AI yorumu, birbirinizi en iyi okuduğunuz ve en çok şaşırdığınız konuları anlatacak. Cevapların oynadığın kişiye ancak ikiniz de bitirince görünür. Yorum açılırsa (gerekli izinlerle) cevaplar bir yapay zekâ hizmet sağlayıcısına gönderilir; satmayız, reklam için kullanmayız."
+        "q": "AI analizi nedir, cevaplarım gizli mi?",
+        "a": "AI analizi, mobil uygulamada 250 coin'le açılan, birbirinizi en iyi okuduğunuz ve en çok şaşırdığınız konuları anlatan bir yorumdur; Red Flag sonucun için de alabilirsin. Uygulamadan kurulan oyunlarda iki oyuncunun da onayıyla hazırlanır. Cevapların oynadığın kişiye ancak ikiniz de bitirince görünür. Analiz açılırsa ilgili oyun verileri bir yapay zekâ hizmet sağlayıcısına gönderilir; verilerini satmayız. Ayrıntılar Gizlilik Politikası'nda."
       },
       {
         "id": "price",
-        "q": "Ücretsiz mi?",
-        "a": "Evet, Game of Us'ı ücretsiz oynayabilirsin. Yakında gelecek mobil uygulamada kayıt olunca hediye coin alacaksın; reklam izleyerek, story paylaşarak ve her gün Red Flag setini oynayarak da coin kazanabileceksin. Daha fazlasını isteyenler için tek seferlik bir premium paket olacak: sınırsız oda, 10 soruluk setler, Karma modu, kılavuzlar ve reklamsız deneyim. Abonelik yok; bir kere ödersin, sonsuza kadar senin olur."
+        "q": "Ücretsiz mi, coin ne işe yarar?",
+        "a": "Evet, ücretsiz oynayabilirsin. Web'de hesap gerekmez; tarayıcı başına bir oda kurabilirsin. Mobil uygulamada coin kullanılır:",
+        "list": [
+          {
+            "name": "Coin kazanma",
+            "text": "Kayıtta 500 coin; reklam izleyerek 20 (24 saatte en fazla 3 kez); Red Flag sonucunu story'de paylaşarak 25 (günde 1); Bugünün Setini tamamlayarak 25 (günde 1)."
+          },
+          {
+            "name": "Coin harcama",
+            "text": "Oda kurmak 100, AI analizi 250 coin. Davet edildiğin odaya katılmak ücretsiz."
+          },
+          {
+            "name": "Bir fincan kahve paketi",
+            "text": "Tek seferlik satın alma, abonelik değil: 1.000 hediye coin, coin harcamadan sınırsız oda, 10 soruluk setler, Karma Tur, kılavuzlar ve Sevgi Haritası; zorunlu reklamlar kalkar. AI analizi yine coin ile açılır."
+          }
+        ]
       },
       {
         "id": "delete",
         "q": "Hesabımı ve verilerimi nasıl silerim?",
-        "a": "Yakında gelecek mobil uygulamada Profil > Ayarlar > Hesabı sil adımlarıyla hesabını ve verilerini istediğin zaman kalıcı olarak silebilirsin (yasal olarak saklanması gereken satın alma kayıtları hariç). Ya da gameofusapp@gmail.com adresine yazarak silme talebinde bulunabilirsin."
+        "a": "Mobil uygulamada Profil > Ayarlar > Hesabımı Sil adımlarıyla hesabını ve verilerini kalıcı olarak silebilirsin (yasal olarak saklanması gereken satın alma kayıtları hariç). Uygulamaya erişemiyorsan gameofusapp@gmail.com adresine yaz. Web'de hesap yoktur; oyun verileri belirli bir süre sonra kendiliğinden silinir."
       },
       {
         "id": "platforms",
         "q": "Hangi dilleri ve cihazları destekliyor?",
-        "a": "Game of Us Türkçe, İngilizce ve İspanyolca destekliyor. Şu anda gameofus.app üzerinden herhangi bir tarayıcıdan oynayabilirsin; iPhone ve Android uygulaması yakında."
+        "a": "Game of Us Türkçe, İngilizce ve İspanyolca destekliyor. gameofus.app üzerinden herhangi bir tarayıcıdan ya da iPhone ve Android uygulamasından oynayabilirsin."
       }
     ]
   }

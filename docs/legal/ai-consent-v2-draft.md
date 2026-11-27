@@ -28,7 +28,7 @@ yeni veri türleri nedeniyle store öncesinde `ai_consent_version >= v2` şartı
 
 **Yapay zekâ yorumu için onayın**
 
-Yorumu hazırlamak için oyununuzdaki bazı bilgiler, yapay zekâ hizmeti sağlayıcımıza (Groq; yedek olarak OpenRouter) gönderilir.
+Yorumu hazırlamak için oyununuzdaki bazı bilgiler, yapay zekâ hizmeti sağlayıcımıza (Groq) gönderilir.
 
 **Gönderilenler**
 - Soruların ve seçeneklerin metni; senin ve oyun arkadaşının cevapları, tahminleri ve sıralamaları
@@ -50,7 +50,7 @@ Yorum eğlence amaçlıdır ve hata yapabilir; tavsiye, değerlendirme ya da te�
 
 **Your consent for AI commentary**
 
-To write the commentary, some information from your game is sent to our AI service provider (Groq; OpenRouter as a backup).
+To write the commentary, some information from your game is sent to our AI service provider (Groq).
 
 **What is sent**
 - The text of the questions and options; your answers, guesses and rankings, and your partner's
@@ -72,7 +72,7 @@ You can withdraw it at any time. The generated commentary is kept until the room
 
 **Tu consentimiento para el comentario de IA**
 
-Para redactar el comentario, parte de la información de tu partida se envía a nuestro proveedor de IA (Groq; OpenRouter como respaldo).
+Para redactar el comentario, parte de la información de tu partida se envía a nuestro proveedor de IA (Groq).
 
 **Qué se envía**
 - El texto de las preguntas y opciones; tus respuestas, predicciones y ordenaciones, y las de la otra persona

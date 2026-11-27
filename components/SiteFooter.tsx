@@ -33,7 +33,17 @@ export function SiteFooter() {
           </a>
         </div>
 
-        <p className="text-xs text-on-surface-variant/70">© {new Date().getFullYear()} Game of Us</p>
+        <div className="flex flex-col items-center md:items-end gap-2">
+          <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+            <Link href="/privacy" className="text-xs text-on-surface-variant hover:text-primary transition-colors">
+              {t("privacy")}
+            </Link>
+            <Link href="/terms" className="text-xs text-on-surface-variant hover:text-primary transition-colors">
+              {t("terms")}
+            </Link>
+          </nav>
+          <p className="text-xs text-on-surface-variant/70">© {new Date().getFullYear()} Game of Us</p>
+        </div>
       </div>
     </footer>
   );

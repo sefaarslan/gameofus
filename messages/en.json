@@ -122,7 +122,7 @@
     "error": "Couldn't send it, want to try again?",
     "thanks": "Thank you, this really helps us 💛"
   },
-  "footer": { "follow": "Follow us on Instagram" },
+  "footer": { "follow": "Follow us on Instagram", "privacy": "Privacy Policy", "terms": "Terms of Use" },
   "meta": { "description": "How well do you really know each other?" },
   "nav": {
     "howItWorks": "How It Works",
@@ -475,6 +475,10 @@
   "faq": {
     "eyebrow": "Frequently asked questions",
     "title": "Everything you want to know",
+    "support": {
+      "title": "Need help?",
+      "text": "For questions, problems and feedback, write to us: gameofusapp@gmail.com"
+    },
     "items": [
       {
         "id": "what",
@@ -484,7 +488,7 @@
       {
         "id": "how",
         "q": "How do you play, and do we need the app?",
-        "a": "Create a room, pick a category and a game mode, and send the invite link. The person invited joins from a browser for free, with nothing to download. No waiting for turns; once you have both finished, you see your guesses and your Reading Score together."
+        "a": "Create a room, pick a category and a game mode, and send the invite link or code. You don't need the app: you can play at gameofus.app without an account; in the mobile app you sign in with Google or Apple. A room created in the app can also be joined from a browser, while a room created on the web is played on the web. Once you have both finished, you see your guesses and your Reading Score together."
       },
       {
         "id": "score",
@@ -501,11 +505,11 @@
         "q": "Which game modes are there?",
         "list": [
           {
-            "name": "Yes / No",
+            "name": "Secret Choice (Yes / No)",
             "text": "Secretly pick your own answer, then guess what your partner picked."
           },
           {
-            "name": "Scenario",
+            "name": "Prediction (Scenario)",
             "text": "Predict the answer your partner will give."
           },
           {
@@ -513,44 +517,58 @@
             "text": "Put the cards in order of importance and see who cares about what."
           },
           {
-            "name": "Mixed",
-            "text": "All the modes mixed together, with a surprise in every round (coming soon to the mobile app)."
+            "name": "Mixed Round",
+            "text": "The modes mix with a surprise in every round. In the mobile app it comes with the “A cup of coffee” package."
           },
           {
             "name": "Red Flag Minefield",
-            "text": "A solo mode where you discover your red lines."
+            "text": "A solo game where you discover your red lines."
           }
         ]
       },
       {
         "id": "redflag",
         "q": "What is Red Flag Minefield?",
-        "a": "A solo mode: each set has 9 situations, and on every card you pick one of three flags (Green, Yellow or Red Flag) to decide which situations are a red line for you. At the end you see your red flag tolerance. The upcoming mobile app will bring a new set every day."
+        "a": "A solo game: each set has 9 situations, and on every card you pick Green, Yellow or Red Flag to decide which situations are a red line for you. At the end you get a result card based on your choices. In the mobile app there is a new set every day in both the Friendship and Romantic categories; you can play each category once a day."
       },
       {
         "id": "guides",
         "q": "What are game guides?",
-        "a": "Guides are game packs made for a particular moment, such as Valentine's Day or New Year's Eve. Each guide has a few games and you can start with whichever you like, so you can enjoy your time together without having to decide what to play. Guides are coming soon to the mobile app."
+        "a": "Guides are games suggested for a particular moment, such as Valentine's Day, New Year's Eve or a birthday. Start with whichever you like; the room settings come ready. For couples, Heart Map adds questions to talk about after each game. You'll find them in the mobile app under Profile > Guides, with the “A cup of coffee” package."
       },
       {
         "id": "ai",
-        "q": "What is the AI commentary, and are my answers private?",
-        "a": "Coming soon to the mobile app, the AI commentary (unlocked with coins) will tell you where you read each other best and what surprised you most. Your answers are shown to the person you play with only after you have both finished. If the commentary is unlocked (with the required permissions), the answers are sent to an AI service provider; we don't sell them or use them for advertising."
+        "q": "What is the AI analysis, and are my answers private?",
+        "a": "The AI analysis, unlocked with 250 coins in the mobile app, is a commentary on where you read each other best and what surprised you most; you can also get one for your Red Flag result. For games created in the app it is prepared with both players' consent. Your answers are shown to the person you play with only after you have both finished. If an analysis is unlocked, the related game data is sent to an AI service provider; we don't sell your data. See the Privacy Policy for details."
       },
       {
         "id": "price",
-        "q": "Is it free?",
-        "a": "Yes, you can play Game of Us for free. In the upcoming mobile app you will get gift coins when you sign up, and you will be able to earn more by watching ads, sharing to your story and playing the daily Red Flag set. If you want more, there will be a one-time premium pack: unlimited rooms, 10-question sets, Mixed mode, guides and an ad-free experience. No subscription: pay once and it's yours forever."
+        "q": "Is it free, and what are coins for?",
+        "a": "Yes, you can play for free. The web needs no account; you can create one room per browser. The mobile app uses coins:",
+        "list": [
+          {
+            "name": "Earning coins",
+            "text": "500 coins when you sign up; 20 for watching an ad (up to 3 times in 24 hours); 25 for sharing your Red Flag result to your story (once a day); 25 for finishing Today's Set (once a day)."
+          },
+          {
+            "name": "Spending coins",
+            "text": "100 to create a room, 250 for an AI analysis. Joining a room you're invited to is free."
+          },
+          {
+            "name": "A cup of coffee package",
+            "text": "A one-time purchase, not a subscription: 1,000 gift coins, unlimited rooms without spending coins, 10-question sets, Mixed Round, guides and Heart Map; mandatory ads are removed. AI analyses are still unlocked with coins."
+          }
+        ]
       },
       {
         "id": "delete",
         "q": "How do I delete my account and data?",
-        "a": "In the upcoming mobile app you can permanently delete your account and data at any time via Profile > Settings > Delete account (except purchase records that we are legally required to keep). You can also request deletion by writing to gameofusapp@gmail.com."
+        "a": "In the mobile app you can permanently delete your account and data via Profile > Settings > Delete My Account (except purchase records that we are legally required to keep). If you can't access the app, write to gameofusapp@gmail.com. The web has no accounts; game data is deleted automatically after a set period."
       },
       {
         "id": "platforms",
         "q": "Which languages and devices are supported?",
-        "a": "Game of Us supports Turkish, English and Spanish. Right now you can play from any browser at gameofus.app; the iPhone and Android app is coming soon."
+        "a": "Game of Us supports Turkish, English and Spanish. You can play from any browser at gameofus.app, or in the iPhone and Android app."
       }
     ]
   }
