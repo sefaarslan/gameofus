@@ -49,22 +49,16 @@ for (const l of LANGS) {
 
 const str = (v, max) => typeof v === "string" && v.trim().length > 0 && v.length <= max;
 
-// `homework`: kök alandaki tek kılavuz benzeri nesne ("Sevgi Haritası" kartı; `guides` listesinde görünmez). Adım kuralları aynıdır; ek olarak
-// `description` ve adımlarda `talk` zorunlu, `occasion` boş dize, bağ türü yalnızca dating/partner.
-function checkGuide(l, g, at, homework = false) {
-  if (!g || typeof g !== "object" || Array.isArray(g)) return fail(`${at}: nesne değil`);
+function checkGuide(l, g, i) {
+  const at = `${l}.json guides[${i}]${g?.id ? ` (${g.id})` : ""}`;
+  if (!g || typeof g !== "object") return fail(`${at}: nesne değil`);
   if (!str(g.id, 80) || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(g.id)) fail(`${at}: id kararlı bir slug olmalı (küçük harf, rakam, tire; yıl ekle)`);
   if (!str(g.slug, 80) || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(g.slug)) fail(`${at}: slug geçersiz`);
-  for (const k of homework ? ["title", "subtitle"] : ["occasion", "title", "subtitle"]) if (!str(g[k], 200)) fail(`${at}: ${k} boş/çok uzun`);
-  if (homework) {
-    if (g.occasion !== "") fail(`${at}: occasion boş dize olmalı`);
-    if (!str(g.description, 500)) fail(`${at}: description boş/çok uzun`);
-  }
+  for (const k of ["occasion", "title", "subtitle"]) if (!str(g[k], 200)) fail(`${at}: ${k} boş/çok uzun`);
   if (str(g.title, 200) && g.title.length > 60) warn(`${at}: title uzun (${g.title.length} > 60)`);
   if (str(g.subtitle, 200) && g.subtitle.length > 140) warn(`${at}: subtitle uzun (${g.subtitle.length} > 140)`);
   const rel = g.relationshipTypes;
   if (!Array.isArray(rel) || !rel.length || !rel.every((r) => REL.includes(r)) || new Set(rel).size !== rel.length) fail(`${at}: relationshipTypes friend|dating|partner dizisi olmalı (boş değil, tekrarsız)`);
-  if (homework && Array.isArray(rel) && rel.some((r) => r !== "dating" && r !== "partner")) fail(`${at}: relationshipTypes yalnızca dating ve partner olabilir`);
   if (!TIERS.includes(g.minTier)) fail(`${at}: minTier ${TIERS.join("|")} olmalı`);
   if (!Number.isInteger(g.players) || g.players < 2) fail(`${at}: players ≥ 2 tamsayı olmalı`);
 
@@ -79,11 +73,6 @@ function checkGuide(l, g, at, homework = false) {
   if (!Array.isArray(g.steps) || g.steps.length === 0) return fail(`${at}: steps boş`);
   g.steps.forEach((st, j) => {
     const sa = `${at} adım ${j + 1}`;
-    if (!st || typeof st !== "object") return fail(`${sa}: nesne değil`);
-    if (homework) {
-      if (!Array.isArray(st.talk) || st.talk.length === 0 || !st.talk.every((q) => str(q, 200))) fail(`${sa}: talk boş olmayan bir metin dizisi olmalı`);
-      else for (const q of st.talk) if (FORCED_ORDER[l]?.test(q)) warn(`${sa}: talk "sırayla oyna" dayatması gibi duruyor: "${q}"`);
-    }
     if (st.order !== j + 1) fail(`${sa}: order ${j + 1} olmalı (1'den ardışık)`);
     for (const k of ["title", "description"]) if (!str(st[k], 200)) fail(`${sa}: ${k} boş/çok uzun`);
     if (!Number.isInteger(st.minutes) || st.minutes < 1 || st.minutes > 120) fail(`${sa}: minutes 1-120 tamsayı olmalı`);
@@ -106,9 +95,9 @@ function checkGuide(l, g, at, homework = false) {
   if (typeof g.id === "string" && l === "tr") {
     const img = join(DIR, "img", `${g.id}.jpg`);
     if (!existsSync(img)) warn(`${g.id}: kapak görseli yok (public/guides/img/${g.id}.jpg)`);
-    else if (statSync(img).size > MAX_IMAGE_BYTES) fail(`${g.id}: kapak görseli ${Math.round(statSync(img).size / 1000)} KB; en çok ${MAX_IMAGE_BYTES / 1000} KB olmalı (mobil şartı; ${homework ? "16:9, ~1200x675" : "5:4 oran, ~1000 px genişlik"})`);
+    else if (statSync(img).size > MAX_IMAGE_BYTES) fail(`${g.id}: kapak görseli ${Math.round(statSync(img).size / 1000)} KB; en çok ${MAX_IMAGE_BYTES / 1000} KB olmalı (mobil şartı; 5:4 oran, ~1000 px genişlik)`);
   }
-  for (const k of ["subtitle", "title", "description"]) if (typeof g[k] === "string" && FORCED_ORDER[l]?.test(g[k])) warn(`${at}: ${k} "sırayla oyna" dayatması gibi duruyor: "${g[k]}"`);
+  for (const k of ["subtitle", "title"]) if (typeof g[k] === "string" && FORCED_ORDER[l]?.test(g[k])) warn(`${at}: ${k} "sırayla oyna" dayatması gibi duruyor: "${g[k]}"`);
 }
 
 for (const l of LANGS) {
@@ -118,47 +107,34 @@ for (const l of LANGS) {
   if (!Array.isArray(d.guides)) { fail(`${l}.json: guides dizi olmalı`); continue; }
   const ids = new Set();
   d.guides.forEach((g, i) => {
-    checkGuide(l, g, `${l}.json guides[${i}]${g?.id ? ` (${g.id})` : ""}`);
+    checkGuide(l, g, i);
     if (g?.id) { if (ids.has(g.id)) fail(`${l}.json: yinelenen id "${g.id}"`); ids.add(g.id); }
   });
-  if (d.homework !== undefined) {
-    checkGuide(l, d.homework, `${l}.json homework`, true);
-    // Aynı kimlik hem listede hem homework'te olamaz (tamamlandı işaretleri ve kapak yolu kimliğe bağlı)
-    if (d.homework?.id && ids.has(d.homework.id)) fail(`${l}.json: homework id "${d.homework.id}" guides içinde de var (listede görünmemeli)`);
-  }
 }
 
 // ── Diller arası tutarlılık: aynı id'ler, aynı yapı (yalnızca metinler dile göre değişir) ────────────────────────────────
-function compare(g, o, name, l) {
-  for (const k of ["id", "slug", "relationshipTypes", "minTier", "players", "startsAt", "endsAt"]) {
-    if (JSON.stringify(g[k] ?? null) !== JSON.stringify(o[k] ?? null)) fail(`${name}: ${k} tr ve ${l} arasında farklı`);
-  }
-  if ((g.steps?.length ?? 0) !== (o.steps?.length ?? 0)) return fail(`${name}: adım sayısı tr (${g.steps?.length}) ≠ ${l} (${o.steps?.length})`);
-  (g.steps ?? []).forEach((s, j) => {
-    for (const k of ["order", "minutes", "mode", "categorySlug", "questionCount"]) {
-      if (JSON.stringify(s?.[k] ?? null) !== JSON.stringify(o.steps[j]?.[k] ?? null)) fail(`${name} adım ${j + 1}: ${k} tr ve ${l} arasında farklı`);
-    }
-    if ((s?.talk?.length ?? 0) !== (o.steps[j]?.talk?.length ?? 0)) fail(`${name} adım ${j + 1}: talk soru sayısı tr ve ${l} arasında farklı`);
-  });
-}
-
 const ref = data.tr;
-for (const l of LANGS.slice(1)) {
-  if (!ref || !data[l]) continue;
-  const a = ref.homework, b = data[l].homework;
-  if (!a !== !b) fail(`homework tr ve ${l} dosyalarından yalnızca birinde var`);
-  else if (a && b) compare(a, b, "homework", l);
-}
 if (ref && Array.isArray(ref.guides)) {
   for (const l of LANGS.slice(1)) {
     const d = data[l];
     if (!d || !Array.isArray(d.guides)) continue;
     const a = ref.guides.map((g) => g?.id), b = d.guides.map((g) => g?.id);
     if (JSON.stringify(a) !== JSON.stringify(b)) { fail(`tr.json ve ${l}.json aynı id'lere/sıraya sahip değil: [${a}] ≠ [${b}]`); continue; }
-    ref.guides.forEach((g, i) => compare(g, d.guides[i], g.id, l));
+    ref.guides.forEach((g, i) => {
+      const o = d.guides[i];
+      for (const k of ["slug", "relationshipTypes", "minTier", "players", "startsAt", "endsAt"]) {
+        if (JSON.stringify(g[k] ?? null) !== JSON.stringify(o[k] ?? null)) fail(`${g.id}: ${k} tr ve ${l} arasında farklı`);
+      }
+      if ((g.steps?.length ?? 0) !== (o.steps?.length ?? 0)) { fail(`${g.id}: adım sayısı tr (${g.steps?.length}) ≠ ${l} (${o.steps?.length})`); return; }
+      g.steps.forEach((s, j) => {
+        for (const k of ["order", "minutes", "mode", "categorySlug", "questionCount"]) {
+          if (JSON.stringify(s[k] ?? null) !== JSON.stringify(o.steps[j][k] ?? null)) fail(`${g.id} adım ${j + 1}: ${k} tr ve ${l} arasında farklı`);
+        }
+      });
+    });
   }
 }
 
 const n = ref?.guides?.length ?? 0;
-console.log(errors ? `\n${errors} hata, ${warnings} uyarı` : `✔ ${n} kılavuz${ref?.homework ? " + homework" : ""}, ${LANGS.length} dil: tamam${warnings ? ` (${warnings} uyarı)` : ""}`);
+console.log(errors ? `\n${errors} hata, ${warnings} uyarı` : `✔ ${n} kılavuz, ${LANGS.length} dil: tamam${warnings ? ` (${warnings} uyarı)` : ""}`);
 process.exit(errors ? 1 : 0);

@@ -534,7 +534,7 @@
       {
         "id": "guides",
         "q": "Oyun kılavuzları nedir?",
-        "a": "Kılavuzlar, belirli bir an için önerilen oyunlardır; örneğin Sevgililer Günü, yılbaşı gecesi ya da doğum günü. İstediğin oyundan başlayabilirsin, oda ayarları hazır gelir. Çiftler için Sevgi Haritası'nda ise her oyunun ardından konuşacağınız sorular var. Mobil uygulamada Profil > Kılavuzlar bölümündedir ve “Bir fincan kahve” paketiyle açılır."
+        "a": "Kılavuzlar, belirli bir an için önerilen oyunlardır; örneğin Sevgililer Günü, yılbaşı gecesi ya da doğum günü. İstediğin oyundan başlayabilirsin, oda ayarları hazır gelir. Mobil uygulamada Profil > Kılavuzlar bölümündedir ve “Bir fincan kahve” paketiyle açılır."
       },
       {
         "id": "ai",
@@ -556,7 +556,7 @@
           },
           {
             "name": "Bir fincan kahve paketi",
-            "text": "Tek seferlik satın alma, abonelik değil: 1.000 hediye coin, coin harcamadan sınırsız oda, 10 soruluk setler, Karma Tur, kılavuzlar ve Sevgi Haritası; zorunlu reklamlar kalkar. AI analizi yine coin ile açılır."
+            "text": "Tek seferlik satın alma, abonelik değil: 1.000 hediye coin, coin harcamadan sınırsız oda, 10 soruluk setler, Karma Tur ve kılavuzlar; zorunlu reklamlar kalkar. AI analizi yine coin ile açılır."
           }
         ]
       },

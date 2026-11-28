@@ -534,7 +534,7 @@
       {
         "id": "guides",
         "q": "What are game guides?",
-        "a": "Guides are games suggested for a particular moment, such as Valentine's Day, New Year's Eve or a birthday. Start with whichever you like; the room settings come ready. For couples, Heart Map adds questions to talk about after each game. You'll find them in the mobile app under Profile > Guides, with the “A cup of coffee” package."
+        "a": "Guides are games suggested for a particular moment, such as Valentine's Day, New Year's Eve or a birthday. Start with whichever you like; the room settings come ready. You'll find them in the mobile app under Profile > Guides, with the “A cup of coffee” package."
       },
       {
         "id": "ai",
@@ -556,7 +556,7 @@
           },
           {
             "name": "A cup of coffee package",
-            "text": "A one-time purchase, not a subscription: 1,000 gift coins, unlimited rooms without spending coins, 10-question sets, Mixed Round, guides and Heart Map; mandatory ads are removed. AI analyses are still unlocked with coins."
+            "text": "A one-time purchase, not a subscription: 1,000 gift coins, unlimited rooms without spending coins, 10-question sets, Mixed Round and guides; mandatory ads are removed. AI analyses are still unlocked with coins."
           }
         ]
       },
