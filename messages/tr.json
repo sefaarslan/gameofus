@@ -148,6 +148,7 @@
       "subtitle": "İkiniz için, farklı duygulara göre farklı oyun kurguları",
       "explore": "Hepsini keşfet",
       "popular": "POPÜLER",
+      "new": "YENİ",
       "sc": {
         "desc": "Seçenekler arasından gizlice seçimini yap. Bakalım partnerin doğru tahmin edebilecek mi?",
         "tag": "Rahat & Eğlenceli"
@@ -159,6 +160,11 @@
       "order": {
         "desc": "Seçenekleri kendi önceliklerine göre sırala. Partnerinin seninkini ne kadar bildiğini test et.",
         "tag": "Keşif"
+      },
+      "bluff": {
+        "title": "Blöf",
+        "desc": "Evet ya da Hayır de, Yalan Kartı’nla bazı cevaplarını ters göster. Bakalım blöfünü yakalayabilecek mi?",
+        "tag": "Kandır & Yakala"
       }
     },
     "mockup": {

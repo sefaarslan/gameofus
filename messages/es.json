@@ -148,6 +148,7 @@
       "subtitle": "Distintas experiencias para distintos momentos, pensadas para dos",
       "explore": "Ver todos",
       "popular": "POPULAR",
+      "new": "NUEVO",
       "sc": {
         "desc": "Elige en secreto entre las opciones. ¿Tu pareja lo adivinará?",
         "tag": "Fácil y divertido"
@@ -159,6 +160,11 @@
       "order": {
         "desc": "Ordena las tarjetas según tus prioridades. Pon a prueba cuánto te conoce tu pareja.",
         "tag": "Descubrimiento"
+      },
+      "bluff": {
+        "title": "Bluff",
+        "desc": "Responde Sí o No y usa una carta de mentira para dar la vuelta a algunas respuestas. ¿Pillarán tu farol?",
+        "tag": "Engaña y pilla"
       }
     },
     "mockup": {

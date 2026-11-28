@@ -319,7 +319,7 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
             {
               icon: "visibility_off",
@@ -331,6 +331,7 @@ export default function HomePage() {
               border: "border-outline-variant/15",
               accent: "from-primary-container/15",
               popular: false,
+              isNew: false,
             },
             {
               icon: "timeline",
@@ -342,6 +343,7 @@ export default function HomePage() {
               border: "border-primary/20",
               accent: "from-tertiary-container/15",
               popular: true,
+              isNew: false,
             },
             {
               icon: "format_list_numbered",
@@ -353,15 +355,33 @@ export default function HomePage() {
               border: "border-outline-variant/15",
               accent: "from-secondary-container/25",
               popular: false,
+              isNew: false,
+            },
+            {
+              icon: "theater_comedy",
+              iconBg: "bg-primary",
+              iconText: "text-on-primary",
+              title: t("modes.bluff.title"),
+              desc: t("modes.bluff.desc"),
+              tag: t("modes.bluff.tag"),
+              border: "border-primary/20",
+              accent: "from-primary-container/25",
+              popular: false,
+              isNew: true,
             },
           ].map((mode) => (
             <div
               key={mode.title}
-              className={`bg-surface rounded-[24px] p-8 shadow-soft-card border ${mode.border} hover:-translate-y-2 hover:shadow-soft-active transition-all duration-300 flex flex-col h-full relative overflow-hidden group cursor-default`}
+              className={`bg-surface rounded-[24px] p-7 shadow-soft-card border ${mode.border} hover:-translate-y-2 hover:shadow-soft-active transition-all duration-300 flex flex-col h-full relative overflow-hidden group cursor-default`}
             >
               {mode.popular && (
                 <div className="absolute top-4 right-4 bg-primary text-on-primary text-[10px] font-bold px-2.5 py-1 rounded-full">
                   {t("modes.popular")}
+                </div>
+              )}
+              {mode.isNew && (
+                <div className="absolute top-4 right-4 bg-[#4caf50] text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
+                  {t("modes.new")}
                 </div>
               )}
               {/* Corner gradient */}

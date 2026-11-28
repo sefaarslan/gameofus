@@ -148,6 +148,7 @@
       "subtitle": "Different setups for different moods, made for two",
       "explore": "Explore all",
       "popular": "POPULAR",
+      "new": "NEW",
       "sc": {
         "desc": "Make your secret choice from the options. Will your partner guess it right?",
         "tag": "Fun & Easy"
@@ -159,6 +160,11 @@
       "order": {
         "desc": "Rank the cards by your own priorities. Test how well your partner knows you.",
         "tag": "Discovery"
+      },
+      "bluff": {
+        "title": "Bluff",
+        "desc": "Answer Yes or No and use a Lie Card to flip some answers. Will your bluff get caught?",
+        "tag": "Fool & Catch"
       }
     },
     "mockup": {
