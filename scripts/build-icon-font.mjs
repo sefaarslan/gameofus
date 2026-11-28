@@ -1,12 +1,14 @@
 // Kodda kullanılan Material Symbols ikonlarından küçük bir font alt kümesi üretir:
 //   node scripts/build-icon-font.mjs   (veya: npm run icons)
-// Çıktı: app/fonts/material-symbols.woff2 — next/font/local ile self-host edilir.
+// Çıktı: app/fonts/material-symbols.css — font CSS içine data URI olarak gömülür. Ayrı bir font dosyası istenmez:
+// ikonlar sayfa stiliyle birlikte gelir (yeni sürüm yayına geçerken ya da tarayıcı önbelleğinde ayrı dosya takılıp ikonların
+// yazı olarak görünmesi olmaz).
 // Yeni bir ikon eklediğinde bu script'i yeniden çalıştır.
 import { readdirSync, readFileSync, statSync, writeFileSync, mkdirSync } from "node:fs";
 import { join, extname } from "node:path";
 
 const ROOTS = ["app", "components"];
-const OUT = "app/fonts/material-symbols.woff2";
+const OUT = "app/fonts/material-symbols.css";
 const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36";
 
@@ -46,6 +48,17 @@ if (!url) throw new Error("Font URL bulunamadı:\n" + css);
 
 const buf = Buffer.from(await (await fetch(url)).arrayBuffer());
 mkdirSync("app/fonts", { recursive: true });
-writeFileSync(OUT, buf);
+writeFileSync(
+  OUT,
+  `/* ÜRETİLİR: npm run icons (scripts/build-icon-font.mjs). Elle düzenleme. */
+@font-face {
+  font-family: "gouIcons";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(data:font/woff2;base64,${buf.toString("base64")}) format("woff2");
+}
+`,
+);
 console.log(`${icons.length} ikon, ${(buf.length / 1024).toFixed(1)} KB → ${OUT}`);
 console.log(icons.join(" "));
