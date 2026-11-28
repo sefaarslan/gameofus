@@ -34,6 +34,10 @@ function selectQuestionCounts(
   gameMode: string,
   questionCount: number,
 ): Array<{ mode: string; count: number }> {
+  // Blöf modu Evet/Hayır sorularını kullanır (ayrı soru havuzu yok); fark oyun akışındadır
+  if (gameMode === "bluff") {
+    return [{ mode: "secret_choice", count: questionCount }];
+  }
   if (gameMode !== "mixed") {
     return [{ mode: gameMode, count: questionCount }];
   }
@@ -79,7 +83,7 @@ export async function POST(req: NextRequest) {
   }
   const selectedRelationship = isRelationshipType(relationshipType) ? relationshipType : null;
 
-  const validModes = ["secret_choice", "prediction", "orderline", "mixed"];
+  const validModes = ["secret_choice", "prediction", "orderline", "mixed", "bluff"];
   const mode = typeof gameMode === "string" && validModes.includes(gameMode)
     ? gameMode
     : "secret_choice";
@@ -295,7 +299,7 @@ export async function POST(req: NextRequest) {
     .from("rooms")
     .insert({
       room_code: roomCode,
-      game_mode: mode as "secret_choice" | "prediction" | "orderline" | "mixed",
+      game_mode: mode as "secret_choice" | "prediction" | "orderline" | "mixed" | "bluff",
       question_count: count,
       locale: roomLocale,
       expires_at: expiresAt.toISOString(),

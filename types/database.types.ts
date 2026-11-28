@@ -125,6 +125,7 @@ export type Database = {
           participant_id: string
           question_id: string
           room_id: string
+          shown_value: Json | null
         }
         Insert: {
           answer_value: Json
@@ -134,6 +135,7 @@ export type Database = {
           participant_id: string
           question_id: string
           room_id: string
+          shown_value?: Json | null
         }
         Update: {
           answer_value?: Json
@@ -143,6 +145,7 @@ export type Database = {
           participant_id?: string
           question_id?: string
           room_id?: string
+          shown_value?: Json | null
         }
         Relationships: [
           {
@@ -469,6 +472,7 @@ export type Database = {
       }
       predictions: {
         Row: {
+          bluff_call: string | null
           confidence_level: Database["public"]["Enums"]["confidence_level"]
           confidence_multiplier: number
           created_at: string
@@ -481,6 +485,7 @@ export type Database = {
           target_participant_id: string
         }
         Insert: {
+          bluff_call?: string | null
           confidence_level?: Database["public"]["Enums"]["confidence_level"]
           confidence_multiplier?: number
           created_at?: string
@@ -493,6 +498,7 @@ export type Database = {
           target_participant_id: string
         }
         Update: {
+          bluff_call?: string | null
           confidence_level?: Database["public"]["Enums"]["confidence_level"]
           confidence_multiplier?: number
           created_at?: string
@@ -1000,6 +1006,10 @@ export type Database = {
         Args: { p_failures: number; p_provider: string; p_requests: number; p_tokens: number }
         Returns: undefined
       }
+      submit_bluff_calls: {
+        Args: { p_caller: string; p_calls: Json; p_room: string }
+        Returns: number
+      }
       apply_coins: {
         Args: { p_delta: number; p_reason: string; p_ref?: string; p_user: string }
         Returns: { applied: boolean; balance: number }[]
@@ -1007,7 +1017,7 @@ export type Database = {
     }
     Enums: {
       confidence_level: "guess" | "think" | "sure"
-      game_mode: "secret_choice" | "prediction" | "orderline" | "mixed"
+      game_mode: "secret_choice" | "prediction" | "orderline" | "mixed" | "bluff"
       participant_role: "owner" | "guest"
       participant_status: "invited" | "joined" | "playing" | "completed"
       payment_status: "pending" | "paid" | "failed" | "refunded"
@@ -1153,7 +1163,7 @@ export const Constants = {
   public: {
     Enums: {
       confidence_level: ["guess", "think", "sure"],
-      game_mode: ["secret_choice", "prediction", "orderline", "mixed"],
+      game_mode: ["secret_choice", "prediction", "orderline", "mixed", "bluff"],
       participant_role: ["owner", "guest"],
       participant_status: ["invited", "joined", "playing", "completed"],
       payment_status: ["pending", "paid", "failed", "refunded"],

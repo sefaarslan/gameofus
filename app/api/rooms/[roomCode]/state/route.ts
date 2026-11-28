@@ -8,6 +8,7 @@ import { apiError, apiOk } from "@/lib/api";
 import { normalizeRoomCode } from "@/lib/room-code-utils";
 import { roomNotFound } from "@/lib/room-lookup";
 import { corsOptions } from "@/lib/cors";
+import { lieCardsFor } from "@/lib/bluff";
 
 export function OPTIONS() {
   return corsOptions();
@@ -129,6 +130,25 @@ export async function GET(
     answeredCount = count ?? 0;
   }
 
+  // Blöf modu: oyuncunun YALNIZCA KENDİ cevapları ve gösterdikleri (yeniden yüklemede "en az bir yalan" adımı için).
+  // Karşı oyuncunun satırları bu uçtan hiçbir zaman okunmaz.
+  let bluff: { lieCards: number; myAnswers: Array<{ questionId: string; value: unknown; shownValue: unknown }> } | null = null;
+  if (me && room.game_mode === "bluff") {
+    const { data } = await supabase
+      .from("answers")
+      .select("question_id, answer_value, shown_value")
+      .eq("room_id", room.id)
+      .eq("participant_id", me.id);
+    bluff = {
+      lieCards: lieCardsFor(room.question_count),
+      // Soru sırasıyla (veritabanı sırasız döndürür)
+      myAnswers: questions.flatMap((q) => {
+        const a = (data ?? []).find((row) => row.question_id === q.questionId);
+        return a ? [{ questionId: a.question_id, value: a.answer_value, shownValue: a.shown_value }] : [];
+      }),
+    };
+  }
+
   return apiOk({
     room: {
       roomCode: room.room_code,
@@ -157,5 +177,6 @@ export async function GET(
       answeredCount,
       totalCount: room.question_count,
     },
+    ...(bluff ? { bluff } : {}),
   });
 }

@@ -25,7 +25,7 @@ Next.js API route sözleşmeleri. **Gerçek davranışın kaynağı `app/api/**`
 ```
 
 Hata kodları: `ROOM_NOT_FOUND` (404), `ROOM_EXPIRED` (400), `ROOM_FULL` (400), `ROOM_WEB_ONLY` (403), `INVALID_TOKEN` (403), `ALREADY_SUBMITTED`,
-`QUESTION_NOT_FOUND` (404), `RESULT_NOT_READY`, `RATE_LIMITED` (429), `INVALID_PAYLOAD`, `INTERNAL_ERROR` (500).
+`QUESTION_NOT_FOUND` (404), `RESULT_NOT_READY`, `LIE_REQUIRED` / `LIE_LIMIT` (blöf modu), `AI_MODE_UNSUPPORTED` (403), `RATE_LIMITED` (429), `INVALID_PAYLOAD`, `INTERNAL_ERROR` (500).
 
 ---
 
@@ -39,6 +39,7 @@ GET  /api/rooms/[roomCode]/state
 POST /api/rooms/[roomCode]/submit-turn
 POST /api/rooms/[roomCode]/complete
 GET  /api/rooms/[roomCode]/results
+POST /api/rooms/[roomCode]/bluff-calls   (yalnızca blöf modu; blöf avı kararları)
 POST /api/feedback
 POST /api/solo/red-flag/start
 POST /api/solo/[sessionId]/complete
@@ -133,6 +134,8 @@ Doğrulama:
 **Soru seçimi:** Havuz = oda dili + `is_active` + ücretsiz + ilişki türüne uygun kategoriler. Seçilen kategori
 önceliklidir; yetmezse yalnızca aynı havuzdan tamamlanır, hâlâ yetmezse `tr` havuzu. Tüm havuz çekilip
 rastgele seçilir. Karma: 10 soruda 4 Secret Choice / 3 Prediction / 3 Orderline (5 soruda 3 / 1 / 1).
+**Blöf (`gameMode: "bluff"`):** sorular Secret Choice havuzundan gelir (odadaki soruların `mode` değeri `secret_choice`; ayrımı `room.gameMode` yapar). Ücret,
+kategori ve 10 soru kuralı diğer modlarla aynıdır; paket kilidi yoktur.
 
 ```json
 {
@@ -204,6 +207,10 @@ katılımcısı değil → **`403 INVALID_TOKEN`**. Hiç kimlik göndermeyen (we
 
 `options` Secret Choice'ta `null`'dır. `relationshipType` eski odalarda `null`.
 
+Blöf odasında katılımcıya ek olarak `bluff: { lieCards: 2, myAnswers: [{ questionId, value, shownValue }] }` döner: `lieCards` sette
+oynanabilecek en çok yalan (istemci sabit yazmaz); `myAnswers` **yalnızca kendi** cevapların (`shownValue` null = dürüst). Karşı
+oyuncunun cevapları bu uçtan hiçbir zaman dönmez. Blöf odasında arayüz yalnızca **Evet / Hayır** gösterir.
+
 ---
 
 ## 7. `POST /api/rooms/[roomCode]/submit-turn`
@@ -221,6 +228,10 @@ Tek soruda cevap **ve** tahmini **tek istekte** kaydeder (kilitler).
 
 `answerValue` / `predictedValue` biçimi moda göre: `{value}` · `{option_id}` · `{order:[…]}`.
 `confidenceLevel`: `guess | think | sure` (geçersizse `guess`).
+
+**Blöf modu:** cevap ve tahmin yalnızca `yes` | `no` (aksi `400 INVALID_PAYLOAD`). İsteğe bağlı `"isLie": true` Yalan Kartı'dır: karşı tarafa
+cevabın **tersi** gösterilir (sunucu hesaplar; `answerValue` her zaman gerçektir). Kart kalmadıysa `400 LIE_LIMIT` ve **hiçbir şey yazılmaz**
+(aynı soru kartsız gönderilebilir). Diğer modlarda `isLie` yok sayılır.
 
 **Kimlik:** katılımcı token'ı (`Authorization: Bearer <token>` ya da gövdede `participantToken`) **ya da (mobil) giriş yapmış kullanıcının
 Supabase JWT'si**: token yoksa `participants.user_id` JWT kullanıcısıyla eşleşen katılımcı o oyuncudur (başka cihazdan/yeniden kurulumdan sonra
@@ -246,11 +257,14 @@ yok sayar ve kilitleyince doğrudan sonraki soruya geçer (ara kart yok). Yanıt
 
 ## 8. `POST /api/rooms/[roomCode]/complete`
 
+**Blöf modu:** tüm sorular cevaplanmış olmalı (`400 INVALID_PAYLOAD`) ve sette **en az 1 yalan** bulunmalı. Yoksa gövdede
+`"lieQuestionId": "uuid"` verilebilir (o cevap ters gösterilir); o da yoksa `400 LIE_REQUIRED` (oyuncu tamamlanmış sayılmaz).
+
 Oyuncuyu `completed` yapar. Kimlik `submit-turn` ile aynıdır (katılımcı token'ı **ya da** mobil JWT; hata kodları ve süresi dolmuş oda davranışı aynı).
-**İlk bitiren:** `participants` ve `rooms.status` (`owner_completed`/
-`guest_completed`) paralel güncellenir. **İkinci bitiren:** sonuç aynı istekte server-side hesaplanır:
+Önce oyuncu `completed` işaretlenir, **sonra** durumlar yeniden okunur (iki oyuncu aynı anda bitirse de sonuç hesaplanır).
+**İlk bitiren:** `rooms.status` (`owner_completed`/`guest_completed`) yazılır (`result_ready` geri alınmaz). **İkinci bitiren:** sonuç aynı istekte server-side hesaplanır:
 `results` satırı yazılır, ardından `rooms.status = result_ready`. Duplicate sonuç oluşmaz
-(`unique(room_id)`); idempotenttir.
+(`unique(room_id)`); idempotenttir. İki oyuncu da tamamlanmış ama sonuç yazılmamışsa tekrar çağrı sonucu hesaplar.
 
 ```json
 { "completed": true, "resultReady": false }
@@ -288,6 +302,57 @@ olmayan JWT → `403 INVALID_TOKEN`; geçersiz/süresi dolmuş JWT → `401 UNAU
 
 Okuma skoru = (doğru + yakın) / toplam tahmin × 100; güven çarpanı skora yansımaz. `scoreLabel` skora göre
 5 kademeli sıcak bir metindir (≥90, ≥70, ≥50, ≥30, <30).
+
+---
+
+### Blöf modunda sonuç (iki aşama)
+
+**Aşama 1 — blöf avı** (isteği yapan oyuncu kararlarını henüz vermediyse). Skor, gerçek cevap, yalan bilgisi ve tahmin sonucu **dönmez**:
+
+```json
+{
+  "room": { "roomCode": "K7M2PQ", "gameMode": "bluff", "questionCount": 5, "relationshipType": "friend" },
+  "me": { "id": "uuid", "role": "owner", "displayName": "Sefa" },
+  "partner": { "role": "guest", "displayName": "Esra" },
+  "bluff": { "phase": "call", "rights": 2, "items": [
+    { "questionId": "uuid", "roundOrder": 1, "questionText": "…", "shownAnswer": { "value": "yes" }, "myPrediction": { "value": "no" } } ] }
+}
+```
+
+**Aşama 2 — açılış** (kararlar verildikten sonra): normal sonuç yanıtı + üst düzey ve soru başına `bluff`:
+
+```json
+{
+  "readingScore": 80, "questions": [ { "…": "…",
+    "bluff": { "myShownAnswer": { "value": "no" }, "myLie": true, "partnerCall": "believe",
+               "partnerShownAnswer": { "value": "yes" }, "partnerLie": false, "myCall": "bluff" } } ],
+  "bluff": { "phase": "reveal",
+    "me":      { "callsDone": true, "caught": 1, "total": 2, "falseAlarms": 1, "lies": 1, "fooled": 1, "titles": [] },
+    "partner": { "callsDone": true, "caught": 0, "total": 1, "falseAlarms": 2, "lies": 2, "fooled": 1, "titles": ["too_skeptical"] } }
+}
+```
+
+Av puanı **yakalanan yalandır**: `caught` / `total` (karşı tarafın yalan sayısı); `falseAlarms` = doğruya boşuna "Blöf!"; `fooled` = karşı tarafın
+yakalayamadığı yalanların. Karşı taraf kararlarını
+vermediyse `partnerCall`, `me.fooled`, `partner.caught/total` `null` ve `partner.callsDone: false` olur. Unvanlar (`lib/bluff.ts`, eşikler
+`lib/bluff-config.ts`): `lie_detector` (karşı tarafın tüm yalanları yakalandı), `poker_face` (hiçbir yalanın yakalanmadı; karşı taraf karar
+verince), `too_skeptical` (≥ 2 doğruya "blöf"), `pure_heart` (karşı tarafın hiçbir yalanını yakalayamadın; `too_skeptical` ile birlikte verilmez).
+
+### `POST /api/rooms/[roomCode]/bluff-calls`
+
+```json
+{ "suspects": ["questionId", "questionId"] }
+```
+
+Karşı tarafın yalan söylediği düşünülen sorular: **en az 1, en çok `results.bluff.rights`** (5 soruda 2, 10 soruda 3), tekrarsız. Seçilenler
+`bluff`, kalanlar `believe` olarak yazılır.
+
+Kimlik `results` ile aynı (token ya da JWT; süresi dolmuş oda yalnızca JWT ile). **Tek istekte, bir kez**
+(`ALREADY_SUBMITTED`). Hatalar: `RESULT_NOT_READY` (iki oyuncu bitirmedi), `INVALID_PAYLOAD` (blöf odası değil, boş/fazla/tekrarlı/geçersiz seçim).
+Yanıt `{ "saved": true }` (doğruluk bilgisi yok); ardından `results` yeniden okunur. Yazımdan sonra `rooms` satırına dokunulur (mobil Realtime).
+
+Blöf odalarında **AI yorumu yoktur** (`GET/POST ai-commentary` → `403 AI_MODE_UNSUPPORTED`). Geçmişte (`history`, `overview`) blöf
+odaları `bluffPending` alanı taşır; `true` iken (oyuncu avını yapmadı) `readingScore: null` döner.
 
 ---
 

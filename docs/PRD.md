@@ -233,6 +233,19 @@ Kartlar:
 
 Secret Choice, Prediction ve Orderline modlarının dengeli karışımıdır. MVP'de öncelik Secret Choice modunda olacaktır. Karma Oyun daha sonra aktif edilebilir.
 
+### 8.4b Blöf (web canlı olacak, mobil planlı)
+
+Tahmin akışının yalanlı hali; Secret Choice soruları **yalnızca Evet / Hayır** ile kullanılır. Her soruda oyuncu gerçek cevabını verir ve karşı
+tarafı tahmin eder. Her oyuncunun set başına sınırlı sayıda **Yalan Kartı** vardır (5 soruda 2, 10 soruda 3): kart oynanan cevap karşı tarafa
+ters gösterilir; oyuncu yalnızca "kartı nerede kullanayım?" diye düşünür. Sette **en az 1 kart** zorunludur; hiç oynamadan sona gelen oyuncuya
+bitirmeden önce bir cevap seçtirilir. İlk blöf oyununda 3 adımlık kısa tanıtım gösterilir ("Cevabını seç · İstersen yalan söyle · Sonunda onun
+yalanını yakala"). İki taraf da bitirince, sonuçtan önce **blöf avı** yapılır: oyuncu, karşı tarafın gösterdiği cevaplardan (yanında kendi tahmini) yalan
+olduğunu düşündüklerine "Blöf!" der; hakkı Yalan Kartı sayısı kadardır (en az 1). **Av puanı yakalanan yalan sayısıdır** (doğru karar sayısı
+puan olsaydı hiç düşünmeden her şeye inanmak en iyi taktik olurdu). Sonra cevaplar **soru soru, küçük animasyonlarla** açılır; toplam puan ve unvanlar sondaki finalde birlikte
+gösterilir. Okuma Skoru gerçek cevaplara
+göre hesaplanır; ayrıca **blöf avı** (yakalanan yalan) ve **kandırma** (karşı tarafın yakalayamadığı yalan) puanları ile kurala dayalı unvanlar
+(Yalan Dedektörü, Poker Face, Fazla Şüpheci, Saf Kalp) gösterilir. AI yorumu yoktur; Karma Tur'a dahil değildir; ücreti diğer modlarla aynıdır.
+
 ### 8.5 Solo Oyun — Red Flag Mayın Tarlası (web canlı, mobil planlı)
 
 İki kişilik oyun partner gerektirdiği için ilk denemede sürtünme yüksektir. Tek kişilik, ~2 dakikalık, paylaşılabilir bu oyun soğuk başlangıcı kırar ve kullanıcıyı mobil uygulamaya taşır.

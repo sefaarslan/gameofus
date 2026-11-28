@@ -87,3 +87,47 @@
   .animate-solo-flip, .animate-solo-pop { animation: none; }
   .animate-slide-in { animation: none; }
 }
+
+/* ── Blöf modu: tanıtım, Yalan Kartı, soru soru açılış ve final ─────────── */
+@keyframes bluff-pop {
+  0%   { opacity: 0; transform: translateY(14px) scale(0.94); }
+  70%  { opacity: 1; transform: translateY(-2px) scale(1.02); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes bluff-flip {
+  0%   { transform: perspective(700px) rotateX(70deg); opacity: 0.2; }
+  100% { transform: perspective(700px) rotateX(0deg); opacity: 1; }
+}
+@keyframes bluff-stamp {
+  0%   { transform: scale(1.25); opacity: 0; }
+  65%  { transform: scale(0.97); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes bluff-shake {
+  0%   { transform: scale(1.2); opacity: 0; }
+  35%  { transform: scale(1) translateX(-9px); opacity: 1; }
+  55%  { transform: translateX(7px); }
+  75%  { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+@keyframes bluff-burst {
+  0%   { transform: scale(0.2); opacity: 0; }
+  60%  { transform: scale(1.12); opacity: 1; }
+  80%  { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+@keyframes bluff-confetti {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  12%  { opacity: 1; }
+  100% { transform: translate(var(--x), calc(var(--y) + 60px)) rotate(var(--r)); opacity: 0; }
+}
+.bluff-pop      { animation: bluff-pop 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.bluff-flip     { animation: bluff-flip 260ms ease-out both; }
+.bluff-stamp    { animation: bluff-stamp 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.bluff-shake    { animation: bluff-shake 480ms ease-out both; }
+.bluff-burst    { animation: bluff-burst 620ms cubic-bezier(0.2, 0.8, 0.2, 1) 150ms both; }
+.bluff-confetti { animation: bluff-confetti 1300ms cubic-bezier(0.15, 0.7, 0.4, 1) 420ms both; }
+@media (prefers-reduced-motion: reduce) {
+  .bluff-pop, .bluff-flip, .bluff-stamp, .bluff-shake, .bluff-burst { animation: none; }
+  .bluff-confetti { display: none; }
+}

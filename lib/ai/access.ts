@@ -35,7 +35,7 @@ export async function authAiUser(req: NextRequest): Promise<AuthUser | Response>
 }
 
 export interface AiRoomContext {
-  room: { id: string; status: string; expires_at: string; locale: string; relationship_type: string | null };
+  room: { id: string; status: string; expires_at: string; locale: string; relationship_type: string | null; game_mode: string };
   me: { id: string; role: string };
 }
 
@@ -47,7 +47,7 @@ export async function resolveAiParticipant(req: NextRequest, roomCode: string, u
   const supabase = createAdminClient();
   const { data: room } = await supabase
     .from("rooms")
-    .select("id, status, expires_at, locale, relationship_type")
+    .select("id, status, expires_at, locale, relationship_type, game_mode")
     .eq("room_code", roomCode)
     .maybeSingle();
   if (!room) return tokenDenied(req);
@@ -55,5 +55,7 @@ export async function resolveAiParticipant(req: NextRequest, roomCode: string, u
   const { data: parts } = await supabase.from("participants").select("id, role, user_id").eq("room_id", room.id);
   const mine = (parts ?? []).filter((p) => p.user_id === user.id);
   if (mine.length !== 1) return tokenDenied(req);
+  // Blöf modunda AI yorumu yoktur: yorum gerçek cevapları okur ve blöf avı bitmeden yalanları açığa çıkarırdı
+  if (room.game_mode === "bluff") return apiError("AI_MODE_UNSUPPORTED", "Bu oyun modunda AI yorumu yok.", 403);
   return { room, me: { id: mine[0].id, role: mine[0].role } };
 }

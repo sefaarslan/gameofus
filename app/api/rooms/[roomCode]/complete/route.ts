@@ -13,6 +13,8 @@ import { compareAnswers, calculateReadingScore } from "@/lib/scoring";
 import { apiError, apiOk } from "@/lib/api";
 import { normalizeRoomCode } from "@/lib/room-code-utils";
 import { denyUnknownRoom, tokenDenied } from "@/lib/room-lookup";
+import { countLies, lieFor } from "@/lib/bluff";
+import { BLUFF_CONFIG } from "@/lib/bluff-config";
 import type { Json } from "@/types/database.types";
 
 type PredictionResult = "correct" | "near" | "miss";
@@ -42,7 +44,7 @@ export async function POST(
 
   const { data: room } = await supabase
     .from("rooms")
-    .select("id, status, expires_at, question_count")
+    .select("id, status, expires_at, question_count, game_mode")
     .eq("room_code", roomCode)
     .maybeSingle();
 
@@ -60,32 +62,50 @@ export async function POST(
   if (!me) return tokenDenied(req);
   if (isRoomExpired(room.expires_at)) return apiError("ROOM_EXPIRED", "Bu odanın süresi dolmuş.");
 
+  const isBluff = room.game_mode === "bluff";
+
   if (me.status === "completed") {
+    // İki oyuncu da bitirmiş ama sonuç yazılmamışsa (yarıda kalan hesaplama) şimdi hesaplanır: oda takılı kalmaz
+    const settled = room.status === "result_ready" || room.status === "completed";
+    if (!settled && participants.length === 2 && participants.every((p) => p.status === "completed")) {
+      const ok = await calculateResults(room.id, participants.map((p) => p.id), supabase, isBluff);
+      return ok ? apiOk({ completed: true, resultReady: true }) : apiError("INTERNAL_ERROR", "Sonuç hesaplanamadı.", 500);
+    }
     return apiOk({ completed: true, resultReady: room.status === "result_ready" });
   }
 
-  const now = new Date().toISOString();
-  // Lazy builder: henüz çalışmaz, await/Promise.all içinde tetiklenir
-  const markCompleted = supabase
+  // Blöf modu: tüm sorular cevaplanmış ve sette en az bir yalan olmalı (eksik yalan bu istekte `lieQuestionId` ile verilebilir)
+  if (isBluff) {
+    const problem = await enforceBluffRules(supabase, room, me.id, (body as Record<string, unknown>).lieQuestionId);
+    if (problem) return problem;
+  }
+
+  // ÖNCE kendimizi tamamlandı işaretler, SONRA durumları yeniden okuruz: iki oyuncu aynı anda bitirse bile en az biri
+  // diğerini "tamamlandı" görür. (Önce okuyup sonra yazmak, ikisinin de karşıyı "bitmedi" görüp sonucu hiç hesaplamamasına yol açıyordu.)
+  const { error: markErr } = await supabase
     .from("participants")
-    .update({ status: "completed", completed_at: now })
+    .update({ status: "completed", completed_at: new Date().toISOString() })
     .eq("id", me.id);
+  if (markErr) return apiError("INTERNAL_ERROR", "Oyun tamamlanamadı.", 500);
 
-  const partner = participants.find((p) => p.id !== me.id);
+  const { data: fresh, error: freshErr } = await supabase.from("participants").select("id, status").eq("room_id", room.id);
+  if (freshErr || !fresh) return apiError("INTERNAL_ERROR", "Oyun durumu okunamadı.", 500);
 
-  // Partner henüz tamamlamadıysa — room status güncelle ve bekle (iki yazma paralel)
-  if (!partner || partner.status !== "completed") {
+  // Partner henüz tamamlamadıysa — room status güncelle ve bekle
+  if (fresh.length < 2 || fresh.some((p) => p.status !== "completed")) {
     const newRoomStatus = me.role === "owner" ? "owner_completed" : "guest_completed";
-    await Promise.all([
-      markCompleted,
-      supabase.from("rooms").update({ status: newRoomStatus }).eq("id", room.id),
-    ]);
+    // Koşullu yazma: bu arada diğer istek sonucu hazırladıysa `result_ready` geri alınmaz
+    await supabase
+      .from("rooms")
+      .update({ status: newRoomStatus })
+      .eq("id", room.id)
+      .not("status", "in", "(result_ready,completed)");
     return apiOk({ completed: true, resultReady: false });
   }
 
   // Her iki oyuncu da tamamladı — sonuç hesapla
-  const result = await calculateResults(room.id, participants.map((p) => p.id), supabase, markCompleted);
-  if (!result) {
+  const ok = await calculateResults(room.id, fresh.map((p) => p.id), supabase, isBluff);
+  if (!ok) {
     return apiError("INTERNAL_ERROR", "Sonuç hesaplanamadı.", 500);
   }
 
@@ -94,15 +114,45 @@ export async function POST(
 
 type SupabaseClient = ReturnType<typeof createAdminClient>;
 
+/** Blöf modunda bitirme kuralları. Sorun yoksa null; varsa istemciye dönecek hata yanıtı. */
+async function enforceBluffRules(
+  supabase: SupabaseClient,
+  room: { id: string; question_count: number },
+  participantId: string,
+  lieQuestionId: unknown,
+) {
+  const { data, error } = await supabase
+    .from("answers")
+    .select("question_id, answer_value, shown_value")
+    .eq("room_id", room.id)
+    .eq("participant_id", participantId);
+  if (error || !data) return apiError("INTERNAL_ERROR", "Cevaplar okunamadı.", 500);
+  if (data.length < room.question_count) return apiError("INVALID_PAYLOAD", "Tüm sorular cevaplanmadan oyun bitirilemez.");
+  if (countLies(data.map((a) => ({ shownValue: a.shown_value }))) >= BLUFF_CONFIG.minLies) return null;
+
+  if (lieQuestionId == null) return apiError("LIE_REQUIRED", "En az bir kez yalan söylemelisin.");
+  const target = data.find((a) => a.question_id === lieQuestionId);
+  const lie = target ? lieFor(target.answer_value) : null;
+  if (!target || !lie) return apiError("INVALID_PAYLOAD", "Yalan Kartı bu oyundaki bir cevabında kullanılmalı.");
+  const { error: writeErr } = await supabase
+    .from("answers")
+    .update({ shown_value: lie })
+    .eq("room_id", room.id)
+    .eq("participant_id", participantId)
+    .eq("question_id", target.question_id)
+    .is("shown_value", null);
+  return writeErr ? apiError("INTERNAL_ERROR", "Yalan kaydedilemedi.", 500) : null;
+}
+
+/** Sonucu bir kez hesaplayıp yazar (`results.room_id` benzersiz). Başarılıysa (ya da başka istek yazdıysa) true. */
 async function calculateResults(
   roomId: string,
   participantIds: string[],
   supabase: SupabaseClient,
-  markCompleted: PromiseLike<unknown>,
-) {
-  // Participant güncellemesi, duplicate result kontrolü ve veri okuma birbirinden bağımsız — hepsi paralel
-  const [, { data: existingResult }, { data: answers }, { data: predictions }, { data: roomQuestions }] = await Promise.all([
-    markCompleted,
+  isBluff: boolean,
+): Promise<boolean> {
+  // Duplicate result kontrolü ve veri okuma birbirinden bağımsız — hepsi paralel
+  const [{ data: existingResult }, { data: answers }, { data: predictions }, { data: roomQuestions }, shown] = await Promise.all([
     supabase
       .from("results")
       .select("id")
@@ -121,15 +171,24 @@ async function calculateResults(
       .select("question_id, round_order, questions(mode)")
       .eq("room_id", roomId)
       .order("round_order"),
+    // Gösterilen (sahte) cevaplar yalnızca blöf modunda okunur
+    isBluff
+      ? supabase.from("answers").select("participant_id, question_id, shown_value").eq("room_id", roomId)
+      : Promise.resolve(null),
   ]);
 
   // Duplicate result oluşturma (unique(room_id))
   if (existingResult) {
     await supabase.from("rooms").update({ status: "result_ready" }).eq("id", roomId);
-    return existingResult;
+    return true;
   }
 
-  if (!answers || !predictions || !roomQuestions) return null;
+  if (!answers || !predictions || !roomQuestions) return false;
+  if (isBluff && !shown?.data) return false;
+
+  const shownMap = new Map<string, Json>(
+    (shown?.data ?? []).map((a) => [`${a.participant_id}:${a.question_id}`, a.shown_value]),
+  );
 
   // question_id → mode map
   const questionModeMap = new Map<string, string>(
@@ -184,6 +243,7 @@ async function calculateResults(
       answers: participantIds.map((pid) => ({
         participantId: pid,
         answerValue: answerMap.get(`${pid}:${questionId}`) ?? null,
+        ...(isBluff ? { shownValue: shownMap.get(`${pid}:${questionId}`) ?? null } : {}),
       })),
       predictions: predictions
         .filter((p) => p.question_id === questionId)
@@ -207,19 +267,16 @@ async function calculateResults(
     };
   });
 
-  const { data: resultRow, error } = await supabase
-    .from("results")
-    .insert({
-      room_id: roomId,
-      reading_score: overallScore,
-      details_json: detailsJson,
-    })
-    .select("id")
-    .single();
+  const { error } = await supabase.from("results").insert({
+    room_id: roomId,
+    reading_score: overallScore,
+    details_json: detailsJson,
+  });
 
-  if (error || !resultRow) return null;
+  // 23505: aynı anda biten diğer istek sonucu bizden önce yazdı — sorun değil
+  if (error && error.code !== "23505") return false;
 
   await supabase.from("rooms").update({ status: "result_ready" }).eq("id", roomId);
 
-  return resultRow;
+  return true;
 }

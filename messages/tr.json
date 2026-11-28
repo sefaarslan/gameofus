@@ -231,17 +231,21 @@
         "secret_choice": "Evet / Hayır",
         "prediction": "Senaryo",
         "orderline": "Sıralama",
-        "mixed": "Karma"
+        "mixed": "Karma",
+        "bluff": "Blöf"
       },
       "descs": {
         "secret_choice": "3 şıklı klasik",
         "prediction": "Çoktan seçmeli",
         "orderline": "Sırayı tahmin et",
-        "mixed": "Hepsinden biraz"
+        "mixed": "Hepsinden biraz",
+        "bluff": "Bazen yalan söyle, bakalım yakalanacak mısın?"
       },
       "mobileOnly": "Mobilde",
       "hint": "Nasıl oynanacak?",
-      "popular": "Popüler"
+      "popular": "Popüler",
+      "new": "Yeni",
+      "bluffHow": "Evet ya da Hayır ile cevapla ve tahmin et. Yalan Kartı'nla bazı cevaplarını ters göster (5 soruda 2, 10 soruda 3 hak; en az 1). Sonunda aynı sayıda “Blöf!” hakkıyla birbirinizin yalanlarını yakalayın."
     },
     "questions": {
       "label": "Soru Sayısı ve Süre",
@@ -403,7 +407,39 @@
     "modePrediction": "Tahmin",
     "modeOrderline": "Sıralama",
     "errorGeneric": "Bir hata oluştu.",
-    "errorConnection": "Bağlantı hatası."
+    "errorConnection": "Bağlantı hatası.",
+    "modeBluff": "Blöf",
+    "bluff": {
+      "truthTitle": "Gerçek cevabın",
+      "guessTitle": "{name} gerçekte ne der?",
+      "whoFallback": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Eşin} other {Partnerin}}",
+      "cardTitle": "Yalan Kartı",
+      "cardUse": "Dokun: bu cevabın ters görünsün",
+      "cardPickFirst": "Önce cevabını seç",
+      "cardActive": "Kart oynandı",
+      "cardPreview": "{name} “{value}” görecek",
+      "cardUndo": "Geri al",
+      "cardsLeft": "{count} hakkın var",
+      "cardsEmpty": "Yalan Kartların bitti",
+      "cardsEmptyDesc": "Kalan sorularda doğruyu göstereceksin",
+      "cardLast": "Son soru: en az 1 kart kullanmalısın",
+      "finishTitle": "Henüz yalan söylemedin",
+      "finishDesc": "En az 1 Yalan Kartı kullanmalısın. Hangi cevabında kullanacaksın?",
+      "truthLabel": "Gerçeğin: {value}",
+      "finishButton": "Kartı kullan ve bitir",
+      "finishing": "Oyunun tamamlanıyor...",
+      "retry": "Tekrar dene",
+      "intro": {
+        "title": "Blöf nasıl oynanır?",
+        "step1": "Cevabını seç",
+        "step1Desc": "Evet ya da Hayır. Sonra {name} ne der, tahmin et.",
+        "step2": "İstersen yalan söyle",
+        "step2Desc": "Bu sette {count} Yalan Kartın var. Soruyu sen seç; en az birini kullan.",
+        "step3": "Sonunda onun yalanını yakala",
+        "step3Desc": "İkiniz de bitirince {count} “Blöf!” hakkınla {name} nerede yalan söyledi, bul.",
+        "start": "Başlayalım"
+      }
+    }
   },
   "option": {
     "yes": "Evet",
@@ -458,7 +494,65 @@
     "guessOf": "tahmini",
     "guessAboutPartner": "{rel, select, friend {kankası} dating {sevgilisi} partner {eşi} other {partneri}} hakkındaki tahmini",
     "partnerRealAnswer": "gerçek cevabı",
-    "partnerFallback": "{rel, select, friend {Kanka} dating {Sevgili} partner {Eş} other {Partner}}"
+    "partnerFallback": "{rel, select, friend {Kanka} dating {Sevgili} partner {Eş} other {Partner}}",
+    "bluff": {
+      "callTitle": "Blöf avı",
+      "callSubtitle": "{name} nerede yalan söyledi? {count} “Blöf!” hakkın var.",
+      "says": "{name} diyor ki",
+      "yourGuess": "Senin tahminin: {value}",
+      "bluff": "Blöf!",
+      "submit": "Avı bitir",
+      "sending": "Gönderiliyor...",
+      "revealStep": "Açılış {current}/{total}",
+      "youBelieved": "Sen inandın",
+      "youDoubted": "Sen “Blöf!” dedin",
+      "caughtLie": "Yalanı yakaladın!",
+      "fooledByLie": "Ama yalan söylüyordu!",
+      "truthBelieved": "Doğruyu söylüyordu",
+      "truthDoubted": "Oysa doğruyu söylüyordu",
+      "truthWas": "Gerçek cevabı: {value}",
+      "yourLie": "Sen “{value}” dedin (yalan)",
+      "yourTruth": "Sen “{value}” dedin (doğru)",
+      "partnerBelieved": "{name} inandı",
+      "partnerDoubted": "{name} “Blöf!” dedi",
+      "partnerPending": "{name} henüz blöf avını yapmadı",
+      "next": "Sıradaki",
+      "skip": "Hepsini geç",
+      "seeResults": "Sonuçları gör",
+      "summaryTitle": "Blöf karnesi",
+      "breakdown": "Blöf dökümü",
+      "caughtLabel": "Blöf avın",
+      "caughtDesc": "yalan yakaladın",
+      "fooledLabel": "Kandırma",
+      "fooledDesc": "yalanına {name} inandı",
+      "partnerRow": "{name} yalanlarının {caught}/{total} tanesini yakaladı · {count, plural, =0 {seni hiç kandıramadı} other {seni # kez kandırdı}}",
+      "titles": {
+        "lie_detector": {
+          "name": "Yalan Dedektörü",
+          "desc": "Bütün yalanları yakaladı"
+        },
+        "poker_face": {
+          "name": "Poker Face",
+          "desc": "Hiçbir yalanı yakalanmadı"
+        },
+        "too_skeptical": {
+          "name": "Fazla Şüpheci",
+          "desc": "Doğrulara bile inanmadı"
+        },
+        "pure_heart": {
+          "name": "Saf Kalp",
+          "desc": "Hiçbir yalanı yakalayamadı"
+        }
+      },
+      "toFinale": "Sonucu patlat",
+      "finaleTitle": "Blöf avı bitti!",
+      "finaleFooled": "{count, plural, =0 {{name} hiçbir yalanına inanmadı} other {{name} senin {lies} yalanından # tanesine inandı}}",
+      "accuse": "Blöf de",
+      "accused": "Blöf! dedin · geri al",
+      "pickOne": "En az 1, en çok {count} cevap seç",
+      "rightsLeft": "{count, plural, =0 {Hakların doldu} other {# hakkın kaldı}}",
+      "falseAlarms": "{count, plural, =0 {Boşa giden “Blöf!” yok} other {# doğruya boşuna “Blöf!” dedin}}"
+    }
   },
   "error": {
     "generic": "Bir şeyler ters gitti. Lütfen tekrar dene.",
@@ -519,6 +613,10 @@
           {
             "name": "Karma Tur",
             "text": "Modlar her turda sürpriz şekilde karışır. Mobil uygulamada “Bir fincan kahve” paketiyle açılır."
+          },
+          {
+            "name": "Blöf",
+            "text": "Evet ya da Hayır ile cevapla ve tahmin et, Yalan Kartı'nla en az bir cevabını ters göster. Sonunda sınırlı “Blöf!” hakkınla karşındakinin yalanlarını yakala."
           },
           {
             "name": "Red Flag Mayın Tarlası",

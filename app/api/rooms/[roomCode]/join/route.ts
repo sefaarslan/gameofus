@@ -131,7 +131,8 @@ export async function POST(
   const guestGender = parseGender(gender);
   // Hesapsız (web) misafirin isteğe bağlı AI rızası: yalnızca mobilden kurulmuş odada anlamlıdır (web odalarında AI yoktur) ve yalnızca
   // kesin `true` kabul edilir. Hesaplı oyuncunun rızası `users` tablosundadır, buradaki alan yok sayılır.
-  const guestAiConsent = aiConsent === true && !authUser && !!room.user_id;
+  // Blöf modunda AI yorumu yoktur: rıza kaydedilmez.
+  const guestAiConsent = aiConsent === true && !authUser && !!room.user_id && room.game_mode !== "bluff";
   // Rıza veren oyuncunun yaş aralığı ve burcu yoruma girer: doğum tarihi rızayla birlikte zorunludur (rıza yoksa isteğe bağlı).
   if (guestAiConsent && !guestBirth) {
     return apiError("INVALID_PAYLOAD", "Yapay zekâ yorumuna izin vermek için doğum tarihi gereklidir.");

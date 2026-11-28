@@ -74,6 +74,21 @@ export async function loadHistory(userId: string) {
   ]);
   if (rooms.error || everyone.error || results.error) throw fail("Oda geçmişi");
 
+  // Blöf modu: oyuncu blöf avını bitirmeden skor gösterilmez (skor, karşı tarafın hangi cevaplarda yalan söylediğine ipucu verir)
+  const bluffRoomIds = new Set((rooms.data ?? []).filter((r) => r.game_mode === "bluff").map((r) => r.id));
+  const bluffReady = (results.data ?? []).filter((r) => bluffRoomIds.has(r.room_id)).map((r) => r.room_id);
+  const bluffPending = new Set<string>();
+  if (bluffReady.length > 0) {
+    const { data: open, error: openErr } = await supabase
+      .from("predictions")
+      .select("room_id")
+      .in("room_id", bluffReady)
+      .in("predictor_participant_id", myRows.map((p) => p.id))
+      .is("bluff_call", null);
+    if (openErr) throw fail("Oda geçmişi");
+    for (const p of open ?? []) bluffPending.add(p.room_id);
+  }
+
   const myByRoom = new Map(myRows.map((p) => [p.room_id, p]));
   const resultByRoom = new Map((results.data ?? []).map((r) => [r.room_id, r]));
   const now = Date.now();
@@ -98,8 +113,10 @@ export async function loadHistory(userId: string) {
         expiresAt: room.expires_at,
         expired: new Date(room.expires_at).getTime() < now,
         resultReady: !!result,
-        readingScore: result?.reading_score ?? null,
+        readingScore: bluffPending.has(room.id) ? null : (result?.reading_score ?? null),
         completedAt: result?.created_at ?? null,
+        // Yalnızca blöf odalarında: sonuç hazır ama bu oyuncu blöf avını henüz yapmadı
+        ...(room.game_mode === "bluff" ? { bluffPending: bluffPending.has(room.id) } : {}),
       },
     ];
   });

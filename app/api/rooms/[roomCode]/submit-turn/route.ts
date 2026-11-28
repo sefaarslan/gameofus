@@ -12,6 +12,7 @@ export function OPTIONS() {
 import { apiError, apiOk } from "@/lib/api";
 import { normalizeRoomCode } from "@/lib/room-code-utils";
 import { denyUnknownRoom, tokenDenied } from "@/lib/room-lookup";
+import { lieCardsFor, lieFor, readChoice } from "@/lib/bluff";
 import type { Json } from "@/types/database.types";
 
 const CONFIDENCE_MULTIPLIERS = { guess: 1, think: 2, sure: 3 } as const;
@@ -31,7 +32,7 @@ export async function POST(
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { questionId, answerValue, predictedValue, confidenceLevel } =
+  const { questionId, answerValue, predictedValue, confidenceLevel, isLie } =
     body as Record<string, unknown>;
   const rawBodyToken = (body as Record<string, unknown>).participantToken;
   const participantToken = extractToken(req, typeof rawBodyToken === "string" ? rawBodyToken : null);
@@ -56,7 +57,7 @@ export async function POST(
 
   const { data: room } = await supabase
     .from("rooms")
-    .select("id, status, expires_at, game_mode")
+    .select("id, status, expires_at, game_mode, question_count")
     .eq("room_code", roomCode)
     .maybeSingle();
 
@@ -89,6 +90,26 @@ export async function POST(
 
   if (!rq) return apiError("QUESTION_NOT_FOUND", "Bu soru bu odaya ait değil.", 404);
 
+  // Blöf modu: yalnızca Evet / Hayır. `isLie: true` → karşı tarafa cevabın TERSİ gösterilir (Yalan Kartı; sette sınırlı sayıda).
+  // Diğer modlarda `isLie` yok sayılır.
+  let lie: Json | null = null;
+  const lieCards = lieCardsFor(room.question_count);
+  const countMyLies = async () => {
+    const { count, error } = await supabase
+      .from("answers")
+      .select("*", { count: "exact", head: true })
+      .eq("room_id", room.id)
+      .eq("participant_id", me.id)
+      .not("shown_value", "is", null);
+    return error ? null : (count ?? 0);
+  };
+  if (room.game_mode === "bluff") {
+    if (!readChoice(answerValue) || !readChoice(predictedValue)) {
+      return apiError("INVALID_PAYLOAD", "Cevap ve tahmin Evet ya da Hayır olmalı.");
+    }
+    if (isLie === true) lie = lieFor(answerValue);
+  }
+
   // Duplicate submit kontrolü
   const { data: existingAnswer } = await supabase
     .from("answers")
@@ -100,6 +121,13 @@ export async function POST(
 
   if (existingAnswer) {
     return apiError("ALREADY_SUBMITTED", "Bu soruya zaten cevap verdiniz.");
+  }
+
+  // Yalan Kartı kalmamışsa hiçbir şey yazılmaz (oyuncu aynı soruyu kartsız gönderebilir)
+  if (lie) {
+    const used = await countMyLies();
+    if (used === null) return apiError("INTERNAL_ERROR", "Cevap kaydedilemedi.", 500);
+    if (used >= lieCards) return apiError("LIE_LIMIT", "Yalan Kartların bitti.");
   }
 
   const now = new Date().toISOString();
@@ -119,6 +147,8 @@ export async function POST(
       participant_id: me.id,
       answer_value: answerValue as Json,
       locked_at: now,
+      // Sütun yalnızca yalan varken yazılır (diğer modların kaydı değişmez)
+      ...(lie ? { shown_value: lie } : {}),
     }),
     supabase.from("predictions").insert({
       room_id: room.id,
@@ -140,6 +170,15 @@ export async function POST(
 
   if (answerErr || predErr) {
     return apiError("INTERNAL_ERROR", "Cevap kaydedilemedi.", 500);
+  }
+
+  // Eşzamanlı istekler sınırı aşmasın: yazdıktan sonra tekrar sayılır; aşan istek kendi yalanını geri alır (cevap dürüst kalır)
+  if (lie) {
+    const used = await countMyLies();
+    if (used !== null && used > lieCards) {
+      await supabase.from("answers").update({ shown_value: null }).eq("room_id", room.id).eq("participant_id", me.id).eq("question_id", questionId);
+      return apiError("LIE_LIMIT", "Yalan Kartların bitti.");
+    }
   }
 
   // `microReveal` yalnızca eski istemcilerin yanıt şeklini bozmamak için kalır (her zaman available:false); yeni istemciler yok sayar.

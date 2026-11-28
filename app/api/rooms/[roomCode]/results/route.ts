@@ -8,6 +8,8 @@ import { apiError, apiOk } from "@/lib/api";
 import { normalizeRoomCode } from "@/lib/room-code-utils";
 import { denyUnknownRoom, tokenDenied } from "@/lib/room-lookup";
 import { corsOptions } from "@/lib/cors";
+import { callItems, callsDone, revealView, type BluffDetail } from "@/lib/bluff-view";
+import { lieCardsFor } from "@/lib/bluff";
 
 export function OPTIONS() {
   return corsOptions();
@@ -114,6 +116,41 @@ export async function GET(
 
   const details = (result.details_json as DetailEntry[] | null) ?? [];
 
+  // Blöf modu: oyuncu blöf avını bitirmeden yalnızca gösterilen cevaplar ve kendi tahminleri döner (skor/gerçek cevap YOK)
+  let reveal: ReturnType<typeof revealView> | null = null;
+  if (room.game_mode === "bluff") {
+    if (!partner) return apiError("RESULT_NOT_READY", "Sonuçlar henüz hazır değil.");
+    const { data: calls, error: callsErr } = await supabase
+      .from("predictions")
+      .select("predictor_participant_id, question_id, predicted_value, bluff_call")
+      .eq("room_id", room.id);
+    if (callsErr || !calls) return apiError("INTERNAL_ERROR", "Sonuçlar okunamadı.", 500);
+    const bluffDetails = details as unknown as BluffDetail[];
+
+    if (!callsDone(calls, me.id)) {
+      return apiOk({
+        room: {
+          roomCode,
+          gameMode: room.game_mode,
+          questionCount: room.question_count,
+          relationshipType: room.relationship_type ?? null,
+        },
+        me: { id: me.id, role: me.role, displayName: me.display_name },
+        partner: { role: partner.role, displayName: partner.display_name },
+        bluff: {
+          phase: "call",
+          // "Blöf!" hakkı: en az 1, en çok bu kadar cevap işaretlenebilir
+          rights: lieCardsFor(room.question_count),
+          items: callItems(bluffDetails, calls, me.id, partner.id).map((item) => ({
+            ...item,
+            questionText: questionMap.get(item.questionId)?.question_text ?? "",
+          })),
+        },
+      });
+    }
+    reveal = revealView(bluffDetails, calls, me.id, partner.id);
+  }
+
   const questions = details.map((d) => {
     const q = questionMap.get(d.questionId);
     const myAnswer = d.answers.find((a) => a.participantId === me.id)?.answerValue ?? null;
@@ -154,6 +191,7 @@ export async function GET(
             result: partnerPredictionOfMe.result,
           }
         : null,
+      ...(reveal ? { bluff: reveal.questions.get(d.questionId) } : {}),
     };
   });
 
@@ -180,5 +218,6 @@ export async function GET(
     me: { id: me.id, role: me.role, displayName: me.display_name },
     partner: partner ? { role: partner.role, displayName: partner.display_name } : null,
     questions,
+    ...(reveal ? { bluff: reveal.summary } : {}),
   });
 }

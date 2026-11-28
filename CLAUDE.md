@@ -260,6 +260,7 @@ elde edilebilecek sıra (Kendall tau mesafesi = 1).
 ### Sonuç kuralları
 - Sonuç yalnızca **iki participant da oyunu tamamladıktan sonra** hesaplanır.
 - Hesaplama **server-side** yapılır.
+- `complete` önce oyuncuyu tamamlandı işaretler, sonra durumları yeniden okur (eşzamanlı bitişte sonuç kaybolmasın); bu sırayı bozma.
 - Aynı oda için **duplicate result oluşturulmaz** (`unique(room_id)`).
 - Sonuç ekranı yalnızca oda `result_ready` durumuna geçtiğinde açılır.
 
@@ -438,13 +439,23 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
 - Her soru ekranı `questions.mode` değerine göre doğru UI bileşenini render eder.
 - Skor hesaplama: her soru kendi modunun doğru/yakın/yanlış kuralına göre değerlenir.
 
+### Blöf (`rooms.game_mode = 'bluff'`; web uygulandı, mobil planlı)
+- Secret Choice soruları (`questions.mode = secret_choice`) kullanılır, ayrı içerik yoktur; ama bu modda **yalnızca Evet / Hayır** vardır ("Kararsız" yok; sunucu reddeder). Soru eklerken Evet/Hayır sorularının iki seçenekle de cevaplanabilir olmasına dikkat et.
+- Her soruda gerçek cevap + tahmin (aynı `submit-turn`). **Yalan Kartı:** `isLie: true` → karşı tarafa cevabın TERSİ gösterilir (`answers.shown_value`, sunucu hesaplar). Sette **en az 1, en çok `lieCards`** (5 soruda 2, 10 soruda 3; `lib/bluff-config.ts`); sınır sunucuda zorlanır (`LIE_LIMIT`). Hiç kart oynamadan biten oyuncuya bir soru seçtirilir (`complete` → `LIE_REQUIRED`, gövdedeki `lieQuestionId`).
+- İlk blöf oyununda 3 adımlık tanıtım (cihazda `gou_bluff_intro_seen`): "Cevabını seç · İstersen yalan söyle · Sonunda onun yalanını yakala".
+- İkisi bitince sonuç hesaplanır (`result_ready`; yeni oda/katılımcı durumu yok), ama her oyuncu önce **blöf avını** yapar (`POST bluff-calls { suspects }` → `predictions.bluff_call`, tek istek, bir kez). Avcının da **sınırlı "Blöf!" hakkı** vardır (en az 1, en çok `lieCards`) ve **puan yakalanan yalan sayısıdır** (denge kuralı: doğru karar sayısı puan olsaydı "her şeye inan" en iyi taktik olurdu; bunu geri getirme). Ardından **soru soru açılış**: toplam puan ve unvanlar gizlidir, hepsi sondaki finalde birlikte patlar (`prefers-reduced-motion` saygı).
+- **Kritik:** oyuncu avını bitirmeden karşı tarafın gerçek cevabından TÜREYEN hiçbir şey dönmez (`results` yalnızca gösterilen cevap + kendi tahmini; `history`/`overview` skoru `null` + `bluffPending`; AI yorumu `AI_MODE_UNSUPPORTED`). Okuma skorunu ya da cevapları gösteren yeni bir uç/alan eklersen blöf odalarında bu kuralı uygula; call görünümü `lib/bluff-view.ts`'te izinli alanlardan sıfırdan kurulur.
+- Puan ve unvanlar yalnızca sunucuda (`lib/bluff.ts`). Okuma skoru gerçek cevaplara göre değişmeden hesaplanır.
+- Katılma ekranında blöf odasında AI rızası/cinsiyet/doğum tarihi sorulmaz.
+- Testler: `node --no-warnings scripts/test-bluff.mjs` (birim) ve `BASE=http://localhost:3001 node --no-warnings scripts/test-bluff-api.mjs` (entegrasyon + sızıntı testi: gösterilenler aynı, gerçekler farklı iki odada açılıştan önceki yanıtlar birebir aynı olmalı).
+
 ### Oda oluşturma ve soru seçimi (`POST /api/rooms/create`)
 - Girdi: ad, `gameMode`, `questionCount` (5/10), `locale`, `relationshipType`,
   (opsiyonel) `categoryId`, (opsiyonel) `birthDate` (`YYYY-AA-GG`, kendi doğum tarihi; < 13 yaş `403 AGE_RESTRICTED`), (opsiyonel) `gender` (`female` | `male`; boş = belirtilmedi). **Yalnızca kurucunun bilgisi**: `partnerName`/`partnerGender`/`partnerBirthDate` gönderilse bile yok sayılır.
   **Oda oluşturma sayfası iki adımlı sihirbazdır (web + mobil görünüm; durum bileşende, sunucuya yalnızca son adımda tek istek):**
   **Adım 1 "Kimler oynuyor?"** (ilişki türü + "Sen" kartı: yalnızca ad; webde oda kurarken **cinsiyet ve doğum tarihi sorulmaz** (2026-11-27; web odalarında kullanım amacı yok). Bu alanlar yalnızca katılma ekranında, mobilden kurulmuş odada sorulur; mobil uygulama API'ye göndermeye devam eder) →
   **Adım 2 "Ne oynuyoruz?"** (kategori → oyun modu → soru sayısı + canlı özet). Tasarım **mobil uygulamadaki `create.tsx` ile aynıdır** (numaralı bölüm başlıkları, dolu kırmızı seçili kartlar, köşe seçim işareti, yatay kaydırmalı kategori kartları, "Popüler"/"İDEAL" rozetleri, özet kartı; parçalar `components/create/ui.tsx`).
-  Geri tuşu 2. adımdan 1. adıma döner (`history.pushState({ createStep: 2 })`). **Taslak korunur:** sihirbaz durumu (adım, ad, ilişki türü, mod, kategori, soru sayısı) `sessionStorage` `gou_create_draft` anahtarında tutulur; sayfa yenilenince/başka sayfaya gidip dönünce kaldığı adımdan devam eder, oda kurulunca silinir, sekme kapanınca gider; sunucuya hiçbir şey gitmez (geri yüklenen değerler doğrulanır, listede olmayan kategori temizlenir). Mod seçicide dört mod vardır (Karma webde soluk/pasif, "Mobilde"). **Sahne modu webde yoktur** (2026-11-27'de arayüzden ve koddan kaldırıldı; yalnızca mobil için planlı).
+  Geri tuşu 2. adımdan 1. adıma döner (`history.pushState({ createStep: 2 })`). **Taslak korunur:** sihirbaz durumu (adım, ad, ilişki türü, mod, kategori, soru sayısı) `sessionStorage` `gou_create_draft` anahtarında tutulur; sayfa yenilenince/başka sayfaya gidip dönünce kaldığı adımdan devam eder, oda kurulunca silinir, sekme kapanınca gider; sunucuya hiçbir şey gitmez (geri yüklenen değerler doğrulanır, listede olmayan kategori temizlenir). Mod seçicide beş mod vardır (Blöf "Yeni" rozetli, Sıralama'nın yanında; Karma altta tam genişlikte, webde soluk/pasif, "Mobilde"). **Sahne modu webde yoktur** (2026-11-27'de arayüzden ve koddan kaldırıldı; yalnızca mobil için planlı).
 - Kategori seçimi **yatay kayan kartlardır** (`components/create/Carousel.tsx`: dokunmatikte kaydırma, masaüstünde yan ok düğmeleri; hiçbir ekranda alt alta sarmaz); ilk kart "Karışık Sürpriz" (kategori yok, varsayılan). Kategoriler sayfa
   açılırken bir kez çekilir, tür değişince istemcide filtrelenir; sunucu yine de uyumu doğrular
   (uyumsuzsa `INVALID_PAYLOAD`).

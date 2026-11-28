@@ -10,7 +10,7 @@ import { ChoiceCard, FloatBadge, NumberBadge, Pill, SectionHeader } from "@/comp
 
 // Tasarım mobil uygulamadaki oda oluşturma ekranıyla aynıdır (gameofus-mobile/src/app/game/create.tsx).
 
-type GameMode = "secret_choice" | "prediction" | "orderline" | "mixed";
+type GameMode = "secret_choice" | "prediction" | "orderline" | "bluff" | "mixed";
 
 interface Category {
   id: string;
@@ -25,11 +25,13 @@ interface Category {
 
 // Her mod kendi ton ve ikonunu taşır (seçiliyken hepsi dolu kırmızıya döner)
 // `mobileOnly`: web'de kapalı (soluk, "Mobilde" rozeti); yalnızca mobil uygulamada paketle (Lite+) oynanır. Sunucu kuralı: `lib/tier.ts` MIXED_MODE_MIN_TIER.
-const MODES: Array<{ value: GameMode; icon: string; tint: string; color: string; popular?: boolean; mobileOnly?: boolean }> = [
+// `isNew`: "Yeni" rozeti. `wide`: satırın tamamını kaplayan kart.
+const MODES: Array<{ value: GameMode; icon: string; tint: string; color: string; popular?: boolean; isNew?: boolean; mobileOnly?: boolean; wide?: boolean }> = [
   { value: "secret_choice", icon: "visibility_off", tint: "bg-primary-container/60", color: "text-[#ae2f34]", popular: true },
   { value: "prediction", icon: "lightbulb", tint: "bg-tertiary-container/45", color: "text-[#6b5900]" },
   { value: "orderline", icon: "format_list_numbered", tint: "bg-secondary-container", color: "text-[#4b4642]" },
-  { value: "mixed", icon: "casino", tint: "bg-error-container", color: "text-[#ae2f34]", mobileOnly: true },
+  { value: "bluff", icon: "theater_comedy", tint: "bg-primary-container/60", color: "text-[#ae2f34]", isNew: true },
+  { value: "mixed", icon: "casino", tint: "bg-error-container", color: "text-[#ae2f34]", mobileOnly: true, wide: true },
 ];
 
 // Kanka: el sıkışma · Sevgili: elde kalp · Evli: yüzük/elmas (dolu stil)
@@ -58,7 +60,7 @@ const CATEGORY_ICONS: Record<string, string> = {
  */
 const DRAFT_KEY = "gou_create_draft";
 // Karma Tur webde seçilemez (taslakta eski bir "mixed" varsa varsayılana düşer)
-const GAME_MODES: readonly GameMode[] = ["secret_choice", "prediction", "orderline"];
+const GAME_MODES: readonly GameMode[] = ["secret_choice", "prediction", "orderline", "bluff"];
 
 interface CreateDraft {
   step: 1 | 2;
@@ -511,8 +513,8 @@ export default function CreatePage() {
                       trailing={<span className="text-xs text-on-surface-variant">{t("mode.hint")}</span>}
                     />
                     <div className="grid grid-cols-2 gap-3 pt-2.5">
-                      {MODES.map(({ value, icon, tint, color, popular, mobileOnly }) => (
-                        <div key={value} className="relative flex">
+                      {MODES.map(({ value, icon, tint, color, popular, isNew, mobileOnly, wide }) => (
+                        <div key={value} className={`relative flex ${wide ? "col-span-2" : ""}`}>
                           <ChoiceCard
                             selected={gameMode === value}
                             onClick={() => setGameMode(value)}
@@ -531,9 +533,21 @@ export default function CreatePage() {
                               {t("mode.popular")}
                             </FloatBadge>
                           )}
+                          {isNew && (
+                            <FloatBadge tone="green" icon="auto_awesome">
+                              {t("mode.new")}
+                            </FloatBadge>
+                          )}
                         </div>
                       ))}
                     </div>
+                    {/* Blöf yeni bir kural getirdiği için seçilince kısaca anlatılır */}
+                    {gameMode === "bluff" && (
+                      <p role="status" className="mt-3 flex gap-2.5 rounded-2xl bg-primary-container/30 px-3.5 py-3 text-xs leading-relaxed text-on-background">
+                        <span className="material-symbols-outlined icon-fill text-lg text-primary shrink-0">theater_comedy</span>
+                        {t("mode.bluffHow")}
+                      </p>
+                    )}
                   </div>
 
                   {/* 3 — Soru sayısı ve süre */}

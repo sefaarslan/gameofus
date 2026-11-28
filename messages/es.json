@@ -231,17 +231,21 @@
         "secret_choice": "Sí / No",
         "prediction": "Escenario",
         "orderline": "Ranking",
-        "mixed": "Mixto"
+        "mixed": "Mixto",
+        "bluff": "Bluff"
       },
       "descs": {
         "secret_choice": "Clásico de 3 opciones",
         "prediction": "Opción múltiple",
         "orderline": "Adivina el orden",
-        "mixed": "Un poco de todo"
+        "mixed": "Un poco de todo",
+        "bluff": "Miente a veces. ¿Te pillarán?"
       },
       "mobileOnly": "En la app",
       "hint": "¿Cómo se juega?",
-      "popular": "Popular"
+      "popular": "Popular",
+      "new": "Nuevo",
+      "bluffHow": "Responde Sí o No y adivina. Usa tus cartas de mentira para mostrar lo contrario en algunas respuestas (2 en 5 preguntas, 3 en 10; al menos 1). Al final, con el mismo número de intentos, pillen las mentiras del otro."
     },
     "questions": {
       "label": "Número de Preguntas y Ritmo",
@@ -403,7 +407,39 @@
     "modePrediction": "Predicción",
     "modeOrderline": "Ranking",
     "errorGeneric": "Algo salió mal.",
-    "errorConnection": "Error de conexión."
+    "errorConnection": "Error de conexión.",
+    "modeBluff": "Bluff",
+    "bluff": {
+      "truthTitle": "Tu respuesta real",
+      "guessTitle": "¿Qué diría {name} de verdad?",
+      "whoFallback": "{rel, select, friend {tu amigo} other {tu pareja}}",
+      "cardTitle": "Carta de mentira",
+      "cardUse": "Toca para mostrar lo contrario de tu respuesta",
+      "cardPickFirst": "Primero elige tu respuesta",
+      "cardActive": "Carta jugada",
+      "cardPreview": "{name} verá «{value}»",
+      "cardUndo": "Deshacer",
+      "cardsLeft": "Te quedan {count}",
+      "cardsEmpty": "No te quedan cartas",
+      "cardsEmptyDesc": "Tus siguientes respuestas se verán tal cual",
+      "cardLast": "Última pregunta: tienes que usar al menos 1 carta",
+      "finishTitle": "Aún no has mentido",
+      "finishDesc": "Tienes que usar al menos 1 carta de mentira. ¿En qué respuesta?",
+      "truthLabel": "Tu verdad: {value}",
+      "finishButton": "Usar la carta y terminar",
+      "finishing": "Terminando tu partida...",
+      "retry": "Reintentar",
+      "intro": {
+        "title": "¿Cómo se juega a Bluff?",
+        "step1": "Elige tu respuesta",
+        "step1Desc": "Sí o No. Luego adivina qué diría {name}.",
+        "step2": "Miente si quieres",
+        "step2Desc": "Tienes {count} cartas de mentira en esta ronda. Tú eliges dónde; usa al menos una.",
+        "step3": "Al final, pilla su mentira",
+        "step3Desc": "Cuando ambos terminen, usa tus {count} intentos para descubrir dónde mintió {name}.",
+        "start": "Empezar"
+      }
+    }
   },
   "option": {
     "yes": "Sí",
@@ -458,7 +494,65 @@
     "guessOf": "predicción",
     "guessAboutPartner": "predicción sobre tu {rel, select, friend {amigo} other {pareja}}",
     "partnerRealAnswer": "respuesta real",
-    "partnerFallback": "{rel, select, friend {Amigo} other {Pareja}}"
+    "partnerFallback": "{rel, select, friend {Amigo} other {Pareja}}",
+    "bluff": {
+      "callTitle": "Pilla la mentira",
+      "callSubtitle": "¿Dónde mintió {name}? Puedes decir «¡Mentira!» {count} veces.",
+      "says": "{name} dice",
+      "yourGuess": "Tu predicción: {value}",
+      "bluff": "¡Mentira!",
+      "submit": "Terminar la caza",
+      "sending": "Enviando...",
+      "revealStep": "Revelación {current}/{total}",
+      "youBelieved": "Te lo creíste",
+      "youDoubted": "Dijiste «¡Mentira!»",
+      "caughtLie": "¡Pillaste la mentira!",
+      "fooledByLie": "¡Pero era mentira!",
+      "truthBelieved": "Decía la verdad",
+      "truthDoubted": "Pero decía la verdad",
+      "truthWas": "Respuesta real: {value}",
+      "yourLie": "Dijiste «{value}» (mentira)",
+      "yourTruth": "Dijiste «{value}» (verdad)",
+      "partnerBelieved": "{name} se lo creyó",
+      "partnerDoubted": "{name} dijo «¡Mentira!»",
+      "partnerPending": "{name} aún no ha decidido",
+      "next": "Siguiente",
+      "skip": "Saltar todo",
+      "seeResults": "Ver resultados",
+      "summaryTitle": "Balance del Bluff",
+      "breakdown": "Respuesta por respuesta",
+      "caughtLabel": "Tus decisiones",
+      "caughtDesc": "mentiras pilladas",
+      "fooledLabel": "Engaños",
+      "fooledDesc": "de tus mentiras se creyó {name}",
+      "partnerRow": "{name} pilló {caught}/{total} de tus mentiras · {count, plural, =0 {no logró engañarte} one {te engañó una vez} other {te engañó # veces}}",
+      "titles": {
+        "lie_detector": {
+          "name": "Detector de mentiras",
+          "desc": "Pilló todas las mentiras"
+        },
+        "poker_face": {
+          "name": "Cara de póker",
+          "desc": "No le pillaron ninguna mentira"
+        },
+        "too_skeptical": {
+          "name": "Mente desconfiada",
+          "desc": "No creyó ni la verdad"
+        },
+        "pure_heart": {
+          "name": "Corazón puro",
+          "desc": "No pilló ni una mentira"
+        }
+      },
+      "toFinale": "Ver la puntuación",
+      "finaleTitle": "¡Se acabó la caza!",
+      "finaleFooled": "{count, plural, =0 {{name} no se creyó ninguna de tus mentiras} one {{name} se creyó # de tus {lies} mentiras} other {{name} se creyó # de tus {lies} mentiras}}",
+      "accuse": "Decir «¡Mentira!»",
+      "accused": "¡Mentira! · deshacer",
+      "pickOne": "Elige al menos 1 y como máximo {count}",
+      "rightsLeft": "{count, plural, =0 {No te quedan intentos} one {Te queda # intento} other {Te quedan # intentos}}",
+      "falseAlarms": "{count, plural, =0 {Ningún intento perdido} one {# verdad señalada por error} other {# verdades señaladas por error}}"
+    }
   },
   "error": {
     "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
@@ -519,6 +613,10 @@
           {
             "name": "Ronda Mixta",
             "text": "Los modos se mezclan con una sorpresa en cada ronda. En la app móvil viene con el paquete “Una taza de café”."
+          },
+          {
+            "name": "Bluff",
+            "text": "Respondan Sí o No y adivinen, y den la vuelta al menos a una respuesta con una carta de mentira. Al final, pillen las mentiras del otro con intentos limitados."
           },
           {
             "name": "Campo Minado de Red Flags",

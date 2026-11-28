@@ -8,6 +8,7 @@ import { decodeRoomCodeParam, normalizeRoomCode } from "@/lib/room-code-utils";
 import { JoinScreen } from "./_screens/JoinScreen";
 import { ShareScreen } from "./_screens/ShareScreen";
 import { GameScreen } from "./_screens/GameScreen";
+import type { MyBluffAnswer } from "./_screens/bluff";
 import { WaitingScreen } from "./_screens/WaitingScreen";
 
 type QuestionMode = "secret_choice" | "prediction" | "orderline";
@@ -43,6 +44,8 @@ interface RoomStateData {
   participants: Array<{ role: string; displayName: string; status: string }>;
   questions: Question[];
   progress: { answeredCount: number; totalCount: number };
+  /** Yalnızca blöf modunda: oyuncunun kendi cevapları ve gösterdikleri */
+  bluff?: { lieCards: number; myAnswers: MyBluffAnswer[] };
 }
 
 type Screen = "loading" | "error" | "join" | "share" | "game" | "waiting" | "results";
@@ -255,7 +258,9 @@ export default function RoomPage() {
   }
 
   if (screen === "join") {
-    return <JoinScreen roomCode={roomCode} mobileRoom={stateData?.room.mobileRoom ?? false} onJoined={handleJoined} />;
+    // Blöf modunda AI yorumu yoktur: rıza, cinsiyet ve doğum tarihi alanları gösterilmez
+    const asksProfile = (stateData?.room.mobileRoom ?? false) && stateData?.room.gameMode !== "bluff";
+    return <JoinScreen roomCode={roomCode} mobileRoom={asksProfile} onJoined={handleJoined} />;
   }
 
   if (screen === "share") {
@@ -282,6 +287,9 @@ export default function RoomPage() {
         questions={stateData.questions}
         initialIndex={stateData.progress.answeredCount}
         relationshipType={stateData.room.relationshipType}
+        isBluff={stateData.room.gameMode === "bluff"}
+        initialBluffAnswers={stateData.bluff?.myAnswers ?? []}
+        lieCards={stateData.bluff?.lieCards ?? 0}
         partnerName={stateData.participants.find((x) => x.role !== stateData.participant?.role)?.displayName ?? null}
         onComplete={handleGameComplete}
       />

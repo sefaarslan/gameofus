@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { decodeRoomCodeParam, normalizeRoomCode } from "@/lib/room-code-utils";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -12,6 +12,16 @@ import { FeedbackExitSheet } from "@/components/FeedbackExitSheet";
 import { SoloPromoCard } from "@/components/solo/SoloPromoCard";
 import { feedbackKeys, readFlag, writeFlag } from "@/lib/feedback-client";
 import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/social";
+import {
+  BluffCallScreen,
+  BluffRevealCard,
+  BluffStepReveal,
+  BluffSummary,
+  type BluffCallItem,
+  type BluffQuestion,
+  type BluffRow,
+  type BluffSummaryData,
+} from "./bluff";
 
 type RevealResult = "correct" | "near" | "miss";
 
@@ -33,6 +43,8 @@ interface QuestionResult {
     confidenceLevel: string;
     result: RevealResult | null;
   } | null;
+  /** Yalnızca blöf modunda */
+  bluff?: BluffQuestion;
 }
 
 interface ResultsData {
@@ -43,6 +55,16 @@ interface ResultsData {
   me: { id: string; role: string; displayName: string };
   partner: { role: string; displayName: string } | null;
   questions: QuestionResult[];
+  /** Yalnızca blöf modunda (blöf avı bittikten sonra) */
+  bluff?: BluffSummaryData;
+}
+
+/** Blöf modunda, oyuncu blöf avını bitirmeden dönen yanıt: skor ve gerçek cevaplar içermez. */
+interface BluffCallData {
+  room: ResultsData["room"];
+  me: ResultsData["me"];
+  partner: { role: string; displayName: string } | null;
+  bluff: { phase: "call"; rights: number; items: BluffCallItem[] };
 }
 
 const RESULT_COLORS: Record<RevealResult, { edge: string; dot: string; badge: string }> = {
@@ -88,7 +110,10 @@ export default function ResultsPage() {
   const router = useRouter();
 
   const [data, setData] = useState<ResultsData | null>(null);
-  const rel = relKey(data?.room.relationshipType);
+  const [callData, setCallData] = useState<BluffCallData | null>(null);
+  // Kararlar az önce gönderildiyse sonuç sayfasından önce cevaplar tek tek açılır
+  const [stepReveal, setStepReveal] = useState(false);
+  const rel = relKey((data ?? callData)?.room.relationshipType);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [participantToken, setParticipantToken] = useState<string | null>(null);
@@ -112,6 +137,28 @@ export default function ResultsPage() {
     miss: t("labelMiss"),
   };
 
+  // Sonucu okur. `quiet`: arka plan yoklaması — hata ekranı açılmaz, mevcut görünüm korunur.
+  const load = useCallback(
+    async (token: string, quiet = false) => {
+      try {
+        // Token URL'de değil başlıkta taşınır (adresler proxy/CDN günlüklerine ve tarayıcı geçmişine düşer)
+        const res = await fetch(`/api/rooms/${roomCode}/results`, { headers: { Authorization: `Bearer ${token}` } });
+        const json = await res.json();
+        if (json.error) {
+          if (!quiet) setErrorMsg(json.error.message ?? tErr("generic"));
+        } else if (json.bluff?.phase === "call") {
+          setCallData(json as BluffCallData);
+        } else {
+          setData(json as ResultsData);
+          setCallData(null);
+        }
+      } catch {
+        if (!quiet) setErrorMsg(tErr("generic"));
+      }
+    },
+    [roomCode, tErr],
+  );
+
   useEffect(() => {
     const token = localStorage.getItem(`gou_token_${roomCode}`);
     if (!token) {
@@ -120,19 +167,18 @@ export default function ResultsPage() {
     }
 
     setParticipantToken(token);
+    void load(token);
+  }, [roomCode, tErr, load]);
 
-    // Token URL'de değil başlıkta taşınır (adresler proxy/CDN günlüklerine ve tarayıcı geçmişine düşer)
-    fetch(`/api/rooms/${roomCode}/results`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.json())
-      .then((json) => {
-        if (json.error) {
-          setErrorMsg(json.error.message ?? tErr("generic"));
-        } else {
-          setData(json);
-        }
-      })
-      .catch(() => setErrorMsg(tErr("generic")));
-  }, [roomCode, tErr]);
+  // Blöf modu: karşı oyuncu blöf avını henüz yapmadıysa sonuç arada bir tazelenir (sekme gizliyken istek atılmaz)
+  const waitingForPartnerCalls = !!data?.bluff && !data.bluff.partner.callsDone;
+  useEffect(() => {
+    if (!waitingForPartnerCalls || !participantToken) return;
+    const timer = setInterval(() => {
+      if (!document.hidden) void load(participantToken, true);
+    }, 10_000);
+    return () => clearInterval(timer);
+  }, [waitingForPartnerCalls, participantToken, load]);
 
   if (errorMsg) {
     return (
@@ -148,6 +194,22 @@ export default function ResultsPage() {
           {tErr("goHome")}
         </button>
       </div>
+    );
+  }
+
+  if (callData && participantToken) {
+    return (
+      <BluffCallScreen
+        roomCode={roomCode}
+        participantToken={participantToken}
+        items={callData.bluff.items}
+        rights={callData.bluff.rights}
+        partnerName={callData.partner?.displayName ?? t("partnerFallback", { rel })}
+        onDone={async () => {
+          setStepReveal(true);
+          await load(participantToken);
+        }}
+      />
     );
   }
 
@@ -172,6 +234,24 @@ export default function ResultsPage() {
   const missCount = data.questions.filter((q) => q.myPrediction?.result === "miss").length;
   const myInitial = data.me.displayName[0]?.toUpperCase() ?? "?";
   const partnerInitial = data.partner?.displayName[0]?.toUpperCase() ?? "P";
+  const partnerLabel = data.partner?.displayName ?? t("partnerFallback", { rel });
+  const bluffRows: BluffRow[] = data.questions.flatMap((q) =>
+    q.bluff ? [{ questionId: q.questionId, questionText: q.questionText, partnerAnswer: q.partnerAnswer, bluff: q.bluff }] : [],
+  );
+
+  if (stepReveal && data.bluff && bluffRows.length > 0) {
+    return (
+      <BluffStepReveal
+        rows={bluffRows}
+        summary={data.bluff}
+        partnerName={partnerLabel}
+        onFinish={() => {
+          setStepReveal(false);
+          window.scrollTo({ top: 0, behavior: "instant" });
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-73px)] bg-background relative overflow-x-hidden">
@@ -213,6 +293,19 @@ export default function ResultsPage() {
             </p>
           )}
         </section>
+
+        {/* ── Blöf modu: karne ve döküm ────────────────────────── */}
+        {data.bluff && (
+          <>
+            <BluffSummary summary={data.bluff} myName={data.me.displayName} partnerName={partnerLabel} />
+            <section className="flex flex-col gap-3">
+              <h2 className="text-headline-md text-on-background text-center">{t("bluff.breakdown")}</h2>
+              {bluffRows.map((row) => (
+                <BluffRevealCard key={row.questionId} row={row} partnerName={partnerLabel} />
+              ))}
+            </section>
+          </>
+        )}
 
         {/* ── Bento insight grid ───────────────────────────────── */}
         <section className="grid grid-cols-2 gap-4">

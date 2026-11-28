@@ -27,7 +27,7 @@ bu doküman onların okunabilir özetidir. Çelişkide migration'lar geçerlidir
 | `room_status` | `created`, `waiting_guest`, `guest_joined`, `owner_playing`, `guest_playing`, `owner_completed`, `guest_completed`, `result_ready`, `completed`, `expired` |
 | `participant_role` | `owner`, `guest` |
 | `participant_status` | `invited`, `joined`, `playing`, `completed` |
-| `game_mode` | `secret_choice`, `prediction`, `orderline`, `mixed` (`questions.mode` yalnızca ilk üçünü kullanır) |
+| `game_mode` | `secret_choice`, `prediction`, `orderline`, `mixed`, `bluff` (`questions.mode` yalnızca ilk üçünü kullanır; `bluff` yalnızca `rooms.game_mode`) |
 | `confidence_level` | `guess` (×1), `think` (×2), `sure` (×3) |
 | `rooms.relationship_type` | `friend`, `dating`, `partner` (check; nullable) |
 | `categories.relationship_types` | bu üç değerin boş olmayan alt kümesi (`text[]`) |
@@ -84,7 +84,7 @@ solo oturum ve geri bildirimlerini siler, `users` satırını (coin hareketleriy
 | id | uuid | PK |
 | room_code | text | unique; yeni odalar 6, eski odalar 8 karakter (büyük harf/rakam, 0/1/I/L/O yok); linkle elle yazılan kod aynı değer; uzunluğa bağlı kısıt yok |
 | status | room_status | |
-| game_mode | game_mode | secret_choice / prediction / orderline / mixed |
+| game_mode | game_mode | secret_choice / prediction / orderline / mixed / bluff |
 | question_count | int | 5 veya 10 |
 | owner_id | uuid null | participants.id |
 | user_id | uuid null | users.id; anonim odalarda null |
@@ -182,12 +182,16 @@ Constraint: `unique(room_id, round_order)`, `unique(room_id, question_id)`.
 
 `room_id`, `question_id`, `participant_id`, `answer_value jsonb`, `locked_at`, `created_at`.
 Constraint: `unique(room_id, question_id, participant_id)`. Kilitlendikten sonra güncellenmez.
+`shown_value jsonb null` (yalnızca blöf): karşı tarafa gösterilen sahte cevap; null = dürüst. `answer_value` her zaman gerçektir. Tek istisna:
+hiç yalan söylememiş oyuncunun `complete` isteğinde bir cevabına sonradan yazılabilir.
 
 ### `predictions`
 
 `room_id`, `question_id`, `predictor_participant_id`, `target_participant_id`, `predicted_value jsonb`,
 `confidence_level`, `confidence_multiplier` (1/2/3), `locked_at`, `created_at`.
 Constraint: `unique(room_id, question_id, predictor_participant_id, target_participant_id)`.
+`bluff_call text null` (yalnızca blöf; `believe` | `bluff`): tahmin eden oyuncunun o cevaba verdiği blöf avı kararı. Tüm kararlar
+`submit_bluff_calls(p_room, p_caller, p_calls)` ile tek ifadede ve bir kez yazılır (yalnızca service role).
 
 ### `results`
 
@@ -266,6 +270,9 @@ bağlı 90 gün) ve eski `rate_limits` satırlarını önce arşivleyip siler; `
 (Vercel Cron) günde bir çağırır.
 
 ## 5. Migration Notları
+
+- `20260624000000_bluff_mode.sql`: `game_mode` += `bluff`, `answers.shown_value`, `predictions.bluff_call`, `submit_bluff_calls`.
+  Blöf kodu yayına alınmadan **önce** uygulanır.
 
 - Migration'lar tarih damgalı dosyalardır; sıra önemlidir. Soru seti v2 migration'ları üretilir
   (`scripts/build-questions-migration.mjs`): `…_questions_v2_schema` → `…part1..4` (sorular pasif eklenir) →

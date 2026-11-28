@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { relKey } from "@/lib/relationship";
+import { oppositeChoice, type Choice } from "@/lib/bluff";
+import { BluffIntro, CHOICE_STYLES, FinishStep, LieCard, shouldShowBluffIntro, type MyBluffAnswer, type PlayedAnswer } from "./bluff";
 
 type QuestionMode = "secret_choice" | "prediction" | "orderline";
 type ConfidenceLevel = "guess" | "think" | "sure";
@@ -24,6 +26,12 @@ interface GameScreenProps {
   relationshipType?: string | null;
   /** Karşı oyuncunun adı (katıldıktan sonra bilinir); varsa başlıklarda ilişki türü yerine ad kullanılır */
   partnerName?: string | null;
+  /** Blöf modu: her cevapta karşı tarafa başka bir cevap gösterilebilir */
+  isBluff?: boolean;
+  /** Blöf modunda daha önce gönderilen kendi cevapların (sayfa yenilenince) */
+  initialBluffAnswers?: MyBluffAnswer[];
+  /** Blöf modunda sette kullanılabilecek Yalan Kartı sayısı (sunucudan) */
+  lieCards?: number;
   onComplete: () => void;
 }
 
@@ -43,28 +51,23 @@ const MODE_ICONS: Record<QuestionMode, string> = {
 };
 
 // ── Secret Choice buttons ────────────────────────────────────────
-// Renk dili mobil uygulamayla aynı: Evet yeşil, Kararsız turuncu, Hayır kırmızı. Seçili = renkli çerçeve + dolgu + yazı + tik
-// (yalnızca renge bağlı kalmaz). Kendi cevabın biraz daha dolgun, partner tahmini daha açık.
-const CHOICE_STYLES: Record<ScChoice, { border: string; answer: string; pred: string; text: string }> = {
-  yes: { border: "border-[#43a047]", answer: "bg-[#43a047]/25", pred: "bg-[#43a047]/10", text: "text-[#1b5e20]" },
-  unsure: { border: "border-[#fb8c00]", answer: "bg-[#fb8c00]/25", pred: "bg-[#fb8c00]/10", text: "text-[#8a4b00]" },
-  no: { border: "border-[#ae2f34]", answer: "bg-[#ae2f34]/20", pred: "bg-[#ae2f34]/10", text: "text-[#8c1f24]" },
-};
-
 function SecretChoiceButtons({
   selected,
   onSelect,
   variant = "answer",
+  binary = false,
 }: {
   selected: ScChoice | null;
   onSelect: (v: ScChoice) => void;
   variant?: "answer" | "prediction";
+  /** Blöf modu: yalnızca Evet / Hayır */
+  binary?: boolean;
 }) {
   const t = useTranslations("option");
-  const options: ScChoice[] = ["yes", "unsure", "no"];
+  const options: ScChoice[] = binary ? ["yes", "no"] : ["yes", "unsure", "no"];
 
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className={`grid gap-2 ${binary ? "grid-cols-2" : "grid-cols-3"}`}>
       {options.map((v) => {
         const isSelected = selected === v;
         const style = CHOICE_STYLES[v];
@@ -219,6 +222,9 @@ export function GameScreen({
   initialIndex,
   relationshipType,
   partnerName,
+  isBluff = false,
+  initialBluffAnswers = [],
+  lieCards = 0,
   onComplete,
 }: GameScreenProps) {
   const t = useTranslations("game");
@@ -237,6 +243,12 @@ export function GameScreen({
   const [leaving, setLeaving] = useState(false);
   const partnerRef = useRef<HTMLDivElement>(null);
   const autoScrolledFor = useRef(-1);
+  // Blöf modu: ilk oyunda kısa tanıtım; bu soruda Yalan Kartı kullanımı ve gönderilmiş kendi cevapların
+  const [showIntro, setShowIntro] = useState(() => isBluff && shouldShowBluffIntro());
+  const [lieOn, setLieOn] = useState(false);
+  const [played, setPlayed] = useState<PlayedAnswer[]>(() =>
+    initialBluffAnswers.map((a) => ({ ...a, questionText: questions.find((q) => q.questionId === a.questionId)?.questionText ?? "" })),
+  );
 
   const question = questions[currentIndex];
   const isLast = currentIndex === questions.length - 1;
@@ -266,25 +278,13 @@ export function GameScreen({
     return { order: val as string[] };
   }
 
-  // Sonraki soruya (ya da son soruysa sonuca) geç: ara ekran yok, kilitlenen tur sessizce kaydedilir
-  async function advance() {
-    if (isLast) {
-      try {
-        await fetch(`/api/rooms/${roomCode}/complete`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ participantToken }),
-        });
-      } catch {
-        // proceed anyway
-      }
-      onComplete();
-      return;
-    }
+  // Sonraki soruya geç: ara ekran yok, kilitlenen tur sessizce kaydedilir. Son sorudan sonra bitirme adımı (`FinishStep`) açılır.
+  function advance() {
     setCurrentIndex((i) => i + 1);
     setMyAnswer(null);
     setMyPrediction(null);
     setConfidence("guess");
+    setLieOn(false);
     setError(null);
   }
 
@@ -292,6 +292,9 @@ export function GameScreen({
     if (!canSubmit || !question) return;
     setSubmitting(true);
     setError(null);
+    const answerValue = buildValue(question.mode, myAnswer!);
+    const lying = isBluff && lieOn;
+    const shownValue = lying ? { value: oppositeChoice(myAnswer as Choice) } : null;
 
     try {
       const res = await fetch(`/api/rooms/${roomCode}/submit-turn`, {
@@ -300,15 +303,27 @@ export function GameScreen({
         body: JSON.stringify({
           participantToken,
           questionId: question.questionId,
-          answerValue: buildValue(question.mode, myAnswer!),
+          answerValue,
+          ...(lying ? { isLie: true } : {}),
           predictedValue: buildValue(question.mode, myPrediction!),
           confidenceLevel: confidence,
         }),
       });
       const data = await res.json();
       if (!res.ok) {
+        if (data.error?.code === "LIE_LIMIT") {
+          setLieOn(false);
+          setError(t("bluff.cardsEmpty"));
+          return;
+        }
         setError(data.error?.message ?? t("errorGeneric"));
         return;
+      }
+      if (isBluff) {
+        setPlayed((list) => [
+          ...list.filter((a) => a.questionId !== question.questionId),
+          { questionId: question.questionId, questionText: question.questionText, value: answerValue, shownValue },
+        ]);
       }
       // Kaydedildi geri bildirimi → içerik solar → sonraki soru (ya da sonuç/bekleme) yumuşakça gelir
       const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -316,7 +331,7 @@ export function GameScreen({
       await new Promise((r) => setTimeout(r, reduce ? 250 : 380));
       setLeaving(true);
       await new Promise((r) => setTimeout(r, reduce ? 0 : 180));
-      await advance();
+      advance();
       setLeaving(false);
       setSavedFlash(false);
     } catch {
@@ -332,8 +347,9 @@ export function GameScreen({
   }, [currentIndex]);
 
   // Kendi cevabın tamamlanınca partner tahmini bölümü ekranın altında kalıyorsa yumuşakça oraya kaydır (soru başına bir kez)
+  // Blöf modunda kaydırılmaz: yalan düğmesi kendi cevabın hemen altında açılır ve gözden kaçmamalı
   useEffect(() => {
-    if (!myAnswerComplete || myPredictionComplete) return;
+    if (isBluff || !myAnswerComplete || myPredictionComplete) return;
     if (autoScrolledFor.current === currentIndex) return;
     autoScrolledFor.current = currentIndex;
     const el = partnerRef.current;
@@ -341,9 +357,29 @@ export function GameScreen({
     if (el.getBoundingClientRect().top < window.innerHeight * 0.5) return; // zaten görünür
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  }, [myAnswerComplete, myPredictionComplete, currentIndex]);
+  }, [isBluff, myAnswerComplete, myPredictionComplete, currentIndex]);
 
-  if (!question) return null;
+  // Karşı oyuncunun adı biliniyorsa başlıklarda onu kullan (ek gerektirmeyen kalıplar: Türkçe ünlü uyumu sorunu yok)
+  const name = partnerName?.trim() || null;
+  const bluffName = name ?? t("bluff.whoFallback", { rel });
+
+  if (showIntro && question) {
+    return <BluffIntro name={bluffName} lieCards={lieCards} onStart={() => setShowIntro(false)} />;
+  }
+
+  if (!question) {
+    if (questions.length === 0) return null;
+    return (
+      <FinishStep
+        roomCode={roomCode}
+        participantToken={participantToken}
+        isBluff={isBluff}
+        answers={played}
+        name={bluffName}
+        onComplete={onComplete}
+      />
+    );
+  }
 
   const confidenceLevels: Array<{ level: ConfidenceLevel; icon: string }> = [
     { level: "guess", icon: "psychology" },
@@ -352,10 +388,13 @@ export function GameScreen({
   ];
 
   const progress = ((currentIndex + 1) / questions.length) * 100;
-  // Karşı oyuncunun adı biliniyorsa başlıklarda onu kullan (ek gerektirmeyen kalıplar: Türkçe ünlü uyumu sorunu yok)
-  const name = partnerName?.trim() || null;
+  const liesTold = played.filter((a) => a.shownValue != null).length;
   const yourAnswerNote = name ? t("yourAnswerNoteNamed", { name }) : t("yourAnswerNote", { rel });
-  const partnerGuessTitle = name ? t("partnerGuessNamed", { name }) : t("partnerGuess", { rel });
+  const partnerGuessTitle = isBluff
+    ? t("bluff.guessTitle", { name: bluffName })
+    : name
+      ? t("partnerGuessNamed", { name })
+      : t("partnerGuess", { rel });
   const partnerOrderGuide = name ? t("partnerOrderGuideNamed", { name }) : t("partnerOrderGuide", { rel });
 
   return (
@@ -384,8 +423,8 @@ export function GameScreen({
         {/* Question */}
         <div className="bg-surface-container-lowest rounded-[24px] p-5 mb-5 shadow-soft-card">
           <span className="inline-flex items-center gap-1.5 bg-primary-container/30 text-primary rounded-full px-3 py-1 mb-3 text-xs font-bold tracking-wide uppercase">
-            <span className="material-symbols-outlined text-sm">{MODE_ICONS[question.mode]}</span>
-            {t("progress", { current: currentIndex + 1, total: questions.length })} · {modeLabels[question.mode]}
+            <span className="material-symbols-outlined text-sm">{isBluff ? "theater_comedy" : MODE_ICONS[question.mode]}</span>
+            {t("progress", { current: currentIndex + 1, total: questions.length })} · {isBluff ? t("modeBluff") : modeLabels[question.mode]}
           </span>
           <h1 className="text-headline-sm md:text-headline-md text-on-surface leading-snug">
             {question.questionText}
@@ -396,7 +435,7 @@ export function GameScreen({
         <div className="glass-card rounded-[24px] p-4 shadow-soft-card relative mb-0">
           <div className="flex items-center gap-2 mb-3 text-primary">
             <span className="material-symbols-outlined text-lg icon-fill">lock</span>
-            <h2 className="text-label-md uppercase tracking-wide">{t("yourAnswer")} — {yourAnswerNote}</h2>
+            <h2 className="text-label-md uppercase tracking-wide">{isBluff ? t("bluff.truthTitle") : `${t("yourAnswer")} — ${yourAnswerNote}`}</h2>
           </div>
 
           {question.mode === "secret_choice" && (
@@ -404,6 +443,18 @@ export function GameScreen({
               selected={myAnswer as ScChoice | null}
               onSelect={(v) => setMyAnswer(v)}
               variant="answer"
+              binary={isBluff}
+            />
+          )}
+          {isBluff && question.mode === "secret_choice" && (
+            <LieCard
+              truth={myAnswer as Choice | null}
+              active={lieOn}
+              name={bluffName}
+              used={liesTold}
+              total={lieCards}
+              isLast={isLast}
+              onToggle={() => setLieOn((v) => !v)}
             />
           )}
           {question.mode === "prediction" && sortedOptions && (
@@ -442,6 +493,7 @@ export function GameScreen({
               selected={myPrediction as ScChoice | null}
               onSelect={(v) => setMyPrediction(v)}
               variant="prediction"
+              binary={isBluff}
             />
           )}
           {question.mode === "prediction" && sortedOptions && (

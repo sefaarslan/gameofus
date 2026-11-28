@@ -231,17 +231,21 @@
         "secret_choice": "Yes / No",
         "prediction": "Scenario",
         "orderline": "Ranking",
-        "mixed": "Mixed"
+        "mixed": "Mixed",
+        "bluff": "Bluff"
       },
       "descs": {
         "secret_choice": "3-option classic",
         "prediction": "Multiple choice",
         "orderline": "Guess the order",
-        "mixed": "A bit of everything"
+        "mixed": "A bit of everything",
+        "bluff": "Lie sometimes. Will you get caught?"
       },
       "mobileOnly": "On mobile",
       "hint": "How to play?",
-      "popular": "Popular"
+      "popular": "Popular",
+      "new": "New",
+      "bluffHow": "Answer Yes or No and guess. Use your Lie Cards to show the opposite of some answers (2 in 5 questions, 3 in 10; at least 1). Then use the same number of “Bluff!” calls to catch each other's lies."
     },
     "questions": {
       "label": "Question Count & Pace",
@@ -403,7 +407,39 @@
     "modePrediction": "Prediction",
     "modeOrderline": "Ranking",
     "errorGeneric": "Something went wrong.",
-    "errorConnection": "Connection error."
+    "errorConnection": "Connection error.",
+    "modeBluff": "Bluff",
+    "bluff": {
+      "truthTitle": "Your true answer",
+      "guessTitle": "What would {name} really say?",
+      "whoFallback": "{rel, select, friend {your friend} other {your partner}}",
+      "cardTitle": "Lie Card",
+      "cardUse": "Tap to show the opposite of this answer",
+      "cardPickFirst": "Pick your answer first",
+      "cardActive": "Card played",
+      "cardPreview": "{name} will see “{value}”",
+      "cardUndo": "Undo",
+      "cardsLeft": "{count} left",
+      "cardsEmpty": "No Lie Cards left",
+      "cardsEmptyDesc": "Your remaining answers will show the truth",
+      "cardLast": "Last question: you need to play at least 1 card",
+      "finishTitle": "You haven't lied yet",
+      "finishDesc": "You need to play at least 1 Lie Card. Which answer will it be?",
+      "truthLabel": "Your truth: {value}",
+      "finishButton": "Play the card and finish",
+      "finishing": "Finishing your game...",
+      "retry": "Try again",
+      "intro": {
+        "title": "How Bluff works",
+        "step1": "Pick your answer",
+        "step1Desc": "Yes or No. Then guess what {name} would say.",
+        "step2": "Lie if you like",
+        "step2Desc": "You have {count} Lie Cards in this set. You choose where; play at least one.",
+        "step3": "At the end, catch their lie",
+        "step3Desc": "When you've both finished, use your {count} “Bluff!” calls to find where {name} lied.",
+        "start": "Let's go"
+      }
+    }
   },
   "option": {
     "yes": "Yes",
@@ -458,7 +494,65 @@
     "guessOf": "guess",
     "guessAboutPartner": "guess about {rel, select, friend {friend} other {partner}}",
     "partnerRealAnswer": "actual answer",
-    "partnerFallback": "{rel, select, friend {Friend} other {Partner}}"
+    "partnerFallback": "{rel, select, friend {Friend} other {Partner}}",
+    "bluff": {
+      "callTitle": "Catch the bluff",
+      "callSubtitle": "Where did {name} lie? You have {count} “Bluff!” calls.",
+      "says": "{name} says",
+      "yourGuess": "Your guess: {value}",
+      "bluff": "Bluff!",
+      "submit": "Finish the hunt",
+      "sending": "Sending...",
+      "revealStep": "Reveal {current}/{total}",
+      "youBelieved": "You believed it",
+      "youDoubted": "You called “Bluff!”",
+      "caughtLie": "You caught the lie!",
+      "fooledByLie": "But it was a lie!",
+      "truthBelieved": "It was the truth",
+      "truthDoubted": "But it was the truth",
+      "truthWas": "True answer: {value}",
+      "yourLie": "You said “{value}” (lie)",
+      "yourTruth": "You said “{value}” (truth)",
+      "partnerBelieved": "{name} believed it",
+      "partnerDoubted": "{name} called “Bluff!”",
+      "partnerPending": "{name} hasn't made their calls yet",
+      "next": "Next",
+      "skip": "Skip all",
+      "seeResults": "See results",
+      "summaryTitle": "Bluff report",
+      "breakdown": "Answer by answer",
+      "caughtLabel": "Your calls",
+      "caughtDesc": "lies caught",
+      "fooledLabel": "Fooled",
+      "fooledDesc": "of your lies {name} believed",
+      "partnerRow": "{name} caught {caught}/{total} of your lies · {count, plural, =0 {never fooled you} one {fooled you once} other {fooled you # times}}",
+      "titles": {
+        "lie_detector": {
+          "name": "Lie Detector",
+          "desc": "Caught every lie"
+        },
+        "poker_face": {
+          "name": "Poker Face",
+          "desc": "Not a single lie was caught"
+        },
+        "too_skeptical": {
+          "name": "Too Suspicious",
+          "desc": "Doubted even the truth"
+        },
+        "pure_heart": {
+          "name": "Pure Heart",
+          "desc": "Didn't catch a single lie"
+        }
+      },
+      "toFinale": "Reveal the score",
+      "finaleTitle": "The hunt is over!",
+      "finaleFooled": "{count, plural, =0 {{name} didn't believe any of your lies} one {{name} believed # of your {lies} lies} other {{name} believed # of your {lies} lies}}",
+      "accuse": "Call bluff",
+      "accused": "Bluff! called · undo",
+      "pickOne": "Pick at least 1, up to {count}",
+      "rightsLeft": "{count, plural, =0 {No calls left} one {# call left} other {# calls left}}",
+      "falseAlarms": "{count, plural, =0 {No wasted calls} one {# truth wrongly called a bluff} other {# truths wrongly called a bluff}}"
+    }
   },
   "error": {
     "generic": "Something went wrong. Please try again.",
@@ -519,6 +613,10 @@
           {
             "name": "Mixed Round",
             "text": "The modes mix with a surprise in every round. In the mobile app it comes with the “A cup of coffee” package."
+          },
+          {
+            "name": "Bluff",
+            "text": "Answer Yes or No and guess, then use a Lie Card to flip at least one answer. At the end, catch the other's lies with a limited number of “Bluff!” calls."
           },
           {
             "name": "Red Flag Minefield",
