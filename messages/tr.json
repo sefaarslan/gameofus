@@ -90,7 +90,7 @@
       "retry": "Tekrar dene"
     },
     "backHome": "Ana sayfaya dön",
-    "details": { "title": "Cevaplarına göz at", "desc": "Hangi kartta hangi bayrağı seçtiğini tek tek gör.", "show": "Detayları gör", "hide": "Özete dön", "yourPick": "Senin seçimin" },
+    "details": { "title": "Cevaplarına göz at", "desc": "Hangi kartta hangi bayrağı seçtiğini tek tek gör.", "show": "Cevapları gör", "hide": "Özete dön", "yourPick": "Senin seçimin" },
     "landing": {
       "badge": "Tek kişilik oyun",
       "title": "Partnerin yok mu? Tek başına dene",
@@ -106,21 +106,6 @@
       "dismiss": "Kapat"
     },
     "footerLink": "Red Flag Mayın Tarlası"
-  },
-  "feedback": {
-    "exitTitle": "Çıkmadan önce bir saniye?",
-    "notNow": "Şimdi değil",
-    "title": "Oyunu nasıl buldun?",
-    "subtitle": "İsteğe bağlı, birkaç saniye sürer. Cevapların gizli kalır.",
-    "ratings": { "1": "Hiç beğenmedim", "2": "Pek beğenmedim", "3": "Fena değil", "4": "Beğendim", "5": "Çok beğendim" },
-    "aiQuestion": "Mobil uygulamada AI yorumunu kullanır mıydın?",
-    "ai": { "yes": "Evet", "maybe": "Belki", "no": "Hayır" },
-    "commentLabel": "Neyi değiştirirdin? (isteğe bağlı)",
-    "commentPlaceholder": "Aklındakini yaz…",
-    "send": "Gönder",
-    "sending": "Gönderiliyor…",
-    "error": "Gönderilemedi, tekrar dener misin?",
-    "thanks": "Teşekkürler, çok işimize yarıyor 💛"
   },
   "footer": { "follow": "Bizi Instagram'da takip et", "privacy": "Gizlilik Politikası", "terms": "Kullanım Koşulları" },
   "meta": { "description": "Birbirinizi ne kadar iyi tanıyorsunuz?" },
@@ -486,7 +471,7 @@
     "continueConvo": "Sohbeti devam ettirin",
     "continueConvoDesc": "Bu sonuçlar üzerine konuşmak ilişkinizi derinleştirebilir.",
     "backToSummary": "Özete Dön",
-    "seeDetails": "Detayları Gör",
+    "seeDetails": "Cevapları Gör",
     "labelCorrect": "Tam İsabet",
     "labelNear": "Yakın Tahmin",
     "labelMiss": "Farklı Görüş",

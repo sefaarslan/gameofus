@@ -46,10 +46,9 @@ daha iyi konuşmalar başlatmak ve birbirini tahmin etme deneyimini oyunlaştır
   `rel` parametresiyle ICU `select` kullanır (`relKey()` — `lib/relationship.ts`); bkz. `messages/*.json`
   içindeki `{rel, select, friend {…} dating {…} partner {…} other {…}}` kalıpları. Landing metinleri
   oda bağlamı olmadığı için sabit kalır.
-- **Geri bildirim:** Sonuç ekranında isteğe bağlı mini anket (1 dokunuşla puan, AI ilgisi, yorum).
-  **Zorunlu yapılmaz** (veri kalitesi + akışın kısa kalması ilkesi). Puan vermeden "Tekrar oyna"/"Ana
-  Sayfa"ya basan kullanıcıya oda başına yalnızca bir kez yumuşak bir çıkış istemi gösterilir; her çıkış
-  yolu kullanıcıyı gitmek istediği yere götürür.
+- **Geri bildirim anketi webden kaldırıldı** (2026-11-28; "Oyunu nasıl buldun?" kartı ve çıkış istemi, iki kişilik ve solo sonuç ekranlarında).
+  Geri eklenmez. `POST /api/feedback`, `feedback` tablosu ve metrik görünümleri duruyor (eski veri ve API sözleşmesi için).
+- **Sonuç ekranı:** ayrıntılar "Sohbeti devam ettirin" kartındaki düğmelerle açılır: **"Cevapları Gör"** ve (blöf odasında) **"Blöf dökümü"**; aynı anda biri açık.
 - **Marka/iletişim:** Domain `gameofus.app`; Instagram `@gameofus.app` (`lib/social.ts`). Sonuç
   ekranında ve footer'da yalnızca sade bir takip bağlantısı vardır; sonucu Instagram'da paylaşma
   özelliği henüz yoktur.
@@ -76,7 +75,8 @@ daha iyi konuşmalar başlatmak ve birbirini tahmin etme deneyimini oyunlaştır
 - **next-intl** ile çoklu dil (TR/EN/ES). Algılama sırası: cookie → `Accept-Language` → `en`; URL
   prefix (`/tr`, `/en`, `/es`) ile manuel override desteklenir.
 - **Fontlar self-host edilir:** Quicksand `next/font/google` ile; ikonlar için **Material Symbols
-  alt kümesi** (`app/fonts/material-symbols.woff2`, ~14 KB, `display: block`). Harici Google font/CSS
+  alt kümesi** CSS içine data URI olarak gömülü (`app/fonts/material-symbols.css`, üretilir, ~23 KB, `display: block`, aile `gouIcons`): ayrı font
+  isteği yoktur (yeni sürüm yayına geçerken ikon dosyasının yüklenemeyip ikonların yazı olarak görünmesi yaşandı; ayrı dosyaya geri dönme). Harici Google font/CSS
   isteği yoktur. **Yeni bir ikon adı eklediğinde `npm run icons` çalıştır** (kodda kullanılan ikonları
   tarayıp alt kümeyi yeniden üretir); aksi halde ikon boş görünür. İkon sınıfı
   `.material-symbols-outlined` için `height` verme (satır yüksekliğiyle çakışıp glifi kaydırır).
@@ -513,11 +513,10 @@ Orderline'da `order` dizisi oyuncunun kendi öncelik sıralamasını temsil eder
   gitmez ve oyun girişinde **hiçbir şey sorulmaz**.
 - **Karne ekranı:** Red sayısına göre sabit başlık + cümle, mini ızgara, **Story görseli**, **WhatsApp'ta paylaş**
   (`wa.me` ile başlık + emoji ızgara + paylaşım linki), **"Cevaplarına göz at" kartı** (iki kişilik sonuç ekranındaki
-  "Detayları gör" ile aynı dil: tıklayınca 9 kartın senaryo metni ve seçilen bayrak kart kart açılır; `localStorage`
-  kaydında `details`/`sessionId`/`token` tutulur), pasif AI düğmesi, **geri bildirim kartı** (aynı `FeedbackCard`,
-  `soloSessionId` ile), mobil CTA ve **sayfanın en sonunda "Ana sayfaya dön" butonu** (üstte geri butonu yok).
+  "Cevapları Gör" ile aynı dil: tıklayınca 9 kartın senaryo metni ve seçilen bayrak kart kart açılır; `localStorage`
+  kaydında `details`/`sessionId`/`token` tutulur), pasif AI düğmesi, mobil CTA ve **sayfanın en sonunda "Ana sayfaya dön" butonu** (üstte geri butonu yok).
   "Sonucumu kopyala" kaldırıldı.
-- Geri bildirim solo oturumuna da bağlanır: `POST /api/feedback` gövdesinde `soloSessionId` (token oturumun
+- (API; web artık kullanmıyor) Geri bildirim solo oturumuna da bağlanabilir: `POST /api/feedback` gövdesinde `soloSessionId` (token oturumun
   `token_hash`'ine karşı doğrulanır, oturum `completed` olmalı); `feedback.solo_session_id` unique, `feedback.game`.
   Metrik görünümünde `source` (`duo` / `solo_red_flag`).
 - Dev sunucusunda (Turbopack) yeni Tailwind sınıfları bazen CSS'e girmez (ör. `w-9` boyutsuz görünür); üretim derlemesi
@@ -537,7 +536,7 @@ Ayrıntılı durum için `docs/PRD.md` Bölüm 21 esas alınır. Özet:
 
 - **Web (tamamlandı, canlıda):** landing (4 adımlı "nasıl çalışır", sayfa sonunda SSS, footer), oda oluşturma
   (ilişki türü + kategori), 4 oyun modu (Secret Choice, Prediction, Orderline, Karma), birleştirilmiş tur,
-  soft realtime, server-side sonuç, sonuç ekranı + geri bildirim, 3 dil, premium kategori
+  soft realtime, server-side sonuç, sonuç ekranı, 3 dil, premium kategori
   kilidi (mobile yönlendirme), soru seti v2, ilişki türüne duyarlı metinler, metrik görünümleri.
 - **Mobil (devam ediyor, ayrı repo):** giriş zorunlu (Google/Apple), coin + tier modeli, IAP, geçmiş,
   push, deep link, hesap silme, AI yorum. İş listesi: `gameofus-mobile/tasklist.md`.
@@ -595,7 +594,7 @@ eskileri pasife alır, yenileri aktifleştirir (atomik). Eski seed dosyaları (`
 - Partner verisini reveal öncesi expose edecek hiçbir sorgu/Realtime aboneliği ekleme.
 - Token'ı URL'de taşıma, DB'de plaintext tutma.
 - Agresif satış, geri sayım veya manipülatif metin üretme; ton sıcak ve yargılayıcı olmayan
-  olmalı. Geri bildirimi zorunlu kılma; paylaşım/etiketleme çağrısını, özellik yokken ekleme.
+  olmalı. Geri bildirim anketi ekleme; paylaşım/etiketleme çağrısını, özellik yokken ekleme.
 - Soru eklerken/değiştirirken `scripts/check-questions.mjs`'i çalıştır; Kanka'ya açık hiçbir soruda
   romantik çağrışım olmamalı. Soruları **silme**, pasife al.
 - Soru seçiminde ilişki türünü ve premium durumunu yok sayan bir sorgu yazma; tüm havuzu çekip karıştır.

@@ -4,7 +4,7 @@ import type { LegalDoc, LegalLocale } from "./types";
 
 const tr: LegalDoc = {
   title: "Gizlilik Politikası",
-  updated: "Son güncelleme: 27 Kasım 2026",
+  updated: "Son güncelleme: 28 Kasım 2026",
   intro: [
     "Game of Us, iki kişinin birbirini daha iyi tanıması için hazırlanmış bir oyundur. Web'de (gameofus.app) ve mobil uygulamada oynanır. Bu sayfa hangi verileri topladığımızı, nasıl kullandığımızı ve nasıl sildirebileceğinizi anlatır.",
     "Veri sorumlusu: Game of Us · gameofusapp@gmail.com",
@@ -35,7 +35,6 @@ const tr: LegalDoc = {
             "**Hesap bilgisi (mobil):** E-posta adresiniz ve hesap kimliğiniz.",
             "**Doğum tarihi ve cinsiyet:** Yalnızca kendiniz için girersiniz. Yaş sınırını uygulamak ve deneyimi kişiselleştirmek için kullanılır; bazı durumlarda isteğe bağlıdır.",
             "**Coin ve satın alma (mobil):** Coin hareketleriniz ve satın alma kayıtlarınız. Kart bilgileriniz bize ulaşmaz.",
-            "**Geri bildirim:** Göndermeyi seçerseniz puanınız ve yorumunuz.",
             "**Teknik veriler:** Güvenlik ve kötüye kullanımı önlemek için IP adresinizden üretilen bir özet ve standart sunucu kayıtları.",
             "**Hata verileri (mobil):** Uygulama hata verdiğinde cihaz modeli, sistem sürümü ve hatanın teknik dökümü.",
             "**Reklam verileri (mobil):** Reklam sağlayıcımız reklam kimliğinizi (izin verirseniz), yaklaşık konumunuzu, cihaz ve etkileşim bilgilerini işleyebilir.",
@@ -100,7 +99,7 @@ const tr: LegalDoc = {
               ["Web odaları (odalar 24 saat sonra kapanır)", "Kapandıktan 14 gün sonra"],
               ["Mobil hesapla ilişkili odalar", "Kapandıktan 90 gün sonra"],
               ["Tek kişilik oyunlar", "90 gün"],
-              ["Yapay zekâ yorumu ve geri bildirim", "İlgili oyunla birlikte silinir"],
+              ["Yapay zekâ yorumu ve daha önce gönderilmiş geri bildirim", "İlgili oyunla birlikte silinir"],
               ["IP özeti", "7 gün"],
               ["Hesap ve coin kayıtları", "Hesabınızı silene kadar"],
               ["Satın alma kayıtları", "Yasal saklama süresi boyunca"],
@@ -147,7 +146,7 @@ const tr: LegalDoc = {
 
 const en: LegalDoc = {
   title: "Privacy Policy",
-  updated: "Last updated: November 27, 2026",
+  updated: "Last updated: November 28, 2026",
   intro: [
     "Game of Us is a game that helps two people get to know each other better. You can play it on the web (gameofus.app) and in the mobile app. This page explains what data we collect, how we use it and how you can have it deleted.",
     "Data controller: Game of Us · gameofusapp@gmail.com",
@@ -178,7 +177,6 @@ const en: LegalDoc = {
             "**Account information (mobile):** Your email address and account ID.",
             "**Birth date and gender:** You enter them only for yourself. They are used to apply age limits and personalise the experience; in some cases they are optional.",
             "**Coins and purchases (mobile):** Your coin activity and purchase records. We never receive your card details.",
-            "**Feedback:** Your rating and comment, if you choose to send them.",
             "**Technical data:** A hash derived from your IP address, used for security and abuse prevention, and standard server logs.",
             "**Error data (mobile):** When the app fails, your device model, system version and technical details of the error.",
             "**Advertising data (mobile):** Our ad provider may process your advertising ID (if you allow it), approximate location, device and interaction information.",
@@ -243,7 +241,7 @@ const en: LegalDoc = {
               ["Web rooms (rooms close after 24 hours)", "14 days after closing"],
               ["Rooms linked to a mobile account", "90 days after closing"],
               ["Solo games", "90 days"],
-              ["AI commentary and feedback", "Deleted with the related game"],
+              ["AI commentary and previously submitted feedback", "Deleted with the related game"],
               ["IP hash", "7 days"],
               ["Account and coin records", "Until you delete your account"],
               ["Purchase records", "For the legally required period"],
@@ -290,7 +288,7 @@ const en: LegalDoc = {
 
 const es: LegalDoc = {
   title: "Política de Privacidad",
-  updated: "Última actualización: 27 de noviembre de 2026",
+  updated: "Última actualización: 28 de noviembre de 2026",
   intro: [
     "Game of Us es un juego para que dos personas se conozcan mejor. Se juega en la web (gameofus.app) y en la aplicación móvil. Esta página explica qué datos recopilamos, cómo los usamos y cómo puedes pedir que se eliminen.",
     "Responsable del tratamiento: Game of Us · gameofusapp@gmail.com",
@@ -321,7 +319,6 @@ const es: LegalDoc = {
             "**Datos de la cuenta (móvil):** Tu correo electrónico e identificador de cuenta.",
             "**Fecha de nacimiento y género:** Solo introduces los tuyos. Sirven para aplicar límites de edad y personalizar la experiencia; en algunos casos son opcionales.",
             "**Monedas y compras (móvil):** Tus movimientos de monedas y registros de compra. Nunca recibimos los datos de tu tarjeta.",
-            "**Opiniones:** Tu puntuación y comentario, si decides enviarlos.",
             "**Datos técnicos:** Un resumen (hash) derivado de tu dirección IP, para seguridad y prevención de abusos, y registros estándar del servidor.",
             "**Datos de errores (móvil):** Cuando la aplicación falla, el modelo del dispositivo, la versión del sistema y los detalles técnicos del error.",
             "**Datos publicitarios (móvil):** Nuestro proveedor de anuncios puede tratar tu identificador publicitario (si lo permites), ubicación aproximada, información del dispositivo e interacciones.",
@@ -386,7 +383,7 @@ const es: LegalDoc = {
               ["Salas web (se cierran a las 24 horas)", "14 días tras el cierre"],
               ["Salas vinculadas a una cuenta móvil", "90 días tras el cierre"],
               ["Juegos individuales", "90 días"],
-              ["Comentario de IA y opiniones", "Se eliminan con la partida"],
+              ["Comentario de IA y opiniones enviadas anteriormente", "Se eliminan con la partida"],
               ["Hash de IP", "7 días"],
               ["Cuenta y monedas", "Hasta que elimines tu cuenta"],
               ["Registros de compra", "Durante el plazo legal"],

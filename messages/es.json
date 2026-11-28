@@ -90,7 +90,7 @@
       "retry": "Reintentar"
     },
     "backHome": "Volver al inicio",
-    "details": { "title": "Revisa tus respuestas", "desc": "Mira qué bandera elegiste en cada carta.", "show": "Ver detalles", "hide": "Volver al resumen", "yourPick": "Tu elección" },
+    "details": { "title": "Revisa tus respuestas", "desc": "Mira qué bandera elegiste en cada carta.", "show": "Ver respuestas", "hide": "Volver al resumen", "yourPick": "Tu elección" },
     "landing": {
       "badge": "Juego en solitario",
       "title": "¿Sin pareja? Pruébalo tú solo",
@@ -106,21 +106,6 @@
       "dismiss": "Cerrar"
     },
     "footerLink": "Campo Minado de Red Flags"
-  },
-  "feedback": {
-    "exitTitle": "¿Antes de irte?",
-    "notNow": "Ahora no",
-    "title": "¿Qué tal el juego?",
-    "subtitle": "Opcional, solo unos segundos. Tus respuestas siguen siendo privadas.",
-    "ratings": { "1": "No me gustó", "2": "No mucho", "3": "Estuvo bien", "4": "Me gustó", "5": "Me encantó" },
-    "aiQuestion": "¿Usarías los comentarios con IA en la app móvil?",
-    "ai": { "yes": "Sí", "maybe": "Quizás", "no": "No" },
-    "commentLabel": "¿Qué cambiarías? (opcional)",
-    "commentPlaceholder": "Cuéntanos lo que piensas…",
-    "send": "Enviar",
-    "sending": "Enviando…",
-    "error": "No se pudo enviar, ¿lo intentas de nuevo?",
-    "thanks": "Gracias, nos ayuda mucho 💛"
   },
   "footer": { "follow": "Síguenos en Instagram", "privacy": "Política de Privacidad", "terms": "Términos de Uso" },
   "meta": { "description": "¿Cuánto os conocéis realmente?" },
@@ -486,7 +471,7 @@
     "continueConvo": "Sigan la conversación",
     "continueConvoDesc": "Hablar sobre estos resultados puede profundizar su vínculo.",
     "backToSummary": "Volver al resumen",
-    "seeDetails": "Ver detalles",
+    "seeDetails": "Ver respuestas",
     "labelCorrect": "Exacto",
     "labelNear": "Cerca",
     "labelMiss": "Opinión distinta",

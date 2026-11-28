@@ -18,7 +18,6 @@ import {
   type PackInfo,
 } from "@/lib/solo";
 import { FlagGlyph } from "./FlagGlyph";
-import { FeedbackCard } from "@/components/FeedbackCard";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { FlagMark, SoloLogo } from "./SoloLogo";
 
@@ -581,9 +580,6 @@ export function RedFlagGame() {
               {t("ai.locked")}
             </span>
           </button>
-
-          {/* Geri bildirim */}
-          {saved?.sessionId && saved.token && <FeedbackCard soloSessionId={saved.sessionId} participantToken={saved.token} />}
 
           {/* Mobil CTA */}
           <div className="bg-gradient-to-br from-tertiary-container/40 to-primary-container/20 rounded-[24px] p-6 text-center border border-outline-variant/20">

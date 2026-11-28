@@ -1,16 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { decodeRoomCodeParam, normalizeRoomCode } from "@/lib/room-code-utils";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { relKey } from "@/lib/relationship";
 import { InstagramIcon } from "@/components/InstagramIcon";
-import { FeedbackCard } from "@/components/FeedbackCard";
-import { FeedbackExitSheet } from "@/components/FeedbackExitSheet";
 import { SoloPromoCard } from "@/components/solo/SoloPromoCard";
-import { feedbackKeys, readFlag, writeFlag } from "@/lib/feedback-client";
 import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/social";
 import {
   BluffCallScreen,
@@ -115,21 +112,17 @@ export default function ResultsPage() {
   const [stepReveal, setStepReveal] = useState(false);
   const rel = relKey((data ?? callData)?.room.relationshipType);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
+  // "Sohbeti devam ettirin" kartındaki düğmelerle açılan bölüm (aynı anda biri açık)
+  const [panel, setPanel] = useState<"answers" | "bluff" | null>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const [participantToken, setParticipantToken] = useState<string | null>(null);
-  const [hasRated, setHasRated] = useState(false);
-  const [exitTarget, setExitTarget] = useState<string | null>(null);
 
-  // Puan vermeden çıkan kullanıcıya oda başına yalnızca bir kez nazik bir istem göster
-  function leaveTo(target: string) {
-    const keys = feedbackKeys(roomCode);
-    if (!participantToken || hasRated || readFlag(keys.prompted)) {
-      router.push(target);
-      return;
-    }
-    writeFlag(keys.prompted);
-    setExitTarget(target);
-  }
+  // Açılan bölüm ekranın altında kalmasın
+  useEffect(() => {
+    if (!panel) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    panelRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  }, [panel]);
 
   const resultLabels: Record<RevealResult, string> = {
     correct: t("labelCorrect"),
@@ -294,18 +287,8 @@ export default function ResultsPage() {
           )}
         </section>
 
-        {/* ── Blöf modu: karne ve döküm ────────────────────────── */}
-        {data.bluff && (
-          <>
-            <BluffSummary summary={data.bluff} myName={data.me.displayName} partnerName={partnerLabel} />
-            <section className="flex flex-col gap-3">
-              <h2 className="text-headline-md text-on-background text-center">{t("bluff.breakdown")}</h2>
-              {bluffRows.map((row) => (
-                <BluffRevealCard key={row.questionId} row={row} partnerName={partnerLabel} />
-              ))}
-            </section>
-          </>
-        )}
+        {/* ── Blöf modu: karne (döküm aşağıdaki karttaki düğmeyle açılır) ── */}
+        {data.bluff && <BluffSummary summary={data.bluff} myName={data.me.displayName} partnerName={partnerLabel} />}
 
         {/* ── Bento insight grid ───────────────────────────────── */}
         <section className="grid grid-cols-2 gap-4">
@@ -363,28 +346,45 @@ export default function ResultsPage() {
           </div>
         </section>
 
-        {/* ── Premium teaser ───────────────────────────────────── */}
+        {/* ── Sohbeti devam ettirin ────────────────────────────── */}
         <section className="bg-surface-container-high rounded-[24px] p-6 text-center shadow-soft-card relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-transparent to-primary/5 pointer-events-none" />
           <span className="material-symbols-outlined text-primary icon-fill mb-3" style={{ fontSize: "40px" }}>volunteer_activism</span>
           <h3 className="text-headline-md text-on-surface mb-2">{t("continueConvo")}</h3>
           <p className="text-body-md text-on-surface-variant mb-4">{t("continueConvoDesc")}</p>
-          <button
-            onClick={() => setShowDetails((v) => !v)}
-            className="px-6 py-2 bg-surface text-primary rounded-full text-label-md font-bold shadow-sm hover:bg-surface-container-lowest active:scale-95 transition-all"
-          >
-            {showDetails ? t("backToSummary") : t("seeDetails")}
-          </button>
+          <div className="relative flex flex-wrap justify-center gap-2">
+            {(data.bluff ? (["answers", "bluff"] as const) : (["answers"] as const)).map((key) => {
+              const open = panel === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setPanel(open ? null : key)}
+                  aria-expanded={open}
+                  className={`min-h-[44px] px-6 py-2 rounded-full text-label-md font-bold shadow-sm active:scale-95 transition-all ${
+                    open ? "bg-primary text-on-primary" : "bg-surface text-primary hover:bg-surface-container-lowest"
+                  }`}
+                >
+                  {open ? t("backToSummary") : key === "answers" ? t("seeDetails") : t("bluff.breakdown")}
+                </button>
+              );
+            })}
+          </div>
         </section>
 
-        {/* ── Geri bildirim mini anketi ────────────────────────── */}
-        {participantToken && (
-          <FeedbackCard roomCode={roomCode} participantToken={participantToken} onRated={() => setHasRated(true)} />
+        {/* ── Blöf dökümü ──────────────────────────────────────── */}
+        {panel === "bluff" && (
+          <section ref={panelRef} className="flex flex-col gap-3 scroll-mt-24">
+            <h2 className="text-headline-md text-on-background text-center">{t("bluff.breakdown")}</h2>
+            {bluffRows.map((row) => (
+              <BluffRevealCard key={row.questionId} row={row} partnerName={partnerLabel} />
+            ))}
+          </section>
         )}
 
         {/* ── Question details ─────────────────────────────────── */}
-        {showDetails && (
-          <section className="flex flex-col gap-6">
+        {panel === "answers" && (
+          <section ref={panelRef} className="flex flex-col gap-6 scroll-mt-24">
             <h2 className="text-headline-md text-on-background text-center">{t("details")}</h2>
             {data.questions.map((q, i) => {
               const myResult = q.myPrediction?.result ?? null;
@@ -499,14 +499,14 @@ export default function ResultsPage() {
         {/* ── Action buttons ───────────────────────────────────── */}
         <section className="flex flex-col gap-4">
           <button
-            onClick={() => leaveTo("/create")}
+            onClick={() => router.push("/create")}
             className="w-full h-14 bg-primary text-on-primary rounded-full text-label-md font-bold shadow-primary-glow hover:bg-surface-tint active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-xl">refresh</span>
             {t("playAgain")}
           </button>
           <button
-            onClick={() => leaveTo("/")}
+            onClick={() => router.push("/")}
             className="w-full h-14 bg-secondary-container text-primary rounded-full text-label-md font-bold hover:bg-secondary-container/80 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-xl">home</span>
@@ -526,20 +526,6 @@ export default function ResultsPage() {
           </a>
         </section>
       </main>
-
-      {participantToken && (
-        <FeedbackExitSheet
-          open={exitTarget !== null}
-          roomCode={roomCode}
-          participantToken={participantToken}
-          onRated={() => setHasRated(true)}
-          onFinish={() => {
-            const target = exitTarget;
-            setExitTarget(null);
-            if (target) router.push(target);
-          }}
-        />
-      )}
     </div>
   );
 }
