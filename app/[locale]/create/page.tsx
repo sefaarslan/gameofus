@@ -470,7 +470,7 @@ export default function CreatePage() {
                   {/* 1 — Kategori */}
                   {(categoriesLoading || allCategories.length > 0) && (
                     <div className="mb-6">
-                      <SectionHeader n={1} icon="apps" title={t("category.label")} trailing={<Pill tone="tertiary">{t("category.badge")}</Pill>} />
+                      <SectionHeader n={1} icon="apps" title={t("category.label")} />
                       {categoriesLoading ? (
                         <div className="h-28 rounded-2xl bg-surface-container animate-pulse" />
                       ) : (

@@ -267,9 +267,8 @@
       "tone": "Define el tono del juego"
     },
     "category": {
-      "label": "Categoría",
+      "label": "Categorías",
       "all": "Sorpréndeme",
-      "badge": "Categoría Recomendada",
       "surpriseDesc": "Equilibrado y Divertido",
       "taglines": {
         "friend_test": "Amistad y Risas",

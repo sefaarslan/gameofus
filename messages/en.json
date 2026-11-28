@@ -267,9 +267,8 @@
       "tone": "Sets the game's tone"
     },
     "category": {
-      "label": "Category",
+      "label": "Categories",
       "all": "Surprise Me",
-      "badge": "Recommended Category",
       "surpriseDesc": "Balanced & Fun",
       "taglines": {
         "friend_test": "Friendship & Laughs",

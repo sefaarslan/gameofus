@@ -267,9 +267,8 @@
       "tone": "Oyun tonunu belirler"
     },
     "category": {
-      "label": "Kategori",
+      "label": "Kategoriler",
       "all": "Karışık Sürpriz",
-      "badge": "Önerilen Kategori",
       "surpriseDesc": "Dengeli & Eğlenceli",
       "taglines": {
         "friend_test": "Dostluk & Kahkaha",
