@@ -100,7 +100,7 @@ daha iyi konuşmalar başlatmak ve birbirini tahmin etme deneyimini oyunlaştır
 - `NEXT_PUBLIC_*` değişkenleri **derleme zamanında** gömülür (Coolify'da Buildtime), gizli anahtarlar yalnızca Runtime'dır. Build arg verilmezse Dockerfile bunları
   **boş metin** yapar: kodda `process.env.X || varsayılan` kullan, `??` kullanma (`layout.tsx` bu yüzden bir kez derlemeyi düşürdü).
 - Kanonik adres **`https://www.gameofus.app`**; `gameofus.app` → `www`'ye yönlendirilir. Web oyuncularının oda token'ları `localStorage`'da `www` kaynağına bağlıdır: kaynağı değiştirme.
-- Next.js sürümü **sabitlenir** (`16.4.4`, `latest` kullanılmaz); sürüm yükseltmesi bilinçli yapılır. Sabit sürüm yamaları otomatik almaz: ayda bir `npm audit --omit=dev` çalıştır, güvenlik açığı varsa branch'te yükselt (`tsc`, `next build`, entegrasyon testleri, Vercel preview) sonra `main`'e al. `next dev` kendiliğinden `AGENTS.md` üretir (Next'in özelliği; bizim içeriğimiz değil).
+- Next.js sürümü **sabitlenir** (`16.4.6`, `latest` kullanılmaz); sürüm yükseltmesi bilinçli yapılır. Sabit sürüm yamaları otomatik almaz: ayda bir `npm audit --omit=dev` çalıştır, güvenlik açığı varsa branch'te yükselt (`tsc`, `next build`, entegrasyon testleri, Vercel preview) sonra `main`'e al. `next dev` kendiliğinden `AGENTS.md` üretir (Next'in özelliği; bizim içeriğimiz değil).
 - Alan adı: `gameofus.app`.
 - **`CLIENT_IP_HEADER=cf-connecting-ip`** (üretimde ayarlı): hız sınırları gerçek istemci IP'sini bu başlıktan okur; origin yalnızca Cloudflare'e açık olduğu için
   başlık taklit edilemez. Origin kilidi bozulursa (80/443 herkese açılırsa) bu ayarı kaldır.
