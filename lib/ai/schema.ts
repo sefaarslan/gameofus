@@ -18,8 +18,6 @@ export const commentarySchema = z
     strengths: z.array(text(420)).length(3),
     blindSpots: z.array(text(460)).min(2).max(3),
     conversationStarters: z.array(text(300)).length(3),
-    /** Eğlenceli "ödül" kartları (v2.0'da eklendi; eski kayıtlarda yoktur, istemci alanın eksikliğini tolere etmeli) */
-    awards: z.array(z.object({ title: text(60), text: text(300) }).strict()).min(3).max(4),
   })
   .strict();
 
@@ -36,17 +34,8 @@ export const COMMENTARY_JSON_SCHEMA = {
       strengths: { type: "array", items: { type: "string" } },
       blindSpots: { type: "array", items: { type: "string" } },
       conversationStarters: { type: "array", items: { type: "string" } },
-      awards: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: { title: { type: "string" }, text: { type: "string" } },
-          required: ["title", "text"],
-          additionalProperties: false,
-        },
-      },
     },
-    required: ["headline", "summary", "strengths", "blindSpots", "conversationStarters", "awards"],
+    required: ["headline", "summary", "strengths", "blindSpots", "conversationStarters"],
     additionalProperties: false,
   },
 } as const;
@@ -101,12 +90,12 @@ function quotedSegments(text: string): string[] {
 }
 
 /**
- * "Yumuşak" sorunlar: üslup/biçim kuralları (klişe, bozuk alıntı, hitap, İngilizce ödül başlığı). Düzeltme turundan sonra HÂLÂ yalnızca bunlar
+ * "Yumuşak" sorunlar: üslup/biçim kuralları (klişe, bozuk alıntı, hitap). Düzeltme turundan sonra HÂLÂ yalnızca bunlar
  * kalıyorsa yorum reddedilmez (kullanıcı parasını iade edip yorumsuz bırakmak, "ortak zemin" gibi bir kalıp yüzünden fazla pahalı);
  * "sert" sorunlar (yüzde, burç, hüküm, düşük skor dili, dil sızıntısı, JSON kırıntısı) her zaman reddedilir.
  */
 export function isSoftIssue(issue: string): boolean {
-  return /^(Avoid empty filler|Avoid invented secrets|The quoted text|Never refer to the pair|Award titles must be)/.test(issue);
+  return /^(Avoid empty filler|Avoid invented secrets|The quoted text|Never refer to the pair)/.test(issue);
 }
 
 export interface QualityContext {
@@ -129,7 +118,7 @@ export interface CommonIssueOptions {
 
 /**
  * Oda yorumu ve solo analiz için ORTAK içerik kuralları: yüzde yok, soru numarası yok, JSON kırıntısı yok, dil sızıntısı yok,
- * klişe yok, burç/astroloji yok, uzun alıntılar birebir. Özelliğe özel kurallar (skor bandı, hitap, ödül başlığı…) çağıran tarafta eklenir.
+ * klişe yok, burç/astroloji yok, uzun alıntılar birebir. Özelliğe özel kurallar (skor bandı, hitap…) çağıran tarafta eklenir.
  */
 export function commonTextIssues(texts: string[], locale: "tr" | "en" | "es", opts: CommonIssueOptions = {}): string[] {
   let all = texts.join("\n");
@@ -164,21 +153,16 @@ export function commonTextIssues(texts: string[], locale: "tr" | "en" | "es", op
   return issues;
 }
 
-/** Şemanın yakalayamadığı içerik kuralları (oda yorumu): ortak kurallar + hitap, ödül başlığı dili, skor bandı dili. */
+/** Şemanın yakalayamadığı içerik kuralları (oda yorumu): ortak kurallar + hitap, skor bandı dili. */
 export function qualityIssues(
   c: Commentary,
   playerNames: string[] = [],
   locale: "tr" | "en" | "es" = "en",
   ctx: QualityContext = {},
 ): string[] {
-  const texts = [c.headline, c.summary, ...c.strengths, ...c.blindSpots, ...c.conversationStarters, ...c.awards.flatMap((a) => [a.title, a.text])];
+  const texts = [c.headline, c.summary, ...c.strengths, ...c.blindSpots, ...c.conversationStarters];
   const original = texts.join("\n");
   const issues = commonTextIssues(texts, locale, { names: playerNames, quotable: ctx.quotable });
-
-  // Ödül başlıkları oda dilinde olmalı: "awardBases" İngilizce notlardır; model etiketi ("Plot-twist Award") kopyalamasın.
-  if (locale !== "en" && c.awards.some((x) => /\b(?:award|plot.?twist|more.?alike|pattern|sharp.?eyed|boldest|finishers?)\b/i.test(x.title))) {
-    issues.push(`Award titles must be written in ${locale === "tr" ? "Turkish" : "Spanish"}; do not copy the English award notes.`);
-  }
 
   // Hitap tutarlılığı: çift üçüncü kişi olarak anılmaz ("Deniz ve Elif ..."); çift her zaman "siz"dir.
   if (playerNames.length === 2 && playerNames[0].trim() && playerNames[1].trim()) {

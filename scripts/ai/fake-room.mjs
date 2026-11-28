@@ -92,7 +92,6 @@ export async function buildFakeRoom({ lang = "tr", relationshipType = "friend", 
   const plan = PLANS[scenario];
 
   const SC = ["yes", "unsure", "no"];
-  const CONF = ["guess", "guess", "think", "think", "sure"]; // "eminim" biraz daha nadir
   const [nameA, nameB] = NAMES[lang];
 
   // Plana göre: cevap çifti (ilişki) ve her iki tahminin istenen sonucu (correct | near | miss) üretilir.
@@ -125,8 +124,8 @@ export async function buildFakeRoom({ lang = "tr", relationshipType = "friend", 
       options,
       answerA: a,
       answerB: b,
-      guessAboutB: { value: guessWith(b, step.a), confidence: pick(CONF) },
-      guessAboutA: { value: guessWith(a, step.b), confidence: pick(CONF) },
+      guessAboutB: { value: guessWith(b, step.a) },
+      guessAboutA: { value: guessWith(a, step.b) },
     };
   };
 
@@ -160,8 +159,8 @@ export async function buildFakeRoom({ lang = "tr", relationshipType = "friend", 
       options,
       answerA,
       answerB,
-      guessAboutB: { value: guessFor(answerB), confidence: pick(CONF) },
-      guessAboutA: { value: guessFor(answerA), confidence: pick(CONF) },
+      guessAboutB: { value: guessFor(answerB) },
+      guessAboutA: { value: guessFor(answerA) },
     };
   });
 

@@ -176,8 +176,6 @@
       "lock": "Lock guess",
       "score": "Reading Score",
       "greatMatch": "Great match!",
-      "correct": "Correct! 🎉",
-      "points": "+3 pts",
       "partnerName": "Alex"
     },
     "joinByCode": {
@@ -380,7 +378,6 @@
     "yourAnswer": "Your answer",
     "yourAnswerNote": "not shown to your {rel, select, friend {friend} other {partner}}",
     "partnerGuess": "What would your {rel, select, friend {friend} other {partner}} answer?",
-    "confidence": "How sure are you?",
     "lock": "Lock guess",
     "locking": "Saving...",
     "answersAtEnd": "Answers will appear at the very end, after you've answered all the questions.",
@@ -435,11 +432,6 @@
     "yes": "Yes",
     "unsure": "Not sure",
     "no": "No"
-  },
-  "confidence": {
-    "guess": "Guess",
-    "think": "I think so",
-    "sure": "I'm sure"
   },
   "waiting": {
     "title": "You're done!",

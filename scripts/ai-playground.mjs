@@ -34,7 +34,7 @@ const sm = room.summary;
 const [pa, pb] = room.players;
 if (room.profiles) console.log(`Profil (modele giden): ${JSON.stringify(room.profiles)}`);
 console.log(`Özet (kodda hesaplandı): okuma skoru ${pa}: ${sm.readingScore[pa]} | ${pb}: ${sm.readingScore[pb]} | daha iyi okuyan: ${sm.betterReader} | cevaplar aynı/yakın/farklı: ${sm.sameCount}/${sm.closeCount}/${sm.differentCount}`);
-console.log(`Öne çıkanlar: ortak ${JSON.stringify(room.highlights.shared)} | farklı ${JSON.stringify(room.highlights.different)} | emin-ıska ${JSON.stringify(room.highlights.confidentMisses)} | ikisi de doğru ${JSON.stringify(room.highlights.bothReadCorrectly)}\n`);
+console.log(`Öne çıkanlar: ortak ${JSON.stringify(room.highlights.shared)} | farklı ${JSON.stringify(room.highlights.different)} | ıska ${JSON.stringify(room.highlights.misses)} | ikisi de doğru ${JSON.stringify(room.highlights.bothReadCorrectly)}\n`);
 
 try {
   const res = await generateCommentary(room, {
@@ -49,7 +49,7 @@ try {
   });
   const c = res.content;
   const bullets = (list) => list.map((x) => `  • ${x}`).join("\n");
-  console.log(`\n${c.headline}\n\n${c.summary}\n\nBirlikte iyi olduğunuz yönler:\n${bullets(c.strengths)}\n\nMerak edilebilecekler:\n${bullets(c.blindSpots)}\n\nKonuşma başlatıcılar:\n${bullets(c.conversationStarters)}\n\nÖdüller:\n${c.awards.map((a) => `  ★ ${a.title} — ${a.text}`).join("\n")}\n`);
+  console.log(`\n${c.headline}\n\n${c.summary}\n\nBirlikte iyi olduğunuz yönler:\n${bullets(c.strengths)}\n\nMerak edilebilecekler:\n${bullets(c.blindSpots)}\n\nKonuşma başlatıcılar:\n${bullets(c.conversationStarters)}\n`);
   const m = res.meta;
   console.log("── ÖLÇÜLER ──");
   console.log(`süre: ${(m.latencyMs / 1000).toFixed(1)} sn | deneme: ${m.attempts} | model: ${m.model} | prompt: ${m.promptVersion}`);

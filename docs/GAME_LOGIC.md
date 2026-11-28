@@ -90,7 +90,6 @@ Her oyuncu tek ekranda:
 ```txt
 kendi cevabını verir      (moda göre: seçenek / kart sırası)
 partner cevabını tahmin eder (aynı format)
-güven seviyesi seçer
 kilitler
 ```
 
@@ -112,13 +111,7 @@ B: cevap + tahmin
 
 ## 4. Güven Seviyesi
 
-| UI | Değer | Çarpan |
-|---|---|---|
-| Tahmin | guess | 1 |
-| Sanırım | think | 2 |
-| Eminim | sure | 3 |
-
-Güven çarpanı okuma skoruna **dahil değildir**. Mikro-reveal mesajı ve oyun hissi için kullanılır.
+Kaldırıldı (2026-11-28). Hiçbir ekranda sorulmaz; sunucu alanı yok sayar.
 
 ---
 
@@ -179,15 +172,6 @@ Yakındın       ← near (yalnızca Secret Choice ve Orderline)
 Iskaladın      ← miss
 ```
 
-### Mikro-reveal points
-
-Puan UI hissi için kullanılabilir, ana skora dahil değildir.
-
-```txt
-correct: confidence_multiplier * 2
-near:    confidence_multiplier * 1
-miss:    0
-```
 
 ---
 

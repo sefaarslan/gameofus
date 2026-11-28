@@ -176,8 +176,6 @@
       "lock": "Tahmini kilitle",
       "score": "Okuma Skoru",
       "greatMatch": "Harika bir uyum!",
-      "correct": "Doğru! 🎉",
-      "points": "+3 puan",
       "partnerName": "Ayşe"
     },
     "joinByCode": {
@@ -380,7 +378,6 @@
     "yourAnswer": "Kendi cevabın",
     "yourAnswerNote": "{rel, select, friend {kankana} dating {sevgiline} partner {eşine} other {partnerine}} gösterilmez",
     "partnerGuess": "{rel, select, friend {Kankan} dating {Sevgilin} partner {Eşin} other {Partnerin}} ne cevap verir?",
-    "confidence": "Ne kadar eminsin?",
     "lock": "Tahmini kilitle",
     "locking": "Kaydediliyor...",
     "answersAtEnd": "Yanıtlar, tüm soruları cevapladıktan sonra en sonda görünecek.",
@@ -435,11 +432,6 @@
     "yes": "Evet",
     "unsure": "Kararsız",
     "no": "Hayır"
-  },
-  "confidence": {
-    "guess": "Tahmin",
-    "think": "Sanırım",
-    "sure": "Eminim"
   },
   "waiting": {
     "title": "Sen tamamladın!",

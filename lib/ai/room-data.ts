@@ -4,7 +4,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { ageBandFor } from "./digest.ts";
 import { zodiacSignFor } from "./zodiac.ts";
-import type { Confidence, Locale, Mode, RawProfile, RawQuestion, RawRoom, RawValue, RelationshipType } from "./digest.ts";
+import type { Locale, Mode, RawProfile, RawQuestion, RawRoom, RawValue, RelationshipType } from "./digest.ts";
 
 type QuestionRow = {
   id: string;
@@ -19,7 +19,7 @@ type DetailEntry = {
   mode: string;
   roundOrder: number;
   answers: Array<{ participantId: string; answerValue: unknown }>;
-  predictions: Array<{ predictorId: string; targetId: string; predictedValue: unknown; confidenceLevel: string }>;
+  predictions: Array<{ predictorId: string; targetId: string; predictedValue: unknown }>;
 };
 
 const LOCALES: Locale[] = ["tr", "en", "es"];
@@ -62,7 +62,6 @@ export async function loadRawRoom(roomId: string, locale: string, relationshipTy
     const gAB = pred(owner.id, guest.id);
     const gBA = pred(guest.id, owner.id);
     if (!answerA || !answerB || !gAB || !gBA) continue; // eksik veri: bu soruyu atla
-    const conf = (c: string): Confidence => (c === "sure" || c === "think" ? c : "guess");
     questions.push({
       mode: q.mode as Mode,
       tag: q.insight_tag,
@@ -72,8 +71,8 @@ export async function loadRawRoom(roomId: string, locale: string, relationshipTy
         : null,
       answerA,
       answerB,
-      guessAboutB: { value: gAB.predictedValue as RawValue, confidence: conf(gAB.confidenceLevel) },
-      guessAboutA: { value: gBA.predictedValue as RawValue, confidence: conf(gBA.confidenceLevel) },
+      guessAboutB: { value: gAB.predictedValue as RawValue },
+      guessAboutA: { value: gBA.predictedValue as RawValue },
     });
   }
   if (questions.length === 0) return null;

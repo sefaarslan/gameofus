@@ -15,9 +15,6 @@ import { denyUnknownRoom, tokenDenied } from "@/lib/room-lookup";
 import { lieCardsFor, lieFor, readChoice } from "@/lib/bluff";
 import type { Json } from "@/types/database.types";
 
-const CONFIDENCE_MULTIPLIERS = { guess: 1, think: 2, sure: 3 } as const;
-type ConfidenceLevel = keyof typeof CONFIDENCE_MULTIPLIERS;
-
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ roomCode: string }> },
@@ -32,7 +29,8 @@ export async function POST(
     return apiError("INVALID_PAYLOAD", "Geçersiz istek gövdesi.");
   }
 
-  const { questionId, answerValue, predictedValue, confidenceLevel, isLie } =
+  // Eski istemcilerin gönderdiği `confidenceLevel` yok sayılır (güven seviyesi kaldırıldı; sütunlar varsayılanda kalır)
+  const { questionId, answerValue, predictedValue, isLie } =
     body as Record<string, unknown>;
   const rawBodyToken = (body as Record<string, unknown>).participantToken;
   const participantToken = extractToken(req, typeof rawBodyToken === "string" ? rawBodyToken : null);
@@ -47,11 +45,6 @@ export async function POST(
   if (!answerValue || !predictedValue) {
     return apiError("INVALID_PAYLOAD", "Cevap ve tahmin gereklidir.");
   }
-
-  const confidence: ConfidenceLevel =
-    typeof confidenceLevel === "string" && confidenceLevel in CONFIDENCE_MULTIPLIERS
-      ? (confidenceLevel as ConfidenceLevel)
-      : "guess";
 
   const supabase = createAdminClient();
 
@@ -156,8 +149,6 @@ export async function POST(
       predictor_participant_id: me.id,
       target_participant_id: partner.id,
       predicted_value: predictedValue as Json,
-      confidence_level: confidence,
-      confidence_multiplier: CONFIDENCE_MULTIPLIERS[confidence],
       locked_at: now,
     }),
     me.status === "joined"

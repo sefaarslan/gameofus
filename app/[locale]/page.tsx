@@ -146,12 +146,6 @@ function GameCardMockup() {
           </p>
         </div>
       </div>
-
-      {/* Floating: micro-reveal badge — right middle */}
-      <div className="absolute top-1/2 -right-6 -translate-y-1/2 bg-tertiary-fixed border border-outline-variant/10 px-3 py-2 rounded-2xl shadow-soft-card text-center z-10 hidden md:block">
-        <p className="text-[11px] font-bold text-on-tertiary-fixed">{tM("correct")}</p>
-        <p className="text-[10px] text-on-tertiary-fixed/70">{tM("points")}</p>
-      </div>
     </div>
   );
 }

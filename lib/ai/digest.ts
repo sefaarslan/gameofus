@@ -12,7 +12,6 @@ import { isSensitiveTag, themeOf } from "./themes.ts";
 export type Locale = "tr" | "en" | "es";
 export type RelationshipType = "friend" | "dating" | "partner";
 export type Mode = "secret_choice" | "prediction" | "orderline";
-export type Confidence = "guess" | "think" | "sure";
 export type Player = "A" | "B";
 
 /** DB'deki answer_value / predicted_value JSONB biçimleri */
@@ -27,8 +26,8 @@ export interface RawQuestion {
   options: Array<{ id: string; text: string }> | null;
   answerA: RawValue;
   answerB: RawValue;
-  guessAboutB: { value: RawValue; confidence: Confidence }; // A'nın B hakkındaki tahmini
-  guessAboutA: { value: RawValue; confidence: Confidence }; // B'nin A hakkındaki tahmini
+  guessAboutB: { value: RawValue }; // A'nın B hakkındaki tahmini
+  guessAboutA: { value: RawValue }; // B'nin A hakkındaki tahmini
 }
 
 /** İsteğe bağlı oyuncu bilgisi. Doğum tarihi ASLA gönderilmez; yalnızca yaş aralığı. */
@@ -78,7 +77,6 @@ export interface DigestGuess {
   by: string;
   about: string;
   guess: Readable;
-  confidence: Confidence;
   result: PredictionResult;
 }
 
@@ -100,7 +98,7 @@ export interface DigestQuestion {
 export type FactKind =
   | "biggest_difference" // ZORUNLU: cevapları en uzak olan sorular (en fazla 3; mesafeyle sıralı)
   | "same_answer_wrong_guess" // ZORUNLU: cevap aynı/çok yakın ama en az biri karşısındakini yanlış tahmin etti ("sandığınızdan çok benziyorsunuz")
-  | "sure_but_missed"
+  | "missed_guess"
   | "answered_alike"
   | "answered_similarly"
   | "both_read_each_other_correctly";
@@ -161,18 +159,13 @@ export interface CommentaryDigest {
   highlights: {
     shared: number[];
     different: number[];
-    confidentMisses: Array<{ by: string; n: number; confidence: Confidence }>;
+    misses: Array<{ by: string; n: number }>;
     bothReadCorrectly: number[];
   };
   /** Yorumun dayanacağı olgu kartları (modele giden asıl içerik) */
   facts: Fact[];
   /** Temalar arası örüntüler (tek tek cevap değil "büyük resim"): ör. "para konusunda hep aynı cevapları verdiniz" */
   patterns: string[];
-  /**
-   * Ödül temelleri (kodda): her biri EN AZ İKİ soruya dayanır; model ödülleri yalnızca bunlardan yazar. Tek bir ortak cevaptan
-   * "şampiyon/kral" ödülü çıkmasını (gerçek bir odada "Mesajlaşma Şampiyonu") engeller. Hassas sorular katılmaz.
-   */
-  awardBases: string[];
   /** Tam soru listesi: test/inceleme içindir, modele GÖNDERİLMEZ */
   questions: DigestQuestion[];
   /** Çıktıda tırnak içinde alıntılanabilecek metinler (oyuncuların cevap/seçenek metinleri); alıntı denetimi için, modele GÖNDERİLMEZ */
@@ -180,7 +173,6 @@ export interface CommentaryDigest {
 }
 
 const MODE_PRIORITY: Record<Mode, number> = { orderline: 0, prediction: 1, secret_choice: 2 }; // daha bilgilendirici olanlar önce
-const CONFIDENCE_RANK: Record<Confidence, number> = { sure: 0, think: 1, guess: 2 };
 
 function readable(q: RawQuestion, v: RawValue): Readable {
   if (q.mode === "secret_choice") return (v as { value: string }).value;
@@ -278,14 +270,12 @@ export function buildDigest(room: RawRoom): CommentaryDigest {
         by: nameA,
         about: nameB,
         guess: readable(q, q.guessAboutB.value),
-        confidence: q.guessAboutB.confidence,
         result: compareAnswers(q.mode, q.answerB, q.guessAboutB.value),
       },
       {
         by: nameB,
         about: nameA,
         guess: readable(q, q.guessAboutA.value),
-        confidence: q.guessAboutA.confidence,
         result: compareAnswers(q.mode, q.answerA, q.guessAboutA.value),
       },
     ],
@@ -298,15 +288,11 @@ export function buildDigest(room: RawRoom): CommentaryDigest {
   const byInfo = (a: DigestQuestion, b: DigestQuestion) => MODE_PRIORITY[a.mode] - MODE_PRIORITY[b.mode] || a.n - b.n;
   const nums = (list: DigestQuestion[], max: number) => list.slice().sort(byInfo).slice(0, max).map((x) => x.n);
 
-  const confidentMisses: CommentaryDigest["highlights"]["confidentMisses"] = [];
-  for (const x of questions) {
-    for (const g of x.guesses) {
-      if (g.result === "miss" && g.confidence !== "guess") confidentMisses.push({ by: g.by, n: x.n, confidence: g.confidence });
-    }
-  }
-  confidentMisses.sort((a, b) => CONFIDENCE_RANK[a.confidence] - CONFIDENCE_RANK[b.confidence] || a.n - b.n);
-
-  const SURE: Record<Confidence, string> = { sure: "very sure", think: "fairly sure", guess: "just guessing" };
+  // Iskalanan tahminler (bilgisi yüksek modlar önce)
+  const misses: CommentaryDigest["highlights"]["misses"] = questions
+    .slice()
+    .sort(byInfo)
+    .flatMap((x) => x.guesses.filter((g) => g.result === "miss").map((g) => ({ by: g.by, n: x.n })));
 
   // Mod farkındalıklı ifade. Sıralama sorusunda oyuncular soruya CEVAP VERMEZ, seçenekleri SIRALAR (1 = en önemli);
   // olgu cümlesi bunu açıkça söylemezse model sıralamayı "soruya verilen cevap" gibi yorumluyordu.
@@ -330,7 +316,7 @@ export function buildDigest(room: RawRoom): CommentaryDigest {
   const byN = new Map(questions.map((x) => [x.n, x]));
   const facts: Fact[] = [];
   // ── Olgu seçimi ────────────────────────────────────────────────────────────────────────────────────────
-  // Hassas konular (çatışma, para gerilimi, kıskançlık, güven, yakınlık…) için KUTLAMA/şaka/ödüle yol açabilecek olgular (aynı/benzer cevap,
+  // Hassas konular (çatışma, para gerilimi, kıskançlık, güven, yakınlık…) için KUTLAMA/şakaya yol açabilecek olgular (aynı/benzer cevap,
   // ikisi de doğru bildi) gönderilmez; farklılıklar ve ıskalar gider ve prompt bunları nazikçe kullandırır.
   const hasMiss = (x: DigestQuestion) => x.guesses.some((g) => g.result === "miss");
   const missCount = (x: DigestQuestion) => x.guesses.filter((g) => g.result === "miss").length;
@@ -398,16 +384,16 @@ export function buildDigest(room: RawRoom): CommentaryDigest {
       sentence: `${answerPart} Yet ${missPart}. So you are MORE ALIKE than you think here. Neither of you knew it, so this is NOT a deliberate agreement or a shared strategy.`,
     });
   }
-  for (const m of confidentMisses.filter((m) => !mustN.has(m.n)).slice(0, 3)) {
+  for (const m of misses.filter((m) => !mustN.has(m.n)).slice(0, 3)) {
     const x = byN.get(m.n)!;
     const g = x.guesses.find((y) => y.by === m.by)!;
     const actual = x.answers[g.about];
     // Sıralamada uzun listeler modeli karıştırıyordu: yalnızca ilk tercih karşılaştırılır (kısa ve net).
     const sentence =
       x.mode === "orderline"
-        ? `${g.by} was ${SURE[g.confidence]} that ${g.about} would put "${top(g.guess)}" first when ranking the options, but ${g.about} actually put "${top(actual)}" first. (This is about ${g.by} misreading ${g.about}'s priorities.)`
-        : `${g.by} was ${SURE[g.confidence]} that ${g.about} ${wouldSay(x.mode, g.guess)}, but ${g.about} actually ${said(x.mode, actual)}. (This is about ${g.by} misreading ${g.about}.)`;
-    facts.push({ kind: "sure_but_missed", mode: x.mode, ...themeFields(x.tag), question: x.question, sentence });
+        ? `${g.by} guessed that ${g.about} would put "${top(g.guess)}" first when ranking the options, but ${g.about} actually put "${top(actual)}" first. (This is about ${g.by} misreading ${g.about}'s priorities.)`
+        : `${g.by} guessed that ${g.about} ${wouldSay(x.mode, g.guess)}, but ${g.about} actually ${said(x.mode, actual)}. (This is about ${g.by} misreading ${g.about}.)`;
+    facts.push({ kind: "missed_guess", mode: x.mode, ...themeFields(x.tag), question: x.question, sentence });
   }
   for (const n of shared) {
     const x = byN.get(n)!;
@@ -450,21 +436,6 @@ export function buildDigest(room: RawRoom): CommentaryDigest {
     });
   }
 
-  // Ödül temelleri: her biri ≥ 2 soruya dayanır, hassas sorular dışında (ödül asla hassas konudan çıkmaz)
-  const topics = (xs: DigestQuestion[]) => [...new Set(xs.map((x) => themeOf(x.tag)))].join(", ");
-  const biggestPlain = biggest.filter((x) => !isSensitiveTag(x.tag));
-  const sameWrongPlain = sameWrong.filter((x) => !isSensitiveTag(x.tag));
-  const awardBases: string[] = [];
-  if (biggestPlain.length >= 2) awardBases.push(`Basis for an award about surprises: your answers were far apart on ${biggestPlain.length} questions (${topics(biggestPlain)}).`);
-  if (sameWrongPlain.length >= 2) awardBases.push(`Basis for an award about hidden similarity: on ${sameWrongPlain.length} questions you gave the same answer without knowing it (${topics(sameWrongPlain)}).`);
-  for (const pat of themePatterns(plain)) awardBases.push(`Basis for an award about a pattern: ${pat}`);
-  const boldMisses = confidentMisses.filter((m) => !isSensitiveTag(byN.get(m.n)!.tag));
-  if (boldMisses.length >= 2) awardBases.push(`Basis for an award about bold guesses: ${boldMisses.length} guesses made with confidence ("very sure" or "fairly sure") turned out wrong.`);
-  const sharp = plain.filter((x) => x.guesses[0].result === "correct" && x.guesses[1].result === "correct");
-  if (sharp.length >= 2) awardBases.push(`Basis for an award about reading each other: you each read the other right on ${sharp.length} questions (${topics(sharp)}).`);
-  awardBases.push(`Basis for an award about finishing: you both answered and guessed all ${questions.length} questions.`);
-  awardBases.splice(5);
-
   // (a) Sayısal özet: tüm tahminlerin dökümü ve skor bandı (kodda; model hesap yapmaz)
   const allResults = questions.flatMap((x) => x.guesses.map((g) => g.result));
   const tally = (rs: PredictionResult[]): GuessTally => ({
@@ -505,7 +476,7 @@ export function buildDigest(room: RawRoom): CommentaryDigest {
     highlights: {
       shared: nums(questions.filter((x) => x.relation === "same"), 3),
       different: biggest.map((x) => x.n),
-      confidentMisses: confidentMisses.slice(0, 3),
+      misses: misses.slice(0, 3),
       bothReadCorrectly: nums(
         questions.filter((x) => x.guesses[0].result === "correct" && x.guesses[1].result === "correct"),
         2,
@@ -513,7 +484,6 @@ export function buildDigest(room: RawRoom): CommentaryDigest {
     },
     facts,
     patterns,
-    awardBases,
     questions,
     quotable,
   };

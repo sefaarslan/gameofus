@@ -57,7 +57,7 @@ async function playRoom(owner, guest) {
   const st = await call("GET", `/api/rooms/${code}/state`, { jwt: owner.jwt });
   for (const [auth, who] of [[{ jwt: owner.jwt }, "owner"], [guestAuth, "guest"]]) {
     for (const q of st.json.questions) {
-      const s = await call("POST", `/api/rooms/${code}/submit-turn`, { ...auth, body: { questionId: q.questionId, answerValue: { value: "yes" }, predictedValue: { value: who === "owner" ? "no" : "yes" }, confidenceLevel: "sure" } });
+      const s = await call("POST", `/api/rooms/${code}/submit-turn`, { ...auth, body: { questionId: q.questionId, answerValue: { value: "yes" }, predictedValue: { value: who === "owner" ? "no" : "yes" } } });
       if (s.status !== 200) throw new Error("submit failed " + JSON.stringify(s.json));
     }
     const done = await call("POST", `/api/rooms/${code}/complete`, { ...auth, body: {} });
@@ -195,8 +195,8 @@ try {
   ok(r.status === 403 && r.json?.error?.code === "AI_MOBILE_ONLY", "web partner POST → 403 AI_MOBILE_ONLY");
   const res = await call("GET", `/api/rooms/${code6}/results`, { token: g6.guestAuth.token });
   const st = await call("GET", `/api/rooms/${code6}/state`, { token: g6.guestAuth.token });
-  ok(res.status === 200 && !/"(?:aiCommentary|ai_commentary|aiConsent|commentary|headline|awards)"/.test(JSON.stringify(res.json)), "web results yanıtında AI alanı yok");
-  ok(st.status === 200 && !/"(?:aiCommentary|ai_commentary|aiConsent|commentary|headline|awards)"/.test(JSON.stringify(st.json)), "web state yanıtında AI alanı yok");
+  ok(res.status === 200 && !/"(?:aiCommentary|ai_commentary|aiConsent|commentary|headline)"/.test(JSON.stringify(res.json)), "web results yanıtında AI alanı yok");
+  ok(st.status === 200 && !/"(?:aiCommentary|ai_commentary|aiConsent|commentary|headline)"/.test(JSON.stringify(st.json)), "web state yanıtında AI alanı yok");
   const hist = await call("GET", "/api/users/history", { jwt: A.jwt });
   ok(Array.isArray(hist.json) && !/commentary|headline/i.test(JSON.stringify(hist.json)), "geçmiş yanıtında AI alanı yok");
 

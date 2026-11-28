@@ -221,13 +221,12 @@ Tek soruda cevap **ve** tahmini **tek istekte** kaydeder (kilitler).
 {
   "questionId": "uuid",
   "answerValue":    { "value": "yes" },
-  "predictedValue": { "value": "unsure" },
-  "confidenceLevel": "think"
+  "predictedValue": { "value": "unsure" }
 }
 ```
 
 `answerValue` / `predictedValue` biçimi moda göre: `{value}` · `{option_id}` · `{order:[…]}`.
-`confidenceLevel`: `guess | think | sure` (geçersizse `guess`).
+`confidenceLevel` **kaldırıldı** (2026-11-28): gönderilse de yok sayılır; sonuç yanıtında da bu alan yoktur.
 
 **Blöf modu:** cevap ve tahmin yalnızca `yes` | `no` (aksi `400 INVALID_PAYLOAD`). İsteğe bağlı `"isLie": true` Yalan Kartı'dır: karşı tarafa
 cevabın **tersi** gösterilir (sunucu hesaplar; `answerValue` her zaman gerçektir). Kart kalmadıysa `400 LIE_LIMIT` ve **hiçbir şey yazılmaz**
@@ -294,13 +293,13 @@ olmayan JWT → `403 INVALID_TOKEN`; geçersiz/süresi dolmuş JWT → `401 UNAU
     { "questionId": "uuid", "roundOrder": 1, "mode": "secret_choice", "questionText": "…",
       "options": null,
       "myAnswer": { "value": "yes" }, "partnerAnswer": { "value": "yes" },
-      "myPrediction": { "predictedValue": { "value": "unsure" }, "confidenceLevel": "think", "result": "near" },
-      "partnerPredictionOfMe": { "predictedValue": { "value": "yes" }, "confidenceLevel": "sure", "result": "correct" } }
+      "myPrediction": { "predictedValue": { "value": "unsure" }, "result": "near" },
+      "partnerPredictionOfMe": { "predictedValue": { "value": "yes" }, "result": "correct" } }
   ]
 }
 ```
 
-Okuma skoru = (doğru + yakın) / toplam tahmin × 100; güven çarpanı skora yansımaz. `scoreLabel` skora göre
+Okuma skoru = (doğru + yakın) / toplam tahmin × 100. `scoreLabel` skora göre
 5 kademeli sıcak bir metindir (≥90, ≥70, ≥50, ≥30, <30).
 
 ---
@@ -570,8 +569,8 @@ JWT → `401 UNAUTHORIZED`; geçerli JWT ama bu odanın katılımcısı değil, 
   `{ type:"solo", sessionId, gameType, pack, headline, createdAt }` (solo analiz, bkz. §10d). Yalnızca kullanıcının SATIN ALDIĞI `ready`
   kayıtlar (partnerin aldıkları çıkmaz). `type` alanı geriye dönük uyumludur (eski istemci yok sayar; oda satırları aynı alanları taşır). JWT'siz `401`.
 
-`content` biçimi (oda dilinde, `rooms.locale`): `{ headline: string, summary: string, strengths: string[3], blindSpots: string[2..3], conversationStarters: string[3], awards: { title: string, text: string }[3..4] }`.
-`awards` (prompt v2.0, 2026-10-23) eğlenceli "ödül" kartlarıdır (`title` ≤ 60 karakter, çoğu zaman baştaki bir emojiyle; `text` tek cümle). **Eski kayıtlarda `awards` yoktur**: istemci alanın eksikliğini tolere etmeli (yoksa bölümü gizle). Ton v2.0'dan itibaren daha eğlenceli ve somuttur; uzunluk sınırları: headline ≤ 180, summary ≤ 1400, strengths/blindSpots ≤ 420/460, conversationStarters ≤ 300 karakter.
+`content` biçimi (oda dilinde, `rooms.locale`): `{ headline: string, summary: string, strengths: string[3], blindSpots: string[2..3], conversationStarters: string[3] }`.
+`awards` alanı **kaldırıldı** (prompt v2.3, 2026-11-28; istemci hiç göstermiyordu): yeni yorumlarda yoktur, eski kayıtlarda kalabilir ve yok sayılmalıdır. Ton v2.0'dan itibaren daha eğlenceli ve somuttur; uzunluk sınırları: headline ≤ 180, summary ≤ 1400, strengths/blindSpots ≤ 420/460, conversationStarters ≤ 300 karakter.
 Sıralama (orderline) sorularında olgular "cevap" değil "sıralama" olarak anlatılır (1 = en önemli).
 Sunucu Zod ile doğrular; yüzde, soru numarası ve JSON kırıntısı gibi içerik kuralları da denetlenir.
 

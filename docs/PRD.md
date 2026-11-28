@@ -118,7 +118,7 @@ Kullanıcıya verilen temel değerler:
 8. Link oluşturma, kopyalama, WhatsApp ile paylaşma
 9. Karşı tarafın linkten katılması (anonim guest token ile)
 10. Birleştirilmiş tur: her soruda kendi cevabını verme + karşı tarafı tahmin etme (tek ekran)
-11. Tahminlerde güven seviyesi seçimi (tahmin / sanırım / eminim)
+11. ~~Güven seviyesi seçimi~~ (kaldırıldı, 2026-11-28)
 12. Kilitleyince doğrudan sonraki soruya geçiş (ara ekran ve anlık sonuç yok; yanıtlar en sonda)
 13. Soft realtime durum ekranı
 14. Sonuç hesaplama ve sonuç ekranı
@@ -165,7 +165,7 @@ Kullanıcı bir soruya üç seçenekten biriyle cevap verir:
 - Kararsız
 - Hayır
 
-Aynı ekranda, kullanıcı partnerinin aynı soruya ne cevap verdiğini de tahmin eder ve bu tahmine bir güven seviyesi ekler.
+Aynı ekranda, kullanıcı partnerinin aynı soruya ne cevap verdiğini de tahmin eder.
 
 Örnek soru:
 
@@ -179,21 +179,14 @@ Tek soru ekranında sıra:
 
 1. Oyuncu kendi cevabını verir (Evet / Kararsız / Hayır). Cevap gizli tutulur.
 2. Aynı ekranda partnerinin ne cevap verdiğini tahmin eder.
-3. Tahminine bir güven seviyesi ekler.
-4. Tahmini kilitler.
-5. Doğrudan sonraki soruya geçilir (ara ekran yok); kilitle düğmesinin altında yanıtların tüm sorular bitince en sonda görüneceği belirtilir. Soru başına anlık sonuç (doğru/yakın/ıskaladı) gösterilmez.
+3. Tahmini kilitler.
+4. Doğrudan sonraki soruya geçilir (ara ekran yok); kilitle düğmesinin altında yanıtların tüm sorular bitince en sonda görüneceği belirtilir. Soru başına anlık sonuç (doğru/yakın/ıskaladı) gösterilmez.
 
 Oyuncu turunu tamamladığında bir sonraki soruya geçer. İki oyuncu da turunu bitirince oda `result_ready` durumuna geçer ve sonuçlar açılır.
 
-#### Güven seviyesi
+#### Güven seviyesi (kaldırıldı)
 
-Oyuncu her tahmin için bir güven seviyesi seçer:
-
-- Tahmin (çarpan ×1)
-- Sanırım (çarpan ×2)
-- Eminim (çarpan ×3)
-
-Güven seviyesi tahminin puan ağırlığını belirler. Emin olup tutturmak daha çok puan kazandırır; emin olup ıskalamak küçük bir risk taşır. Bu katman, basit evet/hayır mekaniğini küçük bir bahis oyununa çevirir ve sonuç ekranında "Sefa sana çok güvendi ve haklı çıktı" gibi konuşkan çıktılar üretir.
+"Tahmin / Sanırım / Eminim" seçimi 2026-11-28'de tüm modlardan kaldırıldı: okuma skoruna ve sonuç ekranına etkisi yoktu, akışı uzatıyordu.
 
 #### Anlık sonuç yok (mikro-reveal kaldırıldı)
 
@@ -298,7 +291,7 @@ Oda oluşturma **iki adımlı sihirbazdır** (web mobil/masaüstü ve mobil uygu
 
 1. Kullanıcı "Cevaplamaya Başla" butonuna tıklar.
 2. Soruları sırayla görür.
-3. Her soruda tek ekranda: önce kendi cevabını verir, sonra partnerinin cevabını tahmin eder ve tahminine güven seviyesi ekler.
+3. Her soruda tek ekranda: önce kendi cevabını verir, sonra partnerinin cevabını tahmin eder.
 4. Tahmini kilitler ve doğrudan sonraki soruya geçer (ara ekran ve anlık sonuç yok; yanıtlar en sonda).
 5. Kendi cevapları gizli tutulur.
 6. Tüm sorular tamamlandığında status `owner_completed` olur.
@@ -372,7 +365,7 @@ Kullanıcı Supabase Auth ile (Google / Apple) giriş yapmıştır. Bu model **y
 ### 9.4 Partnerin (guest) tur akışı
 
 1. Partner soruları sırayla görür.
-2. Her soruda tek ekranda: önce kendi cevabını verir, sonra ilk kullanıcının cevabını tahmin eder ve güven seviyesi ekler.
+2. Her soruda tek ekranda: önce kendi cevabını verir, sonra ilk kullanıcının cevabını tahmin eder.
 3. İlk kullanıcı turunu bitirmiş olsa da partner de anlık sonuç görmez; kilitleyince doğrudan sonraki soruya geçer.
 4. Tüm sorular tamamlandığında status `guest_completed` olur.
 5. İki taraf da turunu tamamladığı için sonuç hesaplama tetiklenir.
@@ -674,7 +667,6 @@ Secret Choice oyun ekranı tek soruda iki bölümlü birleştirilmiş tur yapıs
 - Bölüm 1 — Kendi cevabın: cevap seçenekleri (gizli tutulur); başlık karşı oyuncunun adını kullanır ("Kendi cevabın — Deniz görmez")
 - Bölüm 2 — Karşı tarafı tahmin: aynı seçenekler, farklı vurgu rengi (başlık karşı oyuncunun adıyla: "Deniz ne cevap verir?"; ad henüz bilinmiyorsa ilişki türüne göre: "Kankan / Sevgilin / Eşin ne cevap verir?"). Kendi cevabı tamamlanınca bu bölüm ekranın altında kalıyorsa sayfa oraya yumuşakça kayar (soru başına bir kez)
 - Evet / Kararsız / Hayır renk dili: yeşil / turuncu / kırmızı; seçili durum renkli çerçeve + dolgu + tik, seçilmemişler ince çerçeveli (yalnızca renge bağlı kalmaz)
-- Güven seviyesi seçimi (tahmin / sanırım / eminim)
 - Mikro açıklama
 - "Tahmini kilitle" butonu ve altında küçük not: "Yanıtlar, tüm soruları cevapladıktan sonra en sonda görünecek."
 
@@ -771,7 +763,6 @@ Durumlar:
 - Her soru tek ekranda tamamlanmalı; cevap ve tahmin için oda içinde ileri-geri geçiş olmamalı.
 - Akış kısa hissettirmeli; oyuncu mümkün olduğunca az bekleme ve az tıklama ile oynamalı.
 - Soru başına anlık sonuç gösterilmez; kilitleyince doğrudan sonraki soruya geçilir (ara ekran yok); akış partner verisinin durumundan bağımsızdır.
-- Güven seviyesi seçimi akışı uzatmamalı; tek dokunuşla seçilebilmeli.
 - Ton sıcak, yumuşak ve yargılayıcı olmayan bir dilde olmalı.
 - "Mükemmel eşleşme", "ilişkiniz kötü" gibi teşhis edici metinlerden kaçınılmalı.
 - Sonuçlar kullanıcıyı konuşmaya teşvik etmeli.
@@ -1132,8 +1123,8 @@ Kural:
 | predictor_participant_id | uuid | Tahmini yapan kişi |
 | target_participant_id | uuid | Tahmin edilen kişi |
 | predicted_value | text/jsonb | Tahmin değeri |
-| confidence_level | text | Güven seviyesi: guess / think / sure |
-| confidence_multiplier | int | Güven çarpanı: 1 / 2 / 3 (yalnızca sonuç yorumları/anlatım için; okuma skoruna yansımaz) |
+| confidence_level | text | Kullanılmıyor (güven seviyesi kaldırıldı); varsayılanda kalır |
+| confidence_multiplier | int | Kullanılmıyor; varsayılanda kalır |
 | locked_at | timestamptz | Tahminin kilitlendiği zaman |
 | created_at | timestamptz | Oluşturulma zamanı |
 

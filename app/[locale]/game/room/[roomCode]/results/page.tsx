@@ -32,12 +32,10 @@ interface QuestionResult {
   partnerAnswer: unknown;
   myPrediction: {
     predictedValue: unknown;
-    confidenceLevel: string;
     result: RevealResult | null;
   } | null;
   partnerPredictionOfMe: {
     predictedValue: unknown;
-    confidenceLevel: string;
     result: RevealResult | null;
   } | null;
   /** Yalnızca blöf modunda */

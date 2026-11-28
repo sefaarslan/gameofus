@@ -176,8 +176,6 @@
       "lock": "Confirmar predicción",
       "score": "Puntuación de lectura",
       "greatMatch": "¡Gran sintonía!",
-      "correct": "¡Correcto! 🎉",
-      "points": "+3 pts",
       "partnerName": "Alex"
     },
     "joinByCode": {
@@ -380,7 +378,6 @@
     "yourAnswer": "Tu respuesta",
     "yourAnswerNote": "no se muestra a tu {rel, select, friend {amigo} other {pareja}}",
     "partnerGuess": "¿Qué respondería tu {rel, select, friend {amigo} other {pareja}}?",
-    "confidence": "¿Qué tan seguro/a estás?",
     "lock": "Confirmar predicción",
     "locking": "Guardando...",
     "answersAtEnd": "Las respuestas aparecerán al final, cuando hayas respondido todas las preguntas.",
@@ -435,11 +432,6 @@
     "yes": "Sí",
     "unsure": "No sé",
     "no": "No"
-  },
-  "confidence": {
-    "guess": "Adivino",
-    "think": "Creo que sí",
-    "sure": "Estoy seguro/a"
   },
   "waiting": {
     "title": "¡Terminaste!",

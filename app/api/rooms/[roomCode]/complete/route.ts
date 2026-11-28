@@ -164,7 +164,7 @@ async function calculateResults(
       .eq("room_id", roomId),
     supabase
       .from("predictions")
-      .select("predictor_participant_id, target_participant_id, question_id, predicted_value, confidence_level, confidence_multiplier")
+      .select("predictor_participant_id, target_participant_id, question_id, predicted_value")
       .eq("room_id", roomId),
     supabase
       .from("room_questions")
@@ -260,7 +260,6 @@ async function calculateResults(
             predictorId: p.predictor_participant_id,
             targetId: p.target_participant_id,
             predictedValue: p.predicted_value,
-            confidenceLevel: p.confidence_level,
             result,
           };
         }),

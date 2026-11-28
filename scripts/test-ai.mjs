@@ -27,23 +27,24 @@ ok(ageBandFor(null, now) === null && ageBandFor("saçma", now) === null, "boş/g
 const q = (over = {}) => ({
   mode: "secret_choice", tag: "t", text: "Soru?", options: null,
   answerA: { value: "yes" }, answerB: { value: "no" },
-  guessAboutB: { value: { value: "yes" }, confidence: "sure" },   // A, B'yi yanlış bildi (eminim)
-  guessAboutA: { value: { value: "yes" }, confidence: "guess" },  // B, A'yı doğru bildi
+  guessAboutB: { value: { value: "yes" } },   // A, B'yi yanlış bildi
+  guessAboutA: { value: { value: "yes" } },  // B, A'yı doğru bildi
   ...over,
 });
 const room = (over = {}) => ({
   locale: "tr", relationshipType: "friend", nameA: "Deniz", nameB: "Elif",
   profileA: { gender: "female", ageBand: "25-34" }, profileB: { gender: "male", ageBand: null },
-  questions: [q(), q({ answerB: { value: "yes" }, guessAboutB: { value: { value: "yes" }, confidence: "think" } })],
+  questions: [q(), q({ answerB: { value: "yes" }, guessAboutB: { value: { value: "yes" } } })],
   ...over,
 });
 let d = buildDigest(room());
 ok(d.questions[0].relation === "different" && d.questions[1].relation === "same", "benzerlik: yes↔no farklı, yes↔yes aynı");
 ok(d.facts.some((f) => f.kind === "biggest_difference" && f.mustCover && f.sentence.startsWith("Deniz answered Yes while Elif answered No")), "en büyük farklılık: doğru kişiye atıf + zorunlu işareti");
-// 4 farklı cevap: ilk üçü iki ıskalı, dördüncüsü tek ıskalı → dördüncüsü "en büyük 3"e girmez ve confident-ıska olgusu olarak gelir
-const diff = (over = {}) => q({ guessAboutB: { value: { value: "yes" }, confidence: "guess" }, guessAboutA: { value: { value: "no" }, confidence: "guess" }, ...over });
-d = buildDigest(room({ questions: [diff(), diff(), diff(), diff({ guessAboutB: { value: { value: "yes" }, confidence: "sure" }, guessAboutA: { value: { value: "yes" }, confidence: "guess" } })] }));
-ok(d.facts.some((f) => f.kind === "sure_but_missed" && f.sentence.startsWith("Deniz was very sure that Elif")), "sure_but_missed cümlesi doğru kişiye atfediyor");
+// 4 farklı cevap: ilk üçü iki ıskalı, dördüncüsü tek ıskalı → dördüncüsü "en büyük 3"e girmez ve ıska olgusu olarak gelir
+const diff = (over = {}) => q({ guessAboutB: { value: { value: "yes" } }, guessAboutA: { value: { value: "no" } }, ...over });
+d = buildDigest(room({ questions: [diff(), diff(), diff(), diff({ guessAboutB: { value: { value: "yes" } }, guessAboutA: { value: { value: "yes" } } })] }));
+ok(d.facts.some((f) => f.kind === "missed_guess" && f.sentence.startsWith("Deniz guessed that Elif")), "missed_guess cümlesi doğru kişiye atfediyor");
+ok(!JSON.stringify(d).match(/very sure|fairly sure|confidence/i), "güven seviyesi modele gitmez");
 d = buildDigest(room());
 ok(d.summary.readingScore.Deniz === 50 && d.summary.readingScore.Elif === 100 && d.summary.betterReader === "Elif", "okuma skorları ve daha iyi okuyan");
 ok(d.profiles === undefined || !JSON.stringify(d.profiles).includes("gender"), "tr odasında cinsiyet modele GİTMEZ");
@@ -61,15 +62,15 @@ ok(d.players[0].length <= 30 && !d.players[0].includes("\n"), "uzun/çok satırl
 const ol = (over = {}) => ({
   mode: "orderline", tag: "t", text: "Sırala:", options: [{ id: "1", text: "Kahvaltı" }, { id: "2", text: "Spor" }, { id: "3", text: "Kahve" }, { id: "4", text: "Sessizlik" }],
   answerA: { order: ["1", "2", "3", "4"] }, answerB: { order: ["1", "2", "4", "3"] },
-  guessAboutB: { value: { order: ["4", "3", "2", "1"] }, confidence: "sure" }, guessAboutA: { value: { order: ["1", "2", "3", "4"] }, confidence: "guess" }, ...over,
+  guessAboutB: { value: { order: ["4", "3", "2", "1"] } }, guessAboutA: { value: { order: ["1", "2", "3", "4"] } }, ...over,
 });
 const O = { a: ["1", "2", "3", "4"], close: ["1", "2", "4", "3"], rev: ["4", "3", "2", "1"] };
-const olq = (answerB, gB, gA, conf = "guess") => ol({ answerA: { order: O.a }, answerB: { order: answerB }, guessAboutB: { value: { order: gB }, confidence: conf }, guessAboutA: { value: { order: gA }, confidence: conf } });
+const olq = (answerB, gB, gA) => ol({ answerA: { order: O.a }, answerB: { order: answerB }, guessAboutB: { value: { order: gB } }, guessAboutA: { value: { order: gA } } });
 d = buildDigest(room({ questions: [
   olq(O.a, O.a, O.a),                 // aynı sıralama, ikisi de doğru → answered_alike
   olq(O.close, O.close, O.a),         // yakın sıralama, ikisi de doğru → answered_similarly
   olq(O.rev, O.rev, O.a),             // zıt sıralama → biggest_difference
-  olq(O.a, O.rev, O.a, "sure"),       // aynı sıralama ama A, B'yi yanlış tahmin etti → same_answer_wrong_guess
+  olq(O.a, O.rev, O.a),       // aynı sıralama ama A, B'yi yanlış tahmin etti → same_answer_wrong_guess
 ] }));
 const sentences = d.facts.map((f) => f.sentence).join("\n");
 ok(d.facts.every((f) => f.mode === "orderline"), "olgularda mod bilgisi var");
@@ -91,8 +92,7 @@ const t = (tag, over = {}) => q({ tag, ...over });
 d = buildDigest(room({ questions: [t("conflict_style"), t("conflict_cooling"), t("evening_style", { answerB: { value: "yes" } })] }));
 ok(d.facts.filter((f) => f.theme === "communication and conflict style").every((f) => f.sensitive === true), "hassas olgular işaretlenir (sensitive: true)");
 ok(!d.facts.some((f) => f.sensitive && ["answered_alike", "answered_similarly", "both_read_each_other_correctly"].includes(f.kind)), "hassas konularda kutlama olguları (aynı cevap / ikisi de doğru) HİÇ gönderilmez");
-ok(d.awardBases.every((b) => !/conflict/.test(b)), "ödül temelleri hassas konulardan çıkmaz");
-ok(d.facts.some((f) => f.sensitive && ["biggest_difference", "same_answer_wrong_guess", "sure_but_missed"].includes(f.kind)), "hassas konuda yalnızca farklılık / ıska olguları gider");
+ok(d.facts.some((f) => f.sensitive && ["biggest_difference", "same_answer_wrong_guess", "missed_guess"].includes(f.kind)), "hassas konuda yalnızca farklılık / ıska olguları gider");
 ok(!d.facts.some((f) => f.theme === "daily rhythm and habits" && f.sensitive), "gündelik olgu hassas işaretlenmez");
 ok(!d.patterns.some((p) => /communication and conflict style/.test(p) && /every single time|read each other right/.test(p)), "hassas temada olumlu örüntü (hep aynı / hep doğru) üretilmez");
 d = buildDigest(room({ questions: [t("tradition", { answerB: { value: "yes" } }), t("rules_following", { answerB: { value: "yes" } }), t("evening_style")] }));
@@ -105,12 +105,12 @@ ok(/SCORE BAND MEDIUM/.test(toneFor({ ...d, summary: { ...d.summary, scoreBand: 
 ok(/SCORE BAND HIGH/.test(toneFor({ ...d, summary: { ...d.summary, scoreBand: "high", readingScore: { a: 90, b: 85 } } })), "ton: yüksek band → kutlama");
 ok(!/funny plot twists/.test(lowTone), "ton: düşük skorda ıskalar 'komik ters köşe' diye küçültülmez");
 ok(/noticeably better/.test(toneFor({ ...d, summary: { ...d.summary, readingScore: { a: 90, b: 50 } } })), "ton: büyük fark → utandırma yok");
-const vv = { headline: "h", summary: "s", strengths: ["a", "b", "c"], blindSpots: ["a", "b"], conversationStarters: ["a", "b", "c"], awards: [{ title: "t", text: "x" }, { title: "t", text: "x" }, { title: "t", text: "x" }] };
+const vv = { headline: "h", summary: "s", strengths: ["a", "b", "c"], blindSpots: ["a", "b"], conversationStarters: ["a", "b", "c"] };
 ok(qualityIssues({ ...vv, summary: "Siz uyumsuz bir çiftsiniz" }, [], "tr").length === 1, "ilişki hükmü ('uyumsuz') yakalanır");
 ok(qualityIssues({ ...vv, summary: "Belki bir terapiste gidin" }, [], "tr").length === 1, "terapi dili yakalanır");
 ok(qualityIssues({ ...vv, summary: "Kahve sohbeti sizi rahatlatıyor" }, [], "tr").length === 0, "normal metin temiz kalır");
 
-// ── v2.2: sayısal özet, skor bandı, en büyük farklılıklar, "aynı cevap yanlış tahmin", ödül temelleri ─────────────
+// ── v2.2: sayısal özet, skor bandı, en büyük farklılıklar, "aynı cevap yanlış tahmin" ─────────────
 const lowD = buildDigest(await buildFakeRoom({ lang: "tr", relationshipType: "dating", seed: 5, scenario: "low" }));
 const lt = lowD.summary.guessTotals;
 ok(lowD.summary.overallScore === 45 && lowD.summary.scoreBand === "low", "düşük senaryo: Okuma Skoru 45, band low");
@@ -123,33 +123,31 @@ ok(lowMust.filter((f) => f.kind === "same_answer_wrong_guess").length >= 2, "'ay
 ok(lowD.facts.slice(0, lowMust.length).every((f) => f.mustCover), "zorunlu olgular listenin başında");
 ok(lowMust.filter((f) => f.kind === "same_answer_wrong_guess").every((f) => /MORE ALIKE than you think/.test(f.sentence) && /NOT a deliberate agreement/.test(f.sentence)), "'aynı cevap yanlış tahmin': 'sandığınızdan çok benziyorsunuz' çerçevesi, bilinçli anlaşma değil");
 ok(!lowD.facts.some((f) => ["answered_alike", "answered_similarly"].includes(f.kind) && lowMust.some((m) => m.question === f.question)), "ıskalı 'aynı cevap' olumlu olgu olarak da gönderilmez (uydurma 'gizli anlaşma' kaynağı)");
-ok(lowD.awardBases.length >= 2 && lowD.awardBases.every((b) => /^Basis for an award/.test(b)), "ödül temelleri üretildi ve etiket gibi değil açıklama biçiminde");
 const highD = buildDigest(await buildFakeRoom({ lang: "tr", relationshipType: "dating", seed: 6, scenario: "high" }));
 ok(highD.summary.overallScore === 85 && highD.summary.scoreBand === "high" && highD.summary.guessTotals.wrong === 3, "yüksek senaryo: skor 85, band high, 3 yanlış");
 ok(/SCORE BAND HIGH/.test(toneFor(highD)) && /SCORE BAND LOW/.test(toneFor(lowD)), "ton skor bandına bağlı");
 // Farklılıklar mod önceliğine değil MESAFEYE göre seçilir: kısmi sıralama farkı (mesafe 2/6) evet/hayır zıtlığının (1) önüne geçmez
-const prDiff = { mode: "prediction", tag: "t", text: "?", options: [{ id: "1", text: "Bir" }, { id: "2", text: "İki" }, { id: "3", text: "Üç" }, { id: "4", text: "Dört" }], answerA: { option_id: "1" }, answerB: { option_id: "3" }, guessAboutB: { value: { option_id: "3" }, confidence: "guess" }, guessAboutA: { value: { option_id: "1" }, confidence: "guess" } };
-const scOpp = q({ guessAboutB: { value: { value: "no" }, confidence: "guess" }, guessAboutA: { value: { value: "yes" }, confidence: "guess" } });
+const prDiff = { mode: "prediction", tag: "t", text: "?", options: [{ id: "1", text: "Bir" }, { id: "2", text: "İki" }, { id: "3", text: "Üç" }, { id: "4", text: "Dört" }], answerA: { option_id: "1" }, answerB: { option_id: "3" }, guessAboutB: { value: { option_id: "3" } }, guessAboutA: { value: { option_id: "1" } } };
+const scOpp = q({ guessAboutB: { value: { value: "no" } }, guessAboutA: { value: { value: "yes" } } });
 const olPart = olq(["2", "1", "4", "3"], ["2", "1", "4", "3"], O.a); // iki komşu takas → "farklı" ama mesafe küçük
 const olFull = olq(O.rev, O.rev, O.a);
 d = buildDigest(room({ questions: [olPart, scOpp, prDiff, olFull] }));
 ok(d.highlights.different.length === 3 && !d.highlights.different.includes(1) && [2, 3, 4].every((n) => d.highlights.different.includes(n)), "farklılıklar mesafeye göre seçilir (kısmi sıralama farkı elenir)");
 
 // ── Şema ve kalite kuralları ────────────────────────────────────────────────
-const valid = { headline: "h", summary: "s", strengths: ["a", "b", "c"], blindSpots: ["a", "b"], conversationStarters: ["a", "b", "c"], awards: [{ title: "t", text: "x" }, { title: "t", text: "x" }, { title: "t", text: "x" }] };
+const valid = { headline: "h", summary: "s", strengths: ["a", "b", "c"], blindSpots: ["a", "b"], conversationStarters: ["a", "b", "c"] };
 ok(commentarySchema.safeParse(valid).success, "geçerli yorum şemadan geçer");
 ok(!commentarySchema.safeParse({ ...valid, strengths: ["a"] }).success, "3 yerine 1 güçlü yön reddedilir");
 ok(!commentarySchema.safeParse({ ...valid, extra: 1 }).success, "fazladan alan reddedilir");
 ok(!commentarySchema.safeParse({ ...valid, headline: "" }).success, "boş başlık reddedilir");
-ok(!commentarySchema.safeParse({ ...valid, awards: [{ title: "t", text: "x" }] }).success, "3 yerine 1 ödül reddedilir");
-ok(!commentarySchema.safeParse({ ...valid, awards: [{ title: "t" }, { title: "t", text: "x" }, { title: "t", text: "x" }] }).success, "metinsiz ödül reddedilir");
 ok(qualityIssues({ ...valid, strengths: ["Ortak zemin bulmanız harika", "b", "c"] }, [], "tr").length === 1, "klişe ('ortak zemin') yakalanır");
-ok(qualityIssues({ ...valid, awards: [{ title: "Yüzde 70", text: "%70 uyum" }, ...valid.awards.slice(1)] }).length >= 1, "ödül metinleri de denetlenir (yüzde)");
 ok(qualityIssues({ ...valid, summary: "Yüzde 70 değil, %70 uyum" }).length === 1, "yüzde kullanımı yakalanır");
 ok(qualityIssues({ ...valid, summary: "soru 3 harikaydı" }).length === 1, "soru numarası sızıntısı yakalanır");
 ok(COMMENTARY_JSON_SCHEMA.schema.additionalProperties === false, "sağlayıcı şeması ek alanı yasaklıyor");
+ok(!("awards" in COMMENTARY_JSON_SCHEMA.schema.properties) && !commentarySchema.safeParse({ ...valid, awards: [] }).success, "ödül kartları kaldırıldı: şemada yok, gönderilirse reddedilir");
+ok(!/award/i.test(JSON.stringify(buildDigest(room()))), "modele giden özette ödül bilgisi yok");
 
-// ── v2.2 koruma kuralları: skor bandı dili, alıntı, hitap, ödül başlığı dili ──────────────────────────
+// ── v2.2 koruma kuralları: skor bandı dili, alıntı, hitap ──────────────────────────
 const lowCtx = { band: "low" };
 ok(qualityIssues({ ...valid, headline: "Aynı dalgada sörf yapıyorsunuz!" }, [], "tr", lowCtx).length === 1, "düşük skor: 'aynı dalgada' başlığı reddedilir");
 ok(qualityIssues({ ...valid, summary: "Birkaç komik yanılgı yaşadınız" }, [], "tr", lowCtx).length === 1, "düşük skor: 'birkaç komik yanılgı' (ıskayı küçültme) reddedilir");
@@ -162,8 +160,6 @@ ok(qualityIssues({ ...valid, summary: 'Siz "Nazikçe ben şöyle biliyorum derim
 ok(qualityIssues({ ...valid, summary: 'İkiniz de "Evet" dediniz' }, [], "tr", { quotable }).length === 0, "kısa alıntı serbest");
 ok(qualityIssues({ ...valid, summary: "Deniz ve Elif aynı cevabı vermiş" }, ["Deniz", "Elif"], "tr").length === 1, "çift üçüncü kişi olarak anılırsa reddedilir (hitap tutarlılığı)");
 ok(qualityIssues({ ...valid, summary: "Deniz sakin kalır, Elif karşılık verir" }, ["Deniz", "Elif"], "tr").length === 0, "kişiler ayrı ayrı adla anılabilir");
-ok(qualityIssues({ ...valid, awards: [{ title: "Plot-twist Award", text: "x" }, ...valid.awards.slice(1)] }, [], "tr").length === 1, "tr/es ödül başlığında İngilizce etiket reddedilir");
-ok(qualityIssues({ ...valid, awards: [{ title: "Plot-twist Award", text: "x" }, ...valid.awards.slice(1)] }, [], "en").length === 0, "en ödül başlığı serbest");
 
 ok(isSoftIssue(qualityIssues({ ...valid, strengths: ["Ortak zemin bulmanız harika", "b", "c"] }, [], "tr")[0]), "klişe sorunu 'yumuşak'");
 ok(!isSoftIssue(qualityIssues({ ...valid, summary: "%70 uyum" })[0]) && !isSoftIssue(qualityIssues({ ...valid, headline: "Aynı dalgada" }, [], "tr", { band: "low" })[0]), "yüzde ve düşük skor dili 'sert' (asla kabul edilmez)");

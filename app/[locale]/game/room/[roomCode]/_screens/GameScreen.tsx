@@ -7,7 +7,6 @@ import { oppositeChoice, type Choice } from "@/lib/bluff";
 import { BluffIntro, CHOICE_STYLES, FinishStep, LieCard, shouldShowBluffIntro, type MyBluffAnswer, type PlayedAnswer } from "./bluff";
 
 type QuestionMode = "secret_choice" | "prediction" | "orderline";
-type ConfidenceLevel = "guess" | "think" | "sure";
 type ScChoice = "yes" | "unsure" | "no";
 
 interface Question {
@@ -229,13 +228,11 @@ export function GameScreen({
 }: GameScreenProps) {
   const t = useTranslations("game");
   const rel = relKey(relationshipType);
-  const tConf = useTranslations("confidence");
   const modeLabels = useModeLabels();
 
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [myAnswer, setMyAnswer] = useState<ScChoice | string | string[] | null>(null);
   const [myPrediction, setMyPrediction] = useState<ScChoice | string | string[] | null>(null);
-  const [confidence, setConfidence] = useState<ConfidenceLevel>("guess");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Kilitleyince geri bildirim: düğme kısa süre "✓ Kaydedildi" olur, içerik solup yeni soru kayarak gelir
@@ -283,7 +280,6 @@ export function GameScreen({
     setCurrentIndex((i) => i + 1);
     setMyAnswer(null);
     setMyPrediction(null);
-    setConfidence("guess");
     setLieOn(false);
     setError(null);
   }
@@ -306,7 +302,6 @@ export function GameScreen({
           answerValue,
           ...(lying ? { isLie: true } : {}),
           predictedValue: buildValue(question.mode, myPrediction!),
-          confidenceLevel: confidence,
         }),
       });
       const data = await res.json();
@@ -380,12 +375,6 @@ export function GameScreen({
       />
     );
   }
-
-  const confidenceLevels: Array<{ level: ConfidenceLevel; icon: string }> = [
-    { level: "guess", icon: "psychology" },
-    { level: "think", icon: "lightbulb" },
-    { level: "sure", icon: "verified" },
-  ];
 
   const progress = ((currentIndex + 1) / questions.length) * 100;
   const liesTold = played.filter((a) => a.shownValue != null).length;
@@ -513,28 +502,6 @@ export function GameScreen({
               variant="prediction"
             />
           )}
-
-          {/* Confidence pills */}
-          <div className="mt-4 space-y-2">
-            <p className="text-label-md text-on-surface-variant text-center">{t("confidence")}</p>
-            <div className="grid grid-cols-3 gap-2 sm:flex sm:justify-center">
-              {confidenceLevels.map(({ level, icon }) => (
-                <button
-                  key={level}
-                  type="button"
-                  onClick={() => setConfidence(level)}
-                  className={`flex items-center justify-center gap-1.5 min-w-0 px-2 sm:px-5 py-1.5 rounded-full text-label-md whitespace-nowrap transition-all ${
-                    confidence === level
-                      ? "border border-transparent bg-tertiary-container text-on-tertiary shadow-md"
-                      : "border border-outline-variant bg-surface text-on-surface-variant hover:bg-surface-container"
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-base">{icon}</span>
-                  {tConf(level)}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Error */}

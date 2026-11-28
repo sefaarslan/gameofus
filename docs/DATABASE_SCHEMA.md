@@ -28,7 +28,7 @@ bu doküman onların okunabilir özetidir. Çelişkide migration'lar geçerlidir
 | `participant_role` | `owner`, `guest` |
 | `participant_status` | `invited`, `joined`, `playing`, `completed` |
 | `game_mode` | `secret_choice`, `prediction`, `orderline`, `mixed`, `bluff` (`questions.mode` yalnızca ilk üçünü kullanır; `bluff` yalnızca `rooms.game_mode`) |
-| `confidence_level` | `guess` (×1), `think` (×2), `sure` (×3) |
+| `confidence_level` | `guess`, `think`, `sure` — **kullanılmıyor** (güven seviyesi kaldırıldı; yeni kayıtlar varsayılan `guess`) |
 | `rooms.relationship_type` | `friend`, `dating`, `partner` (check; nullable) |
 | `categories.relationship_types` | bu üç değerin boş olmayan alt kümesi (`text[]`) |
 | `feedback.wants_ai` | `yes`, `maybe`, `no` |

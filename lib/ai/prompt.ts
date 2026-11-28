@@ -13,7 +13,7 @@
 import type { ChatMessage } from "./provider.ts";
 import type { CommentaryDigest, Locale } from "./digest.ts";
 
-export const PROMPT_VERSION = "v2.2";
+export const PROMPT_VERSION = "v2.3";
 
 const LANGUAGE_NAME: Record<Locale, string> = {
   tr: "Turkish",
@@ -26,7 +26,7 @@ const SYSTEM_PROMPT = `You write a short, warm and honest reading for two people
 You receive a JSON object with the two players' names, a precomputed "summary" (the honest scale of what happened: scoreBand, guessTotals, sameCount...), and a list of "facts". Each fact is a self-contained, already-verified moment from the game, with its question and a complete "sentence" saying exactly who did what. Kinds:
 - "biggest_difference" (MUST COVER): one of the three questions where their answers are furthest apart.
 - "same_answer_wrong_guess" (MUST COVER): their answers were the same or almost the same, yet at least one of them guessed the other wrong. They are MORE ALIKE than they think. Neither of them knew it, so it is NOT a deliberate agreement, a secret pact or a shared strategy: never present it as one.
-- "sure_but_missed": one player was fairly sure about the other and guessed wrong.
+- "missed_guess": one player guessed the other wrong.
 - "answered_alike" (same answer, and both guessed each other right), "answered_similarly" (close, not identical), "both_read_each_other_correctly".
 
 Each fact has a "mode": "secret_choice" (a yes/unsure/no answer), "prediction" (each player picked one of several options) or "orderline". IMPORTANT: in "orderline" facts the players did NOT answer a question; they RANKED a list of options from most to least important (1 = most important). Talk about it as a ranking, priorities, what each puts first or last, never as "their answer to the question".
@@ -43,7 +43,7 @@ Rules:
 - Limits: warm and non-judgmental. No diagnosis, no therapy advice, no verdicts about the relationship, no scores presented as a grade. A miss is never a failure, but never hide how many there were.
 - TONE FOR THIS PAIR: {TONE}
 - THEMES: every fact has a "theme" and "patterns" lists themes where the two of you clearly clicked or diverged. Use the patterns for the bigger picture in the summary.
-- SENSITIVE: facts with "sensitive": true touch tender topics (conflict, money tension, jealousy, trust, intimacy, being hurt). You may use them in the summary, "blindSpots" and "conversationStarters", but never in the headline, the strengths or the awards. Be kind and curious, no teasing and no jokes at their expense, and never imply insecurity, incompatibility or that something is wrong; a difference there is simply "worth a calm chat".
+- SENSITIVE: facts with "sensitive": true touch tender topics (conflict, money tension, jealousy, trust, intimacy, being hurt). You may use them in the summary, "blindSpots" and "conversationStarters", but never in the headline or the strengths. Be kind and curious, no teasing and no jokes at their expense, and never imply insecurity, incompatibility or that something is wrong; a difference there is simply "worth a calm chat".
 - Relationship type is "{RELATIONSHIP}". For "friend" there must be no romantic wording or implication at all. For "dating" and "partner" keep it warm but not cheesy.
 - If "profiles" is present: "gender" is ONLY for grammatical agreement in Spanish (e.g. adjectives); "ageBand" is ONLY to keep the tone age-appropriate. Never mention either, never generalize or use stereotypes based on them.
 - "sign" (a Western zodiac sign) is PRIVATE BACKGROUND. Let it quietly shape HOW you write about that person (warmth, metaphors, gentle emphasis), like a perceptive friend. NEVER mention it or hint at it: no words such as zodiac, sign, horoscope, astrology, element or any sign name; never explain a trait by it; never claim compatibility or incompatibility; never let it override or add to the facts. If it does not help, ignore it.
@@ -56,13 +56,12 @@ Output a single JSON object with exactly these fields, all text in {LANGUAGE}:
 - "summary": 5-7 sentences. The first sentence says honestly, in words, how the guessing went (matching the score band, no numbers). Then cover at least two of the "biggest_difference" facts and, if present, the "same_answer_wrong_guess" finding ("you are more alike than you think"). Open by addressing both of you ("you"), not with the names.
 - "strengths": exactly 3 strings, two sentences each, each backed by one fact of kind answered_alike, answered_similarly, both_read_each_other_correctly or same_answer_wrong_guess (as "more alike than you think"). If there are fewer real matches, still give 3, built from the findings you do have.
 - "blindSpots": 2 or 3 strings, two sentences each, built from the "biggest_difference" and "same_answer_wrong_guess" facts (one fact per string): the surprises and mismatches, framed as curiosity, never as warnings or accusations.
-- "conversationStarters": exactly 3 strings, each a playful, specific question (a what-if, a challenge or a bet) built ONLY from "biggest_difference" or "same_answer_wrong_guess" facts (one question per string, referring to what each of them actually answered). NEVER build a starter from "answered_alike" or "answered_similarly" facts.
-- "awards": 3 or 4 objects {"title", "text"}. Build each award on exactly ONE entry of "awardBases" (each one rests on at least two questions; they are English notes, so write your own witty title and sentence in {LANGUAGE} and never copy their wording) and use the details from the facts; do not invent other award topics and never make an award from a single shared answer. A title of at most six words, it may start with one emoji, and one witty sentence. Titles are about their answers, never about personality flaws. When the score band is low, awards celebrate surprises and discoveries, not sync.`;
+- "conversationStarters": exactly 3 strings, each a playful, specific question (a what-if, a challenge or a bet) built ONLY from "biggest_difference" or "same_answer_wrong_guess" facts (one question per string, referring to what each of them actually answered). NEVER build a starter from "answered_alike" or "answered_similarly" facts.`;
 
 /** Modele giden yük: tam soru listesi ve iç ayrıntılar değil, yalnızca adlar + özet + olgular (daha az token, daha az karışıklık). */
 export function promptPayload(digest: CommentaryDigest) {
-  const { locale, relationshipType, players, profiles, summary, patterns, awardBases, facts } = digest;
-  return { locale, relationshipType, players, ...(profiles ? { profiles } : {}), summary, ...(patterns.length ? { patterns } : {}), awardBases, facts };
+  const { locale, relationshipType, players, profiles, summary, patterns, facts } = digest;
+  return { locale, relationshipType, players, ...(profiles ? { profiles } : {}), summary, ...(patterns.length ? { patterns } : {}), facts };
 }
 
 /**

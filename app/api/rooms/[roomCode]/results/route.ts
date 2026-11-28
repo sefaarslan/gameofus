@@ -109,7 +109,6 @@ export async function GET(
       predictorId: string;
       targetId: string;
       predictedValue: unknown;
-      confidenceLevel: string;
       result: string | null;
     }>;
   };
@@ -180,14 +179,12 @@ export async function GET(
       myPrediction: myPrediction
         ? {
             predictedValue: myPrediction.predictedValue,
-            confidenceLevel: myPrediction.confidenceLevel,
             result: myPrediction.result,
           }
         : null,
       partnerPredictionOfMe: partnerPredictionOfMe
         ? {
             predictedValue: partnerPredictionOfMe.predictedValue,
-            confidenceLevel: partnerPredictionOfMe.confidenceLevel,
             result: partnerPredictionOfMe.result,
           }
         : null,
